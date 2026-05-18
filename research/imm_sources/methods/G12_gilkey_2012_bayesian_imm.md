@@ -8,14 +8,18 @@ nasa_tp: NASA/TP-2012-217120
 doi: null
 url: https://core.ac.uk/download/pdf/10569519.pdf
 ntrs: https://ntrs.nasa.gov/citations/20120013096
-mcp_tool_used: firecrawl-mcp
+onedrive_share: https://1drv.ms/b/c/6122c89c30f64940/IQBASfYwnMgiIIBhuKMBAAAAAbJ3m4Xb44drHcOihAAxjRc
+mcp_tool_used: firecrawl-mcp (CORE) + ocr-pipeline (Mistral mistral-ocr-latest) on NTRS original
 fetched_utc: 2026-05-18T21:22:35+00:00
+reverified_utc: 2026-05-18T22:50:00+00:00
 verified: true
+cross_source_verified: true  # CORE republication + NTRS original 20120013096.pdf (md5 28897e5168c3b501fb793f9dc61a4e8f) cross-OCR'd 2026-05-18; equations and convergence rule match
 pages: 46
 spec_sections_supported:
   - "3.6 Lognormal-Poisson MCMC"
   - "Section 7 PyMC notebook spec"
   - "Section 9 V&V convergence rule"
+  - "Appendix B (CI -> EF conversion) — referenced by Selectron prior-elicitation helper"
 authors_full:
   - Gilkey, K. M.
   - McRae, M. P.
@@ -24,16 +28,161 @@ authors_full:
   - Myers, J. G.
 notes: |
   Primary method paper. Lognormal prior + Poisson likelihood + WinBUGS Gibbs
-  sampling. 75,000 MC samples; convergence rule = MC error < 5% of sample mean
+  sampling. 75 000 MC samples; convergence rule = MC error < 5 % of sample mean
   OR Brooks-Gelman-Rubin statistic < 1.2 (whichever first). Both conditions
-  achieved with 75k samples per G12. Selectron Iter 3 ports this model to
+  achieved with 75 000 samples per G12. Selectron Iter 3 ports this model to
   PyMC (NUTS) and validates against JAGS on a subset.
+
+  2026-05-18: cross-source-verified against the NTRS original PDF Diego shared
+  via OneDrive (file 20120013096.pdf, md5 28897e5168c3b501fb793f9dc61a4e8f,
+  Adobe Acrobat Pro 10, July 2012, author kglatzer). The CORE-derived OCR in
+  the body below preserves the full text but rendered Equation (1) as
+  "...×0=1.645×0" (σ collapsed to "0"); the NTRS OCR rendered it correctly as
+  ln(EF) = Φ(0.95)×σ = 1.645×σ. The corrected equation and verbatim WinBUGS
+  model block are reproduced in the Selectron-Iter-3 synthesis section below,
+  and verbatim math_anchors are pinned to the NTRS render.
 math_anchors:
-  - "lognormal prior on incidence rate (verbatim G12 §1)"
-  - "Poisson likelihood with person-years exposure (verbatim G12 §1)"
-  - "error factor EF = sqrt(lambda^(95) / lambda^(5)) (G12 §1.2.2 parameterization)"
-  - "convergence: MC error < 5% AND/OR Brooks-Gelman-Rubin < 1.2 (G12 §1.2.1)"
-  - "two-step Bayesian update: general population prior -> LSAH update -> astronaut update (G12 §2.x)"
+  # All quotes verbatim from the NTRS original 20120013096.pdf
+  # (NASA/TP-2012-217120, July 2012).
+  - "EF parameterization, G12 §1.2 Eq. (1): 'ln(EF) = Φ(0.95) × σ = 1.645 × σ ... where σ is the standard deviation, Φ is the cumulative distribution function, 0.95 is the standard deviation at the 95th percentile of the distribution, and 1.645 is a constant representing the value of Φ at 0.95.'"
+  - "EF definition, G12 §1.2: 'The EF represents the variance in the model, which is defined as the square root of the ratio of the 95th and 5th percentiles.' (Equation B3: EF = sqrt(95th / 5th).)"
+  - "Likelihood and prior, G12 §1.2: 'All prior data used to define the incidence rate were assumed to be lognormal. The Poisson distribution was chosen to be the governing probability distribution (i.e., likelihood) for incidence values because it includes time (person-years) as an element in the probability equation.'"
+  - "Sampler, G12 §1.2: 'All Bayesian updates were performed using the open-source numerical update code called the Bayesian inference Using Gibbs Sampling (WinBUGS). WinBUGS is a computer software program that uses Markov-chain Monte Carlo methods to perform Bayesian analysis of complex statistical models.'"
+  - "Convergence rule, G12 §1.2 (verbatim): 'For this analysis, 75 000 Monte Carlo samplings were used for all medical events because this was a relatively safe indication that the Markov chain had reached its steady state. As rule of thumb for convergence, the WinBUGS manual suggests running until the Monte Carlo error is < 5 percent of the sample mean or until the Brooks-Gelman-Rubin statistic is < 1.2. These conditions were achieved with 75 000 samples in all cases.'"
+  - "WinBUGS model block, G12 Appendix C.2 (verbatim, applied to every medical event with only mean/EF/events/time differing): 'model { events ~ dpois(mean.poisson); mean.poisson <- lambda*time; lambda ~ dlnorm(mu, tau); tau <- 1/pow(sigma, 2); sigma <- log(EF)/1.645; mu <- log(mean) - pow(sigma, 2)/2 } list(mean=<μ_prior>, EF=<EF_prior>, events=<k>, time=<person-years>)'"
+  - "Sample-monitor reporting, G12 Appendix C.1 (verbatim): 'Type \"lambda\" into the drop-down box labeled \"node,\" click \"set,\" and then select. Type \"1001\" into the box labeled \"beg\" and highlight \"5,\" \"median,\" and \"95\" under \"percentiles.\"' — i.e., burn-in = 1000 iterations; posterior reported as MEAN + (5th, MEDIAN, 95th) percentiles + STD DEV. This is the IMM reporting template Selectron-Iter-3 should mirror."
+  - "CI -> EF conversion, G12 Appendix B.1, Eq. (B1) (verbatim): 'σ = sqrt(n) × width_95% / z_{α/2}', with z_{α/2} = 1.96 for the 95% CI and 1.645 used elsewhere for the lognormal mapping. Eq. (B2): 'z_{α/2} × σ/sqrt(n) = width_90%' (z_{α/2} = 1.64 for the 90% CI). Eq. (B3): 'EF = sqrt(95th / 5th)'. Pipeline: 95% CI -> σ -> 90% CI -> 5th & 95th percentiles -> EF."
+  - "Multi-step Bayesian update structure, G12 §2.1 (verbatim, angina worked example): 'Three steps and Bayesian updates were performed. The first step used the general population data (Ref. 5) as priors to update the analog astronaut population data ... The posterior results from this step describe the angina incidence rates for the analog astronaut population. In the second step, the data from these posterior results, namely the mean and the 5th and 95th percentiles, were used as the priors to update the preflight astronaut data ... In the third step, the data from the preflight posterior results were used as the priors to update the in-flight astronaut data.' Posterior-as-next-prior carries only (mean, 5th-pct, 95th-pct) — i.e., the prior chain is summarised by EF + mean."
+  - "PRA framing, G12 §1.1 (verbatim): 'Within PRA aleatory models, most of the parameters are uncertain. This layer of imprecision is defined as epistemic uncertainty ... If an aleatory model is used (e.g., binomial) or a deterministic model is used (e.g., a fault tree), and if any parameter of these models is uncertain, then the model has epistemic uncertainty. Bayesian quantification methods are utilized to determine the nature of the epistemic uncertainty.'"
+  - "Reporting unit convention, G12 Table 1+ (verbatim repeated across all 12 medical events): incidence rates reported as 'incidences per person-year' with paired '95-percent CI' and back-calculated EF. Numbers carry 3–4 significant figures (e.g., 'mean=0.00063, EF=1.77' for angina-male prior); event counts are integers; person-years carry 1 decimal (e.g., 'time=22137.0')."
+---
+
+## Selectron-Iter-3 relevance synthesis
+
+> Added 2026-05-18 after cross-OCR of the NTRS original (file `20120013096.pdf`, md5
+> `28897e5168c3b501fb793f9dc61a4e8f`) Diego shared via OneDrive
+> (`https://1drv.ms/b/c/6122c89c30f64940/IQBASfYwnMgiIIBhuKMBAAAAAbJ3m4Xb44drHcOihAAxjRc`).
+> The CORE-derived body below was re-verified against the NTRS render; this
+> synthesis pins the math and reporting conventions that Selectron Iter-3
+> consumes.
+
+**What this paper calculates.** Twelve in-flight medical-event incidence rates
+(angina, appendicitis, atrial fibrillation, atrial flutter, dental abscess,
+dental caries, dental periodontal disease, gallstone disease, herpes zoster,
+renal stones, seizure, stroke) for the NASA astronaut corps, each as a
+posterior probability distribution over the rate λ (events per person-year),
+conditioned on three layered evidence sources: (a) a general-population prior
+(US population, US Submarine Force, or UK community cohort, depending on the
+condition), (b) the NASA Johnson Space Center "analog astronaut" cohort
+(LSAH), and (c) preflight and in-flight astronaut counts from LSAH. Output is
+posterior λ as a *lognormal-Poisson* distribution, summarised by mean, median,
+5th percentile, 95th percentile, and standard deviation.
+
+**How it calculates.** Each Bayesian update is the same parametric model,
+ported one-to-one from G12 Appendix C.2 — this is the canonical reference for
+the Selectron Iter-3 Phase 3B engine:
+
+```
+events ~ dpois(mean.poisson)
+mean.poisson <- lambda * time          # Poisson likelihood with person-years exposure
+lambda ~ dlnorm(mu, tau)               # lognormal prior on the incidence rate
+tau   <- 1 / pow(sigma, 2)             # WinBUGS parameterises lognormal by precision tau
+sigma <- log(EF) / 1.645               # EF -> sigma via Eq. (1) below
+mu    <- log(mean) - pow(sigma, 2) / 2 # median-correction so E[lambda] = mean
+list(mean = <prior_mean>, EF = <prior_EF>, events = <k_observed>, time = <person_years>)
+```
+
+The two scalars driving the prior are the **mean incidence rate** and the
+**error factor (EF)**. EF parameterisation, G12 §1.2 Eq. (1):
+
+```
+ln(EF) = Φ(0.95) × σ = 1.645 × σ
+EF     = sqrt(λ_95 / λ_5)                # Eq. (B3), defining identity
+```
+
+When the source paper reports a 95 %-confidence interval instead of an EF,
+G12 Appendix B gives the conversion pipeline (Eqs. B1-B3, from Lapin's text):
+
+```
+σ          = sqrt(n) × width_95% / z_{α/2}    (Eq. B1, z_{α/2} = 1.96)
+width_90%  = z_{α/2} × σ / sqrt(n)            (Eq. B2, z_{α/2} = 1.64)
+λ_5, λ_95  = mean ∓ width_90% / 2
+EF         = sqrt(λ_95 / λ_5)                 (Eq. B3)
+```
+
+Inference is by Gibbs sampling in WinBUGS over **75 000 Monte Carlo
+samplings** per update, with the first 1000 iterations burned in (G12
+Appendix C.1: "type '1001' into the box labeled 'beg'"). Multi-step chains
+re-summarise each posterior down to (mean, λ_5, λ_95) and feed those forward
+as the next prior — so the inter-step prior is itself a lognormal
+parameterised by EF = sqrt(λ_95 / λ_5).
+
+**How it reports.** Verbatim G12 §1.2 stopping rule:
+
+> "For this analysis, 75 000 Monte Carlo samplings were used for all medical
+> events because this was a relatively safe indication that the Markov chain
+> had reached its steady state. As rule of thumb for convergence, the WinBUGS
+> manual suggests running until the Monte Carlo error is < 5 percent of the
+> sample mean or until the Brooks-Gelman-Rubin statistic is < 1.2. These
+> conditions were achieved with 75 000 samples in all cases."
+
+Each posterior is reported as a row of (**mean, 5th percentile, 95th
+percentile, standard deviation**) for the rate λ in events per person-year.
+Units are **per person-year**; numeric precision is 3-4 significant figures
+for rates (e.g., `mean = 0.00063, EF = 1.77` for angina-male prior); event
+counts are integers; person-years carry one decimal (`time = 22137.0`). Tables
+group results by sex (male / female / total) and by phase (preflight /
+in-flight). The reporting is *frequentist-in-language but Bayesian-in-content*
+— "95-percent CI" is used to label what is in fact a 5th-to-95th-percentile
+credible interval over the posterior λ. Selectron Iter-3 should display these
+as 90 %-credible intervals (5th-95th) consistent with G12's actual
+construction, not 95 %-CIs.
+
+**Concrete numeric anchors for Selectron Iter-3.**
+
+- *Sampler budget.* Default MCMC budget = 75 000 post-burn-in samples (G12
+  §1.2). Selectron's PyMC NUTS port should target the same effective sample
+  size; 75 000 in Gibbs is roughly equivalent to 4 chains × 5000 NUTS draws
+  after tuning.
+- *Burn-in.* 1000 iterations (G12 Appendix C.1).
+- *Convergence rule, primary.* Brooks-Gelman-Rubin (i.e., R-hat) < 1.2 per
+  monitored parameter. Selectron's spec §9 default of 1.01 is *stricter*
+  than G12 — keep the stricter rule but record this difference in the V&V
+  dossier (Task 60).
+- *Convergence rule, secondary.* MC standard error < 5 % of the posterior
+  mean of λ. This is the practical stopping criterion when R-hat is borderline.
+- *Reporting template.* Posterior summary = (mean, λ_5, MEDIAN, λ_95, SD).
+  Selectron Iter-3 UI tables should mirror this column layout for any imported
+  IMM prior.
+- *Prior elicitation helper.* If the source paper gives a 95 %-CI on a rate,
+  apply G12 Eqs. B1-B3 (Lapin's pipeline) to derive EF. The helper inputs are
+  (mean, n, width_95%) → EF; the output (mean, EF) plugs directly into the
+  WinBUGS block above. This is the smallest reusable computational unit in
+  G12 — Selectron should ship it as `cgem_ext.imm.prior_from_ci(...)` or
+  equivalent.
+- *Reference EFs from G12 Tables.* For sense-checking, G12 reports EF = 1.77
+  (angina male), 2.08 (angina female, sparse), 1.56 (AF male), 2.97 (AF
+  female, sparse), 1.2 (appendicitis general). EFs ≤ 1.5 indicate well-pinned
+  priors; ≥ 2 indicate diffuse priors that should not dominate the posterior.
+
+**Discrepancies vs Iter-3 spec.**
+
+- *Credible vs confidence interval.* G12 calls the 5th-to-95th-percentile band
+  a "95-percent CI" but constructs it from a Bayesian posterior; it is a
+  90 %-credible interval. Iter-3 spec §3.6 should label these as "5/95
+  credible bounds" not "95 % CI".
+- *R-hat threshold.* Iter-3 spec defaults to R-hat < 1.01 (PyMC convention);
+  G12 uses < 1.2 (WinBUGS convention). Keep the stricter Iter-3 threshold but
+  document that G12 results were accepted at the looser bound.
+- *Burn-in convention.* G12 uses 1000-iteration burn-in (Gibbs). Iter-3 (NUTS)
+  should rely on PyMC's adaptive `tune` (default 1000 + warmup); cross-check
+  against G12 by reporting effective sample size.
+- *Posterior-as-next-prior summarisation.* G12 collapses a posterior to
+  (mean, λ_5, λ_95) before the next update — a 3-number summary. Iter-3
+  should either replicate this (lossy but G12-faithful) or feed the full
+  posterior samples forward (lossless but architecturally heavier). Default
+  to lossy replication and flag in §9 V&V.
+
 ---
 
 View metadata, citation and similar papers at core.ac.uk [https://ntrs.nasa.gov/search.jsp?R=20120013096](https://ntrs.nasa.gov/search.jsp?R=20120013096) 2019-08-30T21:40:04+00:00Z _brought to you by_ **CORE** _provided by NASA Technical Reports Server_
