@@ -1,6 +1,6 @@
 # Selectron — STATUS
 
-**Last updated:** 2026-05-18 09:07 UTC
+**Last updated:** 2026-05-18 09:09 UTC
 **Current branch:** `iter1-phase0`
 **Active plan:** [`docs/superpowers/plans/2026-05-18-selectron-iter1-phase0.md`](docs/superpowers/plans/2026-05-18-selectron-iter1-phase0.md)
 **Active spec:** [`docs/superpowers/specs/2026-05-18-selectron-design.md`](docs/superpowers/specs/2026-05-18-selectron-design.md)
@@ -26,7 +26,7 @@ Update rules:
 
 ## Current state
 
-**Next action:** Task 15 — CriterionInput
+**Next action:** Task 16 — App.tsx wiring + smoke build
 
 **In flight (background):** none. All Phase 0 agents have reported (A3 just finished).
 
@@ -55,7 +55,7 @@ Update rules:
 | 12 | Engine barrel + full-suite sanity | **DONE** | `f8c63d7` | Plan heredoc verbatim for `src/engine/index.ts` barrel. Full-suite vitest: 8/8 suites, 21/21 tests pass. `npm run typecheck` shows only the expected `App.tsx` deferred error (Task 16/17). Included cleanups: errors.test.ts line 14 `"E_TEST"` → `"E_BAD_SCORE"` (valid union member); removed unused `makeRng` import in mcda.test.ts. Engine math complete for Iter 1. |
 | 13 | ScoreCard component | **DONE** | `ebbb251` | Plan heredoc verbatim; pure presentational component renders mean, CI90, CI95, CI₉₀ width, and ESS. Project typecheck shows only the expected deferred `App.tsx` error. |
 | 14 | PosteriorPlot (ECharts) | **DONE** | `0d20963` | Plan heredoc verbatim; ECharts core registration (BarChart, LineChart, Grid/Title/Tooltip/MarkLine/MarkArea, CanvasRenderer); 40-bin histogram with CI₉₀ shaded `markArea` and mean `markLine`. Project typecheck shows only the expected deferred `App.tsx` error. |
-| 15 | CriterionInput | PENDING | — | — |
+| 15 | CriterionInput | **DONE** | `8b77b93` | Plan heredoc verbatim; controlled range slider over `criterion.scale.{min,max}` with `(max-min)/100` step, instrument + family meta, 1-decimal numeric readout; calls `onChange(parseFloat(...))`. Project typecheck shows only the expected deferred `App.tsx` error. |
 | 16 | App.tsx wiring + smoke build | PENDING | — | — |
 | 17 | Iter 1 acceptance (full suite + manual UI) | PENDING | — | Diego sanity-checks the live UI. |
 | 18 | Phase 0 research fan-out | IN_PROGRESS (5/6 done) | — | A2, A3, A4, A5, A6 DONE; A1 BLOCKED (see Phase 0 sub-status). |
@@ -120,3 +120,4 @@ This is intentional triage — flag it now if Diego disagrees. The trade-off: ~5
 | 2026-05-18 14:02 | Task 12 implementer | Commit `f8c63d7` — engine barrel (`src/engine/index.ts`); full-suite vitest 8/8 suites / 21/21 tests pass; typecheck shows only the expected deferred `App.tsx` error; bundled cleanups: errors.test.ts `"E_TEST"` → `"E_BAD_SCORE"` and removed unused `makeRng` import in mcda.test.ts. Engine math complete for Iter 1. |
 | 2026-05-18 09:05 | Task 13 implementer | Commit `ebbb251` — ScoreCard presentational component (`src/ui/components/ScoreCard.tsx`); plan heredoc verbatim; renders mean, CI90, CI95, CI₉₀ width, ESS via Tailwind utility classes; project typecheck shows only the expected deferred `App.tsx` error. |
 | 2026-05-18 09:07 | Task 14 implementer | Commit `0d20963` — PosteriorPlot ECharts histogram (`src/ui/components/PosteriorPlot.tsx`); plan heredoc verbatim; per-module ECharts registration via `echarts/core` + `echarts-for-react/lib/core`; 40-bin histogram, CI₉₀ shaded markArea, mean markLine; project typecheck shows only the expected deferred `App.tsx` error. |
+| 2026-05-18 09:09 | Task 15 implementer | Commit `8b77b93` — CriterionInput controlled slider (`src/ui/components/CriterionInput.tsx`); plan heredoc verbatim; range input over `scale.min`/`scale.max` with `(max-min)/100` step, instrument + uppercase family meta, 1-decimal tabular readout, `accent-blue-900`; project typecheck shows only the expected deferred `App.tsx` error. |
