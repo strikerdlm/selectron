@@ -3,7 +3,10 @@ export type SelectronErrorCode =
   | "E_BAD_WEIGHT"
   | "E_NO_CRITERIA"
   | "E_NO_CANDIDATES"
-  | "E_SAMPLER_DIVERGED";
+  | "E_SAMPLER_DIVERGED"
+  | "E_BAD_MISSION"
+  | "E_BAD_CONDITION"
+  | "E_BAD_PRIOR";
 
 export class SelectronError extends Error {
   readonly code: SelectronErrorCode;

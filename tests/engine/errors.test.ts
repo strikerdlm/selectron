@@ -13,4 +13,19 @@ describe("SelectronError", () => {
   it("is instanceof Error", () => {
     expect(new SelectronError("E_BAD_SCORE", "x")).toBeInstanceOf(Error);
   });
+
+  it("accepts E_BAD_MISSION", () => {
+    const e = new SelectronError("E_BAD_MISSION", "unknown mission type");
+    expect(e.code).toBe("E_BAD_MISSION");
+  });
+
+  it("accepts E_BAD_CONDITION", () => {
+    const e = new SelectronError("E_BAD_CONDITION", "unknown condition kind");
+    expect(e.code).toBe("E_BAD_CONDITION");
+  });
+
+  it("accepts E_BAD_PRIOR", () => {
+    const e = new SelectronError("E_BAD_PRIOR", "tau out of [0,1]: 1.2");
+    expect(e.code).toBe("E_BAD_PRIOR");
+  });
 });
