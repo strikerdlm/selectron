@@ -1,6 +1,6 @@
 # Selectron — STATUS
 
-**Last updated:** 2026-05-18 14:00 UTC
+**Last updated:** 2026-05-18 14:02 UTC
 **Current branch:** `iter1-phase0`
 **Active plan:** [`docs/superpowers/plans/2026-05-18-selectron-iter1-phase0.md`](docs/superpowers/plans/2026-05-18-selectron-iter1-phase0.md)
 **Active spec:** [`docs/superpowers/specs/2026-05-18-selectron-design.md`](docs/superpowers/specs/2026-05-18-selectron-design.md)
@@ -26,7 +26,7 @@ Update rules:
 
 ## Current state
 
-**Next action:** Task 12 — Engine barrel + full-suite sanity
+**Next action:** Task 13 — ScoreCard component
 
 **In flight (background):** none. All Phase 0 agents have reported (A3 just finished).
 
@@ -44,7 +44,7 @@ Update rules:
 | 1 | Bootstrap (Vite + React + Tailwind + Vitest) | **DONE** | `637ec14` | DONE_WITH_CONCERNS — implementer correctly excluded research/ artifacts from the bootstrap commit since A2/A4/A5/A6 had landed files in parallel. Research files committed separately in Task 18. |
 | 2 | README.md + CLAUDE.md | **DONE** | `191ed42` | Plan heredocs verbatim; CLAUDE.md adds Resume protocol section per Diego's directive. |
 | 3 | Core TS types (Criterion, Candidate, Posterior) | **DONE** | `fb5df0d` | Plan heredocs verbatim; `npx tsc --noEmit src/types/index.ts` exits 0. |
-| 4 | SelectronError (TDD) | **DONE** | `1f3cb3a` | TDD red→green. `npm test -- tests/engine/errors.test.ts`: 2/2 pass. Self-review concern: test's `"E_TEST"` literal violates the `SelectronErrorCode` union; vitest passes (no typecheck at runtime) but `npm run typecheck` flags it. Plan heredoc was followed verbatim. Trivial fix can land at Task 12 sanity. |
+| 4 | SelectronError (TDD) | **DONE** | `1f3cb3a` | TDD red→green. `npm test -- tests/engine/errors.test.ts`: 2/2 pass. Plan heredocs verbatim; `SelectronError` class carries `code: SelectronErrorCode`, `message`, optional `details`; extends `Error` with `name = "SelectronError"`. |
 | 5 | Mulberry32 PRNG (TDD) | **DONE** | `456257c` | TDD red→green. `npm test -- tests/engine/prng.test.ts`: 3/3 pass. Plan heredocs verbatim; reference Mulberry32 implementation. |
 | 6 | Marsaglia–Tsang Gamma sampler (TDD) | **DONE** | `4b94ae0` | TDD red→green. `npm test -- tests/engine/gamma.test.ts`: 3/3 pass. Plan heredocs verbatim; Marsaglia–Tsang acceptance-rejection + Stuart boosting for shape < 1; Box–Muller standard normal proposal. |
 | 7 | Dirichlet sampler + closed-form moments (TDD) | **DONE** | `26f4f92` | TDD red→green. `npm test -- tests/engine/dirichlet.test.ts`: 2/2 pass. Plan heredocs verbatim; Dirichlet via Gamma normalization (w_k = G_k / sum(G_l)); closed-form mean alpha_k/s and variance alpha_k(s-alpha_k)/(s^2(s+1)). |
@@ -52,7 +52,7 @@ Update rules:
 | 9 | Score normalization (TDD) | **DONE** | `a802b5b` | TDD red→green. `npm test -- tests/engine/normalize.test.ts`: 3/3 pass. Plan heredocs verbatim; affine map [min,max]→[0,1] with `higherIsBetter` flip and `SelectronError("E_BAD_SCORE", …)` on out-of-range input. |
 | 10 | Bayesian MCDA + closed-form moment check (TDD) | **DONE** | `43e4149` | TDD red→green. `npm test -- tests/engine/mcda.test.ts`: 3/3 pass. Plan heredocs verbatim. Closed-form vs 50k-sample empirical: mean rel-err 1.0e-5 (limit 2%), variance rel-err 2.7e-3 (limit 5%) — both well inside tolerance. |
 | 11 | Synthetic candidate generator | **DONE** | `3b7b0be` | TDD red→green. `npm test -- tests/engine/synthetic.test.ts`: 3/3 pass. Plan heredocs verbatim; deterministic per-seed candidate generation (scores uniformly drawn within each criterion's scale via Mulberry32 PRNG) and N-candidate helper with unique synthetic ids. |
-| 12 | Engine barrel + full-suite sanity | PENDING | — | — |
+| 12 | Engine barrel + full-suite sanity | **DONE** | `f8c63d7` | Plan heredoc verbatim for `src/engine/index.ts` barrel. Full-suite vitest: 8/8 suites, 21/21 tests pass. `npm run typecheck` shows only the expected `App.tsx` deferred error (Task 16/17). Included cleanups: errors.test.ts line 14 `"E_TEST"` → `"E_BAD_SCORE"` (valid union member); removed unused `makeRng` import in mcda.test.ts. Engine math complete for Iter 1. |
 | 13 | ScoreCard component | PENDING | — | — |
 | 14 | PosteriorPlot (ECharts) | PENDING | — | — |
 | 15 | CriterionInput | PENDING | — | — |
@@ -117,3 +117,4 @@ This is intentional triage — flag it now if Diego disagrees. The trade-off: ~5
 | 2026-05-18 08:48 | Task 9 implementer | Commit `a802b5b` — score normalization with structured error; vitest 3/3 (affine map; higherIsBetter flip; SelectronError on out-of-range) |
 | 2026-05-18 08:54 | Task 10 implementer | Commit `43e4149` — Bayesian MCDA scorer + closed-form moments; vitest 3/3 (Posterior shape; closed-form vs 50k-sample empirical within mean 2% / variance 5% — actual mean rel-err 1.0e-5, variance rel-err 2.7e-3; seed determinism) |
 | 2026-05-18 14:00 | Task 11 implementer | Commit `3b7b0be` — seeded synthetic candidate generator (`generateCandidate` + `generateCandidates`); vitest 3/3 (in-scale scores; seed determinism; N unique-id candidates) |
+| 2026-05-18 14:02 | Task 12 implementer | Commit `f8c63d7` — engine barrel (`src/engine/index.ts`); full-suite vitest 8/8 suites / 21/21 tests pass; typecheck shows only the expected deferred `App.tsx` error; bundled cleanups: errors.test.ts `"E_TEST"` → `"E_BAD_SCORE"` and removed unused `makeRng` import in mcda.test.ts. Engine math complete for Iter 1. |
