@@ -1,6 +1,6 @@
 # Selectron — STATUS
 
-**Last updated:** 2026-05-18 08:35 UTC
+**Last updated:** 2026-05-18 13:24 UTC
 **Current branch:** `iter1-phase0`
 **Active plan:** [`docs/superpowers/plans/2026-05-18-selectron-iter1-phase0.md`](docs/superpowers/plans/2026-05-18-selectron-iter1-phase0.md)
 **Active spec:** [`docs/superpowers/specs/2026-05-18-selectron-design.md`](docs/superpowers/specs/2026-05-18-selectron-design.md)
@@ -26,7 +26,7 @@ Update rules:
 
 ## Current state
 
-**Next action:** Task 3 — create core TS types (Criterion, Candidate, Posterior)
+**Next action:** Task 4 — implement SelectronError with structured codes (TDD)
 
 **In flight (background):** none. All Phase 0 agents have reported (A3 just finished).
 
@@ -43,7 +43,7 @@ Update rules:
 |---|------|--------|--------|-------|
 | 1 | Bootstrap (Vite + React + Tailwind + Vitest) | **DONE** | `637ec14` | DONE_WITH_CONCERNS — implementer correctly excluded research/ artifacts from the bootstrap commit since A2/A4/A5/A6 had landed files in parallel. Research files committed separately in Task 18. |
 | 2 | README.md + CLAUDE.md | **DONE** | `191ed42` | Plan heredocs verbatim; CLAUDE.md adds Resume protocol section per Diego's directive. |
-| 3 | Core TS types (Criterion, Candidate, Posterior) | PENDING | — | — |
+| 3 | Core TS types (Criterion, Candidate, Posterior) | **DONE** | `fb5df0d` | Plan heredocs verbatim; `npx tsc --noEmit src/types/index.ts` exits 0. |
 | 4 | SelectronError (TDD) | PENDING | — | — |
 | 5 | Mulberry32 PRNG (TDD) | PENDING | — | — |
 | 6 | Marsaglia–Tsang Gamma sampler (TDD) | PENDING | — | — |
@@ -108,3 +108,4 @@ This is intentional triage — flag it now if Diego disagrees. The trade-off: ~5
 | 2026-05-18 08:15 | controller | Created this STATUS.md (per Diego's resume-file directive) |
 | 2026-05-18 08:25 | Task 2 implementer | Commit `191ed42` — README.md + CLAUDE.md (with Resume protocol section) |
 | 2026-05-18 08:35 | A3 | DONE — `psychological.md` (8 constructs, 7 with effect sizes) |
+| 2026-05-18 13:24 | Task 3 implementer | Commit `fb5df0d` — core TS types (Criterion, Candidate, Posterior) + barrel; typecheck clean |
