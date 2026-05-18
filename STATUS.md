@@ -26,9 +26,9 @@ Update rules:
 
 ## Current state
 
-**Next action:** (a) Diego reviews `research/02_criterion_taxonomy.md` and ratifies into `docs/criteria.md` (Iter-2 start gate); (b) Diego performs Task 17 manual UI sanity at http://localhost:5173 — controller then issues the `release(iter1)` commit; (c) **I&C evidence corpus expanded** — `research/evidence/INDEX.md` now lists **31 OCRed papers / 423 pages** (Tier 1 pilot + Tier 2 gap-fill: Mars500 psych, Antarctic-specific, team dynamics, sleep/ANS biomarkers, countermeasures, foundational small-group I&C). Diego decides next query batch (`countermeasures`, `astronaut selection`, `HRV analog`, `crew composition`, `personality selection`, …) for further scale-up.
+**Next action:** (a) Diego reviews `research/02_criterion_taxonomy.md` and ratifies into `docs/criteria.md` (Iter-2 start gate); (b) Diego performs Task 17 manual UI sanity at http://localhost:5173 — controller then issues the `release(iter1)` commit; (c) **Iter-3 plan + spec landed** (`f1e1a3e` plan, `d301064` spec; pushed to origin/iter1-phase0). Phase 3.0 source acquisition started — Tasks 23–28 fetch G12/M18/A22/K15/W14/S20 via firecrawl; Task 29 runs zotero-pdf-ocr for IMM corpus in Diego's library. Math facts mirrored into memory MCP under entities `NASA-IMM`, `Lognormal-Poisson-MCMC`, `IMM-Four-Step-Trial`, `NASA-STD-7009-Eight-Factors`.
 
-**In flight (background):** none. All Phase 0 agents have reported (A3 just finished).
+**In flight (background):** Task 23 — firecrawl G12 (Gilkey 2012 Bayesian IMM) in progress.
 
 **Blocked:** none. A1 retry succeeded — inventory at research/zotero_inventory.md (25 central, 65 excluded, 198 related across 288 unique items).
 
@@ -61,6 +61,7 @@ Update rules:
 | 19 | Synthesis gate | **PROPOSAL DONE** | research/02_criterion_taxonomy.md | 20 rows, 4 families (psych, medical, behavioral, professional). 5 judgement calls flagged for Diego. Hard gate: Iter 2 begins when Diego copies the ratified taxonomy to `docs/criteria.md`. |
 | 20 | Evidence OCR pipeline pilot — Tier-1 I&C | **DONE** | `d13df45` | Zotero → Koofr WebDAV → Mistral OCR → markdown w/ YAML frontmatter. 11 papers, 213 pages, ~75s wall-clock, ~$0.25. Outputs at `research/evidence/`; manifest at `research/evidence/INDEX.md`. Reproducibility script `research/evidence/_build_evidence.py`. Pipeline reliable — ready to scale to other queries. |
 | 21 | Evidence OCR Tier 2 — broader I&C analog evidence | **DONE** | `d13df45` | 20 additional papers via queries `Mars500`, `Antarctic winter-over`, `HI-SEAS`, `SIRIUS`, `analog mission`. Tier-1 Yi×2 + Shea still PDF-unsynced. Tortello-2020 PDF was stored as multipart envelope (not raw PDF) — extracted via boundary split, OCRed cleanly. **Metadata audit found multiple Zotero record errors** (Spanish double-surname parse for Tortello; fabricated co-authors for Nirwan; wrong DOIs from filename-guess); `_build_evidence.py` now sources all metadata from the Zotero API record + OCR-body DOI overrides. 31 markdowns total / 423 pages / valid YAML. |
+| 22 | Iter-3 Phase 3.0 skeleton (`research/imm_sources/`) | IN_PROGRESS | — | Folders created (`methods/`, `architecture/`, `validation/`, `zotero_imm/`, `citation_graph/`, `follow_on/`); INDEX.md skeleton lists 6 Tier-1 rows + 3 future tiers; `_fetch_imm_sources.py` idempotent checker validates per-ref state; `.gitignore` excludes raw PDFs. Memory MCP seeded with 10 entities (NASA-IMM, 6 paper entities, Lognormal-Poisson-MCMC, IMM-Four-Step-Trial, NASA-STD-7009-Eight-Factors). |
 
 ---
 
