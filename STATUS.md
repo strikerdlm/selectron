@@ -1,6 +1,6 @@
 # Selectron — STATUS
 
-**Last updated:** 2026-05-18 15:10 UTC
+**Last updated:** 2026-05-18 15:35 UTC
 **Current branch:** `iter1-phase0`
 **Active plan:** [`docs/superpowers/plans/2026-05-18-selectron-iter1-phase0.md`](docs/superpowers/plans/2026-05-18-selectron-iter1-phase0.md)
 **Active spec:** [`docs/superpowers/specs/2026-05-18-selectron-design.md`](docs/superpowers/specs/2026-05-18-selectron-design.md)
@@ -26,7 +26,7 @@ Update rules:
 
 ## Current state
 
-**Next action:** Task 17 manual UI check by Diego (then release commit), or proceed to Task 19 (taxonomy synthesis from the 6 Phase-0 deliverables).
+**Next action:** (a) Diego reviews `research/02_criterion_taxonomy.md` and ratifies into `docs/criteria.md` (Iter-2 start gate); (b) Diego performs Task 17 manual UI sanity at http://localhost:5173 — controller then issues the `release(iter1)` commit.
 
 **In flight (background):** none. All Phase 0 agents have reported (A3 just finished).
 
@@ -58,7 +58,7 @@ Update rules:
 | 16 | App.tsx wiring + smoke build | **DONE** | `eb2f89f` | Plan heredoc verbatim; wires `PLACEHOLDER_CRITERIA` → `CriterionInput` sliders → `scoreCandidate` (5000 iters, seed `0xc0ffee`) → `ScoreCard` + `PosteriorPlot`. Build green (`dist/index.html` + `assets/index-*.{js,css}`). Dev-server smoke curl returns HTML with `<div id="root">`. Preceded by chore `8d3e025` (`chore(build): drop stale vitest coverage stub`) — vitest.config.ts had a `coverage: { reporter: ... }` block with no `provider` discriminant, which `tsc -b` (full project build) rejected. No coverage provider package was installed anyway, so the block was dead config. |
 | 17 | Iter 1 acceptance (full suite + manual UI) | IN_PROGRESS | — | AUTOMATED CHECKS DONE — awaiting Diego manual UI sanity. Vitest: 8/8 files, 21/21 tests; typecheck exit 0; `npm run build` emits `dist/`. Diego still owes Step 4 (manual UI sanity in browser); release commit (Step 5) held until then. |
 | 18 | Phase 0 research fan-out | **DONE** | A1 retry by controller-staged data + synth subagent | All 6 agents delivered. A1: 25 central, 65 excluded, 198 related. Critical finding: zero Bayesian-MCDA papers in Diego's Zotero. |
-| 19 | Synthesis gate (taxonomy proposal → Diego ratifies → `docs/criteria.md`) | PENDING | — | Hard gate for Iter 2. Cannot run before Task 18 is complete. |
+| 19 | Synthesis gate | **PROPOSAL DONE** | research/02_criterion_taxonomy.md | 20 rows, 4 families (psych, medical, behavioral, professional). 5 judgement calls flagged for Diego. Hard gate: Iter 2 begins when Diego copies the ratified taxonomy to `docs/criteria.md`. |
 
 ---
 
@@ -126,3 +126,5 @@ This is intentional triage — flag it now if Diego disagrees. The trade-off: ~5
 | 2026-05-18 14:18 | Task 17 implementer | Task 17 automated checks complete — awaiting Diego. `npm test`: 8/8 files, 21/21 tests pass. `npm run typecheck`: exit 0, no output. `npm run build`: emits `dist/index.html` + bundle. Steps 1–3 of plan green; Step 4 (manual UI sanity) and Step 5 (release commit) held for Diego. |
 | 2026-05-18 10:06 | A1 retry synthesizer | DONE — research/zotero_inventory.md (465 lines, 51 KB). Anthropic usage cap killed subagent reply but file was written. |
 | 2026-05-18 15:10 | controller | MISTRAL_API_KEY added to /root/.claude/skills/zotero-pdf-ocr/.env (already in Selectron/.env per Diego). OCR now available on demand. |
+| 2026-05-18 15:30 | Task 19 synthesizer | DONE — research/02_criterion_taxonomy.md (3754 words, 20 rows, 4 families). 5 judgement calls flagged for Diego. |
+| 2026-05-18 15:35 | controller | Set git identity strikerdlm/dlmalpica@me.com (was wrongly yahoo.com); added tsbuildinfo + compiled-configs to .gitignore. |
