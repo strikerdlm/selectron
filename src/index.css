@@ -1,3 +1,171 @@
+@import url('https://fonts.googleapis.com/css2?family=Recursive:slnt,wght,CASL,CRSV,MONO@-15..0,300..1000,0..1,0..1,0..1&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,100..800;1,100..800&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+:root {
+  --bg-0: #08090a;
+  --bg-1: #0c0d0f;
+  --bg-2: #131517;
+  --line: #1f2226;
+  --line-2: #2a2e34;
+  --ink-0: #e6e8ec;
+  --ink-1: #b6bac1;
+  --ink-2: #71757c;
+  --ink-3: #4a4d53;
+  --signal: #f5b541;
+  --signal-dim: #f5b54122;
+  --signal-bright: #ffd479;
+  --go: #56d6a0;
+  --warn: #ff6b5e;
+
+  color-scheme: dark;
+}
+
+@layer base {
+  html, body {
+    background-color: var(--bg-0);
+    color: var(--ink-0);
+    font-family: 'Recursive', system-ui, sans-serif;
+    font-variation-settings: 'MONO' 0, 'CASL' 0, 'wght' 380, 'slnt' 0, 'CRSV' 0;
+    font-feature-settings: 'ss01', 'ss02', 'ss12';
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+
+  body {
+    background-image:
+      radial-gradient(rgba(255, 255, 255, 0.04) 1px, transparent 1px);
+    background-size: 18px 18px;
+    background-position: 0 0;
+    min-height: 100vh;
+  }
+
+  ::selection {
+    background-color: var(--signal);
+    color: var(--bg-0);
+  }
+}
+
+@layer components {
+  .mono {
+    font-family: 'JetBrains Mono', ui-monospace, monospace;
+    font-feature-settings: 'tnum', 'zero', 'ss03';
+  }
+
+  .display {
+    font-family: 'Recursive', system-ui, sans-serif;
+    font-variation-settings: 'CASL' 0.5, 'wght' 540, 'slnt' 0;
+    letter-spacing: -0.015em;
+  }
+
+  .label {
+    font-family: 'JetBrains Mono', ui-monospace, monospace;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    font-size: 10px;
+    color: var(--ink-2);
+  }
+
+  .hairline {
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--line-2), transparent);
+  }
+
+  .panel {
+    background-color: var(--bg-1);
+    border: 1px solid var(--line);
+    position: relative;
+  }
+
+  .panel::before, .panel::after {
+    content: '';
+    position: absolute;
+    width: 8px;
+    height: 8px;
+    border: 1px solid var(--ink-3);
+  }
+  .panel::before { top: -1px; left: -1px; border-right: none; border-bottom: none; }
+  .panel::after { bottom: -1px; right: -1px; border-left: none; border-top: none; }
+
+  .signal-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 999px;
+    background: var(--go);
+    box-shadow: 0 0 0 0 var(--go);
+    animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  }
+
+  /* Custom range slider — calibration-instrument style */
+  input[type="range"].instrument {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 100%;
+    height: 24px;
+    background: transparent;
+    cursor: pointer;
+    outline: none;
+  }
+  input[type="range"].instrument::-webkit-slider-runnable-track {
+    height: 1px;
+    background: var(--line-2);
+    border: 0;
+  }
+  input[type="range"].instrument::-moz-range-track {
+    height: 1px;
+    background: var(--line-2);
+    border: 0;
+  }
+  input[type="range"].instrument::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    height: 14px;
+    width: 14px;
+    border-radius: 999px;
+    background: var(--signal);
+    border: 2px solid var(--bg-0);
+    margin-top: -7px;
+    box-shadow: 0 0 0 1px var(--signal), 0 0 12px var(--signal-dim);
+    transition: box-shadow 120ms ease;
+  }
+  input[type="range"].instrument::-moz-range-thumb {
+    height: 14px;
+    width: 14px;
+    border-radius: 999px;
+    background: var(--signal);
+    border: 2px solid var(--bg-0);
+    box-shadow: 0 0 0 1px var(--signal), 0 0 12px var(--signal-dim);
+    transition: box-shadow 120ms ease;
+  }
+  input[type="range"].instrument:hover::-webkit-slider-thumb,
+  input[type="range"].instrument:focus::-webkit-slider-thumb {
+    box-shadow: 0 0 0 1px var(--signal), 0 0 24px var(--signal);
+  }
+  input[type="range"].instrument:hover::-moz-range-thumb,
+  input[type="range"].instrument:focus::-moz-range-thumb {
+    box-shadow: 0 0 0 1px var(--signal), 0 0 24px var(--signal);
+  }
+}
+
+@keyframes pulse {
+  0%, 100% {
+    box-shadow: 0 0 0 0 var(--go);
+    opacity: 1;
+  }
+  50% {
+    box-shadow: 0 0 0 6px transparent;
+    opacity: 0.7;
+  }
+}
+
+@keyframes fadein {
+  from { opacity: 0; transform: translateY(4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.fadein {
+  animation: fadein 480ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
