@@ -1,6 +1,6 @@
 # Selectron — STATUS
 
-**Last updated:** 2026-05-18 14:02 UTC
+**Last updated:** 2026-05-18 09:05 UTC
 **Current branch:** `iter1-phase0`
 **Active plan:** [`docs/superpowers/plans/2026-05-18-selectron-iter1-phase0.md`](docs/superpowers/plans/2026-05-18-selectron-iter1-phase0.md)
 **Active spec:** [`docs/superpowers/specs/2026-05-18-selectron-design.md`](docs/superpowers/specs/2026-05-18-selectron-design.md)
@@ -26,7 +26,7 @@ Update rules:
 
 ## Current state
 
-**Next action:** Task 13 — ScoreCard component
+**Next action:** Task 14 — PosteriorPlot (ECharts)
 
 **In flight (background):** none. All Phase 0 agents have reported (A3 just finished).
 
@@ -53,7 +53,7 @@ Update rules:
 | 10 | Bayesian MCDA + closed-form moment check (TDD) | **DONE** | `43e4149` | TDD red→green. `npm test -- tests/engine/mcda.test.ts`: 3/3 pass. Plan heredocs verbatim. Closed-form vs 50k-sample empirical: mean rel-err 1.0e-5 (limit 2%), variance rel-err 2.7e-3 (limit 5%) — both well inside tolerance. |
 | 11 | Synthetic candidate generator | **DONE** | `3b7b0be` | TDD red→green. `npm test -- tests/engine/synthetic.test.ts`: 3/3 pass. Plan heredocs verbatim; deterministic per-seed candidate generation (scores uniformly drawn within each criterion's scale via Mulberry32 PRNG) and N-candidate helper with unique synthetic ids. |
 | 12 | Engine barrel + full-suite sanity | **DONE** | `f8c63d7` | Plan heredoc verbatim for `src/engine/index.ts` barrel. Full-suite vitest: 8/8 suites, 21/21 tests pass. `npm run typecheck` shows only the expected `App.tsx` deferred error (Task 16/17). Included cleanups: errors.test.ts line 14 `"E_TEST"` → `"E_BAD_SCORE"` (valid union member); removed unused `makeRng` import in mcda.test.ts. Engine math complete for Iter 1. |
-| 13 | ScoreCard component | PENDING | — | — |
+| 13 | ScoreCard component | **DONE** | `ebbb251` | Plan heredoc verbatim; pure presentational component renders mean, CI90, CI95, CI₉₀ width, and ESS. Project typecheck shows only the expected deferred `App.tsx` error. |
 | 14 | PosteriorPlot (ECharts) | PENDING | — | — |
 | 15 | CriterionInput | PENDING | — | — |
 | 16 | App.tsx wiring + smoke build | PENDING | — | — |
@@ -118,3 +118,4 @@ This is intentional triage — flag it now if Diego disagrees. The trade-off: ~5
 | 2026-05-18 08:54 | Task 10 implementer | Commit `43e4149` — Bayesian MCDA scorer + closed-form moments; vitest 3/3 (Posterior shape; closed-form vs 50k-sample empirical within mean 2% / variance 5% — actual mean rel-err 1.0e-5, variance rel-err 2.7e-3; seed determinism) |
 | 2026-05-18 14:00 | Task 11 implementer | Commit `3b7b0be` — seeded synthetic candidate generator (`generateCandidate` + `generateCandidates`); vitest 3/3 (in-scale scores; seed determinism; N unique-id candidates) |
 | 2026-05-18 14:02 | Task 12 implementer | Commit `f8c63d7` — engine barrel (`src/engine/index.ts`); full-suite vitest 8/8 suites / 21/21 tests pass; typecheck shows only the expected deferred `App.tsx` error; bundled cleanups: errors.test.ts `"E_TEST"` → `"E_BAD_SCORE"` and removed unused `makeRng` import in mcda.test.ts. Engine math complete for Iter 1. |
+| 2026-05-18 09:05 | Task 13 implementer | Commit `ebbb251` — ScoreCard presentational component (`src/ui/components/ScoreCard.tsx`); plan heredoc verbatim; renders mean, CI90, CI95, CI₉₀ width, ESS via Tailwind utility classes; project typecheck shows only the expected deferred `App.tsx` error. |
