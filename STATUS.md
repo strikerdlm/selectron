@@ -1,6 +1,6 @@
 # Selectron — STATUS
 
-**Last updated:** 2026-05-18 14:18 UTC
+**Last updated:** 2026-05-18 15:10 UTC
 **Current branch:** `iter1-phase0`
 **Active plan:** [`docs/superpowers/plans/2026-05-18-selectron-iter1-phase0.md`](docs/superpowers/plans/2026-05-18-selectron-iter1-phase0.md)
 **Active spec:** [`docs/superpowers/specs/2026-05-18-selectron-design.md`](docs/superpowers/specs/2026-05-18-selectron-design.md)
@@ -26,12 +26,11 @@ Update rules:
 
 ## Current state
 
-**Next action:** Task 17 manual UI check — Diego runs `npm run dev` and confirms UI is responsive; then controller issues release commit
+**Next action:** Task 17 manual UI check by Diego (then release commit), or proceed to Task 19 (taxonomy synthesis from the 6 Phase-0 deliverables).
 
 **In flight (background):** none. All Phase 0 agents have reported (A3 just finished).
 
-**Blocked:**
-- Agent A1 (Zotero inventory) reported BLOCKED — its subagent environment denied Bash, so it could not invoke `zotero_search.py` / `fetch_pdf.py`. Re-dispatch plan: the controller will run the scripts directly in the main thread, save raw JSON + extracted PDFs to `research/sources/`, then dispatch a fresh A1 whose only job is to synthesize the inventory from the pre-staged data.
+**Blocked:** none. A1 retry succeeded — inventory at research/zotero_inventory.md (25 central, 65 excluded, 198 related across 288 unique items).
 
 **Iter 1 (code) progress vs. Phase 0 (research) progress:** Iter 1 does NOT depend on Phase 0. Phase 0 gates Iter 2 only. Continue Iter 1 code work in the foreground; Phase 0 catches up in the background.
 
@@ -58,7 +57,7 @@ Update rules:
 | 15 | CriterionInput | **DONE** | `8b77b93` | Plan heredoc verbatim; controlled range slider over `criterion.scale.{min,max}` with `(max-min)/100` step, instrument + family meta, 1-decimal numeric readout; calls `onChange(parseFloat(...))`. Project typecheck shows only the expected deferred `App.tsx` error. |
 | 16 | App.tsx wiring + smoke build | **DONE** | `eb2f89f` | Plan heredoc verbatim; wires `PLACEHOLDER_CRITERIA` → `CriterionInput` sliders → `scoreCandidate` (5000 iters, seed `0xc0ffee`) → `ScoreCard` + `PosteriorPlot`. Build green (`dist/index.html` + `assets/index-*.{js,css}`). Dev-server smoke curl returns HTML with `<div id="root">`. Preceded by chore `8d3e025` (`chore(build): drop stale vitest coverage stub`) — vitest.config.ts had a `coverage: { reporter: ... }` block with no `provider` discriminant, which `tsc -b` (full project build) rejected. No coverage provider package was installed anyway, so the block was dead config. |
 | 17 | Iter 1 acceptance (full suite + manual UI) | IN_PROGRESS | — | AUTOMATED CHECKS DONE — awaiting Diego manual UI sanity. Vitest: 8/8 files, 21/21 tests; typecheck exit 0; `npm run build` emits `dist/`. Diego still owes Step 4 (manual UI sanity in browser); release commit (Step 5) held until then. |
-| 18 | Phase 0 research fan-out | IN_PROGRESS (5/6 done) | — | A2, A3, A4, A5, A6 DONE; A1 BLOCKED (see Phase 0 sub-status). |
+| 18 | Phase 0 research fan-out | **DONE** | A1 retry by controller-staged data + synth subagent | All 6 agents delivered. A1: 25 central, 65 excluded, 198 related. Critical finding: zero Bayesian-MCDA papers in Diego's Zotero. |
 | 19 | Synthesis gate (taxonomy proposal → Diego ratifies → `docs/criteria.md`) | PENDING | — | Hard gate for Iter 2. Cannot run before Task 18 is complete. |
 
 ---
@@ -125,3 +124,5 @@ This is intentional triage — flag it now if Diego disagrees. The trade-off: ~5
 | 2026-05-18 14:17 | Task 16 implementer | Commit `eb2f89f` — `feat(ui): App wiring sliders to MCDA scoring + posterior plot`. Plan heredoc verbatim. Typecheck clean (no output), `npm run build` emits `dist/index.html` + bundle (714 kB JS, 7.8 kB CSS), dev server smoke curl returns HTML containing `<div id="root">`. |
 | 2026-05-18 14:17 | Task 16 implementer | Commit `8600fbc` — `docs(status): mark Task 16 DONE`. |
 | 2026-05-18 14:18 | Task 17 implementer | Task 17 automated checks complete — awaiting Diego. `npm test`: 8/8 files, 21/21 tests pass. `npm run typecheck`: exit 0, no output. `npm run build`: emits `dist/index.html` + bundle. Steps 1–3 of plan green; Step 4 (manual UI sanity) and Step 5 (release commit) held for Diego. |
+| 2026-05-18 10:06 | A1 retry synthesizer | DONE — research/zotero_inventory.md (465 lines, 51 KB). Anthropic usage cap killed subagent reply but file was written. |
+| 2026-05-18 15:10 | controller | MISTRAL_API_KEY added to /root/.claude/skills/zotero-pdf-ocr/.env (already in Selectron/.env per Diego). OCR now available on demand. |
