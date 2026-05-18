@@ -1,6 +1,6 @@
 # Selectron — STATUS
 
-**Last updated:** 2026-05-18 13:24 UTC
+**Last updated:** 2026-05-18 13:30 UTC
 **Current branch:** `iter1-phase0`
 **Active plan:** [`docs/superpowers/plans/2026-05-18-selectron-iter1-phase0.md`](docs/superpowers/plans/2026-05-18-selectron-iter1-phase0.md)
 **Active spec:** [`docs/superpowers/specs/2026-05-18-selectron-design.md`](docs/superpowers/specs/2026-05-18-selectron-design.md)
@@ -26,7 +26,7 @@ Update rules:
 
 ## Current state
 
-**Next action:** Task 4 — implement SelectronError with structured codes (TDD)
+**Next action:** Task 5 — Mulberry32 PRNG (TDD)
 
 **In flight (background):** none. All Phase 0 agents have reported (A3 just finished).
 
@@ -44,7 +44,7 @@ Update rules:
 | 1 | Bootstrap (Vite + React + Tailwind + Vitest) | **DONE** | `637ec14` | DONE_WITH_CONCERNS — implementer correctly excluded research/ artifacts from the bootstrap commit since A2/A4/A5/A6 had landed files in parallel. Research files committed separately in Task 18. |
 | 2 | README.md + CLAUDE.md | **DONE** | `191ed42` | Plan heredocs verbatim; CLAUDE.md adds Resume protocol section per Diego's directive. |
 | 3 | Core TS types (Criterion, Candidate, Posterior) | **DONE** | `fb5df0d` | Plan heredocs verbatim; `npx tsc --noEmit src/types/index.ts` exits 0. |
-| 4 | SelectronError (TDD) | PENDING | — | — |
+| 4 | SelectronError (TDD) | **DONE** | `1f3cb3a` | TDD red→green. `npm test -- tests/engine/errors.test.ts`: 2/2 pass. Self-review concern: test's `"E_TEST"` literal violates the `SelectronErrorCode` union; vitest passes (no typecheck at runtime) but `npm run typecheck` flags it. Plan heredoc was followed verbatim. Trivial fix can land at Task 12 sanity. |
 | 5 | Mulberry32 PRNG (TDD) | PENDING | — | — |
 | 6 | Marsaglia–Tsang Gamma sampler (TDD) | PENDING | — | — |
 | 7 | Dirichlet sampler + closed-form moments (TDD) | PENDING | — | — |
@@ -109,3 +109,4 @@ This is intentional triage — flag it now if Diego disagrees. The trade-off: ~5
 | 2026-05-18 08:25 | Task 2 implementer | Commit `191ed42` — README.md + CLAUDE.md (with Resume protocol section) |
 | 2026-05-18 08:35 | A3 | DONE — `psychological.md` (8 constructs, 7 with effect sizes) |
 | 2026-05-18 13:24 | Task 3 implementer | Commit `fb5df0d` — core TS types (Criterion, Candidate, Posterior) + barrel; typecheck clean |
+| 2026-05-18 13:30 | Task 4 implementer | Commit `1f3cb3a` — SelectronError class + structured code union; vitest 2/2; typecheck flags `"E_TEST"` literal in test (plan-heredoc verbatim, fixable at Task 12) |
