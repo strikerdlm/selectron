@@ -1,6 +1,6 @@
 # Selectron — STATUS
 
-**Last updated:** 2026-05-18 15:35 UTC
+**Last updated:** 2026-05-18 19:35 UTC
 **Current branch:** `iter1-phase0`
 **Active plan:** [`docs/superpowers/plans/2026-05-18-selectron-iter1-phase0.md`](docs/superpowers/plans/2026-05-18-selectron-iter1-phase0.md)
 **Active spec:** [`docs/superpowers/specs/2026-05-18-selectron-design.md`](docs/superpowers/specs/2026-05-18-selectron-design.md)
@@ -26,7 +26,7 @@ Update rules:
 
 ## Current state
 
-**Next action:** (a) Diego reviews `research/02_criterion_taxonomy.md` and ratifies into `docs/criteria.md` (Iter-2 start gate); (b) Diego performs Task 17 manual UI sanity at http://localhost:5173 — controller then issues the `release(iter1)` commit.
+**Next action:** (a) Diego reviews `research/02_criterion_taxonomy.md` and ratifies into `docs/criteria.md` (Iter-2 start gate); (b) Diego performs Task 17 manual UI sanity at http://localhost:5173 — controller then issues the `release(iter1)` commit; (c) **I&C evidence corpus expanded** — `research/evidence/INDEX.md` now lists **31 OCRed papers / 423 pages** (Tier 1 pilot + Tier 2 gap-fill: Mars500 psych, Antarctic-specific, team dynamics, sleep/ANS biomarkers, countermeasures, foundational small-group I&C). Diego decides next query batch (`countermeasures`, `astronaut selection`, `HRV analog`, `crew composition`, `personality selection`, …) for further scale-up.
 
 **In flight (background):** none. All Phase 0 agents have reported (A3 just finished).
 
@@ -59,6 +59,8 @@ Update rules:
 | 17 | Iter 1 acceptance (full suite + manual UI) | IN_PROGRESS | — | AUTOMATED CHECKS DONE — awaiting Diego manual UI sanity. Vitest: 8/8 files, 21/21 tests; typecheck exit 0; `npm run build` emits `dist/`. Diego still owes Step 4 (manual UI sanity in browser); release commit (Step 5) held until then. |
 | 18 | Phase 0 research fan-out | **DONE** | A1 retry by controller-staged data + synth subagent | All 6 agents delivered. A1: 25 central, 65 excluded, 198 related. Critical finding: zero Bayesian-MCDA papers in Diego's Zotero. |
 | 19 | Synthesis gate | **PROPOSAL DONE** | research/02_criterion_taxonomy.md | 20 rows, 4 families (psych, medical, behavioral, professional). 5 judgement calls flagged for Diego. Hard gate: Iter 2 begins when Diego copies the ratified taxonomy to `docs/criteria.md`. |
+| 20 | Evidence OCR pipeline pilot — Tier-1 I&C | **DONE** | (pending commit) | Zotero → Koofr WebDAV → Mistral OCR → markdown w/ YAML frontmatter. 11 papers, 213 pages, ~75s wall-clock, ~$0.25. Outputs at `research/evidence/`; manifest at `research/evidence/INDEX.md`. Reproducibility script `research/evidence/_build_evidence.py`. Pipeline reliable — ready to scale to other queries. |
+| 21 | Evidence OCR Tier 2 — broader I&C analog evidence | **DONE** | (pending commit) | 20 additional papers via queries `Mars500`, `Antarctic winter-over`, `HI-SEAS`, `SIRIUS`, `analog mission`. Tier-1 Yi×2 + Shea still PDF-unsynced. Tortello-2020 PDF was stored as multipart envelope (not raw PDF) — extracted via boundary split, OCRed cleanly. **Metadata audit found multiple Zotero record errors** (Spanish double-surname parse for Tortello; fabricated co-authors for Nirwan; wrong DOIs from filename-guess); `_build_evidence.py` now sources all metadata from the Zotero API record + OCR-body DOI overrides. 31 markdowns total / 423 pages / valid YAML. |
 
 ---
 
@@ -128,3 +130,5 @@ This is intentional triage — flag it now if Diego disagrees. The trade-off: ~5
 | 2026-05-18 15:10 | controller | MISTRAL_API_KEY added to /root/.claude/skills/zotero-pdf-ocr/.env (already in Selectron/.env per Diego). OCR now available on demand. |
 | 2026-05-18 15:30 | Task 19 synthesizer | DONE — research/02_criterion_taxonomy.md (3754 words, 20 rows, 4 families). 5 judgement calls flagged for Diego. |
 | 2026-05-18 15:35 | controller | Set git identity strikerdlm/dlmalpica@me.com (was wrongly yahoo.com); added tsbuildinfo + compiled-configs to .gitignore. |
+| 2026-05-18 17:50 | controller | Task 20 DONE — Zotero → OCR pipeline pilot. Searched `isolation and confinement` (24 hits; 21 with PDFs; Diego scoped Tier-1 = 11 papers). Fetched all 11 via Koofr WebDAV in 3 parallel batches; ran Mistral OCR in 4 parallel batches (max 3 concurrent). Pre-fix: stripped CRLF from MISTRAL_API_KEY in .env (request lib rejects `\r` in Authorization header). Wrote `research/evidence/{INDEX.md, *.md, _build_evidence.py, .gitignore}` (raw PDFs + raw OCR cached locally, gitignored). 213 pages OCRed in ~75 s wall, ~$0.25 cost. 3 highly-relevant papers (Yi 2014, Yi 2015, Shea 2009) skipped — no PDF synced to Koofr. |
+| 2026-05-18 19:35 | controller (zotero-pdf-ocr skill resumed) | Task 21 DONE — Tier-2 I&C expansion. Re-verified Yi×2 + Shea PDFs still unavailable. Ran 5 additional Zotero queries (`Mars500`, `Antarctic winter-over`, `HI-SEAS`, `SIRIUS`, `analog mission`) and curated 20 highest-signal I&C-relevant papers. Fetched 20 PDFs via Koofr (4 parallel batches of 5). Tortello-2020 PDF stored as multipart-envelope → extracted embedded `%PDF` via boundary split, OCRed cleanly. OCRed all 20 (3-parallel via xargs). Audited 20 frontmatters against canonical Zotero API records — found ~10 errors in my initial filename/guess-based metadata (Tortello author parse, Shved Frontiers-not-Springer, Glos journal, Nirwan fabricated co-authors, several DOI digit-flips). Rewrote `_build_evidence.py` to pull all metadata directly from Zotero API + OCR-body DOI overrides. Added `yaml_quote` to escape nested quotes in titles (Pattyn 2017). `INDEX.md` now lists 31 papers / 423 pages with full Tier-1/Tier-2 split, Selectron-relevance notes, and known-gotchas. All 31 frontmatters validated via PyYAML safe_load. |
