@@ -1,6 +1,6 @@
 # Selectron — STATUS
 
-**Last updated:** 2026-05-18 08:25 UTC
+**Last updated:** 2026-05-18 08:35 UTC
 **Current branch:** `iter1-phase0`
 **Active plan:** [`docs/superpowers/plans/2026-05-18-selectron-iter1-phase0.md`](docs/superpowers/plans/2026-05-18-selectron-iter1-phase0.md)
 **Active spec:** [`docs/superpowers/specs/2026-05-18-selectron-design.md`](docs/superpowers/specs/2026-05-18-selectron-design.md)
@@ -28,8 +28,7 @@ Update rules:
 
 **Next action:** Task 3 — create core TS types (Criterion, Candidate, Posterior)
 
-**In flight (background):**
-- Agent A3 (psychological constructs evidence table) is still running. Wait for its completion notification.
+**In flight (background):** none. All Phase 0 agents have reported (A3 just finished).
 
 **Blocked:**
 - Agent A1 (Zotero inventory) reported BLOCKED — its subagent environment denied Bash, so it could not invoke `zotero_search.py` / `fetch_pdf.py`. Re-dispatch plan: the controller will run the scripts directly in the main thread, save raw JSON + extracted PDFs to `research/sources/`, then dispatch a fresh A1 whose only job is to synthesize the inventory from the pre-staged data.
@@ -59,7 +58,7 @@ Update rules:
 | 15 | CriterionInput | PENDING | — | — |
 | 16 | App.tsx wiring + smoke build | PENDING | — | — |
 | 17 | Iter 1 acceptance (full suite + manual UI) | PENDING | — | Diego sanity-checks the live UI. |
-| 18 | Phase 0 research fan-out | IN_PROGRESS (4/6 done) | — | A2, A4, A5, A6 DONE; A3 running; A1 BLOCKED (see Phase 0 sub-status). |
+| 18 | Phase 0 research fan-out | IN_PROGRESS (5/6 done) | — | A2, A3, A4, A5, A6 DONE; A1 BLOCKED (see Phase 0 sub-status). |
 | 19 | Synthesis gate (taxonomy proposal → Diego ratifies → `docs/criteria.md`) | PENDING | — | Hard gate for Iter 2. Cannot run before Task 18 is complete. |
 
 ---
@@ -70,7 +69,7 @@ Update rules:
 |-------|-------|--------|--------|-------|
 | A1 | Zotero inventory + synthesis | **BLOCKED** | none yet | Subagent denied Bash; cannot call `zotero_search.py`. Fix plan above. |
 | A2 | Existing frameworks comparison | **DONE** | `research/04_existing_frameworks.md` | 10 frameworks (ASTRA, ESA, NASA, JAXA, D-MARS, OEWF, HI-SEAS, MDRS, CSA, Roscosmos); 1 paywalled (ASTRA). Funnels reconstructed from primary sources. |
-| A3 | Psychological constructs evidence table | RUNNING | — | Background, agent ID `a16a97e4f87c71430`. |
+| A3 | Psychological constructs evidence table | **DONE** | `research/evidence_tables/psychological.md` | 8 constructs; 7 with peer-reviewed predictive validity. Flags Schmidt & Hunter 1998 ρ=.51 GMA as overstated — uses Sackett 2022 / Berry 2024 recalibrations (ρ≈.31) for downstream MCDA weights. |
 | A4 | Medical / physiological criteria | **DONE** | `research/evidence_tables/medical.md` | 11 domains; 9 with explicit numeric thresholds verbatim from primary sources. |
 | A5 | Behavioral / team performance | **DONE** | `research/evidence_tables/behavioral.md` | 9 constructs; 3 with retrieved peer-reviewed predictive validity. |
 | A6 | Bayesian MCDA precedents | **DONE** | `research/methodology_precedents.md` | 7 precedents; novelty claim — no published Bayesian MCDA in astronaut / aircrew selection. |
@@ -108,3 +107,4 @@ This is intentional triage — flag it now if Diego disagrees. The trade-off: ~5
 | 2026-05-18 08:09 | A5 | DONE — `behavioral.md` |
 | 2026-05-18 08:15 | controller | Created this STATUS.md (per Diego's resume-file directive) |
 | 2026-05-18 08:25 | Task 2 implementer | Commit `191ed42` — README.md + CLAUDE.md (with Resume protocol section) |
+| 2026-05-18 08:35 | A3 | DONE — `psychological.md` (8 constructs, 7 with effect sizes) |
