@@ -11,6 +11,6 @@ describe("SelectronError", () => {
   });
 
   it("is instanceof Error", () => {
-    expect(new SelectronError("E_TEST", "x")).toBeInstanceOf(Error);
+    expect(new SelectronError("E_BAD_SCORE", "x")).toBeInstanceOf(Error);
   });
 });

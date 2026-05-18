@@ -1,7 +1,6 @@
 import { describe, it, expect } from "vitest";
 import { scoreCandidate, closedFormMoments } from "@/engine/mcda";
 import { PLACEHOLDER_CRITERIA } from "@/data/placeholder-criteria";
-import { makeRng } from "@/engine/prng";
 import type { Candidate } from "@/types";
 
 const demo: Candidate = {
