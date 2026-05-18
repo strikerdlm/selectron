@@ -1,6 +1,6 @@
 # Selectron — STATUS
 
-**Last updated:** 2026-05-18 13:32 UTC
+**Last updated:** 2026-05-18 13:34 UTC
 **Current branch:** `iter1-phase0`
 **Active plan:** [`docs/superpowers/plans/2026-05-18-selectron-iter1-phase0.md`](docs/superpowers/plans/2026-05-18-selectron-iter1-phase0.md)
 **Active spec:** [`docs/superpowers/specs/2026-05-18-selectron-design.md`](docs/superpowers/specs/2026-05-18-selectron-design.md)
@@ -26,7 +26,7 @@ Update rules:
 
 ## Current state
 
-**Next action:** Task 6 — Marsaglia–Tsang Gamma sampler (TDD)
+**Next action:** Task 7 — Dirichlet sampler + closed-form moments (TDD)
 
 **In flight (background):** none. All Phase 0 agents have reported (A3 just finished).
 
@@ -46,7 +46,7 @@ Update rules:
 | 3 | Core TS types (Criterion, Candidate, Posterior) | **DONE** | `fb5df0d` | Plan heredocs verbatim; `npx tsc --noEmit src/types/index.ts` exits 0. |
 | 4 | SelectronError (TDD) | **DONE** | `1f3cb3a` | TDD red→green. `npm test -- tests/engine/errors.test.ts`: 2/2 pass. Self-review concern: test's `"E_TEST"` literal violates the `SelectronErrorCode` union; vitest passes (no typecheck at runtime) but `npm run typecheck` flags it. Plan heredoc was followed verbatim. Trivial fix can land at Task 12 sanity. |
 | 5 | Mulberry32 PRNG (TDD) | **DONE** | `456257c` | TDD red→green. `npm test -- tests/engine/prng.test.ts`: 3/3 pass. Plan heredocs verbatim; reference Mulberry32 implementation. |
-| 6 | Marsaglia–Tsang Gamma sampler (TDD) | PENDING | — | — |
+| 6 | Marsaglia–Tsang Gamma sampler (TDD) | **DONE** | `4b94ae0` | TDD red→green. `npm test -- tests/engine/gamma.test.ts`: 3/3 pass. Plan heredocs verbatim; Marsaglia–Tsang acceptance-rejection + Stuart boosting for shape < 1; Box–Muller standard normal proposal. |
 | 7 | Dirichlet sampler + closed-form moments (TDD) | PENDING | — | — |
 | 8 | 5 placeholder criteria | PENDING | — | — |
 | 9 | Score normalization (TDD) | PENDING | — | — |
@@ -111,3 +111,4 @@ This is intentional triage — flag it now if Diego disagrees. The trade-off: ~5
 | 2026-05-18 13:24 | Task 3 implementer | Commit `fb5df0d` — core TS types (Criterion, Candidate, Posterior) + barrel; typecheck clean |
 | 2026-05-18 13:30 | Task 4 implementer | Commit `1f3cb3a` — SelectronError class + structured code union; vitest 2/2; typecheck flags `"E_TEST"` literal in test (plan-heredoc verbatim, fixable at Task 12) |
 | 2026-05-18 13:32 | Task 5 implementer | Commit `456257c` — Mulberry32 seeded PRNG (`makeRng`); vitest 3/3 (range, determinism, seed sensitivity) |
+| 2026-05-18 13:34 | Task 6 implementer | Commit `4b94ae0` — Marsaglia–Tsang Gamma sampler (shape≥1 acceptance-rejection + Stuart boosting for shape<1); vitest 3/3 (mean=variance=shape within 5% for shape=5 and shape=0.5; positivity) |
