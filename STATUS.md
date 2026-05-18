@@ -1,6 +1,6 @@
 # Selectron — STATUS
 
-**Last updated:** 2026-05-18 09:09 UTC
+**Last updated:** 2026-05-18 14:17 UTC
 **Current branch:** `iter1-phase0`
 **Active plan:** [`docs/superpowers/plans/2026-05-18-selectron-iter1-phase0.md`](docs/superpowers/plans/2026-05-18-selectron-iter1-phase0.md)
 **Active spec:** [`docs/superpowers/specs/2026-05-18-selectron-design.md`](docs/superpowers/specs/2026-05-18-selectron-design.md)
@@ -26,7 +26,7 @@ Update rules:
 
 ## Current state
 
-**Next action:** Task 16 — App.tsx wiring + smoke build
+**Next action:** Task 17 — Iter 1 acceptance (full suite + manual UI check)
 
 **In flight (background):** none. All Phase 0 agents have reported (A3 just finished).
 
@@ -56,7 +56,7 @@ Update rules:
 | 13 | ScoreCard component | **DONE** | `ebbb251` | Plan heredoc verbatim; pure presentational component renders mean, CI90, CI95, CI₉₀ width, and ESS. Project typecheck shows only the expected deferred `App.tsx` error. |
 | 14 | PosteriorPlot (ECharts) | **DONE** | `0d20963` | Plan heredoc verbatim; ECharts core registration (BarChart, LineChart, Grid/Title/Tooltip/MarkLine/MarkArea, CanvasRenderer); 40-bin histogram with CI₉₀ shaded `markArea` and mean `markLine`. Project typecheck shows only the expected deferred `App.tsx` error. |
 | 15 | CriterionInput | **DONE** | `8b77b93` | Plan heredoc verbatim; controlled range slider over `criterion.scale.{min,max}` with `(max-min)/100` step, instrument + family meta, 1-decimal numeric readout; calls `onChange(parseFloat(...))`. Project typecheck shows only the expected deferred `App.tsx` error. |
-| 16 | App.tsx wiring + smoke build | PENDING | — | — |
+| 16 | App.tsx wiring + smoke build | **DONE** | `eb2f89f` | Plan heredoc verbatim; wires `PLACEHOLDER_CRITERIA` → `CriterionInput` sliders → `scoreCandidate` (5000 iters, seed `0xc0ffee`) → `ScoreCard` + `PosteriorPlot`. Build green (`dist/index.html` + `assets/index-*.{js,css}`). Dev-server smoke curl returns HTML with `<div id="root">`. Preceded by chore `8d3e025` (`chore(build): drop stale vitest coverage stub`) — vitest.config.ts had a `coverage: { reporter: ... }` block with no `provider` discriminant, which `tsc -b` (full project build) rejected. No coverage provider package was installed anyway, so the block was dead config. |
 | 17 | Iter 1 acceptance (full suite + manual UI) | PENDING | — | Diego sanity-checks the live UI. |
 | 18 | Phase 0 research fan-out | IN_PROGRESS (5/6 done) | — | A2, A3, A4, A5, A6 DONE; A1 BLOCKED (see Phase 0 sub-status). |
 | 19 | Synthesis gate (taxonomy proposal → Diego ratifies → `docs/criteria.md`) | PENDING | — | Hard gate for Iter 2. Cannot run before Task 18 is complete. |
@@ -121,3 +121,5 @@ This is intentional triage — flag it now if Diego disagrees. The trade-off: ~5
 | 2026-05-18 09:05 | Task 13 implementer | Commit `ebbb251` — ScoreCard presentational component (`src/ui/components/ScoreCard.tsx`); plan heredoc verbatim; renders mean, CI90, CI95, CI₉₀ width, ESS via Tailwind utility classes; project typecheck shows only the expected deferred `App.tsx` error. |
 | 2026-05-18 09:07 | Task 14 implementer | Commit `0d20963` — PosteriorPlot ECharts histogram (`src/ui/components/PosteriorPlot.tsx`); plan heredoc verbatim; per-module ECharts registration via `echarts/core` + `echarts-for-react/lib/core`; 40-bin histogram, CI₉₀ shaded markArea, mean markLine; project typecheck shows only the expected deferred `App.tsx` error. |
 | 2026-05-18 09:09 | Task 15 implementer | Commit `8b77b93` — CriterionInput controlled slider (`src/ui/components/CriterionInput.tsx`); plan heredoc verbatim; range input over `scale.min`/`scale.max` with `(max-min)/100` step, instrument + uppercase family meta, 1-decimal tabular readout, `accent-blue-900`; project typecheck shows only the expected deferred `App.tsx` error. |
+| 2026-05-18 14:15 | Task 16 implementer | Commit `8d3e025` — `chore(build): drop stale vitest coverage stub`. Pre-existing config bug: vitest.config.ts had `coverage: { reporter: ["text","html"] }` with no `provider` field. `tsc --noEmit` (main tsconfig) never walked into it, but `tsc -b` (full project build, used by `npm run build`) does and rejects it. No coverage provider package installed → dead config → removed cleanly. |
+| 2026-05-18 14:17 | Task 16 implementer | Commit `eb2f89f` — `feat(ui): App wiring sliders to MCDA scoring + posterior plot`. Plan heredoc verbatim. Typecheck clean (no output), `npm run build` emits `dist/index.html` + bundle (714 kB JS, 7.8 kB CSS), dev server smoke curl returns HTML containing `<div id="root">`. |
