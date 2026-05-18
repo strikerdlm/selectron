@@ -1,6 +1,6 @@
 # Selectron — STATUS
 
-**Last updated:** 2026-05-18 08:48 UTC
+**Last updated:** 2026-05-18 08:54 UTC
 **Current branch:** `iter1-phase0`
 **Active plan:** [`docs/superpowers/plans/2026-05-18-selectron-iter1-phase0.md`](docs/superpowers/plans/2026-05-18-selectron-iter1-phase0.md)
 **Active spec:** [`docs/superpowers/specs/2026-05-18-selectron-design.md`](docs/superpowers/specs/2026-05-18-selectron-design.md)
@@ -26,7 +26,7 @@ Update rules:
 
 ## Current state
 
-**Next action:** Task 10 — Bayesian MCDA + closed-form moment check (TDD)
+**Next action:** Task 11 — Synthetic candidate generator (TDD)
 
 **In flight (background):** none. All Phase 0 agents have reported (A3 just finished).
 
@@ -50,7 +50,7 @@ Update rules:
 | 7 | Dirichlet sampler + closed-form moments (TDD) | **DONE** | `26f4f92` | TDD red→green. `npm test -- tests/engine/dirichlet.test.ts`: 2/2 pass. Plan heredocs verbatim; Dirichlet via Gamma normalization (w_k = G_k / sum(G_l)); closed-form mean alpha_k/s and variance alpha_k(s-alpha_k)/(s^2(s+1)). |
 | 8 | 5 placeholder criteria | **DONE** | `b315c1c` | Plan heredocs verbatim. `npm test -- tests/engine/placeholder-criteria.test.ts`: 2/2 pass. 5 criteria across psychological (2), physical (1), professional (1), behavioral (1) families; each carries a DOI citation. |
 | 9 | Score normalization (TDD) | **DONE** | `a802b5b` | TDD red→green. `npm test -- tests/engine/normalize.test.ts`: 3/3 pass. Plan heredocs verbatim; affine map [min,max]→[0,1] with `higherIsBetter` flip and `SelectronError("E_BAD_SCORE", …)` on out-of-range input. |
-| 10 | Bayesian MCDA + closed-form moment check (TDD) | PENDING | — | Scientific core; full subagent two-stage review (spec + quality) required. |
+| 10 | Bayesian MCDA + closed-form moment check (TDD) | **DONE** | `43e4149` | TDD red→green. `npm test -- tests/engine/mcda.test.ts`: 3/3 pass. Plan heredocs verbatim. Closed-form vs 50k-sample empirical: mean rel-err 1.0e-5 (limit 2%), variance rel-err 2.7e-3 (limit 5%) — both well inside tolerance. |
 | 11 | Synthetic candidate generator | PENDING | — | — |
 | 12 | Engine barrel + full-suite sanity | PENDING | — | — |
 | 13 | ScoreCard component | PENDING | — | — |
@@ -115,3 +115,4 @@ This is intentional triage — flag it now if Diego disagrees. The trade-off: ~5
 | 2026-05-18 13:38 | Task 7 implementer | Commit `26f4f92` — Dirichlet sampler via Gamma normalization + closed-form mean/variance; vitest 2/2 (simplex constraint within 1e-9; empirical mean/variance match closed-form within 3% over 50k samples for alpha=[2,3,5]) |
 | 2026-05-18 08:40 | Task 8 implementer | Commit `b315c1c` — 5 placeholder criteria for Iter 1; vitest 2/2 (5 entries; unique ids, sane scales, ≥1 citation each) |
 | 2026-05-18 08:48 | Task 9 implementer | Commit `a802b5b` — score normalization with structured error; vitest 3/3 (affine map; higherIsBetter flip; SelectronError on out-of-range) |
+| 2026-05-18 08:54 | Task 10 implementer | Commit `43e4149` — Bayesian MCDA scorer + closed-form moments; vitest 3/3 (Posterior shape; closed-form vs 50k-sample empirical within mean 2% / variance 5% — actual mean rel-err 1.0e-5, variance rel-err 2.7e-3; seed determinism) |
