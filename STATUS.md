@@ -1,6 +1,6 @@
 # Selectron — STATUS
 
-**Last updated:** 2026-05-18 13:34 UTC
+**Last updated:** 2026-05-18 13:38 UTC
 **Current branch:** `iter1-phase0`
 **Active plan:** [`docs/superpowers/plans/2026-05-18-selectron-iter1-phase0.md`](docs/superpowers/plans/2026-05-18-selectron-iter1-phase0.md)
 **Active spec:** [`docs/superpowers/specs/2026-05-18-selectron-design.md`](docs/superpowers/specs/2026-05-18-selectron-design.md)
@@ -26,7 +26,7 @@ Update rules:
 
 ## Current state
 
-**Next action:** Task 7 — Dirichlet sampler + closed-form moments (TDD)
+**Next action:** Task 8 — 5 placeholder criteria for Iter 1
 
 **In flight (background):** none. All Phase 0 agents have reported (A3 just finished).
 
@@ -47,7 +47,7 @@ Update rules:
 | 4 | SelectronError (TDD) | **DONE** | `1f3cb3a` | TDD red→green. `npm test -- tests/engine/errors.test.ts`: 2/2 pass. Self-review concern: test's `"E_TEST"` literal violates the `SelectronErrorCode` union; vitest passes (no typecheck at runtime) but `npm run typecheck` flags it. Plan heredoc was followed verbatim. Trivial fix can land at Task 12 sanity. |
 | 5 | Mulberry32 PRNG (TDD) | **DONE** | `456257c` | TDD red→green. `npm test -- tests/engine/prng.test.ts`: 3/3 pass. Plan heredocs verbatim; reference Mulberry32 implementation. |
 | 6 | Marsaglia–Tsang Gamma sampler (TDD) | **DONE** | `4b94ae0` | TDD red→green. `npm test -- tests/engine/gamma.test.ts`: 3/3 pass. Plan heredocs verbatim; Marsaglia–Tsang acceptance-rejection + Stuart boosting for shape < 1; Box–Muller standard normal proposal. |
-| 7 | Dirichlet sampler + closed-form moments (TDD) | PENDING | — | — |
+| 7 | Dirichlet sampler + closed-form moments (TDD) | **DONE** | `26f4f92` | TDD red→green. `npm test -- tests/engine/dirichlet.test.ts`: 2/2 pass. Plan heredocs verbatim; Dirichlet via Gamma normalization (w_k = G_k / sum(G_l)); closed-form mean alpha_k/s and variance alpha_k(s-alpha_k)/(s^2(s+1)). |
 | 8 | 5 placeholder criteria | PENDING | — | — |
 | 9 | Score normalization (TDD) | PENDING | — | — |
 | 10 | Bayesian MCDA + closed-form moment check (TDD) | PENDING | — | Scientific core; full subagent two-stage review (spec + quality) required. |
@@ -112,3 +112,4 @@ This is intentional triage — flag it now if Diego disagrees. The trade-off: ~5
 | 2026-05-18 13:30 | Task 4 implementer | Commit `1f3cb3a` — SelectronError class + structured code union; vitest 2/2; typecheck flags `"E_TEST"` literal in test (plan-heredoc verbatim, fixable at Task 12) |
 | 2026-05-18 13:32 | Task 5 implementer | Commit `456257c` — Mulberry32 seeded PRNG (`makeRng`); vitest 3/3 (range, determinism, seed sensitivity) |
 | 2026-05-18 13:34 | Task 6 implementer | Commit `4b94ae0` — Marsaglia–Tsang Gamma sampler (shape≥1 acceptance-rejection + Stuart boosting for shape<1); vitest 3/3 (mean=variance=shape within 5% for shape=5 and shape=0.5; positivity) |
+| 2026-05-18 13:38 | Task 7 implementer | Commit `26f4f92` — Dirichlet sampler via Gamma normalization + closed-form mean/variance; vitest 2/2 (simplex constraint within 1e-9; empirical mean/variance match closed-form within 3% over 50k samples for alpha=[2,3,5]) |
