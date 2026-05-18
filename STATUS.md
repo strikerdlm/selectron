@@ -1,6 +1,6 @@
 # Selectron — STATUS
 
-**Last updated:** 2026-05-18 08:54 UTC
+**Last updated:** 2026-05-18 14:00 UTC
 **Current branch:** `iter1-phase0`
 **Active plan:** [`docs/superpowers/plans/2026-05-18-selectron-iter1-phase0.md`](docs/superpowers/plans/2026-05-18-selectron-iter1-phase0.md)
 **Active spec:** [`docs/superpowers/specs/2026-05-18-selectron-design.md`](docs/superpowers/specs/2026-05-18-selectron-design.md)
@@ -26,7 +26,7 @@ Update rules:
 
 ## Current state
 
-**Next action:** Task 11 — Synthetic candidate generator (TDD)
+**Next action:** Task 12 — Engine barrel + full-suite sanity
 
 **In flight (background):** none. All Phase 0 agents have reported (A3 just finished).
 
@@ -51,7 +51,7 @@ Update rules:
 | 8 | 5 placeholder criteria | **DONE** | `b315c1c` | Plan heredocs verbatim. `npm test -- tests/engine/placeholder-criteria.test.ts`: 2/2 pass. 5 criteria across psychological (2), physical (1), professional (1), behavioral (1) families; each carries a DOI citation. |
 | 9 | Score normalization (TDD) | **DONE** | `a802b5b` | TDD red→green. `npm test -- tests/engine/normalize.test.ts`: 3/3 pass. Plan heredocs verbatim; affine map [min,max]→[0,1] with `higherIsBetter` flip and `SelectronError("E_BAD_SCORE", …)` on out-of-range input. |
 | 10 | Bayesian MCDA + closed-form moment check (TDD) | **DONE** | `43e4149` | TDD red→green. `npm test -- tests/engine/mcda.test.ts`: 3/3 pass. Plan heredocs verbatim. Closed-form vs 50k-sample empirical: mean rel-err 1.0e-5 (limit 2%), variance rel-err 2.7e-3 (limit 5%) — both well inside tolerance. |
-| 11 | Synthetic candidate generator | PENDING | — | — |
+| 11 | Synthetic candidate generator | **DONE** | `3b7b0be` | TDD red→green. `npm test -- tests/engine/synthetic.test.ts`: 3/3 pass. Plan heredocs verbatim; deterministic per-seed candidate generation (scores uniformly drawn within each criterion's scale via Mulberry32 PRNG) and N-candidate helper with unique synthetic ids. |
 | 12 | Engine barrel + full-suite sanity | PENDING | — | — |
 | 13 | ScoreCard component | PENDING | — | — |
 | 14 | PosteriorPlot (ECharts) | PENDING | — | — |
@@ -116,3 +116,4 @@ This is intentional triage — flag it now if Diego disagrees. The trade-off: ~5
 | 2026-05-18 08:40 | Task 8 implementer | Commit `b315c1c` — 5 placeholder criteria for Iter 1; vitest 2/2 (5 entries; unique ids, sane scales, ≥1 citation each) |
 | 2026-05-18 08:48 | Task 9 implementer | Commit `a802b5b` — score normalization with structured error; vitest 3/3 (affine map; higherIsBetter flip; SelectronError on out-of-range) |
 | 2026-05-18 08:54 | Task 10 implementer | Commit `43e4149` — Bayesian MCDA scorer + closed-form moments; vitest 3/3 (Posterior shape; closed-form vs 50k-sample empirical within mean 2% / variance 5% — actual mean rel-err 1.0e-5, variance rel-err 2.7e-3; seed determinism) |
+| 2026-05-18 14:00 | Task 11 implementer | Commit `3b7b0be` — seeded synthetic candidate generator (`generateCandidate` + `generateCandidates`); vitest 3/3 (in-scale scores; seed determinism; N unique-id candidates) |
