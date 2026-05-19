@@ -478,7 +478,8 @@ export function MissionComparison({ candidateId }: MissionComparisonProps) {
       <FigureCaption
         block={f7Caption({
           trials: 25000,
-          seed: 0xfeed,
+          seedBase: 0xfeed,
+          missionCount: ANALOG_MISSIONS.length,
           priorsVersion: SYNTHETIC_PRIORS.model_version,
         })}
       />
