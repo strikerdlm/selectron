@@ -18,6 +18,8 @@
 import ReactEChartsCore from "echarts-for-react/lib/core";
 import { echarts } from "./echarts-base";
 import { NATURE_THEME_NAME } from "./theme";
+import { FigureCaption } from "./FigureCaption";
+import { f2Caption } from "./captions/F2.captions";
 
 // Wong-7 bluish green for bars (#009E73) — colorblind-safe.
 // Gradient: sky-blue (#56B4E9) at top → bluish-green (#009E73) at bottom for depth.
@@ -77,9 +79,21 @@ export type RiskHistogramProps = {
   chiSamples: number[];
   chiMean: number;
   chiCi90: readonly [number, number];
+  seed?: number;
+  trials?: number;
+  missionId?: string;
+  priorsVersion?: string;
 };
 
-export function RiskHistogram({ chiSamples, chiMean, chiCi90 }: RiskHistogramProps) {
+export function RiskHistogram({
+  chiSamples,
+  chiMean,
+  chiCi90,
+  seed = 0xc0ffee,
+  trials,
+  missionId = "—",
+  priorsVersion = "synthetic-iter3-ui-scaffold",
+}: RiskHistogramProps) {
   // Empty-state guard: fewer than 10 samples → no meaningful histogram.
   if (chiSamples.length < 10) {
     return (
@@ -218,12 +232,24 @@ export function RiskHistogram({ chiSamples, chiMean, chiCi90 }: RiskHistogramPro
   };
 
   return (
-    <ReactEChartsCore
-      echarts={echarts}
-      option={option}
-      theme={NATURE_THEME_NAME}
-      style={{ height: 360, width: "100%" }}
-      notMerge
-    />
+    <>
+      <ReactEChartsCore
+        echarts={echarts}
+        option={option}
+        theme={NATURE_THEME_NAME}
+        style={{ height: 360, width: "100%" }}
+        notMerge
+      />
+      <FigureCaption
+        block={f2Caption({
+          chiMean,
+          chiCi90,
+          trials: trials ?? chiSamples.length,
+          seed,
+          missionId,
+          priorsVersion,
+        })}
+      />
+    </>
   );
 }

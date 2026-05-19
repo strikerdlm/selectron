@@ -18,6 +18,8 @@ import ReactEChartsCore from "echarts-for-react/lib/core";
 import type { CustomSeriesRenderItemAPI } from "echarts";
 import { echarts } from "./echarts-base";
 import { NATURE_THEME_NAME } from "./theme";
+import { FigureCaption } from "./FigureCaption";
+import { f4Caption } from "./captions/F4.captions";
 
 export type DashboardSummaryDatum = {
   candidateId: string;
@@ -186,12 +188,15 @@ export function DashboardSummary({ data }: Props) {
   };
 
   return (
-    <ReactEChartsCore
-      echarts={echarts}
-      option={option}
-      theme={NATURE_THEME_NAME}
-      style={{ height: 280, width: "100%" }}
-      notMerge
-    />
+    <>
+      <ReactEChartsCore
+        echarts={echarts}
+        option={option}
+        theme={NATURE_THEME_NAME}
+        style={{ height: 280, width: "100%" }}
+        notMerge
+      />
+      <FigureCaption block={f4Caption({ n: data.length })} />
+    </>
   );
 }

@@ -48,10 +48,21 @@ export function Sim({
             chiSamples={latest.chiSamples}
             chiMean={latest.posterior.chi.mean}
             chiCi90={latest.posterior.chi.ci90}
+            seed={latest.seed}
+            trials={latest.trials}
+            missionId={latest.missionId}
+            priorsVersion={latest.priorsVersion}
           />
         </section>
         <section className="lg:col-span-12 panel p-6">
-          <ConditionContribution posterior={latest.posterior} conditions={ANALOG_CONDITIONS} />
+          <ConditionContribution
+            posterior={latest.posterior}
+            conditions={ANALOG_CONDITIONS}
+            trials={latest.trials}
+            seed={latest.seed}
+            missionId={latest.missionId}
+            priorsVersion={latest.priorsVersion}
+          />
         </section>
         {mission && (
           <section className="lg:col-span-12">

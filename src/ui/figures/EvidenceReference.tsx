@@ -18,6 +18,8 @@ import ReactEChartsCore from "echarts-for-react/lib/core";
 import { echarts } from "./echarts-base";
 import { NATURE_THEME_NAME } from "./theme";
 import type { Criterion } from "@/types";
+import { FigureCaption } from "./FigureCaption";
+import { f5Caption } from "./captions/F5.captions";
 
 // Reference-distribution area: subtle pale grey.
 const REF_AREA_COLOR = "rgba(100, 116, 139, 0.25)";
@@ -120,12 +122,15 @@ export function EvidenceReference({ criterion, enteredValue }: EvidenceReference
   };
 
   return (
-    <ReactEChartsCore
-      echarts={echarts}
-      option={option}
-      theme={NATURE_THEME_NAME}
-      style={{ height: 60, width: 180 }}
-      notMerge
-    />
+    <>
+      <ReactEChartsCore
+        echarts={echarts}
+        option={option}
+        theme={NATURE_THEME_NAME}
+        style={{ height: 60, width: 180 }}
+        notMerge
+      />
+      <FigureCaption block={f5Caption(criterion, enteredValue)} />
+    </>
   );
 }

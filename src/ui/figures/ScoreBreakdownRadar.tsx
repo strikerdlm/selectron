@@ -19,6 +19,8 @@
 import ReactEChartsCore from "echarts-for-react/lib/core";
 import { echarts } from "./echarts-base";
 import { NATURE_THEME_NAME } from "./theme";
+import { FigureCaption } from "./FigureCaption";
+import { f6Caption } from "./captions/F6.captions";
 
 export type RadarDatum = {
   criterionId: string;
@@ -80,13 +82,18 @@ export function ScoreBreakdownRadar({ data }: Props) {
     ],
   };
 
+  const totalScore = data.reduce((s, d) => s + d.contribution, 0);
+
   return (
-    <ReactEChartsCore
-      echarts={echarts}
-      option={option}
-      theme={NATURE_THEME_NAME}
-      style={{ height: 280, width: "100%" }}
-      notMerge
-    />
+    <>
+      <ReactEChartsCore
+        echarts={echarts}
+        option={option}
+        theme={NATURE_THEME_NAME}
+        style={{ height: 280, width: "100%" }}
+        notMerge
+      />
+      <FigureCaption block={f6Caption({ totalScore })} />
+    </>
   );
 }

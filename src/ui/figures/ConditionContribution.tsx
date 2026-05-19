@@ -23,6 +23,8 @@ import type { CustomSeriesRenderItemAPI } from "echarts";
 import { echarts } from "./echarts-base";
 import { NATURE_THEME_NAME } from "./theme";
 import type { Condition, ConditionFamily, RiskPosterior } from "@/types/risk";
+import { FigureCaption } from "./FigureCaption";
+import { f3Caption } from "./captions/F3.captions";
 
 // Okabe-Ito colorblind-safe palette (as specified in task brief / T81).
 const FAMILY_COLOR: Record<ConditionFamily, string> = {
@@ -36,6 +38,10 @@ const FAMILY_COLOR: Record<ConditionFamily, string> = {
 type Props = {
   posterior: RiskPosterior;
   conditions: readonly Condition[];
+  trials?: number;
+  seed?: number;
+  missionId?: string;
+  priorsVersion?: string;
 };
 
 const days = (x: number) => x.toFixed(2) + "d";
@@ -97,7 +103,14 @@ function ciWhiskerRenderItem(
   };
 }
 
-export function ConditionContribution({ posterior, conditions }: Props) {
+export function ConditionContribution({
+  posterior,
+  conditions,
+  trials = 25000,
+  seed = 0xc0ffee,
+  missionId = "—",
+  priorsVersion = "synthetic-iter3-ui-scaffold",
+}: Props) {
   // Build and sort entries descending by mean QTL.
   const entries = conditions
     .map((c) => {
@@ -269,6 +282,15 @@ export function ConditionContribution({ posterior, conditions }: Props) {
           </ul>
         </>
       )}
+      <FigureCaption
+        block={f3Caption({
+          totalQtlMean: total,
+          trials,
+          seed,
+          missionId,
+          priorsVersion,
+        })}
+      />
     </div>
   );
 }

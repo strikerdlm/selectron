@@ -25,6 +25,8 @@ import { simulateMission } from "@/risk/simulate";
 import { saveSimSession, recentSimsFor, getCandidateWithEvidence } from "@/db/repository";
 import type { SimSession } from "@/db/schema";
 import { notify } from "@/ui/components/Toast";
+import { FigureCaption } from "./FigureCaption";
+import { f7Caption } from "./captions/F7.captions";
 
 // ---------------------------------------------------------------------------
 // Design constants
@@ -469,6 +471,13 @@ export function MissionComparison({ candidateId }: MissionComparisonProps) {
           );
         })}
       </div>
+      <FigureCaption
+        block={f7Caption({
+          trials: 25000,
+          seed: 0xfeed,
+          priorsVersion: SYNTHETIC_PRIORS.model_version,
+        })}
+      />
     </div>
   );
 }
