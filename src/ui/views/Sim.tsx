@@ -8,6 +8,7 @@ import { RiskHistogram } from "@/ui/figures/RiskHistogram";
 import { ConditionContribution } from "@/ui/figures/ConditionContribution";
 import { MissionComparison } from "@/ui/figures/MissionComparison";
 import { IMMCalculationTrace } from "@/ui/figures/CalculationTrace";
+import { CHIExplainer } from "@/ui/figures/CHIExplainer";
 import type { AccessTier } from "@/types";
 import { ACCESS_TIERS } from "@/types";
 
@@ -94,6 +95,15 @@ export function Sim({
           />
         </section>
       </div>
+
+      {/* CHI EXPLAINER — Diego scope expansion 2026-05-19: define CHI and
+          interpret this specific run for the mission. Lives directly below the
+          headline RiskCard + RiskHistogram row. */}
+      <CHIExplainer
+        posterior={latest.posterior}
+        chiStar={latest.chiStar}
+        missionId={latest.missionId}
+      />
 
       {/* CALCULATION TRACE — Diego scope expansion 2026-05-19: priority on
           showing how we got to the probability, with educational lay layer. */}

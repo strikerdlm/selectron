@@ -47,13 +47,16 @@ export function App() {
         {/* HEADER ─────────────────────────────────────────────────────────────── */}
         <header className="border-b border-line">
           <div className="mx-auto flex max-w-7xl items-center justify-between px-8 py-5">
-            <div className="flex items-baseline gap-3">
+            <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
               <h1
                 className="display text-2xl text-ink-0 tracking-tight cursor-pointer"
                 onClick={() => setView({ kind: "dashboard" })}
               >
                 SELECTRON
               </h1>
+              <span className="mono text-[11px] uppercase tracking-cap text-ink-1">
+                by <span className="text-ink-0">Diego Malpica MD</span>
+              </span>
               <span className="label text-signal">iter 03 · phase 3f</span>
             </div>
             <div className="mono flex items-center gap-6 text-[11px] text-ink-2">
