@@ -1,4 +1,4 @@
-import { createContext, useCallback, useContext, useEffect, useState, type ReactNode } from "react";
+import { createContext, useCallback, useContext, useEffect, useRef, useState, type ReactNode } from "react";
 import type { DbCandidate, CriterionEntry } from "@/db/schema";
 import { getCandidateWithEvidence, updateCandidate, upsertCriterionEntry } from "@/db/repository";
 import { notify } from "@/ui/components/Toast";
@@ -86,11 +86,16 @@ export function WizardProvider({
     [],
   );
 
+  // flushRef holds the latest flush closure so the cleanup can reach it even
+  // after the effect has re-run with a newer pendingPatches snapshot.
+  const flushRef = useRef<(() => Promise<void>) | null>(null);
+
   // 300 ms debounced auto-save: fires whenever pendingPatches gains content,
   // resets timer on each additional change within the window.
   useEffect(() => {
     if (!pendingPatches.candidate && Object.keys(pendingPatches.criterionEntries).length === 0) return;
-    const handle = setTimeout(async () => {
+
+    const flush = async () => {
       try {
         if (pendingPatches.candidate && candidateId) {
           await updateCandidate(candidateId, pendingPatches.candidate);
@@ -111,8 +116,17 @@ export function WizardProvider({
       } catch (err) {
         notify(`autosave failed: ${(err as Error).message}`, "error");
       }
-    }, 300);
-    return () => clearTimeout(handle);
+    };
+    flushRef.current = flush;
+
+    const handle = setTimeout(flush, 300);
+    return () => {
+      clearTimeout(handle);
+      // Best-effort synchronous flush on unmount so in-flight patches are not
+      // silently dropped (e.g. "Mark ready" → navigate to Sim view mid-debounce).
+      // reloadFromDb after unmount is a no-op; the error branch is also safe.
+      void flushRef.current?.();
+    };
     // state.criterionEntries intentionally captured in closure; pendingPatches
     // drives the dep array so the effect re-runs on each enqueue.
     // eslint-disable-next-line react-hooks/exhaustive-deps
