@@ -5,6 +5,7 @@ import { Dashboard } from "./views/Dashboard";
 import { Wizard } from "./views/Wizard";
 import { Sim } from "./views/Sim";
 import { ToastHost } from "./components/Toast";
+import { TestFigureHost } from "./testing/TestFigureHost";
 
 const SEED_SAMPLER = 0xc0ffee;
 
@@ -29,6 +30,15 @@ export function App() {
   const [view, setView] = useState<View>({ kind: "dashboard" });
 
   const utc = useUtcClock();
+
+  // DEV-only test harness: ?testFigure=F1..F7 renders a figure in isolation
+  // for Playwright visual snapshot tests. Stripped in production builds.
+  if (import.meta.env.DEV) {
+    const testFigure = new URLSearchParams(location.search).get("testFigure");
+    if (testFigure) {
+      return <TestFigureHost figureId={testFigure} />;
+    }
+  }
 
   return (
     <DbProvider>
