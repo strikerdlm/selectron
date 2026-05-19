@@ -1,0 +1,20 @@
+import type { Posterior } from "@/types";
+import type { CaptionBlock } from "../FigureCaption";
+
+const SOFTWARE_VERSION = "ECharts 6.x via Selectron @ HEAD";
+
+export function f1Caption(posterior: Posterior, seed: number, alias: string): CaptionBlock {
+  return {
+    figureId: "F1",
+    oneLine: `Posterior over total MCDA score for ${alias} (n = ${posterior.samples.length.toLocaleString()} samples).`,
+    methods:
+      `56-bin histogram of the Bayesian-MCDA posterior over total score (Iter-1 engine: ` +
+      `S_i = Σ w_k · z(x_{i,k}) where w ~ Dirichlet(1,…,1) and z is per-criterion affine ` +
+      `normalisation to [0,1]). CI90 shaded; posterior mean overlaid as dashed line. ` +
+      `Software: ${SOFTWARE_VERSION}.`,
+    source:
+      "Synthetic-iter1-engine. Computed in-browser at render time; no DB cache (the " +
+      "posterior is cheap enough to resample on every Review-step edit).",
+    reproducibility: `seed=${seed}, iterations=${posterior.samples.length}, alpha=[1,1,1,1,1].`,
+  };
+}

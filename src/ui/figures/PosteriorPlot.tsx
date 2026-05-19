@@ -21,6 +21,8 @@ import ReactEChartsCore from "echarts-for-react/lib/core";
 import { echarts } from "./echarts-base";
 import { NATURE_THEME_NAME } from "./theme";
 import type { Posterior } from "@/types";
+import { FigureCaption } from "./FigureCaption";
+import { f1Caption } from "./captions/F1.captions";
 
 // Amber sequential gradient — Iter-1 identity preserved.
 // Light amber (#fde68a) at top, deep amber (#d97706) at bottom.
@@ -72,9 +74,9 @@ function buildHistogram(
   return { centers, counts };
 }
 
-type Props = { posterior: Posterior };
+type Props = { posterior: Posterior; seed?: number; alias?: string };
 
-export function PosteriorPlot({ posterior }: Props) {
+export function PosteriorPlot({ posterior, seed = 0xc0ffee, alias = "—" }: Props) {
   // Empty-state guard: fewer than 10 samples → no meaningful histogram.
   if (posterior.samples.length < 10) {
     return (
@@ -215,12 +217,15 @@ export function PosteriorPlot({ posterior }: Props) {
   };
 
   return (
-    <ReactEChartsCore
-      echarts={echarts}
-      option={option}
-      theme={NATURE_THEME_NAME}
-      style={{ height: 280, width: "100%" }}
-      notMerge
-    />
+    <>
+      <ReactEChartsCore
+        echarts={echarts}
+        option={option}
+        theme={NATURE_THEME_NAME}
+        style={{ height: 280, width: "100%" }}
+        notMerge
+      />
+      <FigureCaption block={f1Caption(posterior, seed, alias)} />
+    </>
   );
 }

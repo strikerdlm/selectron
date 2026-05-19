@@ -111,7 +111,7 @@ export function StepReview() {
 
       <aside className="lg:col-span-5 space-y-4">
         <div className="panel p-6">
-          <PosteriorPlot posterior={posterior} />
+          <PosteriorPlot posterior={posterior} seed={SEED_SAMPLER} alias={candidate?.alias ?? "—"} />
         </div>
         <ScoreCard posterior={posterior} alias={candidate?.alias ?? "—"} />
         <div className="panel p-6">
