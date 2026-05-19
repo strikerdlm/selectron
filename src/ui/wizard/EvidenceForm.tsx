@@ -3,6 +3,7 @@ import type { Criterion } from "@/types";
 import type { CriterionEntry } from "@/db/schema";
 import { useWizard } from "@/contexts/WizardContext";
 import { AttachmentList } from "./AttachmentList";
+import { EvidenceReference } from "@/ui/figures/EvidenceReference";
 
 type CitationMode = "doi" | "url" | "free";
 
@@ -22,13 +23,19 @@ export function EvidenceForm({
   const { enqueueCriterionPatch } = useWizard();
   const [mode, setMode] = useState<CitationMode>(citationMode(entry));
 
-  function patch(partial: Partial<CriterionEntry>) {
-    enqueueCriterionPatch(criterion.id, partial);
-  }
-
   const midpoint = (criterion.scale.min + criterion.scale.max) / 2;
   const stepSize = (criterion.scale.max - criterion.scale.min) / 100;
   const currentValue = entry?.rawValue ?? midpoint;
+
+  // liveValue tracks the slider position in real-time so the EvidenceReference
+  // marker updates on every drag event, not only after the 300 ms DB auto-save.
+  // Initialise from entry.rawValue when an entry exists; undefined otherwise
+  // (no marker shown until the user interacts with the slider).
+  const [liveValue, setLiveValue] = useState<number | undefined>(entry?.rawValue);
+
+  function patch(partial: Partial<CriterionEntry>) {
+    enqueueCriterionPatch(criterion.id, partial);
+  }
   // units is not part of the Criterion type in Iter 1 but may be added later
   const units = (criterion.scale as { min: number; max: number; units?: string }).units;
 
@@ -43,7 +50,11 @@ export function EvidenceForm({
             max={criterion.scale.max}
             step={stepSize}
             value={currentValue}
-            onChange={(e) => patch({ rawValue: parseFloat(e.target.value) })}
+            onChange={(e) => {
+              const v = parseFloat(e.target.value);
+              setLiveValue(v);
+              patch({ rawValue: v });
+            }}
             className="flex-1 accent-signal"
           />
           <span className="mono tabular-nums text-ink-0 min-w-[3rem] text-right">
@@ -140,6 +151,10 @@ export function EvidenceForm({
           save raw value to enable attachments
         </p>
       )}
+
+      <div className="mt-2">
+        <EvidenceReference criterion={criterion} enteredValue={liveValue} />
+      </div>
     </div>
   );
 }
