@@ -120,17 +120,25 @@ export function WizardProvider({
     flushRef.current = flush;
 
     const handle = setTimeout(flush, 300);
-    return () => {
-      clearTimeout(handle);
-      // Best-effort synchronous flush on unmount so in-flight patches are not
-      // silently dropped (e.g. "Mark ready" → navigate to Sim view mid-debounce).
-      // reloadFromDb after unmount is a no-op; the error branch is also safe.
-      void flushRef.current?.();
-    };
+    // Cleanup on dep change is ONLY clearTimeout — do NOT flush here, otherwise
+    // each rapid edit triggers an immediate concurrent flush alongside the
+    // scheduled 300 ms one (defeats the debounce + floods the IDB write path).
+    // True-unmount flush lives in the separate effect below.
+    return () => clearTimeout(handle);
     // state.criterionEntries intentionally captured in closure; pendingPatches
     // drives the dep array so the effect re-runs on each enqueue.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pendingPatches, candidateId, reloadFromDb]);
+
+  // Separate effect with empty deps so its cleanup runs ONLY on unmount, not on
+  // every pendingPatches change. Best-effort synchronous flush of whatever
+  // `flushRef.current` last held — e.g., when "Mark ready" → navigate to Sim
+  // view mid-debounce, the pending status patch is not silently dropped.
+  useEffect(() => {
+    return () => {
+      void flushRef.current?.();
+    };
+  }, []);
 
   return (
     <WizardContext.Provider
