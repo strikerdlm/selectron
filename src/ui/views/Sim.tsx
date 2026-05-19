@@ -18,15 +18,24 @@ export function Sim({
   candidateId: string;
   onBackToReview: () => void;
 }) {
-  const [latest, setLatest] = useState<SimSession | null>(null);
+  // undefined = still loading from Dexie; null = loaded but no sims for this candidate.
+  // The distinction matters so the post-sim transition doesn't flash the "no sim sessions"
+  // fallback during the async DB round-trip after the wizard hands off.
+  const [latest, setLatest] = useState<SimSession | null | undefined>(undefined);
 
   useEffect(() => {
+    let cancelled = false;
+    setLatest(undefined);
     (async () => {
       const sims = await recentSimsFor(candidateId, 50);
+      if (cancelled) return;
       // Pick the most recent NON-comparison-run sim as the "latest"
       const nonComparison = sims.filter((s) => !(s.notes ?? "").includes("comparison-run-"));
       setLatest(nonComparison[0] ?? null);
     })();
+    return () => {
+      cancelled = true;
+    };
   }, [candidateId]);
 
   // Derive access tier from the notes prefix "tier=<minimum|medium|elite>"
@@ -36,7 +45,25 @@ export function Sim({
       ? (tierMatch[1] as AccessTier)
       : "minimum";
 
-  if (!latest) {
+  if (latest === undefined) {
+    // Loading state — Dexie round-trip after Sim view mounts (typically <100ms,
+    // but the post-sim transition can briefly show this).
+    return (
+      <div className="panel p-12 text-center">
+        <div className="mb-4 flex justify-center">
+          <span className="relative inline-flex h-10 w-10">
+            <span className="absolute inset-0 rounded-full border-2 border-signal/30" />
+            <span className="absolute inset-0 rounded-full border-2 border-signal border-t-transparent animate-spin" />
+          </span>
+        </div>
+        <p className="mono text-[11px] uppercase tracking-cap text-ink-2">
+          loading simulation results…
+        </p>
+      </div>
+    );
+  }
+
+  if (latest === null) {
     return (
       <div className="panel p-6 text-sm text-ink-2">
         no sim sessions yet — go back to step 4 and run one.
