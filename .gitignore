@@ -23,3 +23,7 @@ test-results/
 
 # Ad-hoc screenshots left at repo root by Playwright runs
 /*.png
+
+# PyMC MCMC checkpoints — multi-MB binary; commit only priors.json
+notebooks/*.nc
+notebooks/.ipynb_checkpoints/

@@ -1,0 +1,9 @@
+pymc==5.16.2
+arviz==0.18.0
+numpy>=1.26,<2.0
+pandas>=2.2
+matplotlib>=3.8
+jupyterlab
+nutpie==0.13     # optional: faster NUTS sampler. Comment out if install fails.
+# pyjags==1.3.8  # disabled: requires `apt install jags` system package.
+                 # Re-enable for T42 JAGS cross-check after installing JAGS.
