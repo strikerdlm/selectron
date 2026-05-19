@@ -1,6 +1,6 @@
 // Centralised ECharts core registration. All figures import from here.
 import * as echarts from "echarts/core";
-import { BarChart, LineChart, ScatterChart, RadarChart } from "echarts/charts";
+import { BarChart, LineChart, ScatterChart, RadarChart, CustomChart } from "echarts/charts";
 import {
   GridComponent,
   LegendComponent,
@@ -17,6 +17,7 @@ echarts.use([
   LineChart,
   ScatterChart,
   RadarChart,
+  CustomChart,
   GridComponent,
   LegendComponent,
   MarkAreaComponent,
