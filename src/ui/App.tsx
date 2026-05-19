@@ -3,6 +3,7 @@ import { DbProvider } from "@/contexts/DbContext";
 import { createCandidate } from "@/db/repository";
 import { Dashboard } from "./views/Dashboard";
 import { Wizard } from "./views/Wizard";
+import { Sim } from "./views/Sim";
 import { ToastHost } from "./components/Toast";
 
 const SEED_SAMPLER = 0xc0ffee;
@@ -83,7 +84,10 @@ export function App() {
             />
           )}
           {view.kind === "sim" && (
-            <div className="panel p-6 text-sm text-ink-2">Sim view — see Task 77</div>
+            <Sim
+              candidateId={view.candidateId}
+              onBackToReview={() => setView({ kind: "wizard", candidateId: view.candidateId, step: 2 })}
+            />
           )}
         </main>
 
