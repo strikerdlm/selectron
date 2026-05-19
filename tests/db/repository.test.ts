@@ -4,10 +4,14 @@ import { db } from "@/db/schema";
 import {
   createCandidate,
   deleteCandidate,
+  exportDb,
   getCandidateWithEvidence,
+  importDb,
   listCandidates,
-  updateCandidate,
   listCriterionEntries,
+  recentSimsFor,
+  saveSimSession,
+  updateCandidate,
   upsertCriterionEntry,
   attachFile,
   detachFile,
@@ -159,5 +163,54 @@ describe("attachFile / detachFile", () => {
     await detachFile(a.id, e2.id);
     const goneNow = await db.attachments.get(a.id);
     expect(goneNow).toBeUndefined();
+  });
+});
+
+function fakePosterior() {
+  return {
+    chi: { mean: 0.95, ci90: [0.91, 0.99] as [number, number], ci95: [0.90, 1.00] as [number, number] },
+    pEarlyTermination: { mean: 0, ci90: [0, 0] as [number, number] },
+    expectedLostCrewDays: { mean: 3.87, ci90: [1.0, 7.5] as [number, number] },
+    perConditionQTL: {},
+    ess: 25000,
+    trials: 25000,
+  };
+}
+
+describe("simSessions", () => {
+  test("saveSimSession persists + recentSimsFor returns desc by runAt", async () => {
+    const c = await createCandidate({ alias: "alpha" });
+    await saveSimSession({
+      candidateId: c.id,
+      missionId: "mdrs-2wk",
+      trials: 25000,
+      chiStar: 0.7,
+      seed: 0xc0ffee,
+      priorsVersion: "synthetic-iter3-ui-scaffold",
+      posterior: fakePosterior(),
+      chiSamples: [0.9, 0.95, 0.98],
+      qtlSamples: [4, 3, 2],
+    });
+    const sims = await recentSimsFor(c.id);
+    expect(sims).toHaveLength(1);
+    expect(sims[0].missionId).toBe("mdrs-2wk");
+  });
+});
+
+describe("exportDb / importDb", () => {
+  test("round-trips candidates + criterion entries + sims", async () => {
+    const c = await createCandidate({ alias: "alpha" });
+    await upsertCriterionEntry({
+      candidateId: c.id,
+      criterionId: "psych.conscientiousness",
+      rawValue: 60.0,
+    });
+    const dump = await exportDb();
+    await db.delete();
+    await db.open();
+    expect(await listCandidates()).toHaveLength(0);
+    await importDb(dump);
+    expect(await listCandidates()).toHaveLength(1);
+    expect((await listCriterionEntries(c.id))[0].rawValue).toBe(60.0);
   });
 });

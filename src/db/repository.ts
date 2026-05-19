@@ -1,5 +1,13 @@
 import { v4 as uuid } from "uuid";
-import { db, type DbCandidate, type CandidateStatus, type CriterionEntry, type Attachment } from "./schema";
+import {
+  db,
+  type DbCandidate,
+  type CandidateStatus,
+  type CriterionEntry,
+  type Attachment,
+  type SimSession,
+  SCHEMA_VERSION,
+} from "./schema";
 
 export type CreateCandidateInput = {
   alias: string;
@@ -153,4 +161,114 @@ export async function detachFile(attachmentId: string, criterionEntryId: string)
       await db.attachments.delete(attachmentId);
     }
   });
+}
+
+// ---------------------------------------------------------------------------
+// SimSession CRUD
+// ---------------------------------------------------------------------------
+
+export async function saveSimSession(
+  input: Omit<SimSession, "id" | "runAt">,
+): Promise<SimSession> {
+  const row: SimSession = {
+    ...input,
+    id: uuid(),
+    runAt: new Date().toISOString(),
+  };
+  await db.simSessions.add(row);
+  return row;
+}
+
+export async function recentSimsFor(candidateId: string, limit = 10): Promise<SimSession[]> {
+  const rows = await db.simSessions.where("candidateId").equals(candidateId).toArray();
+  rows.sort((a, b) => b.runAt.localeCompare(a.runAt));
+  return rows.slice(0, limit);
+}
+
+// ---------------------------------------------------------------------------
+// JSON export / import
+// ---------------------------------------------------------------------------
+
+export type DbDump = {
+  schemaVersion: number;
+  candidates: DbCandidate[];
+  criterionEntries: CriterionEntry[];
+  attachments: Array<Omit<Attachment, "blob"> & { blobBase64: string }>;
+  simSessions: SimSession[];
+};
+
+async function blobToBase64(blob: Blob): Promise<string> {
+  const buf = await blob.arrayBuffer();
+  let bin = "";
+  const bytes = new Uint8Array(buf);
+  for (let i = 0; i < bytes.length; i++) bin += String.fromCharCode(bytes[i]);
+  return btoa(bin);
+}
+
+function base64ToBlob(b64: string, mime: string): Blob {
+  const bin = atob(b64);
+  const bytes = new Uint8Array(bin.length);
+  for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
+  return new Blob([bytes], { type: mime });
+}
+
+export async function exportDb(): Promise<DbDump> {
+  const [candidates, criterionEntries, simSessions, attachments] = await Promise.all([
+    db.candidates.toArray(),
+    db.criterionEntries.toArray(),
+    db.simSessions.toArray(),
+    db.attachments.toArray(),
+  ]);
+  const encodedAttachments = await Promise.all(
+    attachments.map(async (a) => ({
+      id: a.id,
+      filename: a.filename,
+      mimeType: a.mimeType,
+      sizeBytes: a.sizeBytes,
+      sha256: a.sha256,
+      uploadedAt: a.uploadedAt,
+      blobBase64: await blobToBase64(a.blob),
+    })),
+  );
+  return {
+    schemaVersion: SCHEMA_VERSION,
+    candidates,
+    criterionEntries,
+    simSessions,
+    attachments: encodedAttachments,
+  };
+}
+
+export async function importDb(dump: DbDump): Promise<void> {
+  if (dump.schemaVersion !== SCHEMA_VERSION) {
+    throw new Error(
+      `Import schema ${dump.schemaVersion} != current ${SCHEMA_VERSION}; migration needed`,
+    );
+  }
+  await db.transaction(
+    "rw",
+    db.candidates,
+    db.criterionEntries,
+    db.simSessions,
+    db.attachments,
+    async () => {
+      await db.candidates.clear();
+      await db.criterionEntries.clear();
+      await db.simSessions.clear();
+      await db.attachments.clear();
+      await db.candidates.bulkAdd(dump.candidates);
+      await db.criterionEntries.bulkAdd(dump.criterionEntries);
+      await db.simSessions.bulkAdd(dump.simSessions);
+      const restoredAttachments = dump.attachments.map((a) => ({
+        id: a.id,
+        filename: a.filename,
+        mimeType: a.mimeType,
+        sizeBytes: a.sizeBytes,
+        sha256: a.sha256,
+        uploadedAt: a.uploadedAt,
+        blob: base64ToBlob(a.blobBase64, a.mimeType),
+      }));
+      await db.attachments.bulkAdd(restoredAttachments);
+    },
+  );
 }
