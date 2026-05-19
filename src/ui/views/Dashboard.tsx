@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import type { DbCandidate, CandidateStatus } from "@/db/schema";
 import { listCandidates, recentSimsFor, deleteCandidate } from "@/db/repository";
 import { CandidateCard } from "../dashboard/CandidateCard";
+import { DashboardSummary, type DashboardSummaryDatum } from "@/ui/figures/DashboardSummary";
 
 type StatusFilter = "all" | CandidateStatus;
 
@@ -12,17 +13,30 @@ export function Dashboard(props: {
 }) {
   const [candidates, setCandidates] = useState<DbCandidate[]>([]);
   const [lastChis, setLastChis] = useState<Record<string, number>>({});
+  const [summaryData, setSummaryData] = useState<DashboardSummaryDatum[]>([]);
   const [statusFilter, setStatusFilter] = useState<StatusFilter>("all");
 
   async function reload() {
     const rows = await listCandidates();
     setCandidates(rows);
+    // Consolidated loop — one recentSimsFor call per candidate builds both
+    // the lastChis card-badge map and the F4 DashboardSummary data array.
     const map: Record<string, number> = {};
+    const data: DashboardSummaryDatum[] = [];
     for (const c of rows) {
       const sims = await recentSimsFor(c.id, 1);
-      if (sims[0]) map[c.id] = sims[0].posterior.chi.mean;
+      if (sims[0]) {
+        map[c.id] = sims[0].posterior.chi.mean;
+        data.push({
+          candidateId: c.id,
+          alias: c.alias,
+          chiMean: sims[0].posterior.chi.mean,
+          chiCi90: sims[0].posterior.chi.ci90,
+        });
+      }
     }
     setLastChis(map);
+    setSummaryData(data);
   }
 
   useEffect(() => {
@@ -39,9 +53,9 @@ export function Dashboard(props: {
 
   return (
     <div className="fadein">
-      {/* F4 PLACEHOLDER */}
+      {/* F4 — CHI per candidate lollipop (DashboardSummary) */}
       <div className="panel p-6 mb-6">
-        <div className="text-sm text-ink-2">Dashboard summary figure — see Task 68</div>
+        <DashboardSummary data={summaryData} />
       </div>
 
       {/* TOOLBAR */}
