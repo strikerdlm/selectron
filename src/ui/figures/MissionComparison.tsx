@@ -224,15 +224,19 @@ export type MissionComparisonProps = {
 };
 
 export function MissionComparison({ candidateId }: MissionComparisonProps) {
-  const [comparisonRows, setComparisonRows] = useState<SimSession[] | null>(null);
+  // Three-valued state:
+  //   undefined → not yet checked (waiting for first loadCache)
+  //   SimSession[] → checked; may be empty array (no comparison data yet)
+  const [comparisonRows, setComparisonRows] = useState<SimSession[] | undefined>(undefined);
   const [running, setRunning] = useState(false);
   const [progress, setProgress] = useState(0); // 0-5
 
   // Load cache on mount / when candidateId changes
   const loadCache = useCallback(async () => {
     const recent = await recentSimsFor(candidateId, 50);
-    const set = pickComparisonSet(recent);
-    setComparisonRows(set);
+    // Coerce null (no complete set found) → empty array so the component
+    // exits the "undefined" (not-yet-checked) state and renders the button.
+    setComparisonRows(pickComparisonSet(recent) ?? []);
   }, [candidateId]);
 
   useEffect(() => {
@@ -349,8 +353,8 @@ export function MissionComparison({ candidateId }: MissionComparisonProps) {
   // Render
   // ---------------------------------------------------------------------------
 
-  // Initial loading state (haven't checked DB yet)
-  if (comparisonRows === null && !running) {
+  // Initial loading state (haven't checked DB yet — undefined means not yet resolved)
+  if (comparisonRows === undefined && !running) {
     // Still awaiting first loadCache — show nothing briefly
     // (The useEffect fires synchronously after mount so this is typically
     //  invisible, but we guard against it for correctness.)
