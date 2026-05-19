@@ -93,6 +93,12 @@ describe("validatePriorsJson", () => {
     expect(() => validatePriorsJson(bad)).toThrow(SelectronError);
   });
 
+  it("rejects empty log_lambda_samples — sampleFromPosterior would crash", () => {
+    const bad = structuredClone(VALID);
+    bad.conditions.insomnia.missions.mars500.log_lambda_samples = [];
+    expect(() => validatePriorsJson(bad)).toThrow(SelectronError);
+  });
+
   it("rejects non-finite vulnerability_beta value", () => {
     const bad = structuredClone(VALID);
     bad.conditions.insomnia.vulnerability_beta["x"] = Number.POSITIVE_INFINITY;

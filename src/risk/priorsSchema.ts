@@ -67,6 +67,7 @@ export function validatePriorsJson(x: unknown): asserts x is PriorsJson {
       if (!isObject(mpRaw)) bail(`condition "${cid}" mission "${mid}" must be an object`);
       const mp = mpRaw;
       if (!Array.isArray(mp.log_lambda_samples)) bail(`condition "${cid}" mission "${mid}" 'log_lambda_samples' must be an array`);
+      if (mp.log_lambda_samples.length === 0) bail(`condition "${cid}" mission "${mid}" 'log_lambda_samples' must be non-empty`);
       for (const s of mp.log_lambda_samples) {
         if (typeof s !== "number" || !Number.isFinite(s)) bail(`condition "${cid}" mission "${mid}" has non-finite log_lambda sample`);
       }
