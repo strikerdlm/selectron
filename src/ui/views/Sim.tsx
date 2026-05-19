@@ -125,7 +125,7 @@ export function Sim({
         </section>
         {mission && (
           <section className="lg:col-span-12">
-            <MissionComparison candidateId={candidateId} />
+            <MissionComparison candidateId={candidateId} accessTier={sessionTier} />
           </section>
         )}
       </div>

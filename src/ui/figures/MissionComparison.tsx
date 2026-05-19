@@ -27,7 +27,7 @@ import type { SimSession } from "@/db/schema";
 import { notify } from "@/ui/components/Toast";
 import { FigureCaption } from "./FigureCaption";
 import { f7Caption } from "./captions/F7.captions";
-import { useWizard } from "@/contexts/WizardContext";
+import type { AccessTier } from "@/types";
 
 // ---------------------------------------------------------------------------
 // Design constants
@@ -222,10 +222,13 @@ function pickComparisonSet(rows: SimSession[]): SimSession[] | null {
 
 export type MissionComparisonProps = {
   candidateId: string;
+  // Passed by Sim view (extracted from latest session's notes prefix) so the
+  // component doesn't need to call useWizard — Sim renders OUTSIDE the
+  // WizardProvider, which previously caused a hard crash here.
+  accessTier: AccessTier;
 };
 
-export function MissionComparison({ candidateId }: MissionComparisonProps) {
-  const { accessTier } = useWizard();
+export function MissionComparison({ candidateId, accessTier }: MissionComparisonProps) {
   // Three-valued state:
   //   undefined → not yet checked (waiting for first loadCache)
   //   SimSession[] → checked; may be empty array (no comparison data yet)
