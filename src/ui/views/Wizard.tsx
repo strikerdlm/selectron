@@ -1,5 +1,6 @@
 import { WizardProvider, useWizard, type WizardStep } from "@/contexts/WizardContext";
 import { StepStrip } from "../wizard/StepStrip";
+import { StepIdentity } from "../wizard/StepIdentity";
 import { notify } from "@/ui/components/Toast";
 
 function Breadcrumb({
@@ -37,7 +38,7 @@ function WizardBody({ onExitToDashboard }: { onExitToDashboard: () => void; onEx
       <Breadcrumb alias={candidate.alias} step={step} onExitToDashboard={onExitToDashboard} />
       <StepStrip />
       <div className="mt-6">
-        {step === 0 && <div className="panel p-6 text-sm text-ink-2">Step 1 Identity — Task 73</div>}
+        {step === 0 && <StepIdentity />}
         {step === 1 && <div className="panel p-6 text-sm text-ink-2">Step 2 Criteria — Tasks 74–75</div>}
         {step === 2 && <div className="panel p-6 text-sm text-ink-2">Step 3 Review — Task 76</div>}
         {step === 3 && <div className="panel p-6 text-sm text-ink-2">Step 4 Mission & sim — Task 77</div>}
