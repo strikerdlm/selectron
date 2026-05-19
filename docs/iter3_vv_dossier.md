@@ -25,9 +25,9 @@ The 2014 [W14] poster lists a slightly different eighth factor ("People Qualific
   - `tests/risk/treatment.test.ts` — 16 tests on linear partial-credit interpolation + the `validatePriorsJson` schema guard.
   - `tests/risk/chi.test.ts` — 17 tests on CHI / QTL / pEarlyTermination aggregation (spec §3.5 closed-form).
   - `tests/risk/simulate.test.ts` — 9 tests including determinism (same seed → identical posterior), CI90 ⊆ CI95 nesting, χ* monotonicity, M18 σ<5% convergence smoke at T=2,000.
-- **Closed-form Poisson-Gamma check (PENDING):** spec §9 calls for a Poisson-Gamma conjugate sanity check directly analogous to the Iter-1 Dirichlet closed-form check in `tests/engine/mcda.test.ts`. Currently the closest analog is the per-trial determinism test in `tests/risk/simulate.test.ts`; an explicit closed-form check should be added as part of Task 59 acceptance.
+- **Closed-form Poisson-Gamma check (SATISFIED, scope-expansion-3):** `tests/risk/poisson_gamma_conjugate.test.ts` (added 2026-05-19, see scope-expansion-3) holds five tests: prior moments E[λ]=α/β + Var[λ]=α/β² within 2%/5%, marginal observation E[N]=(α/β)·t, posterior moments (α+N, β+t), regime-crossover at the Knuth/PTRS λ=30 boundary, and deterministic-seed reproducibility. All pass at 2-5% empirical-vs-closed-form tolerance with 20–50k samples per case.
 
-**Status:** PARTIALLY SATISFIED. The 70+ Iter-3 unit tests (vitest, all green at HEAD) plus the deterministic PRNG cover the structural verification. Adding the explicit closed-form Poisson-Gamma check is a tracked Task 59 item.
+**Status:** SATISFIED. The 70+ Iter-3 unit tests + the Poisson-Gamma conjugate sanity check (5 tests) + the deterministic PRNG cover the structural verification expected by NASA-STD-7009 Factor 1.
 
 ---
 
@@ -152,7 +152,7 @@ The 2014 [W14] poster lists a slightly different eighth factor ("People Qualific
 
 | # | Factor | Status | Outstanding work |
 |---|---|---|---|
-| 1 | Verification | PARTIAL | Add closed-form Poisson-Gamma test at T59. |
+| 1 | Verification | SAT | Closed-form Poisson-Gamma test added in scope-expansion-3 (`tests/risk/poisson_gamma_conjugate.test.ts`). |
 | 2 | Validation | UNSAT | T59 LOOCV notebook (gated on T37 → T40). |
 | 3 | Dev data pedigree | SAT | — |
 | 4 | Input data pedigree | PARTIAL | Diego T37 curation + T41 elicitation. |
@@ -161,6 +161,6 @@ The 2014 [W14] poster lists a slightly different eighth factor ("People Qualific
 | 7 | Use history | UNSAT | Iter-4 paper (post-3F). |
 | 8 | Management | SAT | — |
 
-**Net:** 3 / 8 fully satisfied today; 2 / 8 partial; 3 / 8 pending downstream work. The unsatisfied factors all share a single dependency: Diego's T37 curation unblocks T40 → T59 LOOCV → T61 sensitivity. The Iter-4 paper is a downstream deliverable.
+**Net:** 4 / 8 fully satisfied today (scope-expansion-3 promoted Verification PARTIAL→SAT via the Poisson-Gamma conjugate test); 1 / 8 partial (Input Data Pedigree — Diego T37 pending); 3 / 8 pending downstream work (Validation, Robustness, Use History). The unsatisfied factors all share a single dependency: Diego's T37 curation unblocks T40 → T59 LOOCV → T61 sensitivity. The Iter-4 paper is a downstream deliverable.
 
 **Re-read this dossier on every Iter-3 acceptance step** (T59, T61, T43 sign-off) and update statuses + outstanding-work cells.
