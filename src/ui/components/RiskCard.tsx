@@ -58,11 +58,11 @@ export function RiskCard({ posterior, alias }: Props) {
           {days(expectedLostCrewDays.ci90[0])} <span className="text-ink-3">→</span> {days(expectedLostCrewDays.ci90[1])}
         </dd>
 
-        <dt className="text-ink-2">ESS</dt>
-        <dd className="text-right tabular-nums text-ink-1">{ess.toFixed(0)}</dd>
-
         <dt className="text-ink-2">trials</dt>
         <dd className="text-right tabular-nums text-ink-1">{trials.toLocaleString()}</dd>
+
+        <dt className="text-ink-2">ESS (= trials)</dt>
+        <dd className="text-right tabular-nums text-ink-1">{ess.toFixed(0)}</dd>
       </dl>
 
       <div className="mt-6">
