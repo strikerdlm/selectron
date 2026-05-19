@@ -1,8 +1,9 @@
 import Dexie, { type EntityTable } from "dexie";
+import type { RiskPosterior } from "@/types/risk";
 
 export type CandidateStatus = "draft" | "ready";
 
-export type Candidate = {
+export type DbCandidate = {
   id: string;
   alias: string;
   fullName?: string;
@@ -39,8 +40,6 @@ export type Attachment = {
   uploadedAt: string;
 };
 
-import type { RiskPosterior } from "@/types/risk";
-
 export type SimSession = {
   id: string;
   candidateId: string;
@@ -70,7 +69,7 @@ export type MetaEntry = {
 export const SCHEMA_VERSION = 1;
 
 export class SelectronDb extends Dexie {
-  candidates!: EntityTable<Candidate, "id">;
+  candidates!: EntityTable<DbCandidate, "id">;
   criterionEntries!: EntityTable<CriterionEntry, "id">;
   attachments!: EntityTable<Attachment, "id">;
   simSessions!: EntityTable<SimSession, "id">;
@@ -79,7 +78,7 @@ export class SelectronDb extends Dexie {
 
   constructor() {
     super("selectron");
-    this.version(1).stores({
+    this.version(SCHEMA_VERSION).stores({
       candidates: "id, alias, createdAt, updatedAt, status",
       criterionEntries: "id, candidateId, criterionId, [candidateId+criterionId], updatedAt",
       attachments: "id, sha256, uploadedAt",
