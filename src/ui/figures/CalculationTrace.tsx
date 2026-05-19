@@ -1,0 +1,458 @@
+// Diego scope expansion 2026-05-19: step-by-step calculation viewer.
+// Renders the math behind Stage A (Bayesian MCDA) or Stage B (IMM forward MC)
+// as a vertical chain of steps. Each step has:
+//   - title + scientific notation
+//   - the concrete numbers from THIS candidate's data
+//   - an arrow connector → "in plain English" lay explanation
+//   - a citation footer linking the step to a source
+//
+// Diego's intent: give priority to making the calculation visible + educational.
+// "Like /frontend-design" — cool, dense, scientific aesthetic. Lay text always
+// visible (no collapse-by-default), connected via a downward arrow glyph so the
+// reader's eye travels from equation → human meaning naturally.
+
+import type { ReactNode } from "react";
+import type { Criterion } from "@/types";
+import type { Posterior } from "@/types";
+import type { RiskPosterior, AnalogMission, Condition } from "@/types/risk";
+import { normalizeScore } from "@/engine";
+
+type Citation = { id: string; label: string };
+
+type TraceStep = {
+  n: number;
+  title: string;
+  equation: ReactNode;
+  concrete: ReactNode;
+  lay: string;
+  citation: Citation;
+};
+
+function TraceStepCard({ step, last }: { step: TraceStep; last: boolean }) {
+  return (
+    <div className="relative">
+      <div className="panel p-5">
+        {/* HEADER */}
+        <div className="flex items-baseline gap-3 mb-4">
+          <span
+            className="inline-flex items-center justify-center w-7 h-7 rounded-full
+              border border-signal text-signal mono text-[11px] shrink-0"
+          >
+            {step.n}
+          </span>
+          <h4 className="display text-base text-ink-0 leading-tight">{step.title}</h4>
+        </div>
+
+        {/* EQUATION — scientific notation, monospace */}
+        <div
+          className="mono text-[13px] text-ink-0 bg-bg-2 border border-line/60
+            rounded-md px-4 py-3 mb-3 tabular-nums overflow-x-auto"
+        >
+          {step.equation}
+        </div>
+
+        {/* CONCRETE — actual numbers from this candidate */}
+        <div className="mono text-[11px] text-signal/90 mb-4 tabular-nums">
+          <span className="text-ink-3 mr-2 uppercase tracking-cap">applied here</span>
+          {step.concrete}
+        </div>
+
+        {/* ARROW + LAY */}
+        <div className="flex items-start gap-3 border-l-2 border-signal/40 pl-3 py-1">
+          <span
+            className="mono text-[10px] uppercase tracking-cap text-signal shrink-0
+              flex items-center gap-1.5 pt-0.5"
+            aria-hidden
+          >
+            <span className="text-signal text-[14px] leading-none">↓</span>
+            in plain English
+          </span>
+        </div>
+        <p className="text-sm text-ink-1 leading-relaxed pl-3 mt-1">{step.lay}</p>
+
+        {/* CITATION */}
+        <div className="mt-4 pt-3 border-t border-line/40 mono text-[10px] text-ink-3">
+          <span className="uppercase tracking-cap mr-2">source</span>
+          <span className="text-ink-2">{step.citation.label}</span>
+          <span className="ml-2 text-ink-3">[{step.citation.id}]</span>
+        </div>
+      </div>
+
+      {/* CONNECTOR between cards */}
+      {!last && (
+        <div className="flex justify-center py-2" aria-hidden>
+          <div className="w-px h-6 bg-gradient-to-b from-signal/60 to-line" />
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ─── MCDA mode ─────────────────────────────────────────────────────────────
+
+const sub = (s: string) => (
+  <sub className="text-[9px]" style={{ verticalAlign: "sub" }}>
+    {s}
+  </sub>
+);
+
+const sup = (s: string) => (
+  <sup className="text-[9px]" style={{ verticalAlign: "super" }}>
+    {s}
+  </sup>
+);
+
+const fmt = (x: number, d = 2) => x.toFixed(d);
+
+function mcdaSteps(args: {
+  posterior: Posterior;
+  criteria: readonly Criterion[];
+  scores: Record<string, number>;
+  alias: string;
+  seed: number;
+}): TraceStep[] {
+  const { posterior, criteria, scores } = args;
+  const K = criteria.length;
+
+  // For step 1 demo: pick the first criterion with a non-null score
+  const demoC =
+    criteria.find((c) => scores[c.id] !== undefined) ?? criteria[0];
+  const demoRaw = scores[demoC.id] ?? demoC.scale.min;
+  const demoZ = normalizeScore(demoRaw, demoC.scale, demoC.higherIsBetter);
+
+  // For step 3 demo: actually compute a weighted sum on the FIRST posterior draw
+  const samples = posterior.samples;
+  const firstDraw = samples[0] ?? posterior.mean;
+
+  return [
+    {
+      n: 1,
+      title: "Normalize each raw test score to a unitless 0-to-1 value",
+      equation: (
+        <span>
+          z{sub("k")} = (x{sub("k")} − min{sub("k")}) / (max{sub("k")} − min
+          {sub("k")})
+        </span>
+      ),
+      concrete: (
+        <span>
+          {demoC.label}: x = {fmt(demoRaw, 1)} on [{demoC.scale.min},{" "}
+          {demoC.scale.max}] → z = {fmt(demoZ, 3)}
+          {demoC.higherIsBetter === false && (
+            <span className="text-ink-3 ml-2">(flipped: lower raw → higher z)</span>
+          )}
+        </span>
+      ),
+      lay:
+        "Each test reports its score on its own scale (NEO-PI-R uses T-scores 0–100; VO₂max uses mL/kg/min, etc.). Before we can combine them, we have to put every test on the same ruler. We use an affine map that sets the lowest possible score to 0 and the highest to 1. After this step, every criterion lives in the same [0, 1] interval and can be added together.",
+      citation: {
+        id: "Iter-1 spec §3.2",
+        label: "Selectron Iter-1 design — score normalization",
+      },
+    },
+    {
+      n: 2,
+      title: "Draw a weight vector from the Dirichlet prior",
+      equation: (
+        <span>
+          w ~ Dirichlet(α{sub("1")}, …, α{sub("K")}), α{sub("k")} = 1 for all k
+        </span>
+      ),
+      concrete: (
+        <span>
+          K = {K} criteria · α = (1, …, 1) → uninformative prior · mean weight ={" "}
+          {fmt(1 / K, 3)} per criterion
+        </span>
+      ),
+      lay:
+        "We don't know in advance which test matters most for this mission, so we let the model consider all weightings consistent with the data. The Dirichlet distribution is the natural way to sample probability-vectors — vectors of positive numbers that sum to 1. Using α = (1, …, 1) says 'no prior preference': every reasonable weighting is equally plausible before we look at the data.",
+      citation: {
+        id: "A6 methodology precedents",
+        label: "Bayesian MCDA — Dirichlet weight prior",
+      },
+    },
+    {
+      n: 3,
+      title: "Compute the weighted total score for this draw",
+      equation: (
+        <span>
+          S{sup("(s)")} = Σ{sub("k=1")}
+          {sup("K")} w{sub("k")}
+          {sup("(s)")} · z{sub("k")}
+        </span>
+      ),
+      concrete: (
+        <span>
+          One Monte-Carlo draw out of {posterior.samples.length.toLocaleString()}:
+          S = {fmt(firstDraw, 3)} (this is sample #1 of {posterior.samples.length})
+        </span>
+      ),
+      lay:
+        "For each draw of the weight vector, we multiply each criterion's z-score by its weight and add them up. The result is one possible 'total score' for the candidate. Different weight draws give different totals — that spread is what makes the posterior a distribution, not a single number.",
+      citation: {
+        id: "Iter-1 spec §3.3",
+        label: "Selectron MCDA scoring engine",
+      },
+    },
+    {
+      n: 4,
+      title: "Repeat thousands of draws → posterior distribution over total score",
+      equation: (
+        <span>
+          {`{ S`}
+          {sup("(1)")}, S{sup("(2)")}, …, S{sup("(N)")}
+          {` }, with N = ${posterior.samples.length.toLocaleString()}`}
+        </span>
+      ),
+      concrete: (
+        <span>
+          posterior mean μ = {fmt(posterior.mean, 3)} · CI₉₀ = [
+          {fmt(posterior.ci90[0], 3)}, {fmt(posterior.ci90[1], 3)}] · CI₉₅ = [
+          {fmt(posterior.ci95[0], 3)}, {fmt(posterior.ci95[1], 3)}] · ESS ={" "}
+          {posterior.ess.toFixed(0)}
+        </span>
+      ),
+      lay:
+        "By drawing many weight vectors and computing the total score each time, we build a histogram of all the scores the candidate could plausibly receive. The width of that histogram tells us how robust the ranking is: a narrow band means most weightings agree, a wide band means the answer is sensitive to which criteria you prioritize. The 90% credible interval is the central band that holds 90% of the draws.",
+      citation: {
+        id: "MCMC convergence — [G12] §4",
+        label: "Posterior summary statistics + effective sample size",
+      },
+    },
+  ];
+}
+
+export function MCDACalculationTrace(props: {
+  posterior: Posterior;
+  criteria: readonly Criterion[];
+  scores: Record<string, number>;
+  alias: string;
+  seed: number;
+}) {
+  const steps = mcdaSteps(props);
+  return (
+    <div className="space-y-0">
+      <header className="panel p-4 mb-3 border-signal/40">
+        <div className="flex items-baseline justify-between gap-3">
+          <h3 className="display text-lg text-ink-0">
+            How we scored <span className="text-signal">{props.alias}</span>
+          </h3>
+          <span className="mono text-[10px] uppercase tracking-cap text-ink-2">
+            stage a · bayesian mcda
+          </span>
+        </div>
+        <p className="text-sm text-ink-1 mt-2 leading-relaxed">
+          The total-score posterior on the right is the output of these four steps. Each
+          step shows the math, the concrete numbers, and a plain-English explanation
+          below the equation.
+        </p>
+      </header>
+
+      {steps.map((s, i) => (
+        <TraceStepCard key={s.n} step={s} last={i === steps.length - 1} />
+      ))}
+    </div>
+  );
+}
+
+// ─── IMM mode ───────────────────────────────────────────────────────────────
+
+function immSteps(args: {
+  posterior: RiskPosterior;
+  mission: AnalogMission;
+  conditions: readonly Condition[];
+  trials: number;
+  seed: number;
+  chiStar: number;
+  priorsVersion: string;
+}): TraceStep[] {
+  const { posterior, mission, conditions, trials, chiStar, priorsVersion } = args;
+
+  // Pick the top-contributing condition for a worked example
+  const conditionsWithMean = conditions
+    .map((c) => ({
+      c,
+      mean: posterior.perConditionQTL[c.id]?.mean ?? 0,
+    }))
+    .sort((a, b) => b.mean - a.mean);
+  const top = conditionsWithMean[0]?.c;
+  const topMean = conditionsWithMean[0]?.mean ?? 0;
+  const totalQtl = conditionsWithMean.reduce((s, x) => s + x.mean, 0);
+
+  const availDays = mission.durationDays * mission.crewSize;
+
+  return [
+    {
+      n: 1,
+      title: "Look up each condition's base incidence rate from the prior",
+      equation: (
+        <span>
+          log λ{sub("k")} ~ p(log λ | data){"  "}(frozen posterior, model {priorsVersion})
+        </span>
+      ),
+      concrete: (
+        <span>
+          {conditions.length} conditions · mission {mission.id} · priors version{" "}
+          {priorsVersion}
+        </span>
+      ),
+      lay:
+        "Before any simulation runs, we already have a probability distribution over each condition's base rate (events per crew member per day). This distribution comes from fitting a hierarchical Bayesian model on the analog-mission literature — it's what's stored in priors.json. Each Monte-Carlo trial draws a new rate from this distribution, so the simulation honestly reflects how much we don't know.",
+      citation: {
+        id: "Iter-3 spec §3.6 / [M18 §2.1.1]",
+        label: "Hierarchical Lognormal-Poisson posterior",
+      },
+    },
+    {
+      n: 2,
+      title: "Adjust the rate per crew member using their vulnerability score",
+      equation: (
+        <span>
+          λ{sub("k,i")} = λ{sub("k")}
+          {sup("base")} · exp(β{sub("k")}
+          {sup("⊤")} · z{sub("i")})
+        </span>
+      ),
+      concrete: (
+        <span>
+          crew size {mission.crewSize} · per-condition β vector from the elicitation audit ·
+          z = normalized scores from Stage A
+        </span>
+      ),
+      lay:
+        "Two crew members with the same mission don't have the same risk — a calmer person has lower psychiatric-incident odds, a fitter person has fewer musculoskeletal injuries. We multiply the base rate by a vulnerability factor exp(β·z). β is a Cox-style coefficient elicited from the literature: positive β means high score increases risk, negative β means high score protects. The exp() keeps the rate positive.",
+      citation: {
+        id: "Cox 1972 / [M18 §2.1.1 extension]",
+        label: "Log-linear vulnerability multiplier",
+      },
+    },
+    {
+      n: 3,
+      title: "Sample how many events occur during the mission",
+      equation: (
+        <span>
+          rate conditions: N{sub("k")} ~ Poisson(λ{sub("k,i")} · t · c){"   "}
+          event conditions: N{sub("k")} ~ Binomial(n, p)
+        </span>
+      ),
+      concrete: top ? (
+        <span>
+          example — <span className="text-ink-0">{top.label}</span> ({top.kind}):{" "}
+          mean QTL contribution = {fmt(topMean, 2)} crew-days
+        </span>
+      ) : (
+        <span>(no condition data yet)</span>
+      ),
+      lay:
+        "For 'rate' conditions like insomnia or musculoskeletal injury, we draw the event count from a Poisson distribution — that's the standard distribution for things that happen at a steady rate over time. For 'event' conditions tied to specific operations (EVAs, mission milestones), we use a Binomial draw instead. Each trial gets fresh random numbers, so the simulation captures the natural variability of bad luck.",
+      citation: {
+        id: "[M18 §2.1.2]",
+        label: "Poisson process + Binomial event-trigger",
+      },
+    },
+    {
+      n: 4,
+      title: "For each event, decide severity + treatment outcome",
+      equation: (
+        <span>
+          severity ~ Bernoulli(q{sub("k")}){"   "}
+          lost-days = (1 − τ) · d{sub("untreated")} + τ · d{sub("treated")}
+        </span>
+      ),
+      concrete: (
+        <span>
+          worst-case probability q is per-condition (audit); τ ∈ [0, 1] is treatment
+          availability from mission countermeasures
+        </span>
+      ),
+      lay:
+        "Most events are mild and self-resolve quickly; a small fraction become serious. We draw a Bernoulli coin-flip with probability q to decide which. Then we compute how many crew-days are lost: if treatment is available (τ close to 1), the event is short; if not (τ close to 0), it drags on much longer. The linear interpolation reflects 'partial credit' — half-available treatment shortens the event halfway.",
+      citation: {
+        id: "[A22 §3.3] / [M18 §2.1.2]",
+        label: "Severity branching + treatment partial credit",
+      },
+    },
+    {
+      n: 5,
+      title: "Sum lost days across conditions → QTL, then convert to Crew Health Index",
+      equation: (
+        <span>
+          QTL = Σ{sub("k")} lost-days{sub("k")}
+          {"     "}CHI = 1 − QTL / (t · c)
+        </span>
+      ),
+      concrete: (
+        <span>
+          available person-days = {mission.durationDays} × {mission.crewSize} ={" "}
+          {availDays.toLocaleString()} · total QTL μ = {fmt(totalQtl, 2)} crew-days · CHI μ ={" "}
+          {fmt(100 * posterior.chi.mean, 1)}%
+        </span>
+      ),
+      lay:
+        "We add up all the lost crew-days across all conditions to get QTL — Quality Time Lost. The Crew Health Index is QTL expressed as a percentage of the mission's available person-days: 100% means a perfectly healthy mission, 90% means 10% of the mission's productive time was lost. CHI is the headline number because it normalizes for mission length and crew size, so a 14-day MDRS run and a 520-day Mars500 run can be compared on the same scale.",
+      citation: {
+        id: "[A22 Fig. 1] / [M18 §2.1.2]",
+        label: "QTL aggregation + Crew Health Index definition",
+      },
+    },
+    {
+      n: 6,
+      title: "Repeat thousands of trials → CHI posterior + early-termination probability",
+      equation: (
+        <span>
+          run T = {trials.toLocaleString()} independent trials · χ* threshold ={" "}
+          {chiStar.toFixed(2)} · pEarly = (1/T) Σ 1[CHI{sub("t")} ≤ χ*]
+        </span>
+      ),
+      concrete: (
+        <span>
+          CHI μ = {fmt(100 * posterior.chi.mean, 1)}% · CI₉₀ = [
+          {fmt(100 * posterior.chi.ci90[0], 1)}%,{" "}
+          {fmt(100 * posterior.chi.ci90[1], 1)}%] · pEarlyTermination ={" "}
+          {fmt(100 * posterior.pEarlyTermination.mean, 1)}%
+        </span>
+      ),
+      lay:
+        "One trial captures one possible mission. We re-run with fresh randomness many thousand times to see the full range of outcomes. The 90% credible interval is the band that holds 90% of the trials. pEarlyTermination is the fraction of trials where the crew health dropped below the 'should-end-mission' threshold χ*. It's the closest number we have to 'how likely is this mission to fail'.",
+      citation: {
+        id: "Iter-3 spec §3.5 / [G12] convergence",
+        label: "Monte-Carlo posterior + early-termination probability",
+      },
+    },
+  ];
+}
+
+export function IMMCalculationTrace(props: {
+  posterior: RiskPosterior;
+  mission: AnalogMission;
+  conditions: readonly Condition[];
+  trials: number;
+  seed: number;
+  chiStar: number;
+  priorsVersion: string;
+}) {
+  const steps = immSteps(props);
+  return (
+    <div className="space-y-0">
+      <header className="panel p-4 mb-3 border-signal/40">
+        <div className="flex items-baseline justify-between gap-3">
+          <h3 className="display text-lg text-ink-0">
+            How we projected <span className="text-signal">{props.mission.id}</span>
+          </h3>
+          <span className="mono text-[10px] uppercase tracking-cap text-ink-2">
+            stage b · imm forward monte-carlo
+          </span>
+        </div>
+        <p className="text-sm text-ink-1 mt-2 leading-relaxed">
+          The Crew Health Index histogram on the right is what comes out of these six
+          steps. Each step shows the math, the concrete numbers, and a plain-English
+          explanation below the equation. seed = 0x{props.seed.toString(16)}.
+        </p>
+      </header>
+
+      {steps.map((s, i) => (
+        <TraceStepCard key={s.n} step={s} last={i === steps.length - 1} />
+      ))}
+    </div>
+  );
+}

@@ -7,6 +7,7 @@ import { RiskCard } from "@/ui/components/RiskCard";
 import { RiskHistogram } from "@/ui/figures/RiskHistogram";
 import { ConditionContribution } from "@/ui/figures/ConditionContribution";
 import { MissionComparison } from "@/ui/figures/MissionComparison";
+import { IMMCalculationTrace } from "@/ui/figures/CalculationTrace";
 
 export function Sim({
   candidateId,
@@ -39,6 +40,7 @@ export function Sim({
 
   return (
     <div className="space-y-6">
+      {/* TOP — RiskCard + CHI histogram (the headline result) */}
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-12">
         <section className="lg:col-span-5">
           <RiskCard posterior={latest.posterior} alias={latest.missionId} />
@@ -54,6 +56,25 @@ export function Sim({
             priorsVersion={latest.priorsVersion}
           />
         </section>
+      </div>
+
+      {/* CALCULATION TRACE — Diego scope expansion 2026-05-19: priority on
+          showing how we got to the probability, with educational lay layer. */}
+      {mission && (
+        <section>
+          <IMMCalculationTrace
+            posterior={latest.posterior}
+            mission={mission}
+            conditions={ANALOG_CONDITIONS}
+            trials={latest.trials}
+            seed={latest.seed}
+            chiStar={latest.chiStar}
+            priorsVersion={latest.priorsVersion}
+          />
+        </section>
+      )}
+
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-12">
         <section className="lg:col-span-12 panel p-6">
           <ConditionContribution
             posterior={latest.posterior}

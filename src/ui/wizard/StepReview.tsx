@@ -5,6 +5,7 @@ import { scoreCandidate, normalizeScore } from "@/engine";
 import { PosteriorPlot } from "@/ui/figures/PosteriorPlot";
 import { ScoreCard } from "@/ui/components/ScoreCard";
 import { ScoreBreakdownRadar } from "@/ui/figures/ScoreBreakdownRadar";
+import { MCDACalculationTrace } from "@/ui/figures/CalculationTrace";
 
 const ITERATIONS = 5000;
 const SEED_SAMPLER = 0xc0ffee;
@@ -61,6 +62,7 @@ export function StepReview() {
   );
 
   return (
+    <div className="space-y-6">
     <div className="grid grid-cols-1 gap-6 lg:grid-cols-12">
       <section className="lg:col-span-7 panel p-6 space-y-4">
         <h2 className="display text-lg">Step 3 — Review</h2>
@@ -118,6 +120,19 @@ export function StepReview() {
           <ScoreBreakdownRadar data={radarData} />
         </div>
       </aside>
+    </div>
+
+    {/* CALCULATION TRACE — Diego scope expansion 2026-05-19: educational
+        step-by-step walkthrough of Stage-A MCDA scoring, with lay layer. */}
+    <section>
+      <MCDACalculationTrace
+        posterior={posterior}
+        criteria={PLACEHOLDER_CRITERIA}
+        scores={scoresForEngine}
+        alias={candidate?.alias ?? "—"}
+        seed={SEED_SAMPLER}
+      />
+    </section>
     </div>
   );
 }
