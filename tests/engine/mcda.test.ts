@@ -3,6 +3,9 @@ import { scoreCandidate, closedFormMoments } from "@/engine/mcda";
 import { PLACEHOLDER_CRITERIA } from "@/data/placeholder-criteria";
 import type { Candidate } from "@/types";
 
+// Demo candidate — must carry a score for EVERY criterion in PLACEHOLDER_CRITERIA
+// (Iter-1 placeholders + Diego 2026-05-19 scope expansion = 12 criteria) or
+// scoreCandidate throws E_BAD_SCORE on the missing-key path.
 const demo: Candidate = {
   id: "demo-1",
   alias: "Alpha",
@@ -12,15 +15,24 @@ const demo: Candidate = {
     "physical.vo2max": 52,
     "professional.technical_competence": 8,
     "behavioral.teamwork": 4,
+    "cognitive.nasa_cognition_battery": 1.2, // z-score
+    "cognitive.pvt_b_lapses": 4, // baseline lapses (reversed → high z)
+    "physical.sot5_equilibrium": 72, // SOT-5 EQ score
+    "psych.resilience_cdrisc": 78, // CD-RISC-25 total
+    "psych.emotional_intelligence": 0.9, // MSCEIT z
+    "psych.mmpi2rf_eid": 48, // EID T-score (reversed → high z when low)
+    "psych.bdi2_baseline": 6, // BDI-II baseline (reversed)
   },
 };
+
+const ALPHA = Array.from({ length: 12 }, () => 1);
 
 describe("scoreCandidate", () => {
   it("returns a Posterior with samples, ess, mean, ci90, ci95", () => {
     const post = scoreCandidate({
       candidate: demo,
       criteria: PLACEHOLDER_CRITERIA,
-      alpha: [1, 1, 1, 1, 1],
+      alpha: ALPHA,
       iterations: 5000,
       seed: 42,
     });
@@ -34,7 +46,7 @@ describe("scoreCandidate", () => {
   });
 
   it("matches closed-form mean and variance within 2%", () => {
-    const alpha = [1, 1, 1, 1, 1];
+    const alpha = ALPHA;
     const { mean: cfMean, variance: cfVar } = closedFormMoments({
       candidate: demo,
       criteria: PLACEHOLDER_CRITERIA,
@@ -61,7 +73,7 @@ describe("scoreCandidate", () => {
     const args = {
       candidate: demo,
       criteria: PLACEHOLDER_CRITERIA,
-      alpha: [1, 1, 1, 1, 1],
+      alpha: ALPHA,
       iterations: 1000,
       seed: 99,
     };
