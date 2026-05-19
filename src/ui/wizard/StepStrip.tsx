@@ -1,4 +1,5 @@
 import { STEP_LABELS, type WizardStep, useWizard } from "@/contexts/WizardContext";
+import { notify } from "@/ui/components/Toast";
 
 export function StepStrip() {
   const { step, highestCompletedStep, setStep } = useWizard();
@@ -13,8 +14,14 @@ export function StepStrip() {
           return (
             <button
               key={s}
-              disabled={!clickable}
-              onClick={() => clickable && setStep(s)}
+              aria-disabled={!clickable}
+              onClick={() => {
+                if (!clickable) {
+                  notify("complete the current step first", "error");
+                  return;
+                }
+                setStep(s);
+              }}
               className={
                 "mono uppercase tracking-cap text-[11px] py-3 px-4 -mb-px border-b-2 transition-colors " +
                 (active
