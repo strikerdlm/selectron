@@ -1,6 +1,7 @@
 import { createContext, useCallback, useContext, useEffect, useState, type ReactNode } from "react";
 import type { DbCandidate, CriterionEntry } from "@/db/schema";
-import { getCandidateWithEvidence } from "@/db/repository";
+import { getCandidateWithEvidence, updateCandidate, upsertCriterionEntry } from "@/db/repository";
+import { notify } from "@/ui/components/Toast";
 
 export type WizardStep = 0 | 1 | 2 | 3;
 export const STEP_LABELS: Record<WizardStep, string> = {
@@ -21,6 +22,8 @@ type WizardContextValue = WizardState & {
   setStep: (s: WizardStep) => void;
   markStepCompleted: (s: WizardStep) => void;
   reloadFromDb: () => Promise<void>;
+  enqueueCandidatePatch: (patch: Partial<DbCandidate>) => void;
+  enqueueCriterionPatch: (criterionId: string, patch: Partial<CriterionEntry>) => void;
 };
 
 const WizardContext = createContext<WizardContextValue | null>(null);
@@ -40,6 +43,11 @@ export function WizardProvider({
     step: initialStep,
     highestCompletedStep: -1,
   });
+
+  const [pendingPatches, setPendingPatches] = useState<{
+    candidate?: Partial<DbCandidate>;
+    criterionEntries: Record<string, Partial<CriterionEntry>>;
+  }>({ criterionEntries: {} });
 
   const reloadFromDb = useCallback(async () => {
     const bundle = await getCandidateWithEvidence(candidateId);
@@ -61,8 +69,66 @@ export function WizardProvider({
     }));
   }, []);
 
+  const enqueueCandidatePatch = useCallback((patch: Partial<DbCandidate>) => {
+    setPendingPatches((cur) => ({ ...cur, candidate: { ...cur.candidate, ...patch } }));
+  }, []);
+
+  const enqueueCriterionPatch = useCallback(
+    (criterionId: string, patch: Partial<CriterionEntry>) => {
+      setPendingPatches((cur) => ({
+        ...cur,
+        criterionEntries: {
+          ...cur.criterionEntries,
+          [criterionId]: { ...cur.criterionEntries[criterionId], ...patch },
+        },
+      }));
+    },
+    [],
+  );
+
+  // 300 ms debounced auto-save: fires whenever pendingPatches gains content,
+  // resets timer on each additional change within the window.
+  useEffect(() => {
+    if (!pendingPatches.candidate && Object.keys(pendingPatches.criterionEntries).length === 0) return;
+    const handle = setTimeout(async () => {
+      try {
+        if (pendingPatches.candidate && candidateId) {
+          await updateCandidate(candidateId, pendingPatches.candidate);
+        }
+        for (const [criterionId, patch] of Object.entries(pendingPatches.criterionEntries)) {
+          // Use existing rawValue so a partial patch (e.g. notes-only) does not
+          // overwrite a previously-saved numeric value with 0.
+          const existing = state.criterionEntries.find((e) => e.criterionId === criterionId);
+          await upsertCriterionEntry({
+            candidateId,
+            criterionId,
+            rawValue: patch.rawValue ?? existing?.rawValue ?? 0,
+            ...patch,
+          });
+        }
+        setPendingPatches({ criterionEntries: {} });
+        await reloadFromDb();
+      } catch (err) {
+        notify(`autosave failed: ${(err as Error).message}`, "error");
+      }
+    }, 300);
+    return () => clearTimeout(handle);
+    // state.criterionEntries intentionally captured in closure; pendingPatches
+    // drives the dep array so the effect re-runs on each enqueue.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [pendingPatches, candidateId, reloadFromDb]);
+
   return (
-    <WizardContext.Provider value={{ ...state, setStep, markStepCompleted, reloadFromDb }}>
+    <WizardContext.Provider
+      value={{
+        ...state,
+        setStep,
+        markStepCompleted,
+        reloadFromDb,
+        enqueueCandidatePatch,
+        enqueueCriterionPatch,
+      }}
+    >
       {children}
     </WizardContext.Provider>
   );

@@ -1,8 +1,9 @@
 import { WizardProvider, useWizard, type WizardStep } from "@/contexts/WizardContext";
 import { StepStrip } from "../wizard/StepStrip";
+import { notify } from "@/ui/components/Toast";
 
 function WizardBody({ onExitToDashboard }: { onExitToDashboard: () => void; onExitToSim: () => void }) {
-  const { step, candidate } = useWizard();
+  const { step, candidate, enqueueCandidatePatch } = useWizard();
   if (!candidate) return <div className="p-12 text-ink-2">loading candidate…</div>;
 
   return (
@@ -18,6 +19,17 @@ function WizardBody({ onExitToDashboard }: { onExitToDashboard: () => void; onEx
         <button onClick={onExitToDashboard} className="mono text-[11px] uppercase text-ink-2 hover:text-ink-0">
           ← back to dashboard
         </button>
+        {(step === 2 || step === 3) && candidate.status === "draft" && (
+          <button
+            onClick={() => {
+              enqueueCandidatePatch({ status: "ready" });
+              notify("marked ready");
+            }}
+            className="mono uppercase tracking-cap text-[11px] px-3 py-2 border border-signal text-signal hover:bg-signal/10 rounded-md"
+          >
+            Mark ready
+          </button>
+        )}
       </div>
     </>
   );

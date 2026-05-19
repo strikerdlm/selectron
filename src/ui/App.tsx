@@ -3,6 +3,7 @@ import { DbProvider } from "@/contexts/DbContext";
 import { createCandidate } from "@/db/repository";
 import { Dashboard } from "./views/Dashboard";
 import { Wizard } from "./views/Wizard";
+import { ToastHost } from "./components/Toast";
 
 const SEED_SAMPLER = 0xc0ffee;
 
@@ -104,6 +105,7 @@ export function App() {
             </div>
           </div>
         </footer>
+        <ToastHost />
       </div>
     </DbProvider>
   );
