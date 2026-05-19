@@ -20,6 +20,7 @@ import { echarts } from "./echarts-base";
 import { NATURE_THEME_NAME } from "./theme";
 import { FigureCaption } from "./FigureCaption";
 import { f2Caption } from "./captions/F2.captions";
+import type { AccessTier } from "@/types";
 
 // Wong-7 bluish green for bars (#009E73) — colorblind-safe.
 // Gradient: sky-blue (#56B4E9) at top → bluish-green (#009E73) at bottom for depth.
@@ -83,6 +84,7 @@ export type RiskHistogramProps = {
   trials?: number;
   missionId?: string;
   priorsVersion?: string;
+  accessTier?: AccessTier; // scope-expansion-3
 };
 
 export function RiskHistogram({
@@ -93,6 +95,7 @@ export function RiskHistogram({
   trials,
   missionId = "—",
   priorsVersion = "synthetic-iter3-ui-scaffold",
+  accessTier = "minimum",
 }: RiskHistogramProps) {
   // Empty-state guard: fewer than 10 samples → no meaningful histogram.
   if (chiSamples.length < 10) {
@@ -248,6 +251,7 @@ export function RiskHistogram({
           seed,
           missionId,
           priorsVersion,
+          accessTier,
         })}
       />
     </>

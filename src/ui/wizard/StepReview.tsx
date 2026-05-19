@@ -11,7 +11,7 @@ const ITERATIONS = 5000;
 const SEED_SAMPLER = 0xc0ffee;
 
 export function StepReview() {
-  const { candidate, criterionEntries, setStep, markStepCompleted } = useWizard();
+  const { candidate, criterionEntries, setStep, markStepCompleted, accessTier } = useWizard();
 
   const scores: Record<string, number> = useMemo(() => {
     const m: Record<string, number> = {};
@@ -113,7 +113,7 @@ export function StepReview() {
 
       <aside className="lg:col-span-5 space-y-4">
         <div className="panel p-6">
-          <PosteriorPlot posterior={posterior} seed={SEED_SAMPLER} alias={candidate?.alias ?? "—"} />
+          <PosteriorPlot posterior={posterior} seed={SEED_SAMPLER} alias={candidate?.alias ?? "—"} accessTier={accessTier} />
         </div>
         <ScoreCard posterior={posterior} alias={candidate?.alias ?? "—"} />
         <div className="panel p-6">
@@ -131,6 +131,7 @@ export function StepReview() {
         scores={scoresForEngine}
         alias={candidate?.alias ?? "—"}
         seed={SEED_SAMPLER}
+        accessTier={accessTier}
       />
     </section>
     </div>

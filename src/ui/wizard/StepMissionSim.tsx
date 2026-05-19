@@ -12,7 +12,7 @@ import type { AnalogMission } from "@/types/risk";
 const TRIALS_OPTIONS = [5_000, 10_000, 25_000, 50_000, 100_000];
 
 export function StepMissionSim({ onRunComplete }: { onRunComplete: (sessionId: string) => void }) {
-  const { candidate, criterionEntries, markStepCompleted } = useWizard();
+  const { candidate, criterionEntries, markStepCompleted, accessTier } = useWizard();
   const [mission, setMission] = useState<AnalogMission | null>(null);
   const [trials, setTrials] = useState(25_000);
   const [chiStar, setChiStar] = useState(0.7);
@@ -52,6 +52,7 @@ export function StepMissionSim({ onRunComplete }: { onRunComplete: (sessionId: s
           },
           chiSamples: post.diagnostics?.chiSamples ?? [],
           qtlSamples: post.diagnostics?.qtlSamples ?? [],
+          notes: `tier=${accessTier}`,
         });
         markStepCompleted(3);
         onRunComplete(session.id);

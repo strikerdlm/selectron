@@ -27,6 +27,7 @@ import type { SimSession } from "@/db/schema";
 import { notify } from "@/ui/components/Toast";
 import { FigureCaption } from "./FigureCaption";
 import { f7Caption } from "./captions/F7.captions";
+import { useWizard } from "@/contexts/WizardContext";
 
 // ---------------------------------------------------------------------------
 // Design constants
@@ -224,6 +225,7 @@ export type MissionComparisonProps = {
 };
 
 export function MissionComparison({ candidateId }: MissionComparisonProps) {
+  const { accessTier } = useWizard();
   // Three-valued state:
   //   undefined → not yet checked (waiting for first loadCache)
   //   SimSession[] → checked; may be empty array (no comparison data yet)
@@ -332,7 +334,7 @@ export function MissionComparison({ candidateId }: MissionComparisonProps) {
               },
               chiSamples: post.diagnostics?.chiSamples ?? [],
               qtlSamples: post.diagnostics?.qtlSamples ?? [],
-              notes: `comparison-run-${runId}`,
+              notes: `tier=${accessTier} · comparison-run-${runId}`,
             });
           } catch (err) {
             notify(`Mission ${mission.id} failed: ${(err as Error).message}`, "error");

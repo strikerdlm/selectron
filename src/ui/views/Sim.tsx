@@ -8,6 +8,8 @@ import { RiskHistogram } from "@/ui/figures/RiskHistogram";
 import { ConditionContribution } from "@/ui/figures/ConditionContribution";
 import { MissionComparison } from "@/ui/figures/MissionComparison";
 import { IMMCalculationTrace } from "@/ui/figures/CalculationTrace";
+import type { AccessTier } from "@/types";
+import { ACCESS_TIERS } from "@/types";
 
 export function Sim({
   candidateId,
@@ -22,10 +24,17 @@ export function Sim({
     (async () => {
       const sims = await recentSimsFor(candidateId, 50);
       // Pick the most recent NON-comparison-run sim as the "latest"
-      const nonComparison = sims.filter((s) => !(s.notes ?? "").startsWith("comparison-run-"));
+      const nonComparison = sims.filter((s) => !(s.notes ?? "").includes("comparison-run-"));
       setLatest(nonComparison[0] ?? null);
     })();
   }, [candidateId]);
+
+  // Derive access tier from the notes prefix "tier=<minimum|medium|elite>"
+  const tierMatch = (latest?.notes ?? "").match(/^tier=(\w+)/);
+  const sessionTier: AccessTier =
+    tierMatch?.[1] && ACCESS_TIERS.includes(tierMatch[1] as AccessTier)
+      ? (tierMatch[1] as AccessTier)
+      : "minimum";
 
   if (!latest) {
     return (
@@ -54,6 +63,7 @@ export function Sim({
             trials={latest.trials}
             missionId={latest.missionId}
             priorsVersion={latest.priorsVersion}
+            accessTier={sessionTier}
           />
         </section>
       </div>
@@ -70,6 +80,7 @@ export function Sim({
             seed={latest.seed}
             chiStar={latest.chiStar}
             priorsVersion={latest.priorsVersion}
+            accessTier={sessionTier}
           />
         </section>
       )}

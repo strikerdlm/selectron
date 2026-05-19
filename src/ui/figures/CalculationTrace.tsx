@@ -14,6 +14,8 @@
 import type { ReactNode } from "react";
 import type { Criterion } from "@/types";
 import type { Posterior } from "@/types";
+import type { AccessTier } from "@/types";
+import { TIER_LABEL } from "@/types";
 import type { RiskPosterior, AnalogMission, Condition } from "@/types/risk";
 import { normalizeScore } from "@/engine";
 
@@ -110,6 +112,7 @@ function mcdaSteps(args: {
   scores: Record<string, number>;
   alias: string;
   seed: number;
+  accessTier: AccessTier;
 }): TraceStep[] {
   const { posterior, criteria, scores } = args;
   const K = criteria.length;
@@ -119,6 +122,8 @@ function mcdaSteps(args: {
     criteria.find((c) => scores[c.id] !== undefined) ?? criteria[0];
   const demoRaw = scores[demoC.id] ?? demoC.scale.min;
   const demoZ = normalizeScore(demoRaw, demoC.scale, demoC.higherIsBetter);
+  const demoCInstrument =
+    demoC.tierInstruments?.[args.accessTier]?.instrument ?? demoC.instrument;
 
   // For step 3 demo: actually compute a weighted sum on the FIRST posterior draw
   const samples = posterior.samples;
@@ -136,8 +141,8 @@ function mcdaSteps(args: {
       ),
       concrete: (
         <span>
-          {demoC.label}: x = {fmt(demoRaw, 1)} on [{demoC.scale.min},{" "}
-          {demoC.scale.max}] → z = {fmt(demoZ, 3)}
+          {demoC.label} (instrument: <span className="text-ink-1">{demoCInstrument}</span>):
+          x = {fmt(demoRaw, 1)} on [{demoC.scale.min}, {demoC.scale.max}] → z = {fmt(demoZ, 3)}
           {demoC.higherIsBetter === false && (
             <span className="text-ink-3 ml-2">(flipped: lower raw → higher z)</span>
           )}
@@ -228,6 +233,7 @@ export function MCDACalculationTrace(props: {
   scores: Record<string, number>;
   alias: string;
   seed: number;
+  accessTier: AccessTier; // scope-expansion-3
 }) {
   const steps = mcdaSteps(props);
   return (
@@ -237,9 +243,14 @@ export function MCDACalculationTrace(props: {
           <h3 className="display text-lg text-ink-0">
             How we scored <span className="text-signal">{props.alias}</span>
           </h3>
-          <span className="mono text-[10px] uppercase tracking-cap text-ink-2">
-            stage a · bayesian mcda
-          </span>
+          <div className="flex items-center gap-2">
+            <span className="mono text-[10px] uppercase tracking-cap text-signal border border-signal/40 rounded px-2 py-0.5">
+              tier · {TIER_LABEL[props.accessTier]}
+            </span>
+            <span className="mono text-[10px] uppercase tracking-cap text-ink-2">
+              stage a · bayesian mcda
+            </span>
+          </div>
         </div>
         <p className="text-sm text-ink-1 mt-2 leading-relaxed">
           The total-score posterior on the right is the output of these four steps. Each
@@ -430,6 +441,7 @@ export function IMMCalculationTrace(props: {
   seed: number;
   chiStar: number;
   priorsVersion: string;
+  accessTier: AccessTier; // scope-expansion-3
 }) {
   const steps = immSteps(props);
   return (
@@ -439,9 +451,14 @@ export function IMMCalculationTrace(props: {
           <h3 className="display text-lg text-ink-0">
             How we projected <span className="text-signal">{props.mission.id}</span>
           </h3>
-          <span className="mono text-[10px] uppercase tracking-cap text-ink-2">
-            stage b · imm forward monte-carlo
-          </span>
+          <div className="flex items-center gap-2">
+            <span className="mono text-[10px] uppercase tracking-cap text-signal border border-signal/40 rounded px-2 py-0.5">
+              tier · {TIER_LABEL[props.accessTier]}
+            </span>
+            <span className="mono text-[10px] uppercase tracking-cap text-ink-2">
+              stage b · imm forward monte-carlo
+            </span>
+          </div>
         </div>
         <p className="text-sm text-ink-1 mt-2 leading-relaxed">
           The Crew Health Index histogram on the right is what comes out of these six

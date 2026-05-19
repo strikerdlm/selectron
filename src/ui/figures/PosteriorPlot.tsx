@@ -21,6 +21,7 @@ import ReactEChartsCore from "echarts-for-react/lib/core";
 import { echarts } from "./echarts-base";
 import { NATURE_THEME_NAME } from "./theme";
 import type { Posterior } from "@/types";
+import type { AccessTier } from "@/types";
 import { FigureCaption } from "./FigureCaption";
 import { f1Caption } from "./captions/F1.captions";
 
@@ -74,9 +75,9 @@ function buildHistogram(
   return { centers, counts };
 }
 
-type Props = { posterior: Posterior; seed?: number; alias?: string };
+type Props = { posterior: Posterior; seed?: number; alias?: string; accessTier?: AccessTier };
 
-export function PosteriorPlot({ posterior, seed = 0xc0ffee, alias = "—" }: Props) {
+export function PosteriorPlot({ posterior, seed = 0xc0ffee, alias = "—", accessTier = "minimum" }: Props) {
   // Empty-state guard: fewer than 10 samples → no meaningful histogram.
   if (posterior.samples.length < 10) {
     return (
@@ -225,7 +226,7 @@ export function PosteriorPlot({ posterior, seed = 0xc0ffee, alias = "—" }: Pro
         style={{ height: 280, width: "100%" }}
         notMerge
       />
-      <FigureCaption block={f1Caption(posterior, seed, alias)} />
+      <FigureCaption block={f1Caption(posterior, seed, alias, accessTier)} />
     </>
   );
 }
