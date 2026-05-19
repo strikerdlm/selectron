@@ -70,8 +70,9 @@ The 2014 [W14] poster lists a slightly different eighth factor ("People Qualific
 - **Audit cell:** `notebooks/iter3_imm_fit.ipynb` Cell 1 asserts `(df["extracted_by"] == "Diego").all()` — the notebook refuses to fit proposal rows. If Diego rejects a proposal, the row stays in `.proposals.csv` with a `REJECTED: <reason>` notes column annotation.
 - **Subagent attribution:** the three Task-36 subagent commits (`c2ac879` P-A, `c3e5528` P-B, `7387857` P-C) each list per-paper coverage in the commit message — what was extracted, what was skipped, why. Surfaced concerns per subagent are also in the conversation audit and the `extraction_audit.md` follow-up (Task 38, PENDING).
 - **Hand-elicitation audit:** `research/imm_sources/_beta_elicitation_audit.md` (T41 template, commit `a4e21c3`) holds the rationale for each `vulnerability_beta`, `worst_case_prob_q`, `treated/untreated_lost_days_mean` Diego elicits from the evidence tables. Numbers placeholder pending Diego's T41 work.
+- **Tier-aware audit trail (scope-expansion-3):** Each saved `simSession` now carries an explicit `tier=<minimum|medium|elite>` prefix in its `notes` field (T95, commit `1934988`), making the instrument-realisation of every criterion traceable from the simulator output back to the candidate's chosen accessibility tier and forward to the verified DOIs in `placeholder-criteria.tierInstruments[tier].citations` (T91, commit `0a49407`). The CalculationTrace tier chip + F1/F2 caption tier mention close the loop visually for the reviewer.
 
-**Status:** PARTIALLY SATISFIED. Contract + audit-doc structure in place; concrete pedigree completes when Diego ratifies T37 + T41.
+**Status:** PARTIALLY SATISFIED. Contract + audit-doc structure in place; concrete pedigree completes when Diego ratifies T37 + T41. **Tier-trace audit** (scope-expansion-3) is fully implemented and routes from selection-instrument metadata to the simSession record.
 
 ---
 
