@@ -13,6 +13,21 @@ export const PLACEHOLDER_CRITERIA: readonly Criterion[] = [
     scale: { min: 0, max: 100 },
     higherIsBetter: true,
     citations: ["10.1037/0022-3514.88.1.139"],
+    tierInstruments: {
+      minimum: {
+        instrument: "IPIP-NEO-120 (free, public domain; ipip.ori.org)",
+        citations: ["10.1016/j.jrp.2014.05.003"],
+        notes: "Johnson 2014 T-score equivalent to NEO-PI-R; DOI flagged for manual verification.",
+      },
+      medium: {
+        instrument: "NEO-FFI (60-item; PAR Inc., ~USD 60/set)",
+        citations: ["10.1037/0022-3514.88.1.139"],
+      },
+      elite: {
+        instrument: "NEO-PI-R (240-item; Pearson; licensed psychologist required)",
+        citations: ["10.1037/0022-3514.88.1.139"],
+      },
+    },
   },
   {
     id: "psych.emotional_stability",
@@ -23,6 +38,21 @@ export const PLACEHOLDER_CRITERIA: readonly Criterion[] = [
     scale: { min: 0, max: 100 },
     higherIsBetter: true,
     citations: ["10.3357/ASEM.2521.2009"],
+    tierInstruments: {
+      minimum: {
+        instrument: "IPIP-NEO-120 Neuroticism scale (reversed; free)",
+        citations: ["10.1016/j.jrp.2014.05.003"],
+        notes: "DOI flagged for manual verification.",
+      },
+      medium: {
+        instrument: "NEO-FFI Neuroticism (reversed, T-score; PAR Inc.)",
+        citations: ["10.3357/ASEM.2521.2009"],
+      },
+      elite: {
+        instrument: "NEO-PI-R Neuroticism facets N1–N6 (full 240-item; Pearson)",
+        citations: ["10.3357/ASEM.2521.2009"],
+      },
+    },
   },
   {
     id: "physical.vo2max",
@@ -33,6 +63,22 @@ export const PLACEHOLDER_CRITERIA: readonly Criterion[] = [
     scale: { min: 20, max: 70 },
     higherIsBetter: true,
     citations: ["10.1152/japplphysiol.00756.2017"],
+    tierInstruments: {
+      minimum: {
+        instrument: "Cooper 12-minute run/walk test (free; stopwatch + measured track)",
+        citations: ["10.1001/jama.1968.03140600031004"],
+        notes: "Cooper 1968 original; DOI flagged for manual verification. Cross-validation with CPET r=0.90 in young adults.",
+      },
+      medium: {
+        instrument: "Submaximal cycle ergometer (Åstrand-Rhyming nomogram; ~USD 1–5 k)",
+        citations: ["10.1152/japplphysiol.00756.2017"],
+      },
+      elite: {
+        instrument: "Maximal CPET with metabolic cart (VO2peak direct measure, mL/kg/min)",
+        citations: ["10.1152/japplphysiol.00756.2017"],
+        notes: "OCHMO-STD-100.1A spaceflight medical clearance.",
+      },
+    },
   },
   {
     id: "professional.technical_competence",
@@ -43,6 +89,20 @@ export const PLACEHOLDER_CRITERIA: readonly Criterion[] = [
     scale: { min: 1, max: 10 },
     higherIsBetter: true,
     citations: ["10.1518/001872008X312413"],
+    tierInstruments: {
+      minimum: {
+        instrument: "Structured behavioural rubric (paper/checklist; 1–10 panel rating)",
+        citations: ["10.1518/001872008X312413"],
+      },
+      medium: {
+        instrument: "Structured behavioural rubric (panel + reference check)",
+        citations: ["10.1518/001872008X312413"],
+      },
+      elite: {
+        instrument: "Multi-rater assessment centre (structured rubric + simulation scenario + peer rating)",
+        citations: ["10.1518/001872008X312413"],
+      },
+    },
   },
   {
     id: "behavioral.teamwork",
@@ -53,6 +113,20 @@ export const PLACEHOLDER_CRITERIA: readonly Criterion[] = [
     scale: { min: 1, max: 5 },
     higherIsBetter: true,
     citations: ["10.3357/ASEM.4023.2014"],
+    tierInstruments: {
+      minimum: {
+        instrument: "Behavioural-based interview (BBI; paper rubric; 1–5 scale)",
+        citations: ["10.3357/ASEM.4023.2014"],
+      },
+      medium: {
+        instrument: "BBI + extended scenario probes (1–5 panel rating)",
+        citations: ["10.3357/ASEM.4023.2014"],
+      },
+      elite: {
+        instrument: "MATB-II or HERA group simulation observer rating",
+        citations: ["10.3357/ASEM.4023.2014"],
+      },
+    },
   },
   // Diego scope expansion 2026-05-19: 7 new criteria from
   // research/2026-05-19_selection_test_battery_expansion.md (commit 5ee9840).
@@ -70,6 +144,22 @@ export const PLACEHOLDER_CRITERIA: readonly Criterion[] = [
     scale: { min: -3, max: 3 },
     higherIsBetter: true,
     citations: ["10.3357/amhp.4343.2015", "10.3389/fphys.2024.1451269", "10.1038/s41526-020-00124-6"],
+    tierInstruments: {
+      minimum: {
+        instrument: "PEBL battery (free, open-source): PVT module + DSST equivalent (Digit Span + Symbol Coding) + Trail Making",
+        citations: ["10.7717/peerj.1460"],
+        notes: "Piper et al. 2015 PMID 26713233 verified; covers NASA CB's highest-validity subtests at zero cost.",
+      },
+      medium: {
+        instrument: "CogScreen-AE (PAR Inc.; commercial; ~USD 400–900; aviation-normed)",
+        citations: [],
+        notes: "Primary reference: Kay GG (1995) CogScreen-AE Professional Manual, PAR Inc. — not DOI-indexed. Verify current price at par.iagc.com.",
+      },
+      elite: {
+        instrument: "NASA Cognition Battery (Basner et al. 2015; Joggle Research / Pulsar Informatics; institutional subscription)",
+        citations: ["10.3357/amhp.4343.2015", "10.3389/fphys.2024.1451269"],
+      },
+    },
   },
   {
     id: "cognitive.pvt_b_lapses",
@@ -84,6 +174,21 @@ export const PLACEHOLDER_CRITERIA: readonly Criterion[] = [
     scale: { min: 0, max: 60 },
     higherIsBetter: false,
     citations: ["10.1093/sleep/34.5.581"],
+    tierInstruments: {
+      minimum: {
+        instrument: "Standalone PVT-B (free Pulsar Informatics research version, or PEBL PVT module)",
+        citations: ["10.1093/sleep/34.5.581"],
+        notes: "Basner 2011 PMID 22025811; Pulsar offers free for non-commercial research use.",
+      },
+      medium: {
+        instrument: "Joggle Research / Pulsar Informatics PVT-B (commercial tablet; ~USD 200–500/yr site license)",
+        citations: ["10.1093/sleep/34.5.581"],
+      },
+      elite: {
+        instrument: "PVT-B embedded within NASA Cognition Battery (same Joggle platform; avoids double-counting)",
+        citations: ["10.1093/sleep/34.5.581"],
+      },
+    },
   },
   {
     id: "physical.sot5_equilibrium",
@@ -97,6 +202,26 @@ export const PLACEHOLDER_CRITERIA: readonly Criterion[] = [
     scale: { min: 0, max: 100 },
     higherIsBetter: true,
     citations: ["10.3357/asem.br06.2009"],
+    tierInstruments: {
+      minimum: {
+        instrument: "mCTSIB (foam pad standing × 4 conditions × 30 s) + Functional Mobility Test obstacle course (TTC, seconds)",
+        citations: ["10.1007/s00221-010-2171-0"],
+        scaleTransform: {
+          note: "FMT time-to-complete (seconds, lower=better) requires inverse mapping to SOT-5 EQ canonical 0–100 scale (higher=better). Empirical calibration TBD — flag for Diego.",
+        },
+        notes: "Mulavara 2010 ISS post-flight locomotor function validation; loses vestibular-isolation specificity of SOT-5.",
+      },
+      medium: {
+        instrument: "Wii Balance Board + BalanceTesting software (consumer-grade force plate, ~USD 150–300)",
+        citations: ["10.3389/fphys.2015.00038"],
+        notes: "Paillard & Noé 2015 validation at ±5% vs NeuroCom CDP; DOI flagged for manual verification.",
+      },
+      elite: {
+        instrument: "NeuroCom Equitest CDP — SOT-5 Equilibrium Score (sway-referenced platform; eyes closed)",
+        citations: ["10.3389/fphys.2018.01680", "10.3389/fncir.2021.723504"],
+        notes: "OCHMO standard; 91% fall rate on R+0 in SOT-5M-challenged subjects.",
+      },
+    },
   },
   {
     id: "psych.resilience_cdrisc",
@@ -111,6 +236,25 @@ export const PLACEHOLDER_CRITERIA: readonly Criterion[] = [
     scale: { min: 0, max: 100 },
     higherIsBetter: true,
     citations: ["10.1002/da.10113"],
+    tierInstruments: {
+      minimum: {
+        instrument: "CD-RISC-10 (10-item; free for non-commercial research; CDRisc.com author permission)",
+        citations: ["10.1002/jts.20271"],
+        scaleTransform: {
+          multiplier: 2.5,
+          note: "CD-RISC-10 native 0–40 → ×2.5 → canonical 0–100 scale matching CD-RISC-25.",
+        },
+        notes: "Campbell-Sills & Stein 2007 α≈0.85; DOI flagged for manual verification.",
+      },
+      medium: {
+        instrument: "CD-RISC-25 (25-item full version; free for non-commercial research)",
+        citations: ["10.1002/da.10113"],
+      },
+      elite: {
+        instrument: "CD-RISC-25 + supplemental semi-structured clinical interview",
+        citations: ["10.1002/da.10113"],
+      },
+    },
   },
   {
     id: "psych.emotional_intelligence",
@@ -126,6 +270,21 @@ export const PLACEHOLDER_CRITERIA: readonly Criterion[] = [
     scale: { min: -3, max: 3 },
     higherIsBetter: true,
     citations: ["10.1037/1528-3542.3.1.97"],
+    tierInstruments: {
+      minimum: {
+        instrument: "TEIQue-SF (Trait Emotional Intelligence Questionnaire — Short Form; 30-item; free for research at psychometriclab.com)",
+        citations: ["10.1177/0033294108101897"],
+        notes: "Petrides 2009 α≈0.88; DOI flagged for manual verification.",
+      },
+      medium: {
+        instrument: "EQ-i 2.0 (MHS Inc.; self-report; ~USD 30–50/administration)",
+        citations: ["10.1002/job.714"],
+      },
+      elite: {
+        instrument: "MSCEIT v2.0 (MHS; ability-based; 141-item; 4 branches)",
+        citations: ["10.1002/job.714"],
+      },
+    },
   },
   {
     id: "psych.mmpi2rf_eid",
@@ -140,6 +299,24 @@ export const PLACEHOLDER_CRITERIA: readonly Criterion[] = [
     scale: { min: 30, max: 120 },
     higherIsBetter: false,
     citations: ["10.1037/0033-2909.130.5.661"],
+    tierInstruments: {
+      minimum: {
+        instrument: "DASS-21 (Depression Anxiety Stress Scales, 21-item; free, public domain; Lovibond & Lovibond 1995) — TRIAGE FLAG ONLY",
+        citations: [],
+        notes:
+          "NOT a psychiatric select-out gate at this tier. DASS-21 depression subscale ≥ 14 (severe) " +
+          "MUST trigger external referral to a licensed mental-health professional before mission deployment. " +
+          "Lovibond & Lovibond 1995 — original monograph, not DOI-indexed.",
+      },
+      medium: {
+        instrument: "MMPI-2-RF (Pearson; ~USD 15–30/administration; licensed psychologist required)",
+        citations: ["10.1037/0033-2909.130.5.661"],
+      },
+      elite: {
+        instrument: "MMPI-2-RF (full 338-item) + supplemental psychiatric interview by clinical psychiatrist",
+        citations: ["10.1037/0033-2909.130.5.661"],
+      },
+    },
   },
   {
     id: "psych.bdi2_baseline",
@@ -154,5 +331,24 @@ export const PLACEHOLDER_CRITERIA: readonly Criterion[] = [
     scale: { min: 0, max: 63 },
     higherIsBetter: false,
     citations: ["10.1207/s15327752jpa6703_13"],
+    tierInstruments: {
+      minimum: {
+        instrument: "PHQ-9 (Patient Health Questionnaire, 9-item; free, public domain; Kroenke & Spitzer 2001)",
+        citations: ["10.1046/j.1525-1497.2001.016009606.x"],
+        scaleTransform: {
+          multiplier: 2.33,
+          note: "PHQ-9 native 0–27 → ×2.33 → BDI-II canonical 0–63 scale.",
+        },
+        notes: "Kroenke & Spitzer 2001; DOI flagged for manual verification.",
+      },
+      medium: {
+        instrument: "BDI-II (Pearson; ~USD 2–5/protocol; paper-and-pencil)",
+        citations: ["10.1207/s15327752jpa6703_13"],
+      },
+      elite: {
+        instrument: "BDI-II serial administration (every 2–4 weeks pre-mission; trajectory slope is operative statistic)",
+        citations: ["10.1207/s15327752jpa6703_13", "10.1371/journal.pone.0093298"],
+      },
+    },
   },
 ];
