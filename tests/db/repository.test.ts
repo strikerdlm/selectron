@@ -66,6 +66,59 @@ describe("deleteCandidate", () => {
     await deleteCandidate(c.id);
     expect(await listCandidates()).toHaveLength(0);
   });
+
+  test("keeps shared attachment BLOB when first candidate is deleted", async () => {
+    // Candidate A and B each attach the SAME file (dedup → same attachment id).
+    const candA = await createCandidate({ alias: "alpha" });
+    const candB = await createCandidate({ alias: "beta" });
+
+    const entryA = await upsertCriterionEntry({
+      candidateId: candA.id,
+      criterionId: "psych.conscientiousness",
+      rawValue: 60.0,
+    });
+    const entryB = await upsertCriterionEntry({
+      candidateId: candB.id,
+      criterionId: "psych.conscientiousness",
+      rawValue: 55.0,
+    });
+
+    // Both entries attach the same bytes → dedup hits → same attachment id.
+    const att = await attachFile(await makeBlob("shared-pdf-content"), entryA.id);
+    const attB = await attachFile(await makeBlob("shared-pdf-content"), entryB.id);
+    expect(attB.id).toBe(att.id); // confirm dedup
+
+    // Delete candidate A — attachment must STILL exist (B still references it).
+    await deleteCandidate(candA.id);
+    const stillPresent = await db.attachments.get(att.id);
+    expect(stillPresent).toBeDefined();
+  });
+
+  test("removes orphan attachment BLOB when last referencing candidate is deleted", async () => {
+    // Candidate A and B each attach the SAME file (dedup → same attachment id).
+    const candA = await createCandidate({ alias: "alpha" });
+    const candB = await createCandidate({ alias: "beta" });
+
+    const entryA = await upsertCriterionEntry({
+      candidateId: candA.id,
+      criterionId: "psych.conscientiousness",
+      rawValue: 60.0,
+    });
+    const entryB = await upsertCriterionEntry({
+      candidateId: candB.id,
+      criterionId: "psych.conscientiousness",
+      rawValue: 55.0,
+    });
+
+    const att = await attachFile(await makeBlob("shared-pdf-content"), entryA.id);
+    await attachFile(await makeBlob("shared-pdf-content"), entryB.id); // dedup → same id
+
+    // Delete both candidates — after the second delete, no references remain.
+    await deleteCandidate(candA.id);
+    await deleteCandidate(candB.id);
+    const gone = await db.attachments.get(att.id);
+    expect(gone).toBeUndefined();
+  });
 });
 
 describe("getCandidateWithEvidence", () => {

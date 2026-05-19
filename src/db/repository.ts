@@ -55,11 +55,36 @@ export async function updateCandidate(
 }
 
 export async function deleteCandidate(id: string): Promise<void> {
-  await db.transaction("rw", db.candidates, db.criterionEntries, db.simSessions, async () => {
-    await db.candidates.delete(id);
-    await db.criterionEntries.where("candidateId").equals(id).delete();
-    await db.simSessions.where("candidateId").equals(id).delete();
-  });
+  await db.transaction(
+    "rw",
+    db.candidates,
+    db.criterionEntries,
+    db.simSessions,
+    db.attachments,
+    async () => {
+      // Collect attachment ids referenced by this candidate's entries before deletion.
+      const entries = await db.criterionEntries.where("candidateId").equals(id).toArray();
+      const attachmentIds = Array.from(
+        new Set(entries.flatMap((e) => e.attachmentKeys ?? [])),
+      );
+
+      await db.candidates.delete(id);
+      await db.criterionEntries.where("candidateId").equals(id).delete();
+      await db.simSessions.where("candidateId").equals(id).delete();
+
+      // For each attachment that was referenced by the deleted entries, check
+      // whether any OTHER entry (from a different candidate) still references it.
+      // Delete the BLOB row only if no remaining entry holds a reference.
+      for (const attId of attachmentIds) {
+        const stillReferenced = await db.criterionEntries
+          .filter((e) => (e.attachmentKeys ?? []).includes(attId))
+          .count();
+        if (stillReferenced === 0) {
+          await db.attachments.delete(attId);
+        }
+      }
+    },
+  );
 }
 
 export type UpsertCriterionEntryInput = Omit<CriterionEntry, "id" | "updatedAt" | "attachmentKeys"> & {
