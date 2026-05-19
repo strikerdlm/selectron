@@ -35,26 +35,28 @@ If CogScreen-AE itself is too gated, the fallback candidates are:
 
 **To be ratified** when the research subagent returns. Citation will be a peer-reviewed predictive-validity DOI for the chosen substitute.
 
-## 3. Tier assignments (research-pending)
+## 3. Tier assignments (RESEARCH-RATIFIED, commit `f60f2df`)
 
-The research subagent's output at `research/2026-05-19_test_battery_tiers.md` will provide a per-criterion tier table. Expected structure:
+**Key correction from pre-research draft:** the research output at `research/2026-05-19_test_battery_tiers.md` clarifies that **all 12 criteria are covered at all 3 tiers** — none drop out. The tier doesn't filter criteria; it switches WHICH INSTRUMENT is used to measure each criterion. The Bayesian aggregation absorbs the resulting wider uncertainty at lower tiers (lower-fidelity instrument → wider posterior CI on z-score).
 
-| Criterion id | Min | Med | Elite | Rationale |
-|---|---|---|---|---|
-| `psych.conscientiousness` | ✓ | ✓ | ✓ | NEO-FFI 60-item free; NEO-PI-R commercial for richer assessment |
-| `psych.emotional_stability` | ✓ | ✓ | ✓ | same |
-| `physical.vo2max` | ✓ | ✓ | ✓ | Cooper 12-min run (T1) vs CPET with metabolic cart (T3) |
-| `professional.technical_competence` | ✓ | ✓ | ✓ | structured behavioural rubric, no hardware |
-| `behavioral.teamwork` | ✓ | ✓ | ✓ | behavioral-based interview, no hardware |
-| `cognitive.cogscreen` (NEW; replaces NASA Cog Battery) | (depends on access) | ✓ | ✓ | CogScreen-AE FAA-grade |
-| `cognitive.pvt_b_lapses` | ✓ | ✓ | ✓ | open-source PVT on commodity laptop |
-| `physical.sot5_equilibrium` | — | (?) | ✓ | NeuroCom Equitest CDP USD 50 k+ |
-| `psych.resilience_cdrisc` | ✓ | ✓ | ✓ | CD-RISC-25 free for research, 25 items, 5 min |
-| `psych.emotional_intelligence` | — | ✓ | ✓ | MSCEIT commercial |
-| `psych.mmpi2rf_eid` | — | ✓ | ✓ | requires licensed clinical psychologist |
-| `psych.bdi2_baseline` | ✓ | ✓ | ✓ | paper-based, modest fee, 5 min |
+Concrete substitution chain (verbatim from research §3):
 
-Final table will be regenerated from the research output. Until then this table is provisional.
+| Criterion | Tier 1 instrument | Tier 2 instrument | Tier 3 instrument |
+|---|---|---|---|
+| `cognitive.nasa_cognition_battery` | **PEBL battery** (open-source; DOI `10.7717/peerj.1460`) | CogScreen-AE (USD 400–900) | NASA Cognition Battery (Joggle Research enterprise) |
+| `cognitive.pvt_b_lapses` | Standalone Pulsar PVT-B (free for research) | Same | PVT-B embedded in NASA CB |
+| `physical.sot5_equilibrium` | Functional Movement Test (obstacle-course time) | Berg Balance + Romberg | NeuroCom Equitest CDP SOT-5 |
+| `psych.mmpi2rf_eid` | **DASS-21 triage** (NOT a gate — see §5.3 below) | MMPI-2-RF (licensed psychologist) | Same as Tier 2 |
+| `psych.bdi2_baseline` | PHQ-9 (×2.33 multiplier to BDI-II scale) | BDI-II | Same as Tier 2 |
+| `psych.resilience_cdrisc` | CD-RISC-10 (×2.5 to 100-scale) | CD-RISC-25 | Same as Tier 2 |
+| `psych.emotional_intelligence` | TEIQue-SF (Petrides 2007) | MSCEIT v2.0 | Same as Tier 2 |
+| `physical.vo2max` | Cooper 12-min run estimate | Bruce protocol treadmill VO2max | Direct CPET with metabolic cart |
+| `psych.conscientiousness` | NEO-FFI 60-item | NEO-PI-R (T-score) | Same as Tier 2 |
+| `psych.emotional_stability` | NEO-FFI Neuroticism (reversed) | NEO-PI-R N (reversed) | Same as Tier 2 |
+| `professional.technical_competence` | Structured behavioural rubric 1–10 | Same | Same |
+| `behavioral.teamwork` | Behavioural-based interview 1–5 | Same | Same |
+
+**Verified DOIs** for every Tier-1 instrument citation are in `research/2026-05-19_test_battery_tiers.md` §6. 5 DOIs are flagged for manual verification (Cooper 1968, Johnson 2014, Campbell-Sills & Stein 2007, Kroenke & Spitzer 2002, Petrides 2007); Diego adjudicates before they ship in `placeholder-criteria.ts`.
 
 ## 4. UI changes — Scenario selector
 
@@ -79,23 +81,36 @@ export const TIER_DESCRIPTION: Record<AccessTier, string> = {
 
 ### 4.2 Extend `Criterion` type
 
+**Corrected after research:** the tier doesn't filter criteria; it filters instruments. So the type gains a `tierInstruments` map, not an `accessTier` array:
+
 ```ts
 // src/types/criterion.ts
+export type CriterionInstrument = {
+  instrument: string;          // e.g. "PEBL battery (DSST + PVT + Trail Making composite)"
+  citations: string[];         // verified DOIs for THIS instrument
+  scaleTransform?: {
+    multiplier?: number;       // e.g. PHQ-9 → BDI-II × 2.33
+    note?: string;             // human-readable transform note
+  };
+  notes?: string;              // tier-specific caveats (e.g. "DASS-21 is TRIAGE, not gate")
+};
+
 export type Criterion = {
   id: string;
   family: string;
   label: string;
   description: string;
-  instrument: string;
   scale: { min: number; max: number };
   higherIsBetter: boolean;
+  // Legacy fields (still required for backward compat; act as Tier-3 default):
+  instrument: string;
   citations: string[];
   // NEW (scope-expansion-3):
-  accessTier: AccessTier[]; // 1+ tiers this test belongs to
+  tierInstruments?: Record<AccessTier, CriterionInstrument>;
 };
 ```
 
-The accessTier field is an **array** because some tests are valid at multiple tiers (e.g. NEO-FFI fits in T1/T2/T3 — same instrument, identical computation, just commodity hardware).
+`tierInstruments` is optional initially — criteria without it fall back to the legacy `instrument` + `citations` fields (interpreted as Tier-3 default). All 12 current criteria gain populated `tierInstruments` entries per the research table.
 
 ### 4.3 ScenarioSelector component
 
@@ -117,9 +132,11 @@ Lives at `src/ui/wizard/ScenarioSelector.tsx`. Shown at the **top of wizard step
 
 Default tier: `"minimum"`. Tier choice is **persisted in WizardContext** + saved to `DbCandidate` (new field `DbCandidate.accessTier?: AccessTier`).
 
-### 4.4 Wizard step 2 filter
+### 4.4 Wizard step 2 — instrument switching (NOT filtering)
 
-`StepCriteria.tsx` filters `PLACEHOLDER_CRITERIA` by `c.accessTier.includes(currentTier)`. Counts in the status row reflect the filtered count: "3 ok · 1 partial · 1 empty (of 5 tier-1 criteria)".
+`StepCriteria.tsx` does NOT filter criteria by tier. Instead, each criterion row displays the tier-specific instrument name + scale-transform note. `EvidenceForm.tsx` looks up `criterion.tierInstruments[currentTier]?.instrument` and renders that string in place of the legacy `instrument` field. Scale transforms (e.g. PHQ-9 × 2.33) are applied at score-entry time + flagged in the lay caption of `CalculationTrace`.
+
+Counts in the status row are tier-agnostic ("X ok · Y partial · Z empty (of 12 criteria)").
 
 ### 4.5 ScoreBreakdownRadar spoke count
 
