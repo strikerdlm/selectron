@@ -1,5 +1,5 @@
 import { v4 as uuid } from "uuid";
-import { db, type DbCandidate, type CandidateStatus, type CriterionEntry } from "./schema";
+import { db, type DbCandidate, type CandidateStatus, type CriterionEntry, type Attachment } from "./schema";
 
 export type CreateCandidateInput = {
   alias: string;
@@ -101,4 +101,56 @@ export async function getCandidateWithEvidence(id: string): Promise<CandidateBun
   if (!candidate) throw new Error(`Candidate ${id} not found`);
   const criterionEntries = await db.criterionEntries.where("candidateId").equals(id).toArray();
   return { candidate, criterionEntries };
+}
+
+async function sha256Hex(blob: Blob): Promise<string> {
+  const buf = await blob.arrayBuffer();
+  const digest = await crypto.subtle.digest("SHA-256", buf);
+  return Array.from(new Uint8Array(digest))
+    .map((b) => b.toString(16).padStart(2, "0"))
+    .join("");
+}
+
+export async function attachFile(file: File, criterionEntryId: string): Promise<Attachment> {
+  const sha = await sha256Hex(file);
+  return db.transaction("rw", db.attachments, db.criterionEntries, async () => {
+    let row = await db.attachments.where("sha256").equals(sha).first();
+    if (!row) {
+      row = {
+        id: uuid(),
+        filename: file.name,
+        mimeType: file.type,
+        sizeBytes: file.size,
+        blob: file,
+        sha256: sha,
+        uploadedAt: new Date().toISOString(),
+      };
+      await db.attachments.add(row);
+    }
+    const entry = await db.criterionEntries.get(criterionEntryId);
+    if (!entry) throw new Error(`CriterionEntry ${criterionEntryId} not found`);
+    if (!entry.attachmentKeys.includes(row.id)) {
+      entry.attachmentKeys.push(row.id);
+      entry.updatedAt = new Date().toISOString();
+      await db.criterionEntries.put(entry);
+    }
+    return row;
+  });
+}
+
+export async function detachFile(attachmentId: string, criterionEntryId: string): Promise<void> {
+  await db.transaction("rw", db.attachments, db.criterionEntries, async () => {
+    const entry = await db.criterionEntries.get(criterionEntryId);
+    if (entry) {
+      entry.attachmentKeys = entry.attachmentKeys.filter((k) => k !== attachmentId);
+      entry.updatedAt = new Date().toISOString();
+      await db.criterionEntries.put(entry);
+    }
+    const refsRemaining = await db.criterionEntries
+      .filter((e) => e.attachmentKeys.includes(attachmentId))
+      .count();
+    if (refsRemaining === 0) {
+      await db.attachments.delete(attachmentId);
+    }
+  });
 }

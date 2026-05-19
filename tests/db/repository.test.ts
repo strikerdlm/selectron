@@ -9,6 +9,8 @@ import {
   updateCandidate,
   listCriterionEntries,
   upsertCriterionEntry,
+  attachFile,
+  detachFile,
 } from "@/db/repository";
 
 beforeEach(async () => {
@@ -103,5 +105,59 @@ describe("upsertCriterionEntry / listCriterionEntries", () => {
     });
     await deleteCandidate(c.id);
     expect(await listCriterionEntries(c.id)).toHaveLength(0);
+  });
+});
+
+async function makeBlob(content: string): Promise<File> {
+  return new File([content], "test.txt", { type: "text/plain" });
+}
+
+describe("attachFile / detachFile", () => {
+  test("attachFile stores BLOB and returns id", async () => {
+    const c = await createCandidate({ alias: "alpha" });
+    const entry = await upsertCriterionEntry({
+      candidateId: c.id,
+      criterionId: "psych.conscientiousness",
+      rawValue: 60.0,
+    });
+    const a = await attachFile(await makeBlob("hello"), entry.id);
+    expect(a.sizeBytes).toBe(5);
+    expect(a.sha256).toMatch(/^[0-9a-f]{64}$/);
+  });
+
+  test("attachFile dedups by sha256", async () => {
+    const c = await createCandidate({ alias: "alpha" });
+    const entry = await upsertCriterionEntry({
+      candidateId: c.id,
+      criterionId: "psych.conscientiousness",
+      rawValue: 60.0,
+    });
+    const a1 = await attachFile(await makeBlob("same content"), entry.id);
+    const a2 = await attachFile(await makeBlob("same content"), entry.id);
+    expect(a2.id).toBe(a1.id); // dedup hit
+  });
+
+  test("detachFile removes attachment only when refcount hits zero", async () => {
+    const c = await createCandidate({ alias: "alpha" });
+    const e1 = await upsertCriterionEntry({
+      candidateId: c.id,
+      criterionId: "psych.conscientiousness",
+      rawValue: 60.0,
+    });
+    const e2 = await upsertCriterionEntry({
+      candidateId: c.id,
+      criterionId: "psych.emotional_stability",
+      rawValue: 50.0,
+    });
+    const a = await attachFile(await makeBlob("shared"), e1.id);
+    await attachFile(await makeBlob("shared"), e2.id); // dedup → same id, refcount 2
+
+    await detachFile(a.id, e1.id);
+    const stillThere = await db.attachments.get(a.id);
+    expect(stillThere).toBeDefined();
+
+    await detachFile(a.id, e2.id);
+    const goneNow = await db.attachments.get(a.id);
+    expect(goneNow).toBeUndefined();
   });
 });
