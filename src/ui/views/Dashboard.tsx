@@ -1,8 +1,10 @@
 import { useEffect, useState } from "react";
 import type { DbCandidate, CandidateStatus } from "@/db/schema";
-import { listCandidates, recentSimsFor, deleteCandidate } from "@/db/repository";
+import { listCandidates, recentSimsFor, deleteCandidate, exportDb, importDb, createCandidate, upsertCriterionEntry } from "@/db/repository";
 import { CandidateCard } from "../dashboard/CandidateCard";
 import { DashboardSummary, type DashboardSummaryDatum } from "@/ui/figures/DashboardSummary";
+import { PLACEHOLDER_CRITERIA } from "@/data/placeholder-criteria";
+import { generateCandidate } from "@/engine";
 
 type StatusFilter = "all" | CandidateStatus;
 
@@ -43,6 +45,38 @@ export function Dashboard(props: {
     reload();
   }, []);
 
+  async function handleExport() {
+    const dump = await exportDb();
+    const blob = new Blob([JSON.stringify(dump, null, 2)], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `selectron-export-${new Date().toISOString().slice(0, 10)}.json`;
+    a.click();
+    URL.revokeObjectURL(url);
+  }
+
+  async function handleImport(file: File) {
+    const text = await file.text();
+    const dump = JSON.parse(text) as Parameters<typeof importDb>[0];
+    await importDb(dump);
+    await reload();
+  }
+
+  async function handleGenerateSynthetic() {
+    const synth = generateCandidate(PLACEHOLDER_CRITERIA, Math.floor(Math.random() * 1e9), "synth");
+    const c = await createCandidate({ alias: synth.alias });
+    for (const [criterionId, rawValue] of Object.entries(synth.scores)) {
+      await upsertCriterionEntry({
+        candidateId: c.id,
+        criterionId,
+        rawValue,
+        citationFree: "synthetic seed",
+      });
+    }
+    await reload();
+  }
+
   const filtered =
     statusFilter === "all"
       ? candidates
@@ -71,28 +105,35 @@ export function Dashboard(props: {
           </button>
           <button
             type="button"
-            disabled
-            className="mono uppercase tracking-cap text-[11px] px-4 py-2 border border-line
-              text-ink-3 cursor-not-allowed rounded-sm opacity-50"
+            onClick={handleGenerateSynthetic}
+            className="mono uppercase tracking-cap text-[11px] px-4 py-2 border border-signal
+              text-signal hover:bg-signal/10 transition-colors rounded-sm"
           >
             Generate synthetic
           </button>
           <button
             type="button"
-            disabled
+            onClick={handleExport}
             className="mono uppercase tracking-cap text-[11px] px-4 py-2 border border-line
-              text-ink-3 cursor-not-allowed rounded-sm opacity-50"
-          >
-            Import
-          </button>
-          <button
-            type="button"
-            disabled
-            className="mono uppercase tracking-cap text-[11px] px-4 py-2 border border-line
-              text-ink-3 cursor-not-allowed rounded-sm opacity-50"
+              text-ink-2 hover:border-ink-2 hover:bg-line/20 transition-colors rounded-sm"
           >
             Export
           </button>
+          <label
+            className="mono uppercase tracking-cap text-[11px] px-4 py-2 border border-line
+              text-ink-2 hover:border-ink-2 hover:bg-line/20 transition-colors rounded-sm cursor-pointer"
+          >
+            Import
+            <input
+              type="file"
+              accept="application/json"
+              className="hidden"
+              onChange={(e) => {
+                const f = e.target.files?.[0];
+                if (f) void handleImport(f);
+              }}
+            />
+          </label>
         </div>
 
         {/* FILTER + STATS */}
