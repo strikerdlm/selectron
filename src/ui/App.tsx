@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { DbProvider } from "@/contexts/DbContext";
 import { createCandidate } from "@/db/repository";
 import { Dashboard } from "./views/Dashboard";
+import { Wizard } from "./views/Wizard";
 
 const SEED_SAMPLER = 0xc0ffee;
 
@@ -73,7 +74,12 @@ export function App() {
             />
           )}
           {view.kind === "wizard" && (
-            <div className="panel p-6 text-sm text-ink-2">Wizard — see Tasks 70–77</div>
+            <Wizard
+              candidateId={view.candidateId}
+              initialStep={view.step}
+              onExitToDashboard={() => setView({ kind: "dashboard" })}
+              onExitToSim={(id) => setView({ kind: "sim", candidateId: id })}
+            />
           )}
           {view.kind === "sim" && (
             <div className="panel p-6 text-sm text-ink-2">Sim view — see Task 77</div>
