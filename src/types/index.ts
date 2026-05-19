@@ -12,3 +12,10 @@ export type {
   PosteriorSummary,
   RiskPosterior,
 } from "./risk";
+export type { AccessTier } from "./scenario";
+export {
+  ACCESS_TIERS,
+  TIER_LABEL,
+  TIER_SHORT_DESCRIPTION,
+  TIER_LONG_DESCRIPTION,
+} from "./scenario";
