@@ -66,8 +66,8 @@ export const PLACEHOLDER_CRITERIA: readonly Criterion[] = [
     tierInstruments: {
       minimum: {
         instrument: "Cooper 12-minute run/walk test (free; stopwatch + measured track)",
-        citations: ["10.1001/jama.1968.03140600031004"],
-        notes: "Cooper 1968 original; DOI flagged for manual verification. Cross-validation with CPET r=0.90 in young adults.",
+        citations: ["10.1001/jama.203.3.201"],
+        notes: "Cooper 1968 — verified via Scite (Kenneth H. Cooper, JAMA 203(3):201–204, 322 citations). Cross-validation with CPET r=0.90 in young adults.",
       },
       medium: {
         instrument: "Submaximal cycle ergometer (Åstrand-Rhyming nomogram; ~USD 1–5 k)",
@@ -273,8 +273,8 @@ export const PLACEHOLDER_CRITERIA: readonly Criterion[] = [
     tierInstruments: {
       minimum: {
         instrument: "TEIQue-SF (Trait Emotional Intelligence Questionnaire — Short Form; 30-item; free for research at psychometriclab.com)",
-        citations: ["10.1177/0033294108101897"],
-        notes: "Petrides 2009 α≈0.88; DOI flagged for manual verification.",
+        citations: ["10.1007/978-0-387-88370-0_5"],
+        notes: "Petrides 2009 — verified via Scite (K. V. Petrides, Springer book chapter 'Psychometric Properties of the TEIQue', 1333 citations). α≈0.88; convergent validity with MSCEIT and EQ-i established in multiple meta-analyses.",
       },
       medium: {
         instrument: "EQ-i 2.0 (MHS Inc.; self-report; ~USD 30–50/administration)",
