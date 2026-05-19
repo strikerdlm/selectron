@@ -13,6 +13,7 @@ export const PLACEHOLDER_CRITERIA: readonly Criterion[] = [
     scale: { min: 0, max: 100 },
     higherIsBetter: true,
     citations: ["10.1037/0022-3514.88.1.139"],
+    minimumTier: "minimum",
     tierInstruments: {
       minimum: {
         instrument: "IPIP-NEO-120 (free, public domain; ipip.ori.org)",
@@ -38,6 +39,7 @@ export const PLACEHOLDER_CRITERIA: readonly Criterion[] = [
     scale: { min: 0, max: 100 },
     higherIsBetter: true,
     citations: ["10.3357/ASEM.2521.2009"],
+    minimumTier: "minimum",
     tierInstruments: {
       minimum: {
         instrument: "IPIP-NEO-120 Neuroticism scale (reversed; free)",
@@ -63,6 +65,7 @@ export const PLACEHOLDER_CRITERIA: readonly Criterion[] = [
     scale: { min: 20, max: 70 },
     higherIsBetter: true,
     citations: ["10.1152/japplphysiol.00756.2017"],
+    minimumTier: "minimum",
     tierInstruments: {
       minimum: {
         instrument: "Cooper 12-minute run/walk test (free; stopwatch + measured track)",
@@ -89,6 +92,7 @@ export const PLACEHOLDER_CRITERIA: readonly Criterion[] = [
     scale: { min: 1, max: 10 },
     higherIsBetter: true,
     citations: ["10.1518/001872008X312413"],
+    minimumTier: "minimum",
     tierInstruments: {
       minimum: {
         instrument: "Structured behavioural rubric (paper/checklist; 1–10 panel rating)",
@@ -113,6 +117,7 @@ export const PLACEHOLDER_CRITERIA: readonly Criterion[] = [
     scale: { min: 1, max: 5 },
     higherIsBetter: true,
     citations: ["10.3357/ASEM.4023.2014"],
+    minimumTier: "minimum",
     tierInstruments: {
       minimum: {
         instrument: "Behavioural-based interview (BBI; paper rubric; 1–5 scale)",
@@ -144,6 +149,7 @@ export const PLACEHOLDER_CRITERIA: readonly Criterion[] = [
     scale: { min: -3, max: 3 },
     higherIsBetter: true,
     citations: ["10.3357/amhp.4343.2015", "10.3389/fphys.2024.1451269", "10.1038/s41526-020-00124-6"],
+    minimumTier: "medium",
     tierInstruments: {
       minimum: {
         instrument: "PEBL battery (free, open-source): PVT module + DSST equivalent (Digit Span + Symbol Coding) + Trail Making",
@@ -162,30 +168,40 @@ export const PLACEHOLDER_CRITERIA: readonly Criterion[] = [
     },
   },
   {
-    id: "cognitive.pvt_b_lapses",
+    // scope-expansion-3 follow-up (2026-05-19): renamed from cognitive.pvt_b_lapses
+    // to cognitive.pvt_b_rt_ms — Diego pointed out he has the NASA PVT iOS app
+    // (free), and the iOS app's headline output is mean reaction time in ms (not
+    // lapse count). Mean RT is also the more interpretable + comparable metric
+    // across populations. The lapse count is still tracked internally by the
+    // app but the primary score we record in Selectron is mean RT (ms).
+    id: "cognitive.pvt_b_rt_ms",
     family: "cognitive",
-    label: "Vigilance — PVT-B baseline lapses (reversed)",
+    label: "Vigilance — PVT-B reaction time",
     description:
-      "Lapse count (reaction time > 500 ms) on the 3-minute Psychomotor Vigilance Test Brief — the " +
-      "ISS standard for catching dangerous slowing before EVAs. Lapses above the 75th percentile " +
-      "flag trait vulnerability to sleep-restriction-induced impairment. Reversed: lower lapses → " +
-      "higher Selectron z.",
-    instrument: "PVT-B 3-min, lapse count (Basner 2011); reversed scale 0–60 lapses",
-    scale: { min: 0, max: 60 },
-    higherIsBetter: false,
+      "Mean reaction time (in milliseconds) on the 3-minute Psychomotor Vigilance Test Brief — " +
+      "the ISS standard for detecting dangerous slowing before EVAs. Operational range for adults: " +
+      "200–500 ms; <250 ms = elite vigilance, 250–300 ms = typical, >350 ms = sleep-restriction " +
+      "impairment, >500 ms = a 'lapse' (Dinges et al. 1991 criterion). Lower RT means better " +
+      "sustained-attention performance.",
+    instrument: "PVT-B 3-min, mean RT in ms (Basner 2011; NASA PVT iOS app at par.iagc.com)",
+    // Scale: 200 ms (elite floor) to 500 ms (lapse threshold).
+    scale: { min: 200, max: 500 },
+    higherIsBetter: false, // shorter RT = higher Selectron z
     citations: ["10.1093/sleep/34.5.581"],
+    minimumTier: "minimum", // 8-of-12 DIY-feasible core
     tierInstruments: {
       minimum: {
-        instrument: "Standalone PVT-B (free Pulsar Informatics research version, or PEBL PVT module)",
+        instrument: "NASA PVT (iOS app, FREE) — distributed by NASA Behavioral Health & Performance lab; same engine as the ISS PVT-B reaction-self-test. Records mean RT, fastest 10%, slowest 10%, and lapses (RT > 500 ms).",
         citations: ["10.1093/sleep/34.5.581"],
-        notes: "Basner 2011 PMID 22025811; Pulsar offers free for non-commercial research use.",
+        notes: "Diego confirms NASA PVT iOS app is accessible at no cost — preferred Tier-1 PVT instrument. PEBL PVT module is a cross-platform fallback if iOS is unavailable.",
       },
       medium: {
-        instrument: "Joggle Research / Pulsar Informatics PVT-B (commercial tablet; ~USD 200–500/yr site license)",
+        instrument: "NASA PVT (iOS app, free) or commercial Pulsar Informatics PVT-B (Windows/tablet; ~USD 200–500/yr).",
         citations: ["10.1093/sleep/34.5.581"],
+        notes: "At Tier 2 the same NASA PVT app is still defensible; the commercial Pulsar version is a richer-norms alternative when a research license is in budget.",
       },
       elite: {
-        instrument: "PVT-B embedded within NASA Cognition Battery (same Joggle platform; avoids double-counting)",
+        instrument: "PVT-B embedded within the NASA Cognition Battery (same Joggle platform; avoids double-counting the subtest).",
         citations: ["10.1093/sleep/34.5.581"],
       },
     },
@@ -202,6 +218,7 @@ export const PLACEHOLDER_CRITERIA: readonly Criterion[] = [
     scale: { min: 0, max: 100 },
     higherIsBetter: true,
     citations: ["10.3357/asem.br06.2009"],
+    minimumTier: "elite",
     tierInstruments: {
       minimum: {
         instrument: "mCTSIB (foam pad standing × 4 conditions × 30 s) + Functional Mobility Test obstacle course (TTC, seconds)",
@@ -236,6 +253,7 @@ export const PLACEHOLDER_CRITERIA: readonly Criterion[] = [
     scale: { min: 0, max: 100 },
     higherIsBetter: true,
     citations: ["10.1002/da.10113"],
+    minimumTier: "minimum",
     tierInstruments: {
       minimum: {
         instrument: "CD-RISC-10 (10-item; free for non-commercial research; CDRisc.com author permission)",
@@ -270,6 +288,7 @@ export const PLACEHOLDER_CRITERIA: readonly Criterion[] = [
     scale: { min: -3, max: 3 },
     higherIsBetter: true,
     citations: ["10.1037/1528-3542.3.1.97"],
+    minimumTier: "medium",
     tierInstruments: {
       minimum: {
         instrument: "TEIQue-SF (Trait Emotional Intelligence Questionnaire — Short Form; 30-item; free for research at psychometriclab.com)",
@@ -289,7 +308,7 @@ export const PLACEHOLDER_CRITERIA: readonly Criterion[] = [
   {
     id: "psych.mmpi2rf_eid",
     family: "psychological",
-    label: "Psychiatric screen — MMPI-2-RF EID (reversed)",
+    label: "Psychiatric screen — MMPI-2-RF EID",
     description:
       "Emotional-Internalising Dysfunction higher-order score from the MMPI-2-RF — the primary " +
       "psychiatric select-out instrument in NASA / ESA / Antarctic winter-over programs. Clinical " +
@@ -299,6 +318,7 @@ export const PLACEHOLDER_CRITERIA: readonly Criterion[] = [
     scale: { min: 30, max: 120 },
     higherIsBetter: false,
     citations: ["10.1037/0033-2909.130.5.661"],
+    minimumTier: "elite",
     tierInstruments: {
       minimum: {
         instrument: "DASS-21 (Depression Anxiety Stress Scales, 21-item; free, public domain; Lovibond & Lovibond 1995) — TRIAGE FLAG ONLY",
@@ -321,7 +341,7 @@ export const PLACEHOLDER_CRITERIA: readonly Criterion[] = [
   {
     id: "psych.bdi2_baseline",
     family: "psychological",
-    label: "Depression-state baseline (BDI-II, reversed)",
+    label: "Depression-state baseline (BDI-II)",
     description:
       "Beck Depression Inventory-II total score at baseline. Captures emerging mood state " +
       "complementary to MMPI-2-RF (state vs trait). In Mars-500 the crew member whose BDI-II " +
@@ -331,6 +351,7 @@ export const PLACEHOLDER_CRITERIA: readonly Criterion[] = [
     scale: { min: 0, max: 63 },
     higherIsBetter: false,
     citations: ["10.1207/s15327752jpa6703_13"],
+    minimumTier: "minimum",
     tierInstruments: {
       minimum: {
         instrument: "PHQ-9 (Patient Health Questionnaire, 9-item; free, public domain; Kroenke & Spitzer 2001)",

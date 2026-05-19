@@ -2,7 +2,8 @@
 // Lives at the top of the wizard view. Default tier is "minimum".
 
 import type { AccessTier } from "@/types";
-import { ACCESS_TIERS, TIER_LABEL, TIER_SHORT_DESCRIPTION } from "@/types";
+import { ACCESS_TIERS, TIER_LABEL, TIER_SHORT_DESCRIPTION, isCriterionAvailableAtTier } from "@/types";
+import { PLACEHOLDER_CRITERIA } from "@/data/placeholder-criteria";
 
 type Props = {
   value: AccessTier;
@@ -48,6 +49,40 @@ export function ScenarioSelector({ value, onChange, disabled = false }: Props) {
       </div>
 
       <p className="text-sm text-ink-1 leading-relaxed">{TIER_SHORT_DESCRIPTION[value]}</p>
+
+      {/* Educational footer — explains what changes between tiers in plain English.
+          Diego scope-expansion-3 follow-up 2026-05-19: "clarify below how the
+          computations change." */}
+      <div className="mt-3 pt-3 border-t border-line/40 grid grid-cols-3 gap-3">
+        {ACCESS_TIERS.map((t) => {
+          const count = PLACEHOLDER_CRITERIA.filter((c) =>
+            isCriterionAvailableAtTier(c.minimumTier, t),
+          ).length;
+          const active = t === value;
+          return (
+            <div
+              key={t}
+              className={
+                "border-l-2 pl-2 mono text-[10px] " +
+                (active ? "border-signal text-ink-1" : "border-line text-ink-3")
+              }
+            >
+              <span className="uppercase tracking-cap">{TIER_LABEL[t]}</span>
+              <div className="tabular-nums mt-0.5">
+                {count} of {PLACEHOLDER_CRITERIA.length} criteria
+              </div>
+            </div>
+          );
+        })}
+      </div>
+
+      <p className="mt-3 mono text-[10px] text-ink-3 leading-relaxed">
+        switching tier changes BOTH the criteria list AND the instrument used for each one.
+        The Bayesian MCDA aggregation runs against whatever subset is active — the posterior
+        is always internally honest about which tests the program actually measured.
+        Mathematical detail: the Dirichlet mean weight per criterion is 1/K (K = number of
+        active criteria), so a Tier-1 criterion carries weight 1/8 vs 1/12 at Tier-3.
+      </p>
     </div>
   );
 }

@@ -60,7 +60,17 @@ export function EvidenceForm({
         )}
       </div>
       <div>
-        <label className="label">raw value</label>
+        <label className="label">
+          raw value
+          {/* scope-expansion-3 follow-up 2026-05-19: drop "(reversed)" suffix
+              from criterion labels; instead, surface the direction inline as a
+              plain-English caption right next to the slider. */}
+          {criterion.higherIsBetter === false && (
+            <span className="ml-2 mono text-[10px] uppercase tracking-cap text-amber-300">
+              ↓ lower is better
+            </span>
+          )}
+        </label>
         <div className="flex items-center gap-3">
           <input
             type="range"

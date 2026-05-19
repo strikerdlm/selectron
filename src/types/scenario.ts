@@ -4,10 +4,15 @@
 // centre with commercial computerised tools; Tier 3 = real spaceflight / NASA-
 // grade program with hardware-gated clinical instruments.
 //
-// Tier does NOT change which criteria Selectron scores — all 12 criteria are
-// present at every tier. Tier only switches WHICH INSTRUMENT measures each
-// criterion (and any scale transformation needed when a Tier-1 instrument has
-// a different numeric range than the canonical Tier-3 instrument).
+// Tier changes BOTH which criteria the wizard shows AND which instrument
+// measures each visible criterion (with any scale transformation):
+//
+//   - Tier 1 (Minimum) — 8 DIY-feasible criteria (the "core" battery)
+//   - Tier 2 (Medium)  — 10 criteria (adds 2 commercial-license tests)
+//   - Tier 3 (Elite)   — 12 criteria (adds 2 specialist-hardware/clinician tests)
+//
+// The per-criterion `minimumTier` field in src/types/criterion.ts gates the
+// filter; isCriterionAvailableAtTier(min, current) is the runtime check.
 //
 // See research/2026-05-19_test_battery_tiers.md for the per-criterion × per-
 // tier instrument table.
@@ -27,6 +32,25 @@ export const TIER_SHORT_DESCRIPTION: Record<AccessTier, string> = {
   medium: "Well-equipped research centre · commercial software + clinical psychology consult · USD 5–50 k",
   elite: "Real spaceflight / NASA-grade · CDP balance + metabolic cart + sleep lab · agency staff",
 };
+
+// Ordinal — lower tier is more accessible. Used to compare a Criterion's
+// `minimumTier` against the user's chosen tier:
+//   `tierOrdinal(criterion.minimumTier) <= tierOrdinal(currentTier)` is true
+// iff the criterion should be visible at the current tier.
+export const TIER_ORDINAL: Record<AccessTier, number> = {
+  minimum: 0,
+  medium: 1,
+  elite: 2,
+};
+
+export function isCriterionAvailableAtTier(
+  minimumTier: AccessTier | undefined,
+  currentTier: AccessTier,
+): boolean {
+  const required = TIER_ORDINAL[minimumTier ?? "minimum"];
+  const have = TIER_ORDINAL[currentTier];
+  return have >= required;
+}
 
 export const TIER_LONG_DESCRIPTION: Record<AccessTier, string> = {
   minimum:

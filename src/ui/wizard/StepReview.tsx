@@ -6,12 +6,23 @@ import { PosteriorPlot } from "@/ui/figures/PosteriorPlot";
 import { ScoreCard } from "@/ui/components/ScoreCard";
 import { ScoreBreakdownRadar } from "@/ui/figures/ScoreBreakdownRadar";
 import { MCDACalculationTrace } from "@/ui/figures/CalculationTrace";
+import { isCriterionAvailableAtTier } from "@/types";
 
 const ITERATIONS = 5000;
 const SEED_SAMPLER = 0xc0ffee;
 
 export function StepReview() {
   const { candidate, criterionEntries, setStep, markStepCompleted, accessTier } = useWizard();
+
+  // Only the criteria available at the user's chosen tier feed the posterior +
+  // table + radar. Tier-1 Posterior is a K=8 Dirichlet vs Tier-3 K=12 — the
+  // mean weight per criterion is 1/K (not 1/12) when computed against the
+  // tier-active subset, so a Tier-1 Selectron answer is internally honest about
+  // which tests it actually measured.
+  const visibleCriteria = useMemo(
+    () => PLACEHOLDER_CRITERIA.filter((c) => isCriterionAvailableAtTier(c.minimumTier, accessTier)),
+    [accessTier],
+  );
 
   const scores: Record<string, number> = useMemo(() => {
     const m: Record<string, number> = {};
@@ -23,11 +34,11 @@ export function StepReview() {
   // never throws E_BAD_SCORE (incomplete wizard state is valid during review).
   const scoresForEngine = useMemo(() => {
     const m: Record<string, number> = {};
-    for (const c of PLACEHOLDER_CRITERIA) {
+    for (const c of visibleCriteria) {
       m[c.id] = scores[c.id] ?? c.scale.min;
     }
     return m;
-  }, [scores]);
+  }, [scores, visibleCriteria]);
 
   const candidateForEngine = useMemo(
     () => ({
@@ -42,23 +53,23 @@ export function StepReview() {
     () =>
       scoreCandidate({
         candidate: candidateForEngine,
-        criteria: PLACEHOLDER_CRITERIA,
-        alpha: PLACEHOLDER_CRITERIA.map(() => 1),
+        criteria: visibleCriteria,
+        alpha: visibleCriteria.map(() => 1),
         iterations: ITERATIONS,
         seed: SEED_SAMPLER,
       }),
-    [candidateForEngine],
+    [candidateForEngine, visibleCriteria],
   );
 
   const radarData = useMemo(
     () =>
-      PLACEHOLDER_CRITERIA.map((c) => {
+      visibleCriteria.map((c) => {
         const raw = scores[c.id] ?? c.scale.min;
         const z = normalizeScore(raw, c.scale, c.higherIsBetter);
-        const weight = 1 / PLACEHOLDER_CRITERIA.length;
+        const weight = 1 / visibleCriteria.length;
         return { criterionId: c.id, label: c.label, contribution: weight * z };
       }),
-    [scores],
+    [scores, visibleCriteria],
   );
 
   return (
@@ -77,7 +88,7 @@ export function StepReview() {
             </tr>
           </thead>
           <tbody>
-            {PLACEHOLDER_CRITERIA.map((c) => {
+            {visibleCriteria.map((c) => {
               const raw = scores[c.id];
               const z = raw === undefined ? "—" : normalizeScore(raw, c.scale, c.higherIsBetter).toFixed(2);
               return (
@@ -127,7 +138,7 @@ export function StepReview() {
     <section>
       <MCDACalculationTrace
         posterior={posterior}
-        criteria={PLACEHOLDER_CRITERIA}
+        criteria={visibleCriteria}
         scores={scoresForEngine}
         alias={candidate?.alias ?? "—"}
         seed={SEED_SAMPLER}

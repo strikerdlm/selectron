@@ -18,4 +18,6 @@ export {
   TIER_LABEL,
   TIER_SHORT_DESCRIPTION,
   TIER_LONG_DESCRIPTION,
+  TIER_ORDINAL,
+  isCriterionAvailableAtTier,
 } from "./scenario";

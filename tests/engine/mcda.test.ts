@@ -16,7 +16,7 @@ const demo: Candidate = {
     "professional.technical_competence": 8,
     "behavioral.teamwork": 4,
     "cognitive.nasa_cognition_battery": 1.2, // z-score
-    "cognitive.pvt_b_lapses": 4, // baseline lapses (reversed → high z)
+    "cognitive.pvt_b_rt_ms": 280, // PVT-B mean RT (ms) — lower is better, 280 ms = typical adult
     "physical.sot5_equilibrium": 72, // SOT-5 EQ score
     "psych.resilience_cdrisc": 78, // CD-RISC-25 total
     "psych.emotional_intelligence": 0.9, // MSCEIT z

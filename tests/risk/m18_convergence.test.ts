@@ -95,7 +95,7 @@ describe("M18/A22 convergence rule (NASA IMM canonical, V&V Factor 1)", () => {
         "professional.technical_competence": 7,
         "behavioral.teamwork": 4,
         "cognitive.nasa_cognition_battery": 0.5,
-        "cognitive.pvt_b_lapses": 4,
+        "cognitive.pvt_b_rt_ms": 280, // mean RT 280 ms — typical adult vigilance
         "physical.sot5_equilibrium": 65,
         "psych.resilience_cdrisc": 70,
         "psych.emotional_intelligence": 0.5,

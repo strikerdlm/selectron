@@ -39,4 +39,14 @@ export type Criterion = {
    * scope-expansion-3 populates this for all 12 placeholder criteria.
    */
   tierInstruments?: Record<AccessTier, CriterionInstrument>;
+  /**
+   * Lowest accessibility tier at which this criterion appears in the wizard.
+   * - "minimum" → visible at all three tiers (Tier-1, 2, 3) — these are the
+   *   8 DIY-feasible "core" tests of the battery
+   * - "medium"  → visible at Tier-2 and Tier-3 — adds 2 commercial-license tests
+   * - "elite"   → visible only at Tier-3 — adds 2 specialist-hardware/clinician tests
+   * Default (when undefined) is "minimum" — full backward compatibility with the
+   * pre-scope-expansion-3-followup behavior where every criterion ran at every tier.
+   */
+  minimumTier?: AccessTier;
 };
