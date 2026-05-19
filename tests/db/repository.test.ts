@@ -7,6 +7,8 @@ import {
   getCandidateWithEvidence,
   listCandidates,
   updateCandidate,
+  listCriterionEntries,
+  upsertCriterionEntry,
 } from "@/db/repository";
 
 beforeEach(async () => {
@@ -66,5 +68,40 @@ describe("getCandidateWithEvidence", () => {
     const bundle = await getCandidateWithEvidence(c.id);
     expect(bundle.candidate.alias).toBe("alpha");
     expect(bundle.criterionEntries).toEqual([]);
+  });
+});
+
+describe("upsertCriterionEntry / listCriterionEntries", () => {
+  test("creates a fresh entry then upserts in place", async () => {
+    const c = await createCandidate({ alias: "alpha" });
+    const e1 = await upsertCriterionEntry({
+      candidateId: c.id,
+      criterionId: "psych.conscientiousness",
+      rawValue: 60.1,
+      instrument: "NEO-PI-R",
+      citationFree: "internal report 2026-05-10",
+    });
+    expect(e1.id).toBeDefined();
+
+    const e2 = await upsertCriterionEntry({
+      candidateId: c.id,
+      criterionId: "psych.conscientiousness",
+      rawValue: 62.0,
+    });
+    expect(e2.id).toBe(e1.id); // same (candidateId+criterionId) → upsert
+    expect(e2.rawValue).toBe(62.0);
+
+    expect(await listCriterionEntries(c.id)).toHaveLength(1);
+  });
+
+  test("cascade-deletes when candidate is deleted", async () => {
+    const c = await createCandidate({ alias: "alpha" });
+    await upsertCriterionEntry({
+      candidateId: c.id,
+      criterionId: "psych.conscientiousness",
+      rawValue: 60.0,
+    });
+    await deleteCandidate(c.id);
+    expect(await listCriterionEntries(c.id)).toHaveLength(0);
   });
 });

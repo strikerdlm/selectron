@@ -54,6 +54,43 @@ export async function deleteCandidate(id: string): Promise<void> {
   });
 }
 
+export type UpsertCriterionEntryInput = Omit<CriterionEntry, "id" | "updatedAt" | "attachmentKeys"> & {
+  id?: string;
+  attachmentKeys?: string[];
+};
+
+export async function upsertCriterionEntry(
+  input: UpsertCriterionEntryInput,
+): Promise<CriterionEntry> {
+  const existing = await db.criterionEntries
+    .where("[candidateId+criterionId]")
+    .equals([input.candidateId, input.criterionId])
+    .first();
+
+  const now = new Date().toISOString();
+  const row: CriterionEntry = {
+    id: existing?.id ?? input.id ?? uuid(),
+    candidateId: input.candidateId,
+    criterionId: input.criterionId,
+    rawValue: input.rawValue,
+    unit: input.unit,
+    instrument: input.instrument,
+    measurementDate: input.measurementDate,
+    citationDoi: input.citationDoi,
+    citationUrl: input.citationUrl,
+    citationFree: input.citationFree,
+    notes: input.notes,
+    attachmentKeys: input.attachmentKeys ?? existing?.attachmentKeys ?? [],
+    updatedAt: now,
+  };
+  await db.criterionEntries.put(row);
+  return row;
+}
+
+export async function listCriterionEntries(candidateId: string): Promise<CriterionEntry[]> {
+  return db.criterionEntries.where("candidateId").equals(candidateId).toArray();
+}
+
 export type CandidateBundle = {
   candidate: DbCandidate;
   criterionEntries: CriterionEntry[];
