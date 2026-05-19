@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { flushSync } from "react-dom";
 import { ANALOG_MISSIONS } from "@/data/analog-missions";
 import { ANALOG_CONDITIONS } from "@/risk/conditions";
 import { SYNTHETIC_PRIORS, synthesizeCrew } from "@/data/synthetic-iter3";
@@ -25,55 +26,70 @@ export function StepMissionSim({ onRunComplete }: { onRunComplete: (sessionId: s
 
   async function handleRun() {
     if (!mission || !candidate) return;
-    setRunning(true);
 
-    // Double-rAF + microtask yield: the FIRST frame paints the overlay
-    // (setRunning(true) → React re-renders → browser paints). Only on the
-    // SECOND frame do we start the ~10s synchronous Monte-Carlo loop. Without
-    // this the overlay never gets a chance to paint and the page LOOKS blank
-    // for the whole freeze. See docs/iter3_nasa_monte_carlo_audit.md.
-    requestAnimationFrame(() => {
-      requestAnimationFrame(async () => {
-        try {
-          const scores: Record<string, number> = {};
-          for (const e of criterionEntries) scores[e.criterionId] = e.rawValue;
-          const template = { id: candidate.id, alias: candidate.alias, scores };
-          const crew = synthesizeCrew(template, mission.crewSize);
-          const post: RiskPosteriorWithDiagnostics = simulateMission(
-            crew,
-            mission,
-            SYNTHETIC_PRIORS,
-            ANALOG_CONDITIONS,
-            { seed, trials, chiStar, diagnostics: true },
-          );
-          const session = await saveSimSession({
-            candidateId: candidate.id,
-            missionId: mission.id,
-            trials,
-            chiStar,
-            seed,
-            priorsVersion: SYNTHETIC_PRIORS.model_version,
-            posterior: {
-              chi: post.chi,
-              pEarlyTermination: post.pEarlyTermination,
-              expectedLostCrewDays: post.expectedLostCrewDays,
-              perConditionQTL: post.perConditionQTL,
-              ess: post.ess,
-              trials: post.trials,
-            },
-            chiSamples: post.diagnostics?.chiSamples ?? [],
-            qtlSamples: post.diagnostics?.qtlSamples ?? [],
-            notes: `tier=${accessTier}`,
-          });
-          markStepCompleted(3);
-          onRunComplete(session.id);
-        } catch (err) {
-          const msg = (err as Error).message || "simulation failed (unknown error)";
-          notify(msg, "error");
-          setRunning(false); // ensure UI recovers even on error
-        }
+    // Why this dance:
+    //   The previous double-rAF pattern doesn't guarantee the overlay paints
+    //   before the heavy work starts. React 18's setState is async: even after
+    //   two rAFs, the commit may still be pending while the heavy work begins,
+    //   so the user sees a frozen wizard (= "page goes blank") for the whole
+    //   ~10s freeze. Fix:
+    //
+    //   1. `flushSync(setRunning(true))` — FORCES React to commit the re-render
+    //      synchronously. The overlay is in the DOM after this call returns.
+    //   2. `await new Promise(r => requestAnimationFrame(...))` — yields to the
+    //      browser so it can actually PAINT the overlay (commit ≠ paint).
+    //   3. `await new Promise(r => setTimeout(r, 50))` — belt-and-suspenders
+    //      additional yield. On slower devices the paint can take 1–2 frames;
+    //      50 ms is well within human-perception threshold and well over the
+    //      paint budget. Total overhead: <100 ms vs ~10 s simulation = noise.
+    //
+    //   Only AFTER both yields complete do we kick off the heavy work.
+    flushSync(() => setRunning(true));
+    await new Promise<void>((resolve) => requestAnimationFrame(() => resolve()));
+    await new Promise<void>((resolve) => setTimeout(resolve, 50));
+
+    try {
+      const scores: Record<string, number> = {};
+      for (const e of criterionEntries) scores[e.criterionId] = e.rawValue;
+      const template = { id: candidate.id, alias: candidate.alias, scores };
+      const crew = synthesizeCrew(template, mission.crewSize);
+      const post: RiskPosteriorWithDiagnostics = simulateMission(
+        crew,
+        mission,
+        SYNTHETIC_PRIORS,
+        ANALOG_CONDITIONS,
+        { seed, trials, chiStar, diagnostics: true },
+      );
+      const session = await saveSimSession({
+        candidateId: candidate.id,
+        missionId: mission.id,
+        trials,
+        chiStar,
+        seed,
+        priorsVersion: SYNTHETIC_PRIORS.model_version,
+        posterior: {
+          chi: post.chi,
+          pEarlyTermination: post.pEarlyTermination,
+          expectedLostCrewDays: post.expectedLostCrewDays,
+          perConditionQTL: post.perConditionQTL,
+          ess: post.ess,
+          trials: post.trials,
+        },
+        chiSamples: post.diagnostics?.chiSamples ?? [],
+        qtlSamples: post.diagnostics?.qtlSamples ?? [],
+        notes: `tier=${accessTier}`,
       });
-    });
+      markStepCompleted(3);
+      onRunComplete(session.id);
+    } catch (err) {
+      const msg = (err as Error).message || "simulation failed (unknown error)";
+      // Surface the full error to the console for Diego's debugging — silent
+      // catches were a previous suspected cause of the "blank page" report.
+      // eslint-disable-next-line no-console
+      console.error("[Selectron] simulation failed:", err);
+      notify(msg, "error");
+      setRunning(false); // ensure UI recovers from any error
+    }
   }
 
   // Rough wall-clock estimate for the progress overlay. Calibrated against
@@ -87,24 +103,37 @@ export function StepMissionSim({ onRunComplete }: { onRunComplete: (sessionId: s
   return (
     <div className="space-y-4">
       {/* FULL-SCREEN PROGRESS OVERLAY during the simulation.
-          Painted by the FIRST rAF before the heavy work starts in the second. */}
+          flushSync(setRunning(true)) + rAF yield + setTimeout(50ms) above
+          guarantees this overlay is painted before the main thread freezes.
+          Solid opaque background — backdrop-blur was removed because GPU-bound
+          paint effects can delay the visible state past the JS lock. */}
       {running && (
         <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-bg-0/80 backdrop-blur-sm"
+          className="fixed inset-0 z-[100] flex items-center justify-center"
           role="alertdialog"
           aria-live="polite"
           aria-label="Simulation in progress"
+          style={{
+            backgroundColor: "rgba(8, 9, 10, 0.96)", // near-solid bg-0
+            // explicit inline styles defeat any parent CSS containment context
+            // that might trap `fixed inset-0`
+            position: "fixed",
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+          }}
         >
-          <div className="panel p-8 max-w-md text-center border-signal/40 shadow-[0_0_48px_rgba(245,181,65,0.25)]">
+          <div className="panel p-8 max-w-md text-center border-signal shadow-[0_0_64px_rgba(245,181,65,0.35)]">
             {/* Pulsing spinner */}
             <div className="mb-5 flex justify-center">
-              <span className="relative inline-flex h-12 w-12">
+              <span className="relative inline-flex h-14 w-14">
                 <span className="absolute inset-0 rounded-full border-2 border-signal/30" />
                 <span className="absolute inset-0 rounded-full border-2 border-signal border-t-transparent animate-spin" />
               </span>
             </div>
-            <h3 className="display text-lg text-ink-0 mb-1">Running Monte-Carlo simulation</h3>
-            <p className="mono text-[11px] text-ink-2 mb-3">
+            <h3 className="display text-xl text-ink-0 mb-2">Running Monte-Carlo simulation</h3>
+            <p className="mono text-[12px] text-ink-1 mb-3 tabular-nums">
               {trials.toLocaleString()} trials ·{" "}
               {mission ? `${mission.crewSize} crew × ${ANALOG_CONDITIONS.length} conditions` : "?"}
               {estSeconds ? ` · ~${estSeconds}s` : ""}
@@ -113,8 +142,12 @@ export function StepMissionSim({ onRunComplete }: { onRunComplete: (sessionId: s
               The browser main thread is locked for the duration — this is expected
               and the page may not respond to clicks until the run finishes.
             </p>
-            <p className="mono mt-3 text-[10px] text-ink-3 uppercase tracking-cap">
+            <p className="mono mt-4 text-[10px] text-ink-3 uppercase tracking-cap">
               NASA canonical T = 100,000 per M18 / A22 · see iter3 audit doc
+            </p>
+            <p className="mono mt-2 text-[10px] text-ink-3 leading-relaxed">
+              Tip: dial trials down to 25,000 in the dropdown for a faster preview
+              run if you don't need the full NASA-canonical precision.
             </p>
           </div>
         </div>

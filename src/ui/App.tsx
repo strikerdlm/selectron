@@ -5,6 +5,7 @@ import { Dashboard } from "./views/Dashboard";
 import { Wizard } from "./views/Wizard";
 import { Sim } from "./views/Sim";
 import { ToastHost } from "./components/Toast";
+import { ErrorBoundary } from "./components/ErrorBoundary";
 import { TestFigureHost } from "./testing/TestFigureHost";
 
 const SEED_SAMPLER = 0xc0ffee;
@@ -89,18 +90,28 @@ export function App() {
             />
           )}
           {view.kind === "wizard" && (
-            <Wizard
-              candidateId={view.candidateId}
-              initialStep={view.step}
-              onExitToDashboard={() => setView({ kind: "dashboard" })}
-              onExitToSim={(id) => setView({ kind: "sim", candidateId: id })}
-            />
+            <ErrorBoundary
+              fallbackLabel="The wizard crashed during render"
+              onReset={() => setView({ kind: "dashboard" })}
+            >
+              <Wizard
+                candidateId={view.candidateId}
+                initialStep={view.step}
+                onExitToDashboard={() => setView({ kind: "dashboard" })}
+                onExitToSim={(id) => setView({ kind: "sim", candidateId: id })}
+              />
+            </ErrorBoundary>
           )}
           {view.kind === "sim" && (
-            <Sim
-              candidateId={view.candidateId}
-              onBackToReview={() => setView({ kind: "wizard", candidateId: view.candidateId, step: 2 })}
-            />
+            <ErrorBoundary
+              fallbackLabel="The Sim view crashed during render — your simulation IS saved, this is a display bug"
+              onReset={() => setView({ kind: "dashboard" })}
+            >
+              <Sim
+                candidateId={view.candidateId}
+                onBackToReview={() => setView({ kind: "wizard", candidateId: view.candidateId, step: 2 })}
+              />
+            </ErrorBoundary>
           )}
         </main>
 
