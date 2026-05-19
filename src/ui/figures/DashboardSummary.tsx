@@ -140,9 +140,9 @@ export function DashboardSummary({ data }: Props) {
         const d = sorted[aliases.indexOf(row.name)];
         if (!d) return "";
         return [
-          `<span style="color:#71757c">candidate</span> <b>${d.alias}</b>`,
-          `<span style="color:#71757c">CHI mean</span> ${d.chiMean.toFixed(3)}`,
-          `<span style="color:#71757c">CI₉₀</span> [${d.chiCi90[0].toFixed(3)}, ${d.chiCi90[1].toFixed(3)}]`,
+          `<span style="color:#b0b6bd">candidate</span> <b>${d.alias}</b>`,
+          `<span style="color:#b0b6bd">CHI mean</span> ${d.chiMean.toFixed(3)}`,
+          `<span style="color:#b0b6bd">CI₉₀</span> [${d.chiCi90[0].toFixed(3)}, ${d.chiCi90[1].toFixed(3)}]`,
         ].join("<br/>");
       },
     },

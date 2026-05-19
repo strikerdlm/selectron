@@ -134,8 +134,8 @@ export function PosteriorPlot({ posterior, seed = 0xc0ffee, alias = "—" }: Pro
         if (!params.length) return "";
         const p = params[0];
         return [
-          `<span style="color:#71757c">score</span> <b>${p.name}</b>`,
-          `<span style="color:#71757c">count</span> ${p.value}`,
+          `<span style="color:#b0b6bd">score</span> <b>${p.name}</b>`,
+          `<span style="color:#b0b6bd">count</span> ${p.value}`,
         ].join("<br/>");
       },
     },

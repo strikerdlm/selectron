@@ -149,8 +149,8 @@ export function RiskHistogram({
         if (!params.length) return "";
         const p = params[0];
         return [
-          `<span style="color:#71757c">CHI</span> <b>${p.name}</b>`,
-          `<span style="color:#71757c">count</span> ${p.value}`,
+          `<span style="color:#b0b6bd">CHI</span> <b>${p.name}</b>`,
+          `<span style="color:#b0b6bd">count</span> ${p.value}`,
         ].join("<br/>");
       },
     },

@@ -16,8 +16,8 @@ export default {
         ink: {
           0: "#e6e8ec",
           1: "#b6bac1",
-          2: "#71757c",
-          3: "#4a4d53",
+          2: "#b0b6bd",
+          3: "#8a8f96",
         },
         signal: {
           DEFAULT: "#f5b541",

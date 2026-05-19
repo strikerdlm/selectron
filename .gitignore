@@ -17,3 +17,9 @@ vitest.config.js
 
 # Playwright MCP scratch (browser snapshots/console logs)
 .playwright-mcp/
+
+# Playwright test runner artifacts (per-run results, traces)
+test-results/
+
+# Ad-hoc screenshots left at repo root by Playwright runs
+/*.png
