@@ -106,4 +106,53 @@ export const ANALOG_MISSIONS: readonly AnalogMission[] = [
       "10.1007/s00421-024-05575-3", // Giacon 2024 — EMMPOL-6 stress biomarkers
     ],
   },
+  // Diego scope expansion 2026-05-19: 7d / 22d / 45d missions for short-campaign analogs.
+  {
+    id: "short-7d",
+    type: "mdrs",
+    label: "Short campaign (7-day) — MDRS one-week rotation",
+    durationDays: 7,
+    crewSize: 6,
+    evaCount: 3,
+    commsDelaySec: 0,
+    countermeasures: {
+      exercise: 1,
+      "social-comms-realtime": 1,
+    },
+    citations: [
+      "10.1089/ast.2019.2035", // McMenamin 2020 — AMADEE-18 / short Mars-analog rotations
+    ],
+  },
+  {
+    id: "short-22d",
+    type: "thor",
+    label: "Short campaign (22-day) — 3-week THOR-class analog",
+    durationDays: 22,
+    crewSize: 6,
+    evaCount: 4,
+    commsDelaySec: 300,
+    countermeasures: {
+      exercise: 1,
+      "social-comms-realtime": 1,
+    },
+    citations: [
+      "10.17981/JACN.4.2.2023.4", // Malpica 2024 — THOR isolation/confinement responses
+    ],
+  },
+  {
+    id: "hi-seas-45d",
+    type: "hi-seas",
+    label: "HI-SEAS 45-day mission (Mauna Loa Mars analog)",
+    durationDays: 45,
+    crewSize: 6,
+    evaCount: 12,
+    commsDelaySec: 1200, // ~20 min RTLT (Earth-Mars baseline simulated)
+    countermeasures: {
+      exercise: 1,
+      "social-comms-realtime": 0,
+    },
+    citations: [
+      "10.1089/space.2020.0048", // Cromwell 2021 — HI-SEAS analog campaign typology
+    ],
+  },
 ];

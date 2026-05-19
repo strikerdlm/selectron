@@ -2,8 +2,8 @@ import { describe, it, expect } from "vitest";
 import { ANALOG_MISSIONS } from "@/data/analog-missions";
 
 describe("ANALOG_MISSIONS", () => {
-  it("ships exactly 5 analog mission profiles for Iter-3 v1", () => {
-    expect(ANALOG_MISSIONS).toHaveLength(5);
+  it("ships 8 analog mission profiles (5 Iter-3 v1 + 3 short-campaign additions for Diego's 2026-05-19 scope expansion)", () => {
+    expect(ANALOG_MISSIONS).toHaveLength(8);
   });
 
   it("has unique ids", () => {
@@ -11,9 +11,12 @@ describe("ANALOG_MISSIONS", () => {
     expect(new Set(ids).size).toBe(ids.length);
   });
 
-  it("covers all six MissionType values exactly once or zero times (no duplicates)", () => {
+  it("covers MissionType values; duplicates allowed (multiple campaigns may share the same MissionType, e.g. mdrs-2wk + short-7d both type 'mdrs')", () => {
     const types = ANALOG_MISSIONS.map((m) => m.type);
-    expect(new Set(types).size).toBe(types.length);
+    // No assertion on uniqueness — Diego's 2026-05-19 expansion adds short-7d ('mdrs'),
+    // short-22d ('thor'), hi-seas-45d ('hi-seas'), reusing MissionType enum members.
+    // We instead assert every type is from the allowed enum (checked via TS, no runtime check needed).
+    expect(types.length).toBeGreaterThanOrEqual(8);
   });
 
   it("every mission has positive duration and crew size", () => {

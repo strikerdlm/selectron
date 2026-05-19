@@ -14,8 +14,8 @@ export default {
           2: "#2a2e34",
         },
         ink: {
-          0: "#e6e8ec",
-          1: "#b6bac1",
+          0: "#f0f4fa",
+          1: "#d8dde4",
           2: "#b0b6bd",
           3: "#8a8f96",
         },
