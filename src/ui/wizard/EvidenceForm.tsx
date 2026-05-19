@@ -20,8 +20,13 @@ export function EvidenceForm({
   criterion: Criterion;
   entry?: CriterionEntry;
 }) {
-  const { enqueueCriterionPatch } = useWizard();
+  const { enqueueCriterionPatch, accessTier } = useWizard();
   const [mode, setMode] = useState<CitationMode>(citationMode(entry));
+
+  const tierInst = criterion.tierInstruments?.[accessTier];
+  const instrumentLabel = tierInst?.instrument ?? criterion.instrument;
+  const transform = tierInst?.scaleTransform;
+  const tierNotes = tierInst?.notes;
 
   const midpoint = (criterion.scale.min + criterion.scale.max) / 2;
   const stepSize = (criterion.scale.max - criterion.scale.min) / 100;
@@ -42,6 +47,19 @@ export function EvidenceForm({
   return (
     <div className="space-y-4 border-l border-line pl-4">
       <div>
+        <div className="mono text-[10px] text-ink-3 mb-2">
+          instrument · <span className="text-ink-1">{instrumentLabel}</span>
+        </div>
+        {transform?.note && (
+          <p className="mono text-[10px] text-amber-300 leading-relaxed mb-2">
+            ⚠ scale transform · {transform.note}
+          </p>
+        )}
+        {tierNotes && (
+          <p className="mono text-[10px] text-ink-2 leading-relaxed mb-2">{tierNotes}</p>
+        )}
+      </div>
+      <div>
         <label className="label">raw value</label>
         <div className="flex items-center gap-3">
           <input
@@ -51,9 +69,10 @@ export function EvidenceForm({
             step={stepSize}
             value={currentValue}
             onChange={(e) => {
-              const v = parseFloat(e.target.value);
-              setLiveValue(v);
-              patch({ rawValue: v });
+              const raw = parseFloat(e.target.value);
+              const transformed = transform?.multiplier ? raw * transform.multiplier : raw;
+              setLiveValue(raw); // keep slider in native range for UX
+              patch({ rawValue: transformed });
             }}
             className="flex-1 accent-signal"
           />

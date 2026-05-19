@@ -2,6 +2,7 @@ import { createContext, useCallback, useContext, useEffect, useRef, useState, ty
 import type { DbCandidate, CriterionEntry } from "@/db/schema";
 import { getCandidateWithEvidence, updateCandidate, upsertCriterionEntry } from "@/db/repository";
 import { notify } from "@/ui/components/Toast";
+import type { AccessTier } from "@/types";
 
 export type WizardStep = 0 | 1 | 2 | 3;
 export const STEP_LABELS: Record<WizardStep, string> = {
@@ -16,6 +17,7 @@ type WizardState = {
   criterionEntries: CriterionEntry[];
   step: WizardStep;
   highestCompletedStep: -1 | WizardStep;
+  accessTier: AccessTier; // scope-expansion-3
 };
 
 type WizardContextValue = WizardState & {
@@ -24,6 +26,7 @@ type WizardContextValue = WizardState & {
   reloadFromDb: () => Promise<void>;
   enqueueCandidatePatch: (patch: Partial<DbCandidate>) => void;
   enqueueCriterionPatch: (criterionId: string, patch: Partial<CriterionEntry>) => void;
+  setAccessTier: (tier: AccessTier) => void;
 };
 
 const WizardContext = createContext<WizardContextValue | null>(null);
@@ -42,6 +45,7 @@ export function WizardProvider({
     criterionEntries: [],
     step: initialStep,
     highestCompletedStep: -1,
+    accessTier: "minimum",
   });
 
   const [pendingPatches, setPendingPatches] = useState<{
@@ -51,7 +55,12 @@ export function WizardProvider({
 
   const reloadFromDb = useCallback(async () => {
     const bundle = await getCandidateWithEvidence(candidateId);
-    setState((s) => ({ ...s, candidate: bundle.candidate, criterionEntries: bundle.criterionEntries }));
+    setState((s) => ({
+      ...s,
+      candidate: bundle.candidate,
+      criterionEntries: bundle.criterionEntries,
+      accessTier: bundle.candidate.accessTier ?? s.accessTier,
+    }));
   }, [candidateId]);
 
   useEffect(() => {
@@ -85,6 +94,14 @@ export function WizardProvider({
     },
     [],
   );
+
+  const setAccessTier = useCallback((tier: AccessTier) => {
+    setState((cur) => ({ ...cur, accessTier: tier }));
+    setPendingPatches((cur) => ({
+      ...cur,
+      candidate: { ...cur.candidate, accessTier: tier },
+    }));
+  }, []);
 
   // flushRef holds the latest flush closure so the cleanup can reach it even
   // after the effect has re-run with a newer pendingPatches snapshot.
@@ -149,6 +166,7 @@ export function WizardProvider({
         reloadFromDb,
         enqueueCandidatePatch,
         enqueueCriterionPatch,
+        setAccessTier,
       }}
     >
       {children}

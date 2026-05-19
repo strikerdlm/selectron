@@ -4,6 +4,7 @@ import { StepIdentity } from "../wizard/StepIdentity";
 import { StepCriteria } from "../wizard/StepCriteria";
 import { StepReview } from "../wizard/StepReview";
 import { StepMissionSim } from "../wizard/StepMissionSim";
+import { ScenarioSelector } from "../wizard/ScenarioSelector";
 import { notify } from "@/ui/components/Toast";
 
 function Breadcrumb({
@@ -33,13 +34,16 @@ function Breadcrumb({
 }
 
 function WizardBody({ onExitToDashboard, onExitToSim }: { onExitToDashboard: () => void; onExitToSim: () => void }) {
-  const { step, candidate, enqueueCandidatePatch } = useWizard();
+  const { step, candidate, accessTier, setAccessTier, enqueueCandidatePatch } = useWizard();
   if (!candidate) return <div className="p-12 text-ink-2">loading candidate…</div>;
 
   return (
     <>
       <Breadcrumb alias={candidate.alias} step={step} onExitToDashboard={onExitToDashboard} />
       <StepStrip />
+      <div className="mx-auto max-w-7xl px-8 pt-6">
+        <ScenarioSelector value={accessTier} onChange={setAccessTier} />
+      </div>
       <div className="mt-6">
         {step === 0 && <StepIdentity />}
         {step === 1 && <StepCriteria />}

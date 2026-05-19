@@ -79,6 +79,9 @@ export function App() {
             <Dashboard
               onNewCandidate={async () => {
                 const c = await createCandidate({ alias: "untitled" });
+                await import("@/db/repository").then((m) =>
+                  m.updateCandidate(c.id, { accessTier: "minimum" }),
+                );
                 setView({ kind: "wizard", candidateId: c.id, step: 0 });
               }}
               onEditCandidate={(id) => setView({ kind: "wizard", candidateId: id, step: 2 })}
