@@ -2,6 +2,7 @@ import { useState } from "react";
 import type { Criterion } from "@/types";
 import type { CriterionEntry } from "@/db/schema";
 import { useWizard } from "@/contexts/WizardContext";
+import { AttachmentList } from "./AttachmentList";
 
 type CitationMode = "doi" | "url" | "free";
 
@@ -133,7 +134,12 @@ export function EvidenceForm({
         />
       </div>
 
-      <p className="mono text-[10px] text-ink-3">attachments — added in Task 75</p>
+      {entry && <AttachmentList entry={entry} />}
+      {!entry && (
+        <p className="mono text-[10px] text-ink-3">
+          save raw value to enable attachments
+        </p>
+      )}
     </div>
   );
 }
