@@ -9,9 +9,8 @@ describe("schema migrations", () => {
     expect(db.verno).toBe(SCHEMA_VERSION);
   });
 
-  test("future v2 migration scaffold — no-op for now", async () => {
-    // Placeholder: when SCHEMA_VERSION bumps to 2, add a Dexie.version(2).upgrade(...)
-    // block to schema.ts and replace this test with a real round-trip.
-    expect(SCHEMA_VERSION).toBe(1);
+  test("SCHEMA_VERSION is 2 (v2 adds DbCandidate.accessTier)", async () => {
+    // v2 promoted from placeholder. Real round-trip covered by schema_v2_migration.test.ts.
+    expect(SCHEMA_VERSION).toBe(2);
   });
 });

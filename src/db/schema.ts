@@ -1,5 +1,6 @@
 import Dexie, { type EntityTable } from "dexie";
 import type { RiskPosterior } from "@/types/risk";
+import type { AccessTier } from "@/types/scenario";
 
 export type CandidateStatus = "draft" | "ready";
 
@@ -12,6 +13,8 @@ export type DbCandidate = {
   status: CandidateStatus;
   notes?: string;
   photoBlobKey?: string;
+  /** scope-expansion-3 (Task 92): accessibility tier set at candidate creation. */
+  accessTier?: AccessTier;
 };
 
 export type CriterionEntry = {
@@ -66,7 +69,7 @@ export type MetaEntry = {
   schemaVersion: number;
 };
 
-export const SCHEMA_VERSION = 1;
+export const SCHEMA_VERSION = 2;
 
 export class SelectronDb extends Dexie {
   candidates!: EntityTable<DbCandidate, "id">;
@@ -78,6 +81,18 @@ export class SelectronDb extends Dexie {
 
   constructor() {
     super("selectron");
+    this.version(1).stores({
+      candidates: "id, alias, createdAt, updatedAt, status",
+      criterionEntries: "id, candidateId, criterionId, [candidateId+criterionId], updatedAt",
+      attachments: "id, sha256, uploadedAt",
+      simSessions: "id, candidateId, missionId, runAt, [candidateId+missionId]",
+      priorsCache: "id",
+      _meta: "id",
+    });
+    // v2 (scope-expansion-3, 2026-05-19): adds DbCandidate.accessTier.
+    // The schema declaration is the same — no new indexed column. Existing rows
+    // are valid as-is (accessTier is optional). Upgrade hook is a no-op but
+    // exists so Dexie bumps the version cleanly.
     this.version(SCHEMA_VERSION).stores({
       candidates: "id, alias, createdAt, updatedAt, status",
       criterionEntries: "id, candidateId, criterionId, [candidateId+criterionId], updatedAt",
