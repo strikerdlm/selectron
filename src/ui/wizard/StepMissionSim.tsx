@@ -9,12 +9,16 @@ import { saveSimSession } from "@/db/repository";
 import { notify } from "@/ui/components/Toast";
 import type { AnalogMission } from "@/types/risk";
 
+// NASA IMM canonical (M18 §Methods, A22 §149): T = 100,000 trials per mission.
+// See docs/iter3_nasa_monte_carlo_audit.md for the literature audit + rationale
+// for picking 100_000 as the default vs the cheaper preview tiers.
 const TRIALS_OPTIONS = [5_000, 10_000, 25_000, 50_000, 100_000];
+const NASA_CANONICAL_TRIALS = 100_000;
 
 export function StepMissionSim({ onRunComplete }: { onRunComplete: (sessionId: string) => void }) {
   const { candidate, criterionEntries, markStepCompleted, accessTier } = useWizard();
   const [mission, setMission] = useState<AnalogMission | null>(null);
-  const [trials, setTrials] = useState(25_000);
+  const [trials, setTrials] = useState(NASA_CANONICAL_TRIALS);
   const [chiStar, setChiStar] = useState(0.7);
   const [seed, setSeed] = useState(0xc0ffee);
   const [running, setRunning] = useState(false);
