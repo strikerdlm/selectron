@@ -1,0 +1,26 @@
+flowchart TB
+    subgraph A["Stage A — Bayesian MCDA"]
+        E_C["Candidate scores x_{i,k}\n(tier-filtered)"]
+        E_A["Dirichlet prior α\n(elicited)"]
+        E_N["z(x) → [0,1]"]
+        E_S["IID Dirichlet draws\nvia Gamma decomposition"]
+        E_M["S_i = Σ w_k · z_k"]
+        E_P["Posterior of S_i:\nmean · CI₉₀ · CI₉₅ · ESS"]
+        E_C --> E_N --> E_M
+        E_A --> E_S --> E_M --> E_P
+    end
+    subgraph B["Stage B — IMM Monte Carlo"]
+        R_S["Synthetic crew × mission"]
+        R_PRIOR["Lognormal-Poisson priors"]
+        R_MC["4-step trial × T = 100 000\nper [M18]/[A22]"]
+        R_OUT["χ posterior:\nmean · CI · P(χ<χ*) · E[LCD]"]
+        R_S --> R_MC
+        R_PRIOR --> R_MC --> R_OUT
+    end
+    subgraph V["NASA HSRB verdict"]
+        V_LXC["JSC-66705 Rev A Fig. 4\n5×5 LxC matrix"]
+        V_COLOR["green ≤10 · yellow 11–19 · red ≥20"]
+        V_LXC --> V_COLOR
+    end
+    E_P --> R_S
+    R_OUT --> V_LXC
