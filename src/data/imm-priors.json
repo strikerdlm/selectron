@@ -1,0 +1,269 @@
+{
+  "schema_version": 1,
+  "calibration_target": "K15 Table 1 (ISS 6mo, 6 crew)",
+  "conditions": {
+    "acute-sinusitis": {
+      "conditionId": "acute-sinusitis",
+      "provenance": "tierA-nasa",
+      "source_ref": "research/imm_sources/methods/M18_myers_2018_imm_validation.md#acute-sinusitis",
+      "incidence": {
+        "distribution": "Gamma-Poisson",
+        "alpha": 2.0,
+        "beta": 204.0,
+        "lambda_unit": "events-per-person-day"
+      },
+      "severity": { "worst_case_prob_alpha": 1.2, "worst_case_prob_beta": 4.8 },
+      "treated": {
+        "fi_cp1": { "min": 0.0, "mode": 0.05, "max": 0.15 },
+        "dt_cp1_hours": { "min": 2, "mode": 6, "max": 24 },
+        "fi_cp2": { "min": 0.0, "mode": 0.0, "max": 0.05 },
+        "dt_cp2_hours": { "min": 0, "mode": 12, "max": 72 },
+        "fi_cp3": { "min": 0.0, "mode": 0.0, "max": 0.0 },
+        "p_evac": { "min": 0.0, "mode": 0.001, "max": 0.01 },
+        "p_locl": { "min": 0.0, "mode": 0.0, "max": 0.001 }
+      },
+      "untreated": {
+        "fi_cp1": { "min": 0.05, "mode": 0.2, "max": 0.5 },
+        "dt_cp1_hours": { "min": 12, "mode": 48, "max": 168 },
+        "fi_cp2": { "min": 0.0, "mode": 0.05, "max": 0.2 },
+        "dt_cp2_hours": { "min": 12, "mode": 72, "max": 240 },
+        "fi_cp3": { "min": 0.0, "mode": 0.0, "max": 0.02 },
+        "p_evac": { "min": 0.01, "mode": 0.05, "max": 0.15 },
+        "p_locl": { "min": 0.0, "mode": 0.001, "max": 0.02 }
+      },
+      "risk_factor_multipliers": {},
+      "required_resources": { "antibiotic-broad-spectrum": 7, "nasal-decongestant": 3 }
+    },
+    "influenza": {
+      "conditionId": "influenza",
+      "provenance": "tierA-nasa",
+      "source_ref": "research/imm_sources/methods/M18_myers_2018_imm_validation.md#influenza",
+      "incidence": {
+        "distribution": "Gamma-Poisson",
+        "alpha": 2.0,
+        "beta": 1429.0,
+        "lambda_unit": "events-per-person-day"
+      },
+      "severity": { "worst_case_prob_alpha": 1.2, "worst_case_prob_beta": 4.8 },
+      "treated": {
+        "fi_cp1": { "min": 0.1, "mode": 0.3, "max": 0.6 },
+        "dt_cp1_hours": { "min": 24, "mode": 48, "max": 96 },
+        "fi_cp2": { "min": 0.0, "mode": 0.05, "max": 0.15 },
+        "dt_cp2_hours": { "min": 24, "mode": 72, "max": 168 },
+        "fi_cp3": { "min": 0.0, "mode": 0.0, "max": 0.0 },
+        "p_evac": { "min": 0.0, "mode": 0.002, "max": 0.02 },
+        "p_locl": { "min": 0.0, "mode": 0.0, "max": 0.002 }
+      },
+      "untreated": {
+        "fi_cp1": { "min": 0.2, "mode": 0.5, "max": 0.8 },
+        "dt_cp1_hours": { "min": 48, "mode": 120, "max": 336 },
+        "fi_cp2": { "min": 0.05, "mode": 0.15, "max": 0.4 },
+        "dt_cp2_hours": { "min": 48, "mode": 120, "max": 360 },
+        "fi_cp3": { "min": 0.0, "mode": 0.0, "max": 0.05 },
+        "p_evac": { "min": 0.02, "mode": 0.08, "max": 0.25 },
+        "p_locl": { "min": 0.0, "mode": 0.002, "max": 0.05 }
+      },
+      "risk_factor_multipliers": {},
+      "required_resources": { "antiviral": 7, "analgesic-mild": 14 }
+    },
+    "skin-laceration": {
+      "conditionId": "skin-laceration",
+      "provenance": "tierA-nasa",
+      "source_ref": "research/imm_sources/methods/M18_myers_2018_imm_validation.md#skin-laceration",
+      "incidence": {
+        "distribution": "Gamma-Poisson",
+        "alpha": 2.0,
+        "beta": 741.0,
+        "lambda_unit": "events-per-person-day"
+      },
+      "severity": { "worst_case_prob_alpha": 1.2, "worst_case_prob_beta": 4.8 },
+      "treated": {
+        "fi_cp1": { "min": 0.0, "mode": 0.05, "max": 0.2 },
+        "dt_cp1_hours": { "min": 1, "mode": 4, "max": 12 },
+        "fi_cp2": { "min": 0.0, "mode": 0.0, "max": 0.05 },
+        "dt_cp2_hours": { "min": 0, "mode": 24, "max": 72 },
+        "fi_cp3": { "min": 0.0, "mode": 0.0, "max": 0.02 },
+        "p_evac": { "min": 0.0, "mode": 0.005, "max": 0.05 },
+        "p_locl": { "min": 0.0, "mode": 0.0, "max": 0.002 }
+      },
+      "untreated": {
+        "fi_cp1": { "min": 0.05, "mode": 0.15, "max": 0.4 },
+        "dt_cp1_hours": { "min": 4, "mode": 24, "max": 96 },
+        "fi_cp2": { "min": 0.0, "mode": 0.05, "max": 0.15 },
+        "dt_cp2_hours": { "min": 24, "mode": 72, "max": 240 },
+        "fi_cp3": { "min": 0.0, "mode": 0.01, "max": 0.08 },
+        "p_evac": { "min": 0.005, "mode": 0.03, "max": 0.15 },
+        "p_locl": { "min": 0.0, "mode": 0.001, "max": 0.03 }
+      },
+      "risk_factor_multipliers": {},
+      "required_resources": { "wound-closure-strips": 5, "antiseptic": 2 }
+    },
+    "skin-abrasion": {
+      "conditionId": "skin-abrasion",
+      "provenance": "tierA-nasa",
+      "source_ref": "research/imm_sources/methods/M18_myers_2018_imm_validation.md#skin-abrasion",
+      "incidence": {
+        "distribution": "Gamma-Poisson",
+        "alpha": 2.0,
+        "beta": 556.0,
+        "lambda_unit": "events-per-person-day"
+      },
+      "severity": { "worst_case_prob_alpha": 1.2, "worst_case_prob_beta": 4.8 },
+      "treated": {
+        "fi_cp1": { "min": 0.0, "mode": 0.02, "max": 0.1 },
+        "dt_cp1_hours": { "min": 0.5, "mode": 2, "max": 6 },
+        "fi_cp2": { "min": 0.0, "mode": 0.0, "max": 0.02 },
+        "dt_cp2_hours": { "min": 0, "mode": 12, "max": 48 },
+        "fi_cp3": { "min": 0.0, "mode": 0.0, "max": 0.0 },
+        "p_evac": { "min": 0.0, "mode": 0.0, "max": 0.005 },
+        "p_locl": { "min": 0.0, "mode": 0.0, "max": 0.0 }
+      },
+      "untreated": {
+        "fi_cp1": { "min": 0.01, "mode": 0.08, "max": 0.2 },
+        "dt_cp1_hours": { "min": 2, "mode": 12, "max": 48 },
+        "fi_cp2": { "min": 0.0, "mode": 0.02, "max": 0.1 },
+        "dt_cp2_hours": { "min": 12, "mode": 36, "max": 120 },
+        "fi_cp3": { "min": 0.0, "mode": 0.0, "max": 0.01 },
+        "p_evac": { "min": 0.0, "mode": 0.002, "max": 0.02 },
+        "p_locl": { "min": 0.0, "mode": 0.0, "max": 0.002 }
+      },
+      "risk_factor_multipliers": {},
+      "required_resources": { "antiseptic": 2, "bandage": 3 }
+    },
+    "headache-co2-induced": {
+      "conditionId": "headache-co2-induced",
+      "provenance": "tierA-nasa",
+      "source_ref": "research/imm_sources/methods/M18_myers_2018_imm_validation.md#headache-co2-induced",
+      "incidence": {
+        "distribution": "Gamma-Poisson",
+        "alpha": 2.0,
+        "beta": 167.0,
+        "lambda_unit": "events-per-person-day"
+      },
+      "severity": { "worst_case_prob_alpha": 1.2, "worst_case_prob_beta": 4.8 },
+      "treated": {
+        "fi_cp1": { "min": 0.0, "mode": 0.1, "max": 0.3 },
+        "dt_cp1_hours": { "min": 1, "mode": 4, "max": 12 },
+        "fi_cp2": { "min": 0.0, "mode": 0.0, "max": 0.05 },
+        "dt_cp2_hours": { "min": 0, "mode": 4, "max": 24 },
+        "fi_cp3": { "min": 0.0, "mode": 0.0, "max": 0.0 },
+        "p_evac": { "min": 0.0, "mode": 0.0, "max": 0.005 },
+        "p_locl": { "min": 0.0, "mode": 0.0, "max": 0.0 }
+      },
+      "untreated": {
+        "fi_cp1": { "min": 0.1, "mode": 0.3, "max": 0.6 },
+        "dt_cp1_hours": { "min": 4, "mode": 12, "max": 48 },
+        "fi_cp2": { "min": 0.0, "mode": 0.05, "max": 0.2 },
+        "dt_cp2_hours": { "min": 4, "mode": 24, "max": 96 },
+        "fi_cp3": { "min": 0.0, "mode": 0.0, "max": 0.02 },
+        "p_evac": { "min": 0.0, "mode": 0.01, "max": 0.08 },
+        "p_locl": { "min": 0.0, "mode": 0.0, "max": 0.005 }
+      },
+      "risk_factor_multipliers": {},
+      "required_resources": { "analgesic-mild": 10, "oxygen-supplemental": 1 }
+    },
+    "ankle-sprain-strain": {
+      "conditionId": "ankle-sprain-strain",
+      "provenance": "tierA-nasa",
+      "source_ref": "research/imm_sources/methods/M18_myers_2018_imm_validation.md#ankle-sprain-strain",
+      "incidence": {
+        "distribution": "Gamma-Poisson",
+        "alpha": 2.0,
+        "beta": 2500.0,
+        "lambda_unit": "events-per-person-day"
+      },
+      "severity": { "worst_case_prob_alpha": 1.2, "worst_case_prob_beta": 4.8 },
+      "treated": {
+        "fi_cp1": { "min": 0.05, "mode": 0.2, "max": 0.5 },
+        "dt_cp1_hours": { "min": 4, "mode": 24, "max": 96 },
+        "fi_cp2": { "min": 0.0, "mode": 0.1, "max": 0.3 },
+        "dt_cp2_hours": { "min": 24, "mode": 120, "max": 336 },
+        "fi_cp3": { "min": 0.0, "mode": 0.02, "max": 0.1 },
+        "p_evac": { "min": 0.0, "mode": 0.005, "max": 0.05 },
+        "p_locl": { "min": 0.0, "mode": 0.0, "max": 0.002 }
+      },
+      "untreated": {
+        "fi_cp1": { "min": 0.2, "mode": 0.4, "max": 0.7 },
+        "dt_cp1_hours": { "min": 24, "mode": 96, "max": 336 },
+        "fi_cp2": { "min": 0.05, "mode": 0.2, "max": 0.5 },
+        "dt_cp2_hours": { "min": 72, "mode": 240, "max": 720 },
+        "fi_cp3": { "min": 0.0, "mode": 0.05, "max": 0.2 },
+        "p_evac": { "min": 0.01, "mode": 0.05, "max": 0.2 },
+        "p_locl": { "min": 0.0, "mode": 0.001, "max": 0.02 }
+      },
+      "risk_factor_multipliers": {},
+      "required_resources": { "ace-bandage": 2, "analgesic-mild": 7 }
+    },
+    "diarrhea": {
+      "conditionId": "diarrhea",
+      "provenance": "tierA-nasa",
+      "source_ref": "research/imm_sources/methods/M18_myers_2018_imm_validation.md#diarrhea",
+      "incidence": {
+        "distribution": "Gamma-Poisson",
+        "alpha": 2.0,
+        "beta": 455.0,
+        "lambda_unit": "events-per-person-day"
+      },
+      "severity": { "worst_case_prob_alpha": 1.2, "worst_case_prob_beta": 4.8 },
+      "treated": {
+        "fi_cp1": { "min": 0.05, "mode": 0.2, "max": 0.4 },
+        "dt_cp1_hours": { "min": 4, "mode": 12, "max": 48 },
+        "fi_cp2": { "min": 0.0, "mode": 0.05, "max": 0.15 },
+        "dt_cp2_hours": { "min": 12, "mode": 48, "max": 120 },
+        "fi_cp3": { "min": 0.0, "mode": 0.0, "max": 0.0 },
+        "p_evac": { "min": 0.0, "mode": 0.002, "max": 0.02 },
+        "p_locl": { "min": 0.0, "mode": 0.0, "max": 0.002 }
+      },
+      "untreated": {
+        "fi_cp1": { "min": 0.1, "mode": 0.35, "max": 0.6 },
+        "dt_cp1_hours": { "min": 12, "mode": 48, "max": 168 },
+        "fi_cp2": { "min": 0.0, "mode": 0.1, "max": 0.3 },
+        "dt_cp2_hours": { "min": 24, "mode": 96, "max": 336 },
+        "fi_cp3": { "min": 0.0, "mode": 0.0, "max": 0.03 },
+        "p_evac": { "min": 0.005, "mode": 0.03, "max": 0.15 },
+        "p_locl": { "min": 0.0, "mode": 0.001, "max": 0.03 }
+      },
+      "risk_factor_multipliers": {},
+      "required_resources": { "antidiarrheal": 5, "oral-rehydration-salts": 7 }
+    },
+    "eye-abrasion-foreign-body": {
+      "conditionId": "eye-abrasion-foreign-body",
+      "provenance": "tierA-nasa",
+      "source_ref": "research/imm_sources/methods/M18_myers_2018_imm_validation.md#eye-abrasion-foreign-body",
+      "incidence": {
+        "distribution": "Gamma-Poisson",
+        "alpha": 2.0,
+        "beta": 1667.0,
+        "lambda_unit": "events-per-person-day"
+      },
+      "severity": { "worst_case_prob_alpha": 1.2, "worst_case_prob_beta": 4.8 },
+      "treated": {
+        "fi_cp1": { "min": 0.05, "mode": 0.15, "max": 0.35 },
+        "dt_cp1_hours": { "min": 1, "mode": 4, "max": 24 },
+        "fi_cp2": { "min": 0.0, "mode": 0.02, "max": 0.1 },
+        "dt_cp2_hours": { "min": 4, "mode": 24, "max": 72 },
+        "fi_cp3": { "min": 0.0, "mode": 0.0, "max": 0.02 },
+        "p_evac": { "min": 0.0, "mode": 0.002, "max": 0.02 },
+        "p_locl": { "min": 0.0, "mode": 0.0, "max": 0.001 }
+      },
+      "untreated": {
+        "fi_cp1": { "min": 0.1, "mode": 0.3, "max": 0.6 },
+        "dt_cp1_hours": { "min": 4, "mode": 24, "max": 96 },
+        "fi_cp2": { "min": 0.02, "mode": 0.1, "max": 0.3 },
+        "dt_cp2_hours": { "min": 12, "mode": 72, "max": 240 },
+        "fi_cp3": { "min": 0.0, "mode": 0.02, "max": 0.1 },
+        "p_evac": { "min": 0.005, "mode": 0.05, "max": 0.2 },
+        "p_locl": { "min": 0.0, "mode": 0.001, "max": 0.03 }
+      },
+      "risk_factor_multipliers": {},
+      "required_resources": { "eye-irrigation-kit": 1, "ophthalmic-antibiotic": 5 }
+    }
+  },
+  "global_calibration": {
+    "tierC_multiplier_iss_hms": 1.00,
+    "tierC_multiplier_iss_none": 1.00,
+    "tierC_multiplier_iss_unlimited": 1.00,
+    "fit_against": "K15 Table 1, 100k trials",
+    "fit_residuals_within_CI95": false
+  }
+}
