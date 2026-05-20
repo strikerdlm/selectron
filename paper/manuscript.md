@@ -116,7 +116,9 @@ Factor 2 (Validation) — leave-one-mission-out cross-validation against analog-
 
 **Figure 4.** Stage A four-step calculation trace for DEMO-01 at Medium tier: (1) raw scores per criterion; (2) normalized z-values in [0, 1] with `higherIsBetter` direction applied; (3) Dirichlet draw of the weight vector w; (4) aggregated total S_i = Σ w_k · z_k. The plain-language layer below each step (visible in the application) is omitted here for space; see commit `__COMMIT_SHA__` for the live render.
 
-<!-- T13: F5 convergence — insert between F4 and F6 -->
+![](figures/F5_convergence.png){#fig:convergence width=85%}
+
+**Figure 5.** Stage B convergence: trailing-window σ(χ) per 1 000-trial increment stabilises well before the canonical T = 100 000 trials. The dashed red line marks the final σ value; the annotation reports the fractional change |Δσ/σ| between the last two 1 000-trial windows (2.63 %), which falls below the 5 % rule of [@imm-m18] and [@imm-a22]. Mission: HI-SEAS 45-day. Seed 0xc0ffee. Commit `__COMMIT_SHA__`.
 
 ![](figures/F6.png){#fig:lxc width=80%}
 
