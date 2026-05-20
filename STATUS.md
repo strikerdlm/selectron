@@ -179,7 +179,7 @@ This is intentional triage — flag it now if Diego disagrees. The trade-off: ~5
 | IMM-20 | outcomes.ts — concurrent FI formula | DONE | cc36eeb | 1−Π(1−f_i); clamped; 5 tests |
 | IMM-21 | treatment.ts — RAF distribution shifting | DONE | TBD | interpolateBetaPertByRAF; linear; clamped; 6 tests |
 | IMM-22 | simulate.ts — runIMMTrial scaffold | DONE | TBD | 2/2 vitest pass; 215/215 full suite; typecheck only pre-existing TS6133. Rng inlined (prng.ts doesn't export type). Plan deviation: earlyTerminated checked per-crew before entering condition loop (correct). Plan's `import type { Rng }` replaced with inline `type Rng = () => number`. concurrentFI NOT used (T26 will add). |
-| IMM-23 | simulate.ts — SPE Poisson + ARS chain | PENDING | — | — |
+| IMM-23 | simulate.ts — SPE Poisson + ARS chain | DONE | TBD | samplePoissonProcess in incidence.ts; pre-sampled SPE timeline per trial (all crew share same solar events); ARS Beta-Bernoulli per SPE event; timeDays preserved; Occurrence type extended with evacSampled/loclSampled (T25 bundled here) |
 | IMM-24 | simulate.ts — SA once-per-mission cap | PENDING | — | — |
 | IMM-25 | simulate.ts — per-event Bernoulli end-state | PENDING | — | — |
 | IMM-26 | simulate.ts — concurrent FI QTL accounting | PENDING | — | — |

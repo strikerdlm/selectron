@@ -60,3 +60,38 @@ describe("sampleBetaBernoulli", () => {
     expect(sum / 50_000).toBeCloseTo(0.2, 1);
   });
 });
+
+import { samplePoissonProcess } from "../../src/imm/incidence";
+
+describe("samplePoissonProcess", () => {
+  it("mean event count per unit time ≈ λ over 10k process draws", () => {
+    // For a HPP at rate λ over duration T, E[N] = λ·T.
+    // Estimating λ from empirical event counts avoids right-censorship bias.
+    const rng = makeRng(0xabcdef);
+    const lambda = 0.01;
+    const duration = 1000;
+    const nTrials = 10_000;
+    let totalEvents = 0;
+    for (let i = 0; i < nTrials; i++) {
+      totalEvents += samplePoissonProcess(rng, lambda, duration).length;
+    }
+    const empiricalLambda = totalEvents / (nTrials * duration);
+    // Accept within 5% of true lambda
+    expect(empiricalLambda).toBeGreaterThan(lambda * 0.95);
+    expect(empiricalLambda).toBeLessThan(lambda * 1.05);
+  });
+
+  it("returns empty array for lambda=0", () => {
+    const rng = makeRng(1);
+    expect(samplePoissonProcess(rng, 0, 100)).toEqual([]);
+  });
+
+  it("all event times are within [0, duration]", () => {
+    const rng = makeRng(2);
+    const times = samplePoissonProcess(rng, 0.1, 50);
+    for (const t of times) {
+      expect(t).toBeGreaterThanOrEqual(0);
+      expect(t).toBeLessThan(50);
+    }
+  });
+});

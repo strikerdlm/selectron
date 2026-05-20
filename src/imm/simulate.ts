@@ -1,10 +1,18 @@
 // src/imm/simulate.ts
 // Rng inlined — prng.ts does not export this type (matches incidence.ts convention)
 type Rng = () => number;
+
+/**
+ * K15 §II.A.4 SPE rate constant: 1.5e-3 events/day (solar maximum estimate).
+ * Source: Keenan 2015, ICES-2015-123, Table 1 — SPE frequency at solar max.
+ * Used as λ_SPE in the homogeneous Poisson process that drives ARS sampling.
+ */
+const LAMBDA_SPE_PER_DAY = 1.5e-3;
+
 import type { IMMCrewMember, IMMMission, IMMKitScenario, IMMPrior } from "./types";
 import { IMM_CONDITIONS } from "./conditions";
 import { loadIMMPriors } from "./priors";
-import { samplePoisson, sampleLognormalPoisson, sampleGammaPoisson, sampleBetaBernoulli } from "./incidence";
+import { samplePoisson, sampleLognormalPoisson, sampleGammaPoisson, sampleBetaBernoulli, samplePoissonProcess } from "./incidence";
 import { sampleSeverity } from "./severity";
 import { sampleBetaPert } from "./outcomes";
 import { interpolateBetaPertByRAF } from "./treatment";
@@ -16,6 +24,9 @@ type Occurrence = {
   timeDays: number;
   severity: "best" | "worst";
   raf: number;
+  // T25: sampled once per event — used for both earlyTerminated and per-condition aggregation
+  evacSampled: 0 | 1;
+  loclSampled: 0 | 1;
   outcomes: {
     fi_cp1: number; dt_cp1_hours: number;
     fi_cp2: number; dt_cp2_hours: number;
@@ -66,6 +77,10 @@ export function runIMMTrial(
   const occurrences: Occurrence[] = [];
   const earlyTerminated = new Set<number>();
 
+  // T23: Pre-sample SPE event times once per trial (one solar event affects all crew).
+  // λ_SPE = LAMBDA_SPE_PER_DAY (solar max estimate per K15 §II.A.4).
+  const speEventTimes = samplePoissonProcess(rng, LAMBDA_SPE_PER_DAY, mission.durationDays);
+
   for (let cIdx = 0; cIdx < crew.length; cIdx++) {
     const member = crew[cIdx];
     if (earlyTerminated.has(cIdx)) continue;
@@ -94,8 +109,38 @@ export function runIMMTrial(
           if (sampleIncidence(rng, prior) > 0) count++;
         }
       } else if (cond.processType === "SPE-coupled") {
-        // Simplified: treat as Bernoulli per mission. Full SPE process is in Task 23.
-        if (sampleIncidence(rng, prior) > 0) count = 1;
+        // T23: Per-SPE-event Bernoulli via ARS prior (Beta-Bernoulli per event).
+        // speEventTimes pre-sampled once per trial so all crew share the same solar timeline.
+        // Occurrences created directly here to preserve timeDays = spe event time.
+        const arsAlpha = prior.incidence.alpha ?? 2;
+        const arsBeta  = prior.incidence.beta  ?? 18;
+        for (const speTime of speEventTimes) {
+          if (earlyTerminated.has(cIdx)) break;
+          if (sampleBetaBernoulli(rng, arsAlpha, arsBeta) === 1) {
+            const severity = sampleSeverity(rng, prior.severity.worst_case_prob_alpha, prior.severity.worst_case_prob_beta);
+            const raf = computeRAF(prior.required_resources, availableResources);
+            const fi_cp1 = sampleBetaPert(rng, ...Object.values(interpolateBetaPertByRAF(prior.treated.fi_cp1, prior.untreated.fi_cp1, raf)) as [number, number, number]);
+            const dt_cp1 = sampleBetaPert(rng, ...Object.values(interpolateBetaPertByRAF(prior.treated.dt_cp1_hours, prior.untreated.dt_cp1_hours, raf)) as [number, number, number]);
+            const fi_cp2 = sampleBetaPert(rng, ...Object.values(interpolateBetaPertByRAF(prior.treated.fi_cp2, prior.untreated.fi_cp2, raf)) as [number, number, number]);
+            const dt_cp2 = sampleBetaPert(rng, ...Object.values(interpolateBetaPertByRAF(prior.treated.dt_cp2_hours, prior.untreated.dt_cp2_hours, raf)) as [number, number, number]);
+            const fi_cp3 = sampleBetaPert(rng, ...Object.values(interpolateBetaPertByRAF(prior.treated.fi_cp3, prior.untreated.fi_cp3, raf)) as [number, number, number]);
+            const p_evac = sampleBetaPert(rng, ...Object.values(interpolateBetaPertByRAF(prior.treated.p_evac, prior.untreated.p_evac, raf)) as [number, number, number]);
+            const p_locl = sampleBetaPert(rng, ...Object.values(interpolateBetaPertByRAF(prior.treated.p_locl, prior.untreated.p_locl, raf)) as [number, number, number]);
+            const evacSampled: 0 | 1 = rng() < p_evac ? 1 : 0;
+            const loclSampled: 0 | 1 = rng() < p_locl ? 1 : 0;
+            occurrences.push({
+              conditionId: cond.id, crewIndex: cIdx, timeDays: speTime, severity, raf,
+              evacSampled, loclSampled,
+              outcomes: { fi_cp1, dt_cp1_hours: dt_cp1, fi_cp2, dt_cp2_hours: dt_cp2, fi_cp3, p_evac, p_locl },
+            });
+            for (const [k, q] of Object.entries(prior.required_resources)) {
+              availableResources[k] = Math.max(0, (availableResources[k] ?? 0) - q * raf);
+            }
+            if (evacSampled) earlyTerminated.add(cIdx);
+            if (loclSampled) earlyTerminated.add(cIdx);
+          }
+        }
+        count = 0; // SPE occurrences created directly above; skip the generic loop
       } else if (cond.processType === "SA-VIIP-late") {
         if (sampleIncidence(rng, prior) > 0) count = 1;
       }
@@ -111,8 +156,11 @@ export function runIMMTrial(
         const fi_cp3 = sampleBetaPert(rng, ...Object.values(interpolateBetaPertByRAF(prior.treated.fi_cp3, prior.untreated.fi_cp3, raf)) as [number, number, number]);
         const p_evac = sampleBetaPert(rng, ...Object.values(interpolateBetaPertByRAF(prior.treated.p_evac, prior.untreated.p_evac, raf)) as [number, number, number]);
         const p_locl = sampleBetaPert(rng, ...Object.values(interpolateBetaPertByRAF(prior.treated.p_locl, prior.untreated.p_locl, raf)) as [number, number, number]);
+        const evacSampled: 0 | 1 = rng() < p_evac ? 1 : 0;
+        const loclSampled: 0 | 1 = rng() < p_locl ? 1 : 0;
         occurrences.push({
           conditionId: cond.id, crewIndex: cIdx, timeDays: 0, severity, raf,
+          evacSampled, loclSampled,
           outcomes: { fi_cp1, dt_cp1_hours: dt_cp1, fi_cp2, dt_cp2_hours: dt_cp2, fi_cp3, p_evac, p_locl },
         });
         // Decrement resources by RAF × required
@@ -120,9 +168,8 @@ export function runIMMTrial(
           const used = q * raf;
           availableResources[k] = Math.max(0, (availableResources[k] ?? 0) - used);
         }
-        // End-state Bernoullis
-        if (rng() < p_evac) { earlyTerminated.add(cIdx); }
-        if (rng() < p_locl) { earlyTerminated.add(cIdx); }
+        if (evacSampled) earlyTerminated.add(cIdx);
+        if (loclSampled) earlyTerminated.add(cIdx);
       }
     }
   }
@@ -139,11 +186,12 @@ export function runIMMTrial(
     qtl += o.outcomes.fi_cp2 * o.outcomes.dt_cp2_hours;
   }
 
-  // EVAC/LOCL: 1 if any event's sampled p_evac > 0.5 threshold (simplified; Task 25 replaces with per-event Bernoulli)
+  // T25: EVAC/LOCL aggregation uses per-event Bernoulli samples (not 0.5 threshold).
+  // evacSampled/loclSampled are set once per occurrence above and reused here.
   let evac: 0 | 1 = 0, locl: 0 | 1 = 0;
   for (const o of occurrences) {
-    if (o.outcomes.p_evac > 0.5) evac = 1;
-    if (o.outcomes.p_locl > 0.5) locl = 1;
+    if (o.evacSampled) evac = 1;
+    if (o.loclSampled) locl = 1;
   }
 
   const perConditionCounts: Record<string, number> = {};
@@ -151,8 +199,8 @@ export function runIMMTrial(
   const perConditionLocl: Record<string, number> = {};
   for (const o of occurrences) {
     perConditionCounts[o.conditionId] = (perConditionCounts[o.conditionId] ?? 0) + 1;
-    if (o.outcomes.p_evac > 0.5) perConditionEvac[o.conditionId] = (perConditionEvac[o.conditionId] ?? 0) + 1;
-    if (o.outcomes.p_locl > 0.5) perConditionLocl[o.conditionId] = (perConditionLocl[o.conditionId] ?? 0) + 1;
+    if (o.evacSampled) perConditionEvac[o.conditionId] = (perConditionEvac[o.conditionId] ?? 0) + 1;
+    if (o.loclSampled) perConditionLocl[o.conditionId] = (perConditionLocl[o.conditionId] ?? 0) + 1;
   }
 
   return { tme, qtl, evac, locl, perConditionCounts, perConditionEvac, perConditionLocl };

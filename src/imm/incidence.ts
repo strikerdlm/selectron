@@ -80,3 +80,21 @@ export function sampleBetaBernoulli(rng: Rng, alpha: number, beta: number): 0 | 
   const p = sampleBeta(rng, alpha, beta);
   return rng() < p ? 1 : 0;
 }
+
+/**
+ * samplePoissonProcess — homogeneous Poisson process via inter-arrival times.
+ * Returns sorted list of event times in [0, duration].
+ * Uses -log(U)/lambda inter-arrival gaps; U floored at 1e-12 to avoid log(0).
+ */
+export function samplePoissonProcess(rng: Rng, lambda: number, duration: number): number[] {
+  if (lambda <= 0 || duration <= 0) return [];
+  const times: number[] = [];
+  let t = 0;
+  while (true) {
+    const u = Math.max(rng(), 1e-12);
+    t += -Math.log(u) / lambda;
+    if (t >= duration) break;
+    times.push(t);
+  }
+  return times;
+}
