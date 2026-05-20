@@ -108,6 +108,24 @@ Factor 2 (Validation) — leave-one-mission-out cross-validation against analog-
 
 **Figure 2.** Criterion taxonomy × accessibility-tier matrix. Of the 12 evidence-grounded criteria, eight are active at Tier-1 (Minimum), ten at Tier-2 (Medium), and all twelve at Tier-3 (Elite). The Dirichlet weight per active criterion is 1/K so the posterior is internally honest about the active subset.
 
+![](figures/F3.png){#fig:posterior width=80%}
+
+**Figure 3.** Stage A posterior for candidate alias DEMO-01 at the Medium tier (K = 10 active criteria). 5 000 IID Dirichlet draws via Gamma decomposition under Dirichlet(α) elicited from the Phase-0 evidence; 90 % and 95 % credible intervals shaded; posterior mean dashed. Seed 0xc0ffee; commit `__COMMIT_SHA__`.
+
+![](figures/F4.png){#fig:trace width=90%}
+
+**Figure 4.** Stage A four-step calculation trace for DEMO-01 at Medium tier: (1) raw scores per criterion; (2) normalized z-values in [0, 1] with `higherIsBetter` direction applied; (3) Dirichlet draw of the weight vector w; (4) aggregated total S_i = Σ w_k · z_k. The plain-language layer below each step (visible in the application) is omitted here for space; see commit `__COMMIT_SHA__` for the live render.
+
+<!-- T13: F5 convergence — insert between F4 and F6 -->
+
+![](figures/F6.png){#fig:lxc width=80%}
+
+**Figure 6.** NASA HSRB Likelihood × Consequence matrix for DEMO-01 on the HI-SEAS 45-day mission at Medium tier. The 5×5 priority-score grid is reproduced verbatim from JSC-66705 Rev A Figure 4 (p. 28). The highlighted cell is this run's (L, C) bucket: L is bucketed P(χ < χ*) using the In-Mission likelihood thresholds; C is bucketed (1 − χ_mean) under the Mission Objectives Impact sub-category. Color zones per §3.2.4 (p. 27): green ≤ 10, yellow 11–19, red ≥ 20.
+
+![](figures/F7.png){#fig:missions width=95%}
+
+**Figure 7.** Multi-mission comparison for DEMO-01 at Medium tier. Each panel shows the χ-posterior mini-histogram and the NASA HSRB LxC chip (L × C = priority score, color). The catalog contains 8 analog-mission profiles spanning 7-day short-duration through simulated-Mars long-duration. T = 100 000 per panel; seed base 0xfeed (incremented per mission). Commit `__COMMIT_SHA__`.
+
 <!-- T16: ~1800 words; worked example walking F3–F7 -->
 
 ## 4. Discussion
