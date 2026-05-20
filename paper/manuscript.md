@@ -12,13 +12,13 @@ bibliography: references.bib
 
 ## Abstract
 
-**Background.** Selection panels for analog-astronaut missions collapse genuine uncertainty into ordinal rankings, and mission-risk verdicts are typically not aligned with the NASA Human System Risk Board (HSRB) process of JSC-66705 Revision A. No published Bayesian MCDA pipeline exists for astronaut, aircrew, or analog-astronaut selection, and no formal bridge between analog Monte Carlo and the HSRB priority-score grid has been described.
+**Background.** Selection panels for analog-astronaut missions collapse genuine uncertainty into ordinal rankings, and mission-risk verdicts are typically not aligned with the NASA Human System Risk Board (HSRB; JSC-66705 Rev A). No published Bayesian MCDA pipeline exists for astronaut, aircrew, or analog-astronaut selection, and no formal bridge from analog Monte Carlo to the HSRB grid exists.
 
-**Methods.** Selectron is a reproducible TypeScript pipeline. Stage A samples a Bayesian posterior over each candidate's total score from a Dirichlet weight prior elicited against a Phase-0 literature synthesis (12 evidence-grounded criteria across three accessibility tiers). Stage B runs an IMM-style four-step forward Monte Carlo at the NASA-canonical T = 100 000 trials per Myers (2018) and Antonsen (2022), over 12 modeled medical and behavioral conditions. The Crew Health Index posterior is mapped to the NASA HSRB 5×5 Likelihood × Consequence matrix verbatim from JSC-66705 Rev A Figure 4 and §3.2.4.
+**Methods.** Selectron is a reproducible TypeScript pipeline. Stage A samples a Bayesian posterior over each candidate's total score from a Dirichlet weight prior elicited against a Phase-0 literature synthesis (12 evidence-grounded criteria across three tiers). Stage B runs an IMM-style four-step forward Monte Carlo at the NASA-canonical T = 100 000 trials per Myers (2018) and Antonsen (2022), over 12 modeled medical and behavioral conditions. The Crew Health Index posterior is mapped to the NASA HSRB 5×5 Likelihood × Consequence matrix verbatim from JSC-66705 Rev A Figure 4 and §3.2.4.
 
 **Results.** A canonical worked example (one synthetic candidate × eight analog missions × three tiers) produces credible-interval-bounded posteriors and an HSRB green/yellow/red verdict per mission. Convergence (σ < 5 %) is reached well before T = 100 000.
 
-**Conclusions.** Calibrated candidate uncertainty plus NASA-institutional-aligned mission-risk verdict in one MIT-licensed artifact is the first of its kind for analog-astronaut selection.
+**Conclusions.** Calibrated candidate uncertainty plus NASA-institutional-aligned mission-risk verdict in one MIT-licensed artifact is novel for analog-astronaut selection.
 
 ## 1. Introduction
 
@@ -234,6 +234,20 @@ Selectron contributes two pieces of methodology to analog-astronaut selection th
 The artifact is MIT-licensed, browser-resident, single-author TypeScript, archived at a citable Zenodo DOI tied to the commit that generated every figure in this paper. The intent is reproducibility against drift: any reader can re-run the pipeline from the source and arrive at the numbers reported here.
 
 Selectron is decision-support input to selection panels — a structured way to expose what is uncertain about a candidate and what a NASA-aligned review of the same person would say — not an autonomous selector. The decision remains with the panel.
+
+## Statements
+
+**Data availability.** All datasets used in this manuscript are synthetic and reproducible from the source repository at the commit recorded in the figure captions. The Phase-0 literature corpus (DOI-verified) is enumerated in `paper/references.bib`. No human-subjects data, clinical records, or analog-mission incident data were collected or analyzed.
+
+**Code availability.** The full Selectron source — including all engine math, the Stage-B Monte Carlo simulator, the NASA HSRB LxC mapper, the figure-generation scripts, and the V&V test suite — is publicly released under the MIT License at `https://github.com/strikerdlm/selectron`. The version of record archived for this manuscript is at Zenodo: [doi:`__ZENODO_DOI__`](https://doi.org/`__ZENODO_DOI__`); commit SHA `__COMMIT_SHA__`. Both placeholders are populated at submission per the reproducibility contract described in §2.5.
+
+**Author contributions (CRediT).** D.L.M. is the sole author and is responsible for all CRediT roles: Conceptualization; Methodology; Software; Validation; Formal Analysis; Investigation; Data Curation; Writing — Original Draft; Writing — Review & Editing; Visualization; Supervision; Project Administration; Funding Acquisition.
+
+**Funding.** No external funding was received for this work. The author's institutional affiliation is the Direction of Aerospace Medicine, Colombian Aerospace Force (FAC); no FAC operational budget was used in the development or release of the software artifact.
+
+**Competing interests.** The author declares no competing interests.
+
+**Ethics declarations.** This is a methodology contribution exercised on synthetic data. No human or animal subjects were involved, no clinical or operational records were accessed, and no institutional review board approval was required.
 
 ## References
 
