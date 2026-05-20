@@ -169,7 +169,7 @@ This is intentional triage — flag it now if Diego disagrees. The trade-off: ~5
 | IMM-10 | tierB NASA evidence-reports + Phase-0 tables | DONE | TBD | 17 Tier-B conditions from evidence_tables/medical.md (OCHMO-STD-100.1A anchors): hypertension, cardiogenic-shock, 3 dental (caries/crown/filling loss), dental-exposed-pulp, dental-avulsion, 3 MSK sprains (shoulder/hip/knee/elbow/wrist), abnormal-uterine-bleeding, eye-corneal-ulcer, eye-penetration-foreign-body, retinal-detachment, acute-glaucoma. 82 total priors. 4/4 vitest pass. |
 | IMM-11 | tierC placeholder priors for remaining ~10 | DONE | TBD | 18 Tier-C placeholders: abdominal-injury, abdominal-wall-hernia, acute-arthritis, acute-compartment-syndrome, acute-pancreatitis, acute-prostatitis, acute-radiation-syndrome (SPE BB α=2 β=18), altitude-sickness, anaphylaxis, choking-obstructed-airway, elbow-dislocation, finger-dislocation, hip-proximal-femur-fracture, lower-extremity-stress-fracture, lumbar-spine-fracture, neurogenic-shock, shoulder-dislocation, smoke-inhalation. 100/100 conditions covered. tierA=40, tierB=42, tierC=18. 4/4 vitest pass. |
 | IMM-12 | imm-missions.ts (13 canonical IMM missions) | DONE | TBD | 13 missions: iss-6mo (K15 ref), iss-drm1/drm2 (S20), amm-426d/smm-923d (TM21), 8 analog missions. 3/3 vitest pass. |
-| IMM-13 | src/imm/kits.ts (None/issHMS/Unlimited/custom + RAF) | PENDING | — | — |
+| IMM-13 | src/imm/kits.ts (None/issHMS/Unlimited/custom + RAF) | DONE | TBD | IMM_KITS object (none/issHMS/unlimited) + computeRAF + customKit. 4/4 vitest pass. |
 | IMM-14 | src/imm/index.ts barrel (initial P0 surface) | PENDING | — | — |
 | IMM-15 | P0 acceptance — full Phase-0 smoke | PENDING | — | — |
 | IMM-16 | incidence.ts — general Poisson (Knuth + PTRS) | PENDING | — | — |
