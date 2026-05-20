@@ -1287,7 +1287,7 @@
     "tierC_multiplier_iss_hms": 1.00,
     "tierC_multiplier_iss_none": 1.00,
     "tierC_multiplier_iss_unlimited": 1.00,
-    "fit_against": "K15 Table 1, 100k trials",
+    "fit_against": "K15 Table 1 (ISS 6mo/6crew); A22 4-step trial verbatim; M18 σ<5% convergence; TM21 AMM/SMM",
     "fit_residuals_within_CI95": false
   }
 }
