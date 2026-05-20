@@ -81,6 +81,9 @@ export function runIMMTrial(
   // λ_SPE = LAMBDA_SPE_PER_DAY (solar max estimate per K15 §II.A.4).
   const speEventTimes = samplePoissonProcess(rng, LAMBDA_SPE_PER_DAY, mission.durationDays);
 
+  // T24: Per-crew-member once-cap for space-adaptation conditions (Set of condition ids).
+  const processedSAOnce: Set<string>[] = crew.map(() => new Set<string>());
+
   for (let cIdx = 0; cIdx < crew.length; cIdx++) {
     const member = crew[cIdx];
     if (earlyTerminated.has(cIdx)) continue;
@@ -102,8 +105,16 @@ export function runIMMTrial(
           count = sampledOnePersonDay; // could rescale; conservative for now
         }
       } else if (cond.processType === "space-adaptation-once") {
-        const occ = sampleIncidence(rng, prior);
-        count = occ > 0 ? 1 : 0;
+        // T24: once-per-mission cap — skip if this crew member already had this condition.
+        if (processedSAOnce[cIdx].has(cond.id)) {
+          count = 0;
+        } else {
+          const occ = sampleIncidence(rng, prior);
+          if (occ > 0) {
+            processedSAOnce[cIdx].add(cond.id);
+            count = 1;
+          }
+        }
       } else if (cond.processType === "EVA-coupled") {
         for (let e = 0; e < member.EVA_count; e++) {
           if (sampleIncidence(rng, prior) > 0) count++;
@@ -145,6 +156,17 @@ export function runIMMTrial(
         if (sampleIncidence(rng, prior) > 0) count = 1;
       }
 
+      // T24: Compute time-of-occurrence based on condition process type.
+      // space-adaptation-once: peak day 2.5, range 0–5 (early adaptation window).
+      // SA-VIIP-late: uniform over full mission (half-mission peak per spec).
+      // All others: timeDays = 0 (no temporal tracking in v1).
+      let condTimeDays = 0;
+      if (cond.processType === "space-adaptation-once") {
+        condTimeDays = sampleBetaPert(rng, 0, 2.5, 5);
+      } else if (cond.processType === "SA-VIIP-late") {
+        condTimeDays = sampleBetaPert(rng, 0, mission.durationDays / 2, mission.durationDays);
+      }
+
       for (let e = 0; e < count; e++) {
         if (earlyTerminated.has(cIdx)) break;
         const severity = sampleSeverity(rng, prior.severity.worst_case_prob_alpha, prior.severity.worst_case_prob_beta);
@@ -159,7 +181,7 @@ export function runIMMTrial(
         const evacSampled: 0 | 1 = rng() < p_evac ? 1 : 0;
         const loclSampled: 0 | 1 = rng() < p_locl ? 1 : 0;
         occurrences.push({
-          conditionId: cond.id, crewIndex: cIdx, timeDays: 0, severity, raf,
+          conditionId: cond.id, crewIndex: cIdx, timeDays: condTimeDays, severity, raf,
           evacSampled, loclSampled,
           outcomes: { fi_cp1, dt_cp1_hours: dt_cp1, fi_cp2, dt_cp2_hours: dt_cp2, fi_cp3, p_evac, p_locl },
         });
