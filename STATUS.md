@@ -150,6 +150,113 @@ This is intentional triage — flag it now if Diego disagrees. The trade-off: ~5
 
 ---
 
+## IMM Calculator task status (Iter-5)
+
+**Plan:** [docs/superpowers/plans/2026-05-20-selectron-imm-calculator.md](docs/superpowers/plans/2026-05-20-selectron-imm-calculator.md)
+**Spec:** [docs/superpowers/specs/2026-05-20-selectron-imm-calculator-design.md](docs/superpowers/specs/2026-05-20-selectron-imm-calculator-design.md)
+
+| # | Task | Status | Commit | Notes |
+|---|------|--------|--------|-------|
+| IMM-01 | Branch + scaffold | IN_PROGRESS | — | This commit |
+| IMM-02 | src/imm/types.ts | PENDING | — | — |
+| IMM-03 | Build conditions.ts from K15 appendix | PENDING | — | — |
+| IMM-04 | imm-priors.json schema + tierA M18 seed | PENDING | — | — |
+| IMM-05 | tierA G12 Bayesian-updated 5 conditions | PENDING | — | — |
+| IMM-06 | tierA TM21 Mars driving conditions | PENDING | — | — |
+| IMM-07 | tierA S20 ISS DRM driving conditions | PENDING | — | — |
+| IMM-08 | tierA A22 aggregate-anchor reference | PENDING | — | — |
+| IMM-09 | tierB Phase-0 I&C corpus (~30 conditions) | PENDING | — | — |
+| IMM-10 | tierB NASA evidence-reports + Phase-0 tables | PENDING | — | — |
+| IMM-11 | tierC placeholder priors for remaining ~10 | PENDING | — | — |
+| IMM-12 | imm-missions.ts (13 canonical IMM missions) | PENDING | — | — |
+| IMM-13 | src/imm/kits.ts (None/issHMS/Unlimited/custom + RAF) | PENDING | — | — |
+| IMM-14 | src/imm/index.ts barrel (initial P0 surface) | PENDING | — | — |
+| IMM-15 | P0 acceptance — full Phase-0 smoke | PENDING | — | — |
+| IMM-16 | incidence.ts — general Poisson (Knuth + PTRS) | PENDING | — | — |
+| IMM-17 | incidence.ts — Lognormal/Gamma/Beta-Bernoulli | PENDING | — | — |
+| IMM-18 | severity.ts — worst-case Bernoulli | PENDING | — | — |
+| IMM-19 | outcomes.ts — Beta-Pert sampler | PENDING | — | — |
+| IMM-20 | outcomes.ts — concurrent FI formula | PENDING | — | — |
+| IMM-21 | treatment.ts — RAF distribution shifting | PENDING | — | — |
+| IMM-22 | simulate.ts — runIMMTrial scaffold | PENDING | — | — |
+| IMM-23 | simulate.ts — SPE Poisson + ARS chain | PENDING | — | — |
+| IMM-24 | simulate.ts — SA once-per-mission cap | PENDING | — | — |
+| IMM-25 | simulate.ts — per-event Bernoulli end-state | PENDING | — | — |
+| IMM-26 | simulate.ts — concurrent FI QTL accounting | PENDING | — | — |
+| IMM-27 | simulate.ts — risk-factor multipliers tested | PENDING | — | — |
+| IMM-28 | simulate.ts — resource consumption + RAF re-comp | PENDING | — | — |
+| IMM-29 | simulate.ts — simulateIMM T-trial aggregation | PENDING | — | — |
+| IMM-30 | simulate.ts — σ<5% convergence assertion | PENDING | — | — |
+| IMM-31 | calibration.ts — Tier-C global multiplier fit | PENDING | — | — |
+| IMM-32 | scripts/calibrate_imm_priors.ts | PENDING | — | — |
+| IMM-33 | imm-simulate.worker.ts (Web Worker) | PENDING | — | — |
+| IMM-34 | Update src/imm/index.ts barrel | PENDING | — | — |
+| IMM-35 | scripts/validate_imm.ts | PENDING | — | — |
+| IMM-36 | P1 acceptance | PENDING | — | — |
+| IMM-37 | Dexie v3 — imm_sessions schema migration | PENDING | — | — |
+| IMM-38 | imm_sessions CRUD repository | PENDING | — | — |
+| IMM-39 | IMMCalculator.tsx view skeleton + tab | PENDING | — | — |
+| IMM-40 | IMMCrewBuilder.tsx | PENDING | — | — |
+| IMM-41 | IMMKitPicker.tsx | PENDING | — | — |
+| IMM-42 | IMMResultsCard.tsx | PENDING | — | — |
+| IMM-43 | Mission inputs panel | PENDING | — | — |
+| IMM-44 | Custom prior override drilldown | PENDING | — | — |
+| IMM-45 | ▶ Run simulation button + Web Worker | PENDING | — | — |
+| IMM-46 | Validation badge vs K15 Table 1 | PENDING | — | — |
+| IMM-47 | Engine toggle (MC vs Surrogate) stub | PENDING | — | — |
+| IMM-48 | Vulnerability mode toggle | PENDING | — | — |
+| IMM-49 | Quick-load presets | PENDING | — | — |
+| IMM-50 | Session save/load/share UI | PENDING | — | — |
+| IMM-51 | P2 acceptance | PENDING | — | — |
+| IMM-52 | feature_engineering.ts | PENDING | — | — |
+| IMM-53 | surrogate.ts inference scaffold | PENDING | — | — |
+| IMM-54 | scripts/train_imm_surrogate.ts | PENDING | — | — |
+| IMM-55 | Run surrogate training, commit model | PENDING | — | — |
+| IMM-56 | surrogate.test.ts vs MC held-out grid | PENDING | — | — |
+| IMM-57 | vulnerability.ts inference scaffold (TFJS) | PENDING | — | — |
+| IMM-58 | scripts/train_imm_vulnerability.ts | PENDING | — | — |
+| IMM-59 | Run vulnerability training, commit model | PENDING | — | — |
+| IMM-60 | vulnerability.test.ts calibration ECE | PENDING | — | — |
+| IMM-61 | training_provenance.md | PENDING | — | — |
+| IMM-62 | Engine toggle live — surrogate routing | PENDING | — | — |
+| IMM-63 | Vulnerability modifier UI live | PENDING | — | — |
+| IMM-64 | Surrogate-vs-MC calibration badge | PENDING | — | — |
+| IMM-65 | P3 acceptance | PENDING | — | — |
+| IMM-66 | FigureCaption extension for layperson | PENDING | — | — |
+| IMM-67 | I1 IMMHeadlineCard | PENDING | — | — |
+| IMM-68 | I2 IMMPosteriorHist | PENDING | — | — |
+| IMM-69 | I3 IMMConditionDrivers | PENDING | — | — |
+| IMM-70 | I4 IMMConvergencePlot | PENDING | — | — |
+| IMM-71 | I5 IMMValidationCompare | PENDING | — | — |
+| IMM-72 | I6 IMMSensitivityTornado | PENDING | — | — |
+| IMM-73 | I7 IMMCrewRiskHeat | PENDING | — | — |
+| IMM-74 | I8 IMMVulnerabilityCalibration | PENDING | — | — |
+| IMM-75 | I1.layperson.ts | PENDING | — | — |
+| IMM-76 | I2.layperson.ts | PENDING | — | — |
+| IMM-77 | I3.layperson.ts | PENDING | — | — |
+| IMM-78 | I4.layperson.ts | PENDING | — | — |
+| IMM-79 | I5.layperson.ts | PENDING | — | — |
+| IMM-80 | I6.layperson.ts | PENDING | — | — |
+| IMM-81 | I7.layperson.ts | PENDING | — | — |
+| IMM-82 | I8.layperson.ts | PENDING | — | — |
+| IMM-83 | Caption toggle state persistence (Dexie) | PENDING | — | — |
+| IMM-84 | I1-I8 Playwright snapshots | PENDING | — | — |
+| IMM-85 | P4 acceptance | PENDING | — | — |
+| IMM-86 | validation.test.ts — K15 Table 1 reproduction | PENDING | — | — |
+| IMM-87 | validation.test.ts — TM21 AMM/SMM ±20% | PENDING | — | — |
+| IMM-88 | scripts/validate_imm.ts (V&V dossier deltas) | PENDING | — | — |
+| IMM-89 | V&V dossier §5 — IMM Calculator validation | PENDING | — | — |
+| IMM-90 | NASA MC audit §4 — IMM alignment | PENDING | — | — |
+| IMM-91 | README.md update | PENDING | — | — |
+| IMM-92 | CLAUDE.md (Selectron) update | PENDING | — | — |
+| IMM-93 | STATUS.md task rows DONE | PENDING | — | — |
+| IMM-94 | CITATION.cff training-script provenance | PENDING | — | — |
+| IMM-95 | Full-suite acceptance | PENDING | — | — |
+| IMM-96 | Diego manual sign-off | PENDING | — | — |
+| IMM-97 | Push to origin | PENDING | — | — |
+
+---
+
 ## Audit log
 
 | Timestamp (UTC) | Agent | Event |
