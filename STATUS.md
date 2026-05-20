@@ -176,7 +176,7 @@ This is intentional triage — flag it now if Diego disagrees. The trade-off: ~5
 | IMM-17 | incidence.ts — Lognormal/Gamma/Beta-Bernoulli | DONE | TBD | 6/6 incidence vitest pass (3 existing + 3 new). sampleGamma called as (shape, rng) per gamma.ts convention — plan code had args reversed. Reused src/engine/gamma.ts, no duplicate sampler. 195/195 full suite. |
 | IMM-18 | severity.ts — worst-case Bernoulli | DONE | 390c387 | Beta-Bernoulli wrapper; alpha=0 → "best" |
 | IMM-19 | outcomes.ts — Beta-Pert sampler | DONE | TBD | sampleBetaPert; mean=(a+4m+b)/6; degenerate+E_BAD_PRIOR guards |
-| IMM-20 | outcomes.ts — concurrent FI formula | PENDING | — | — |
+| IMM-20 | outcomes.ts — concurrent FI formula | DONE | TBD | 1−Π(1−f_i); clamped; 5 tests |
 | IMM-21 | treatment.ts — RAF distribution shifting | PENDING | — | — |
 | IMM-22 | simulate.ts — runIMMTrial scaffold | PENDING | — | — |
 | IMM-23 | simulate.ts — SPE Poisson + ARS chain | PENDING | — | — |
