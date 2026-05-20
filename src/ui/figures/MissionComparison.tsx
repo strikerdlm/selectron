@@ -28,6 +28,15 @@ import { notify } from "@/ui/components/Toast";
 import { FigureCaption } from "./FigureCaption";
 import { f7Caption } from "./captions/F7.captions";
 import type { AccessTier } from "@/types";
+import { assessLxC } from "@/risk/lxc";
+
+// NASA HSRB color → swatch fill for the per-mission LxC chip.
+const NASA_CHIP_FILL: Record<"green" | "yellow" | "red" | "gray", string> = {
+  green: "bg-emerald-500/85 text-emerald-950 border-emerald-400/60",
+  yellow: "bg-amber-500/90 text-amber-950 border-amber-400/60",
+  red: "bg-red-600/90 text-red-50 border-red-500/60",
+  gray: "bg-gray-600/75 text-gray-100 border-gray-500/60",
+};
 
 // ---------------------------------------------------------------------------
 // Design constants
@@ -476,6 +485,29 @@ export function MissionComparison({ candidateId, accessTier }: MissionComparison
                   {(100 * row.posterior.chi.ci90[1]).toFixed(1)}%
                 </span>
               </div>
+
+              {/* NASA HSRB LxC chip — Diego scope-add 2026-05-19, per JSC-66705
+                  Rev A Figure 4. Compact: shows (L, C) cell, priority score,
+                  and color. Tooltip lists the verbatim band definitions. */}
+              {(() => {
+                const lxc = assessLxC(row.posterior);
+                return (
+                  <div className="mt-2 pt-2 border-t border-line/40 flex items-center justify-between gap-2">
+                    <span className="mono text-[9px] uppercase tracking-cap text-ink-3">
+                      NASA HSRB · JSC-66705
+                    </span>
+                    <span
+                      className={
+                        "mono text-[10px] tabular-nums uppercase tracking-cap font-semibold px-2 py-1 rounded-sm border " +
+                        NASA_CHIP_FILL[lxc.color]
+                      }
+                      title={`L${lxc.likelihood} (${lxc.likelihoodLabel}) — ${lxc.likelihoodDefinition}\n\nC${lxc.consequence} (${lxc.consequenceLabel}) — ${lxc.consequenceDefinition}\n\nLxC score ${lxc.score} → ${lxc.color}`}
+                    >
+                      L{lxc.likelihood}×C{lxc.consequence}={lxc.score} {lxc.color}
+                    </span>
+                  </div>
+                );
+              })()}
             </div>
           );
         })}

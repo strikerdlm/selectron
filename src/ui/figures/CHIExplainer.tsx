@@ -5,11 +5,41 @@
 // of THIS run's specific numbers. No external dependencies — pure presentation.
 
 import type { RiskPosterior } from "@/types/risk";
+import { assessLxC } from "@/risk/lxc";
+import { LxCMatrix } from "./LxCMatrix";
 
 type Props = {
   posterior: RiskPosterior;
   chiStar: number;
   missionId: string;
+};
+
+const NASA_COLOR_TONE: Record<"green" | "yellow" | "red" | "gray", string> = {
+  green: "text-emerald-300",
+  yellow: "text-amber-300",
+  red: "text-warn",
+  gray: "text-ink-2",
+};
+
+const NASA_COLOR_BORDER: Record<"green" | "yellow" | "red" | "gray", string> = {
+  green: "border-emerald-400/40",
+  yellow: "border-amber-400/40",
+  red: "border-warn/40",
+  gray: "border-ink-2/40",
+};
+
+// Per JSC-66705 Rev A §3.2.6, the color informs (but does not dictate) the
+// HSRB Risk Disposition. These blurbs paraphrase the document's intent into
+// operational guidance a non-NASA reader can act on.
+const NASA_COLOR_GUIDANCE: Record<"green" | "yellow" | "red" | "gray", string> = {
+  green:
+    "GREEN risks are managed within existing standards and resources. Per JSC-66705 §3.2.6, current countermeasures are deemed effective; the HSRB would typically ACCEPT this risk without further mitigation work.",
+  yellow:
+    "YELLOW risks fall in the 'Requires Mitigation' band. Per JSC-66705 §3.2.6.2, current countermeasures are believed inadequate and the HSRB would commission additional or improved countermeasures, technologies, or standards to improve Risk Posture before flight.",
+  red:
+    "RED risks admit at least one credible scenario with a very serious consequence/likelihood combination (LxC ≥ 20). Per JSC-66705 §3.2.4, red risks are PRIORITIZED for mitigation over yellow risks; per §3.2.6, the HSRB may still accept a red risk if mitigation resources are unachievable, but acceptance must be explicitly documented and revisited as new evidence emerges.",
+  gray:
+    "GRAY risks are those the LxC matrix cannot characterize (likelihood or consequence undefined). Per JSC-66705 §3.2.4 final paragraph, gray is used as a placeholder — additional evidence collection is needed before a real color can be assigned.",
 };
 
 function severityBucket(chiMean: number, chiStar: number): {
@@ -69,15 +99,117 @@ export function CHIExplainer({ posterior, chiStar, missionId }: Props) {
 
   const severity = severityBucket(chi, chiStar);
   const etBucket = pctBucket(pET);
+  // NASA HSRB LxC assessment driven by the Monte-Carlo posterior. This is
+  // the canonical verdict surface — the chi-gap "severity" above stays as a
+  // secondary lay-language layer below.
+  const lxc = assessLxC(posterior);
+  const nasaTone = NASA_COLOR_TONE[lxc.color];
+  const nasaBorder = NASA_COLOR_BORDER[lxc.color];
 
   return (
-    <section className={`panel p-6 border-l-2 ${severity.tone}`}>
+    <section className={`panel p-6 border-l-2 ${nasaBorder}`}>
       <header className="flex items-baseline justify-between mb-4 flex-wrap gap-2">
         <h2 className="display text-lg text-ink-0">
-          Reading this result · what does it mean for the mission?
+          Reading this result · NASA Risk Posture for the mission
         </h2>
+        <span className={`mono text-[10px] uppercase tracking-cap ${nasaTone}`}>
+          NASA verdict · {lxc.color.toUpperCase()} · LxC = {lxc.score}
+        </span>
+      </header>
+
+      {/* ── NASA LxC RISK ASSESSMENT (per JSC-66705 Rev A) ──────────────── */}
+      <div className={`mb-6 border ${nasaBorder} rounded-md p-4 bg-bg-1/40`}>
+        <div className="flex items-baseline justify-between flex-wrap gap-2 mb-3">
+          <h3 className="display text-base text-ink-0">
+            NASA HSRB Likelihood × Consequence matrix
+          </h3>
+          <span className="mono text-[10px] uppercase tracking-cap text-ink-3">
+            JSC-66705 Rev A · Fig. 4
+          </span>
+        </div>
+        <p className="text-sm text-ink-1 leading-relaxed mb-4">
+          NASA's Human System Risk Board scores every Human System Risk on a 5×5
+          Likelihood × Consequence matrix and assigns a single color (green /
+          yellow / red) that summarises the mission-level disposition. Selectron
+          maps this run's Bayesian Monte-Carlo posterior onto that matrix using
+          NASA's published quantitative likelihood bands and the In-Mission
+          Mission Objectives Impact consequence definitions (the sub-category
+          that aligns with our QTL-based fraction-of-mission-time-lost metric;
+          JSC-66705 §3.2.4 p. 29 requires picking exactly one sub-category per
+          impact category). The matrix below shows where this run lands; the
+          priority scores in each cell are verbatim from Figure 4.
+        </p>
+
+        <div className="grid grid-cols-1 md:grid-cols-[minmax(260px,360px)_1fr] gap-5 items-start">
+          <LxCMatrix assessment={lxc} />
+
+          <div className="space-y-3 text-sm text-ink-1 leading-relaxed">
+            <div>
+              <span className="mono text-[10px] uppercase tracking-cap text-ink-3">
+                likelihood · L{lxc.likelihood} ({lxc.likelihoodLabel})
+              </span>
+              <p className="mt-1">
+                <span className="mono text-ink-0">
+                  P(χ &lt; χ*) = {(lxc.pEarlyTermination * 100).toFixed(2)} %
+                </span>{" "}
+                — {lxc.likelihoodDefinition}
+              </p>
+            </div>
+            <div>
+              <span className="mono text-[10px] uppercase tracking-cap text-ink-3">
+                consequence · C{lxc.consequence} ({lxc.consequenceLabel})
+              </span>
+              <p className="mt-1">
+                <span className="mono text-ink-0">
+                  fraction crew-days lost = {(lxc.fractionLost * 100).toFixed(1)} %
+                </span>{" "}
+                — {lxc.consequenceDefinition}
+              </p>
+            </div>
+            <div>
+              <span className="mono text-[10px] uppercase tracking-cap text-ink-3">
+                LxC score · color
+              </span>
+              <p className="mt-1">
+                <span className="mono text-ink-0">
+                  L{lxc.likelihood} × C{lxc.consequence} = priority score {lxc.score}
+                </span>{" "}
+                · color{" "}
+                <span className={`mono uppercase tracking-cap ${nasaTone}`}>
+                  {lxc.color}
+                </span>{" "}
+                (NASA cut-offs: green ≤ 10, yellow 11–19, red ≥ 20).
+              </p>
+            </div>
+            <div className={`border-t ${nasaBorder} pt-3 mt-3`}>
+              <span className="mono text-[10px] uppercase tracking-cap text-ink-3">
+                HSRB disposition guidance
+              </span>
+              <p className="mt-1">{NASA_COLOR_GUIDANCE[lxc.color]}</p>
+            </div>
+          </div>
+        </div>
+
+        <p className="mono mt-4 pt-3 border-t border-line/40 text-[10px] text-ink-3 leading-relaxed">
+          Likelihood thresholds verbatim from JSC-66705 Rev A Figure 4 p. 28
+          "LIKELIHOOD RATING · In-Mission" (P ≤ 0.01 %, 0.01–0.1 %, 0.1–1 %, 1–10 %,
+          &gt; 10 %). Consequence categories verbatim from Figure 4 "IN MISSION ·
+          Mission Objectives Impact" row. Selectron's quantitative bridge from
+          chi-gap to consequence band (1 %, 5 %, 15 %, 30 % crew-days lost) is
+          documented in src/risk/lxc-definitions.ts — JSC-66705's consequence
+          scale is qualitative; cutoffs here are aligned to the published
+          descriptors. Color rule from §3.2.4 p. 27: red ≥ 20, yellow 11–19,
+          green ≤ 10. Per-mission LxC chips appear in the Mission Comparison
+          panel below.
+        </p>
+      </div>
+
+      <header className="flex items-baseline justify-between mb-4 flex-wrap gap-2">
+        <h3 className="display text-base text-ink-0">
+          Plain-language lay layer · what the underlying CHI numbers mean
+        </h3>
         <span className={`mono text-[10px] uppercase tracking-cap ${severity.tone}`}>
-          verdict · {severity.label}
+          lay verdict · {severity.label}
         </span>
       </header>
 
