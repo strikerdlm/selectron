@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { Criterion } from "@/types";
 import type { CriterionEntry } from "@/db/schema";
 import { useWizard } from "@/contexts/WizardContext";
@@ -30,16 +30,42 @@ export function EvidenceForm({
 
   const midpoint = (criterion.scale.min + criterion.scale.max) / 2;
   const stepSize = (criterion.scale.max - criterion.scale.min) / 100;
-  const currentValue = entry?.rawValue ?? midpoint;
 
-  // liveValue tracks the slider position in real-time so the EvidenceReference
-  // marker updates on every drag event, not only after the 300 ms DB auto-save.
-  // Initialise from entry.rawValue when an entry exists; undefined otherwise
-  // (no marker shown until the user interacts with the slider).
+  // liveValue is the SINGLE SOURCE OF TRUTH for the slider position during
+  // drag. Previously the slider was bound to `entry?.rawValue ?? midpoint`,
+  // which only updates after the 300 ms debounced IDB flush + reloadFromDb —
+  // so during drag the thumb visually snapped back, and the context-wide
+  // re-render on every pixel of drag made the UI feel laggy.
+  // Now: liveValue drives the visual; the WizardContext patch is committed
+  // on pointer-up only (onChange writes to liveValue; onPointerUp/onKeyUp
+  // commit to context). This decouples drag-smoothness from autosave debounce.
   const [liveValue, setLiveValue] = useState<number | undefined>(entry?.rawValue);
+
+  // Reconcile local liveValue with entry.rawValue when the DB-side value
+  // changes for a reason OTHER than this slider (e.g. tier switch causes a
+  // criterion to reappear, or another tab edits). We treat the entry as
+  // canonical when the user isn't actively dragging.
+  const draggingRef = useRef(false);
+  useEffect(() => {
+    if (!draggingRef.current && entry?.rawValue !== undefined) {
+      setLiveValue(entry.rawValue);
+    }
+  }, [entry?.rawValue]);
+
+  const currentValue = liveValue ?? entry?.rawValue ?? midpoint;
 
   function patch(partial: Partial<CriterionEntry>) {
     enqueueCriterionPatch(criterion.id, partial);
+  }
+
+  // Commit the slider's current position to the WizardContext (debounced
+  // 300 ms IDB write happens downstream). Called on pointerup / keyup —
+  // NOT on every onChange — so drag is bounded by browser paint, not by
+  // React re-renders cascading through the context.
+  function commitSliderValue(raw: number) {
+    const transformed = transform?.multiplier ? raw * transform.multiplier : raw;
+    patch({ rawValue: transformed });
+    draggingRef.current = false;
   }
   // units is not part of the Criterion type in Iter 1 but may be added later
   const units = (criterion.scale as { min: number; max: number; units?: string }).units;
@@ -79,11 +105,12 @@ export function EvidenceForm({
             step={stepSize}
             value={currentValue}
             onChange={(e) => {
-              const raw = parseFloat(e.target.value);
-              const transformed = transform?.multiplier ? raw * transform.multiplier : raw;
-              setLiveValue(raw); // keep slider in native range for UX
-              patch({ rawValue: transformed });
+              draggingRef.current = true;
+              setLiveValue(parseFloat(e.target.value));
             }}
+            onPointerUp={(e) => commitSliderValue(parseFloat((e.target as HTMLInputElement).value))}
+            onKeyUp={(e) => commitSliderValue(parseFloat((e.target as HTMLInputElement).value))}
+            onBlur={(e) => commitSliderValue(parseFloat(e.target.value))}
             className="flex-1 accent-signal"
           />
           <span className="mono tabular-nums text-ink-0 min-w-[3rem] text-right">
