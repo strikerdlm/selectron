@@ -88,7 +88,9 @@ The color rule follows JSC-66705 §3.2.4 (p. 27) verbatim: "red (maximum LxC Sco
 
 ### 2.5 Implementation and reproducibility
 
-<!-- T6: ~250 words; commit SHA + Zenodo DOI -->
+Selectron is implemented in TypeScript on a Vite + React + Tailwind CSS frontend, with ECharts for all quantitative figures and Dexie (IndexedDB) for client-side candidate persistence [@vite; @echarts]. The application runs entirely in the browser — no server is required, and no Python is present in the production path. A PyMC notebook in `paper/supplementary/S-Notebooks/` was used during exploratory prior elicitation and is archived for transparency, but it contributes no runtime state; all production scoring, simulation, and risk mapping are executed by the same TypeScript modules that back the application. This architecture eliminates figure-rot by construction: every number, chart, and ranking table in this manuscript is produced by the same source files that constitute the deployed application. Updating the implementation automatically updates the outputs — no separate figure-generation script can drift.
+
+The repository is available under the MIT License at `https://github.com/strikerdlm/selectron`. A Zenodo archive of the manuscript commit carries the DOI `__ZENODO_DOI__`; the exact commit SHA used to generate all figures and tables is `__COMMIT_SHA__` (both placeholders are populated in the final pre-submission step). Reproducibility is enforced through a two-tier test suite: 171 vitest unit and property tests cover engine mathematics, database schema migrations, and UI component behavior, and 7 Playwright end-to-end snapshot tests verify the full rendered application against deterministic fixtures — all green at the manuscript commit. Verification and validation of this implementation against NASA-STD-7009A criteria is treated in §2.6.
 
 ### 2.6 Verification and validation
 
