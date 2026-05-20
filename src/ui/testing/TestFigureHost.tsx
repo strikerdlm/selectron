@@ -306,20 +306,18 @@ export function TestFigureHost({ figureId }: { figureId: string }) {
 function PaperF3() {
   const ref = useRef<HTMLDivElement>(null);
   useEChartsReady(ref);
-  const riskPost = paperRiskPosterior();
+  const posterior = paperMCDAPosterior();
   return (
     <div
       ref={ref}
       className="p-8 bg-white"
       style={{ width: 1400 }}
     >
-      <ConditionContribution
-        posterior={riskPost}
-        conditions={ANALOG_CONDITIONS}
-        trials={5_000}
+      <PosteriorPlot
+        posterior={posterior}
+        alias={PAPER_ALIAS}
         seed={PAPER_SEED}
-        missionId={PAPER_MISSION.id}
-        priorsVersion={SYNTHETIC_PRIORS.model_version}
+        accessTier={PAPER_TIER}
       />
     </div>
   );
