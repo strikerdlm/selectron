@@ -257,6 +257,166 @@
       },
       "risk_factor_multipliers": {},
       "required_resources": { "eye-irrigation-kit": 1, "ophthalmic-antibiotic": 5 }
+    },
+    "acute-cholecystitis-biliary-colic": {
+      "conditionId": "acute-cholecystitis-biliary-colic",
+      "provenance": "tierA-nasa",
+      "source_ref": "research/imm_sources/methods/G12_gilkey_2012_bayesian_imm.md#acute-cholecystitis-biliary-colic",
+      "incidence": {
+        "distribution": "Lognormal-Poisson",
+        "mu_log_lambda": -8.5,
+        "sigma_log_lambda": 0.8,
+        "lambda_unit": "events-per-person-day"
+      },
+      "severity": { "worst_case_prob_alpha": 1.5, "worst_case_prob_beta": 3.5 },
+      "treated": {
+        "fi_cp1": { "min": 0.05, "mode": 0.20, "max": 0.50 },
+        "dt_cp1_hours": { "min": 24, "mode": 72, "max": 168 },
+        "fi_cp2": { "min": 0.0, "mode": 0.05, "max": 0.15 },
+        "dt_cp2_hours": { "min": 48, "mode": 336, "max": 1008 },
+        "fi_cp3": { "min": 0.0, "mode": 0.0, "max": 0.02 },
+        "p_evac": { "min": 0.05, "mode": 0.20, "max": 0.50 },
+        "p_locl": { "min": 0.0, "mode": 0.005, "max": 0.02 }
+      },
+      "untreated": {
+        "fi_cp1": { "min": 0.30, "mode": 0.60, "max": 0.95 },
+        "dt_cp1_hours": { "min": 48, "mode": 168, "max": 720 },
+        "fi_cp2": { "min": 0.0, "mode": 0.10, "max": 0.30 },
+        "dt_cp2_hours": { "min": 168, "mode": 720, "max": 2880 },
+        "fi_cp3": { "min": 0.0, "mode": 0.02, "max": 0.10 },
+        "p_evac": { "min": 0.40, "mode": 0.70, "max": 0.95 },
+        "p_locl": { "min": 0.02, "mode": 0.10, "max": 0.40 }
+      },
+      "risk_factor_multipliers": { "sex-female": 1.3 },
+      "required_resources": { "iv-fluid": 2, "antibiotic-broad-spectrum": 14, "analgesic-strong": 7 }
+    },
+    "appendicitis": {
+      "conditionId": "appendicitis",
+      "provenance": "tierA-nasa",
+      "source_ref": "research/imm_sources/methods/G12_gilkey_2012_bayesian_imm.md#appendicitis",
+      "incidence": {
+        "distribution": "Lognormal-Poisson",
+        "mu_log_lambda": -12.8815,
+        "sigma_log_lambda": 0.1088,
+        "lambda_unit": "events-per-person-day"
+      },
+      "severity": { "worst_case_prob_alpha": 1.5, "worst_case_prob_beta": 3.5 },
+      "treated": {
+        "fi_cp1": { "min": 0.05, "mode": 0.20, "max": 0.50 },
+        "dt_cp1_hours": { "min": 12, "mode": 48, "max": 120 },
+        "fi_cp2": { "min": 0.0, "mode": 0.05, "max": 0.15 },
+        "dt_cp2_hours": { "min": 24, "mode": 240, "max": 720 },
+        "fi_cp3": { "min": 0.0, "mode": 0.0, "max": 0.02 },
+        "p_evac": { "min": 0.10, "mode": 0.30, "max": 0.70 },
+        "p_locl": { "min": 0.0, "mode": 0.005, "max": 0.02 }
+      },
+      "untreated": {
+        "fi_cp1": { "min": 0.40, "mode": 0.70, "max": 0.95 },
+        "dt_cp1_hours": { "min": 24, "mode": 96, "max": 480 },
+        "fi_cp2": { "min": 0.05, "mode": 0.20, "max": 0.50 },
+        "dt_cp2_hours": { "min": 72, "mode": 360, "max": 1440 },
+        "fi_cp3": { "min": 0.0, "mode": 0.05, "max": 0.20 },
+        "p_evac": { "min": 0.50, "mode": 0.80, "max": 0.98 },
+        "p_locl": { "min": 0.02, "mode": 0.15, "max": 0.50 }
+      },
+      "risk_factor_multipliers": { "sex-male": 1.1 },
+      "required_resources": { "iv-fluid": 2, "antibiotic-broad-spectrum": 14, "analgesic-strong": 7 }
+    },
+    "atrial-fibrillation-atrial-flutter": {
+      "conditionId": "atrial-fibrillation-atrial-flutter",
+      "provenance": "tierA-nasa",
+      "source_ref": "research/imm_sources/methods/G12_gilkey_2012_bayesian_imm.md#atrial-fibrillation-atrial-flutter",
+      "incidence": {
+        "distribution": "Lognormal-Poisson",
+        "mu_log_lambda": -13.5442,
+        "sigma_log_lambda": 0.2092,
+        "lambda_unit": "events-per-person-day"
+      },
+      "severity": { "worst_case_prob_alpha": 1.5, "worst_case_prob_beta": 3.5 },
+      "treated": {
+        "fi_cp1": { "min": 0.05, "mode": 0.25, "max": 0.60 },
+        "dt_cp1_hours": { "min": 1, "mode": 6, "max": 24 },
+        "fi_cp2": { "min": 0.0, "mode": 0.05, "max": 0.20 },
+        "dt_cp2_hours": { "min": 6, "mode": 48, "max": 168 },
+        "fi_cp3": { "min": 0.0, "mode": 0.0, "max": 0.02 },
+        "p_evac": { "min": 0.05, "mode": 0.20, "max": 0.50 },
+        "p_locl": { "min": 0.0, "mode": 0.005, "max": 0.02 }
+      },
+      "untreated": {
+        "fi_cp1": { "min": 0.20, "mode": 0.50, "max": 0.90 },
+        "dt_cp1_hours": { "min": 2, "mode": 24, "max": 168 },
+        "fi_cp2": { "min": 0.05, "mode": 0.20, "max": 0.50 },
+        "dt_cp2_hours": { "min": 24, "mode": 168, "max": 720 },
+        "fi_cp3": { "min": 0.0, "mode": 0.02, "max": 0.10 },
+        "p_evac": { "min": 0.15, "mode": 0.40, "max": 0.80 },
+        "p_locl": { "min": 0.01, "mode": 0.05, "max": 0.20 }
+      },
+      "risk_factor_multipliers": { "sex-male": 1.42, "sex-female": 0.46 },
+      "required_resources": { "antiarrhythmic": 14, "anticoagulant": 30 }
+    },
+    "nephrolithiasis": {
+      "conditionId": "nephrolithiasis",
+      "provenance": "tierA-nasa",
+      "source_ref": "research/imm_sources/methods/G12_gilkey_2012_bayesian_imm.md#nephrolithiasis",
+      "incidence": {
+        "distribution": "Lognormal-Poisson",
+        "mu_log_lambda": -11.4388,
+        "sigma_log_lambda": 0.116,
+        "lambda_unit": "events-per-person-day"
+      },
+      "severity": { "worst_case_prob_alpha": 1.5, "worst_case_prob_beta": 3.5 },
+      "treated": {
+        "fi_cp1": { "min": 0.10, "mode": 0.40, "max": 0.80 },
+        "dt_cp1_hours": { "min": 1, "mode": 6, "max": 48 },
+        "fi_cp2": { "min": 0.0, "mode": 0.05, "max": 0.20 },
+        "dt_cp2_hours": { "min": 12, "mode": 72, "max": 240 },
+        "fi_cp3": { "min": 0.0, "mode": 0.0, "max": 0.02 },
+        "p_evac": { "min": 0.05, "mode": 0.20, "max": 0.50 },
+        "p_locl": { "min": 0.0, "mode": 0.002, "max": 0.01 }
+      },
+      "untreated": {
+        "fi_cp1": { "min": 0.30, "mode": 0.60, "max": 0.90 },
+        "dt_cp1_hours": { "min": 6, "mode": 48, "max": 336 },
+        "fi_cp2": { "min": 0.0, "mode": 0.10, "max": 0.30 },
+        "dt_cp2_hours": { "min": 48, "mode": 240, "max": 1440 },
+        "fi_cp3": { "min": 0.0, "mode": 0.01, "max": 0.08 },
+        "p_evac": { "min": 0.20, "mode": 0.50, "max": 0.85 },
+        "p_locl": { "min": 0.0, "mode": 0.02, "max": 0.10 }
+      },
+      "risk_factor_multipliers": { "sex-male": 2.0, "sex-female": 0.5 },
+      "required_resources": { "analgesic-strong": 7, "iv-fluid": 1 }
+    },
+    "seizures": {
+      "conditionId": "seizures",
+      "provenance": "tierA-nasa",
+      "source_ref": "research/imm_sources/methods/G12_gilkey_2012_bayesian_imm.md#seizures",
+      "incidence": {
+        "distribution": "Lognormal-Poisson",
+        "mu_log_lambda": -14.1233,
+        "sigma_log_lambda": 0.1061,
+        "lambda_unit": "events-per-person-day"
+      },
+      "severity": { "worst_case_prob_alpha": 1.5, "worst_case_prob_beta": 3.5 },
+      "treated": {
+        "fi_cp1": { "min": 0.10, "mode": 0.40, "max": 0.80 },
+        "dt_cp1_hours": { "min": 0.5, "mode": 2, "max": 12 },
+        "fi_cp2": { "min": 0.0, "mode": 0.05, "max": 0.20 },
+        "dt_cp2_hours": { "min": 6, "mode": 48, "max": 168 },
+        "fi_cp3": { "min": 0.0, "mode": 0.0, "max": 0.02 },
+        "p_evac": { "min": 0.05, "mode": 0.15, "max": 0.40 },
+        "p_locl": { "min": 0.0, "mode": 0.003, "max": 0.02 }
+      },
+      "untreated": {
+        "fi_cp1": { "min": 0.20, "mode": 0.55, "max": 0.90 },
+        "dt_cp1_hours": { "min": 1, "mode": 12, "max": 96 },
+        "fi_cp2": { "min": 0.0, "mode": 0.10, "max": 0.30 },
+        "dt_cp2_hours": { "min": 24, "mode": 120, "max": 480 },
+        "fi_cp3": { "min": 0.0, "mode": 0.02, "max": 0.10 },
+        "p_evac": { "min": 0.20, "mode": 0.50, "max": 0.85 },
+        "p_locl": { "min": 0.01, "mode": 0.05, "max": 0.25 }
+      },
+      "risk_factor_multipliers": {},
+      "required_resources": { "anticonvulsant": 30, "iv-fluid": 1 }
     }
   },
   "global_calibration": {
