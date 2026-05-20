@@ -157,8 +157,8 @@ This is intentional triage — flag it now if Diego disagrees. The trade-off: ~5
 
 | # | Task | Status | Commit | Notes |
 |---|------|--------|--------|-------|
-| IMM-01 | Branch + scaffold | IN_PROGRESS | — | This commit |
-| IMM-02 | src/imm/types.ts | PENDING | — | — |
+| IMM-01 | Branch + scaffold | DONE | 699b3bf | Branch iter1-phase0 + src/imm/ + tests/imm/ scaffolded |
+| IMM-02 | src/imm/types.ts | DONE | — | 3/3 vitest pass, typecheck clean (only pre-existing TestFigureHost TS6133 remains) |
 | IMM-03 | Build conditions.ts from K15 appendix | PENDING | — | — |
 | IMM-04 | imm-priors.json schema + tierA M18 seed | PENDING | — | — |
 | IMM-05 | tierA G12 Bayesian-updated 5 conditions | PENDING | — | — |
