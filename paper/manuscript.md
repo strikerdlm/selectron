@@ -191,23 +191,43 @@ The practical consequence is auditability in the institutional language of space
 
 ### 4.2 Positioning vs precedents
 
-<!-- T19: ~350 words; from research/methodology_precedents.md -->
+The closest match on mathematical form is Saint-Hilary and colleagues (2017), whose Dirichlet unification of MCDA and SMAA in drug benefit–risk assessment supplies Selectron's prior structure: a Dirichlet over criterion weights with concentration $\alpha_0$ encoding the operator's strength of belief in the elicited means [@sainthilary2017]. Saint-Hilary et al. work at the population level — per-criterion scores are sampled from clinical-trial likelihoods — while Selectron treats individual candidate scores as observed and only weights as random. The output semantics — posterior over aggregated value plus rank-acceptability indices — carry over directly to the selection domain.
+
+The Selectron deliverable that maps most cleanly onto an existing output is the rank-acceptability index of stochastic multicriteria acceptability analysis (SMAA-2) [@lahdelma2001], surveyed across distributional choices by Tervonen and Figueira (2008) [@tervonen2008]. SMAA samples weights from a simplex distribution, computes the deterministic ranking per draw, and aggregates to per-alternative rank probabilities — Selectron's "credible intervals on rank position" under another name. SMAA, however, frames the weight distribution as preference imprecision rather than a Bayesian prior; Selectron's elicited Dirichlet means with finite precision give the same machinery a posterior interpretation, opening a coherent update path.
+
+The closest domain precedent is Li, Wei, Sun, and Yang (2020), who applied Mohammadi and Rezaei's (2020) Bayesian Best-Worst Method [@mohammadi2020] to a 14-subcriterion competence framework for crowdsourced food-delivery couriers in Chongqing [@li2020]. The analysis elicits a Dirichlet posterior over criterion weights from managers' pairwise comparisons and terminates there: it ranks competence dimensions, not candidates, and produces neither a per-candidate composite posterior nor rank credible intervals. The shared form is the weight prior; the unbridged gap is candidate aggregation — exactly the gap Selectron's Stage A closes.
+
+The historical ancestor is Stam and Silva (1997), who treated AHP pairwise judgments as random variables over judgment intervals and propagated the uncertainty via Monte Carlo, reporting rank-reversal probabilities per alternative pair [@stamsilva1997]. Their core claim — that rank is uncertain and that uncertainty matters operationally — anticipates Selectron's deliverable. The mathematical apparatus, however, has been superseded: frequentist confidence intervals over AHP eigenvector aggregation rather than Bayesian posteriors over additive Dirichlet aggregation. We cite Stam and Silva for lineage, not for current methodological alignment.
 
 ### 4.3 Open methodological risks
 
-<!-- T20: ~300 words; six risks acknowledged -->
+- **Dirichlet precision elicitation.** Saint-Hilary and colleagues flag $\alpha_0$ as the open problem of their framework: concentration controls prior tightness with no principled default [@sainthilary2017]. Selectron faces the same choice when elicitation draws on a literature synthesis with heterogeneous effect sizes. The mitigation is to report at $\alpha_0 \in \{1, 10, 100\}$ as a robustness panel rather than fix a single value.
+
+- **Validation without outcome labels.** Selection-domain precedents dodge this — Li et al. validate against expert agreement and benefit–risk papers against meta-analyses [@li2020]. Selectron lacks ground-truth analog-mission outcomes within the paper horizon, so validation is internal — closed-form sampler checks, ESS, the V&V dossier — and outcome validity is disclosed as out of scope.
+
+- **Rank reversal under criterion-set change.** Stam and Silva (1997) documented that adding or removing criteria can invert ranks under additive aggregation [@stamsilva1997]. Selectron's response is a Phase-0 hard gate: the criterion set is pre-registered, and any subsequent taxonomy edit invalidates prior posterior runs by construction.
+
+- **Additive aggregation is contested.** Wedley (1993) and Maleki and Zahir (2013) argue that outranking methods avoid the rank-reversal pathologies inherent to additive forms [@wedley1993; @malekizahir2013]. Selectron picks additive deliberately for Dirichlet-posterior tractability and acknowledges the trade-off; Tervonen and Figueira's outranking-SMAA survey marks the natural next-step pathway [@tervonen2008].
+
+- **Single-operator applicability.** Canonical SMAA assumes a committee, and B-BWM aggregates across raters [@mohammadi2020]; the literature does not directly support "single-operator Bayesian MCDA" as a published pattern. Selectron is framed as a methodology paper, with the elicited weights presented as a worked example rather than a population estimate over panels.
+
+- **Non-comparable scales.** Personality T-scores, ECG-derived binary flags, and interview ratings carry heterogeneous scales that the Bayesian MCDA literature treats with a perfunctory z-scoring step. Selectron declares its per-criterion normalization $z(\cdot)$ explicitly and flags sensitivity to alternative normalizations as future work in §4.5.
 
 ### 4.4 Limitations
 
-<!-- T21: ~150 words -->
+The most consequential limitation is that Stage B operates on synthetic priors. The lognormal-Poisson incidence rates and per-condition worst-case probabilities used in the worked example are placeholders drawn from a Phase-3B literature elicitation, not posterior fits to mission-level outcome data — an analog-mission outcome dataset of sufficient scale to support a hierarchical Bayesian update remains unavailable within the paper horizon. Stage A inherits a parallel limitation: the Dirichlet concentration is fixed at the flat default rather than fit from elicited expert means with heterogeneity-derived precision. The pipeline is exercised on a single canonical worked example (DEMO-01, eight missions, three tiers) for one synthetic operator, which is sufficient to demonstrate the dual-novelty architecture but cannot, by construction, characterize behavior across multi-candidate panels, across the analog-program operator population, or under the cross-cultural heterogeneity expected when the framework is deployed beyond the Colombian operational context described here.
 
 ### 4.5 Future work
 
-<!-- T21: ~100 words; Iter-3 sensitivity layer; retrospective cross-walk -->
+Three extensions are tractable from the current artifact. First, the Iter-3 sensitivity layer — global Sobol indices plus a one-at-a-time tornado-style perturbation panel — will surface the most-perturbative criterion for each candidate and promote that criterion to a panel-facing robustness flag. Second, a retrospective cross-walk to published analog-mission incident catalogues from HI-SEAS, MDRS, AMADEE, and Mars-500, if a sufficient corpus can be assembled, would convert Stage B's synthetic priors into hierarchical posterior fits. Third, the multi-candidate ranking surface with credible-interval rank semantics — already implemented but deliberately not the lead deliverable here — will move forward as a stand-alone follow-up.
 
 ## 5. Conclusion
 
-<!-- T25: ~200 words -->
+Selectron contributes two pieces of methodology to analog-astronaut selection that were absent from the published literature. First, a Bayesian multi-criteria decision analysis pipeline produces a posterior over each candidate's composite score — credible intervals and rank-acceptability semantics included — against a 12-criterion taxonomy organized across three accessibility tiers. Second, a formal mapping from the Stage-B IMM-style mission-risk Monte Carlo posterior onto the NASA Human System Risk Board 5×5 Likelihood × Consequence matrix delivers a verdict in the institutional language of spaceflight risk. The coupling — the Stage-A score posterior conditioning the synthetic crew that feeds Stage B — is what makes the pair more than the sum of its parts.
+
+The artifact is MIT-licensed, browser-resident, single-author TypeScript, archived at a citable Zenodo DOI tied to the commit that generated every figure in this paper. The intent is reproducibility against drift: any reader can re-run the pipeline from the source and arrive at the numbers reported here.
+
+Selectron is decision-support input to selection panels — a structured way to expose what is uncertain about a candidate and what a NASA-aligned review of the same person would say — not an autonomous selector. The decision remains with the panel.
 
 ## References
 
