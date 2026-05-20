@@ -161,7 +161,7 @@ This is intentional triage — flag it now if Diego disagrees. The trade-off: ~5
 | IMM-02 | src/imm/types.ts | DONE | — | 3/3 vitest pass, typecheck clean (only pre-existing TestFigureHost TS6133 remains) |
 | IMM-03 | Build conditions.ts from K15 appendix | DONE | 1a28ef4 | 100 conditions; 4/4 vitest; typecheck only pre-existing TS6133 |
 | IMM-04 | imm-priors.json schema + tierA M18 seed | DONE | — | 8 M18 conditions; 4/4 priors vitest; 182/182 total; typecheck only pre-existing TS6133 |
-| IMM-05 | tierA G12 Bayesian-updated 5 conditions | DONE | pending | 5 G12 conditions appended to imm-priors.json (13 total); 4/4 priors vitest pass |
+| IMM-05 | tierA G12 Bayesian-updated 5 conditions | DONE | dfb6446 | 5 G12 conditions appended to imm-priors.json (13 total); 4/4 priors vitest pass |
 | IMM-06 | tierA TM21 Mars driving conditions | PENDING | — | — |
 | IMM-07 | tierA S20 ISS DRM driving conditions | PENDING | — | — |
 | IMM-08 | tierA A22 aggregate-anchor reference | PENDING | — | — |
