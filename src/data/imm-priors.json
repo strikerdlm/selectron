@@ -357,10 +357,10 @@
     "nephrolithiasis": {
       "conditionId": "nephrolithiasis",
       "provenance": "tierA-nasa",
-      "source_ref": "research/imm_sources/methods/G12_gilkey_2012_bayesian_imm.md#nephrolithiasis",
+      "source_ref": "research/imm_sources/methods/G12_gilkey_2012_bayesian_imm.md#nephrolithiasis; research/imm_sources/validation/S20_walton_kerstman_2020_iss_quantification.md#nephrolithiasis",
       "incidence": {
         "distribution": "Lognormal-Poisson",
-        "mu_log_lambda": -11.4388,
+        "mu_log_lambda": -11.5,
         "sigma_log_lambda": 0.116,
         "lambda_unit": "events-per-person-day"
       },
@@ -1089,6 +1089,198 @@
       },
       "risk_factor_multipliers": {},
       "required_resources": { "antibiotic": 7, "wound-care": 5 }
+    },
+    "behavioral-emergency": {
+      "conditionId": "behavioral-emergency",
+      "provenance": "tierA-nasa",
+      "source_ref": "research/imm_sources/validation/S20_walton_kerstman_2020_iss_quantification.md#behavioral-emergency",
+      "incidence": {
+        "distribution": "Gamma-Poisson",
+        "alpha": 2.0,
+        "beta": 400000,
+        "lambda_unit": "events-per-person-day"
+      },
+      "severity": { "worst_case_prob_alpha": 1.5, "worst_case_prob_beta": 3.5 },
+      "treated": {
+        "fi_cp1": { "min": 0.40, "mode": 0.70, "max": 0.90 },
+        "dt_cp1_hours": { "min": 1, "mode": 12, "max": 72 },
+        "fi_cp2": { "min": 0.0, "mode": 0.15, "max": 0.40 },
+        "dt_cp2_hours": { "min": 24, "mode": 120, "max": 480 },
+        "fi_cp3": { "min": 0.0, "mode": 0.05, "max": 0.20 },
+        "p_evac": { "min": 0.10, "mode": 0.30, "max": 0.65 },
+        "p_locl": { "min": 0.0, "mode": 0.05, "max": 0.20 }
+      },
+      "untreated": {
+        "fi_cp1": { "min": 0.55, "mode": 0.85, "max": 1.0 },
+        "dt_cp1_hours": { "min": 2, "mode": 24, "max": 168 },
+        "fi_cp2": { "min": 0.0, "mode": 0.30, "max": 0.70 },
+        "dt_cp2_hours": { "min": 48, "mode": 240, "max": 720 },
+        "fi_cp3": { "min": 0.0, "mode": 0.15, "max": 0.50 },
+        "p_evac": { "min": 0.20, "mode": 0.55, "max": 0.90 },
+        "p_locl": { "min": 0.02, "mode": 0.20, "max": 0.55 }
+      },
+      "risk_factor_multipliers": {},
+      "required_resources": { "psychotropic": 14, "sedative": 5 }
+    },
+    "anxiety": {
+      "conditionId": "anxiety",
+      "provenance": "tierA-nasa",
+      "source_ref": "research/imm_sources/validation/S20_walton_kerstman_2020_iss_quantification.md#anxiety",
+      "incidence": {
+        "distribution": "Gamma-Poisson",
+        "alpha": 2.0,
+        "beta": 25000,
+        "lambda_unit": "events-per-person-day"
+      },
+      "severity": { "worst_case_prob_alpha": 1.5, "worst_case_prob_beta": 3.5 },
+      "treated": {
+        "fi_cp1": { "min": 0.40, "mode": 0.70, "max": 0.90 },
+        "dt_cp1_hours": { "min": 1, "mode": 6, "max": 48 },
+        "fi_cp2": { "min": 0.0, "mode": 0.05, "max": 0.20 },
+        "dt_cp2_hours": { "min": 24, "mode": 120, "max": 480 },
+        "fi_cp3": { "min": 0.0, "mode": 0.0, "max": 0.05 },
+        "p_evac": { "min": 0.02, "mode": 0.08, "max": 0.25 },
+        "p_locl": { "min": 0.0, "mode": 0.005, "max": 0.02 }
+      },
+      "untreated": {
+        "fi_cp1": { "min": 0.50, "mode": 0.78, "max": 0.95 },
+        "dt_cp1_hours": { "min": 2, "mode": 12, "max": 96 },
+        "fi_cp2": { "min": 0.0, "mode": 0.10, "max": 0.30 },
+        "dt_cp2_hours": { "min": 48, "mode": 240, "max": 720 },
+        "fi_cp3": { "min": 0.0, "mode": 0.01, "max": 0.08 },
+        "p_evac": { "min": 0.05, "mode": 0.15, "max": 0.40 },
+        "p_locl": { "min": 0.0, "mode": 0.005, "max": 0.02 }
+      },
+      "risk_factor_multipliers": {},
+      "required_resources": { "anxiolytic": 14 }
+    },
+    "indigestion": {
+      "conditionId": "indigestion",
+      "provenance": "tierA-nasa",
+      "source_ref": "research/imm_sources/validation/S20_walton_kerstman_2020_iss_quantification.md#indigestion",
+      "incidence": {
+        "distribution": "Gamma-Poisson",
+        "alpha": 2.0,
+        "beta": 4000,
+        "lambda_unit": "events-per-person-day"
+      },
+      "severity": { "worst_case_prob_alpha": 1.5, "worst_case_prob_beta": 3.5 },
+      "treated": {
+        "fi_cp1": { "min": 0.50, "mode": 0.82, "max": 0.97 },
+        "dt_cp1_hours": { "min": 0.5, "mode": 4, "max": 24 },
+        "fi_cp2": { "min": 0.0, "mode": 0.02, "max": 0.10 },
+        "dt_cp2_hours": { "min": 12, "mode": 48, "max": 240 },
+        "fi_cp3": { "min": 0.0, "mode": 0.0, "max": 0.02 },
+        "p_evac": { "min": 0.0, "mode": 0.005, "max": 0.02 },
+        "p_locl": { "min": 0.0, "mode": 0.001, "max": 0.005 }
+      },
+      "untreated": {
+        "fi_cp1": { "min": 0.60, "mode": 0.88, "max": 1.0 },
+        "dt_cp1_hours": { "min": 1, "mode": 8, "max": 72 },
+        "fi_cp2": { "min": 0.0, "mode": 0.05, "max": 0.20 },
+        "dt_cp2_hours": { "min": 24, "mode": 120, "max": 480 },
+        "fi_cp3": { "min": 0.0, "mode": 0.0, "max": 0.05 },
+        "p_evac": { "min": 0.0, "mode": 0.01, "max": 0.05 },
+        "p_locl": { "min": 0.0, "mode": 0.001, "max": 0.005 }
+      },
+      "risk_factor_multipliers": {},
+      "required_resources": { "antacid": 14 }
+    },
+    "allergic-reaction-mild-to-moderate": {
+      "conditionId": "allergic-reaction-mild-to-moderate",
+      "provenance": "tierA-nasa",
+      "source_ref": "research/imm_sources/validation/S20_walton_kerstman_2020_iss_quantification.md#allergic-reaction",
+      "incidence": {
+        "distribution": "Gamma-Poisson",
+        "alpha": 2.0,
+        "beta": 20000,
+        "lambda_unit": "events-per-person-day"
+      },
+      "severity": { "worst_case_prob_alpha": 1.5, "worst_case_prob_beta": 3.5 },
+      "treated": {
+        "fi_cp1": { "min": 0.55, "mode": 0.85, "max": 0.98 },
+        "dt_cp1_hours": { "min": 0.5, "mode": 4, "max": 24 },
+        "fi_cp2": { "min": 0.0, "mode": 0.03, "max": 0.12 },
+        "dt_cp2_hours": { "min": 12, "mode": 48, "max": 240 },
+        "fi_cp3": { "min": 0.0, "mode": 0.0, "max": 0.02 },
+        "p_evac": { "min": 0.0, "mode": 0.01, "max": 0.05 },
+        "p_locl": { "min": 0.0, "mode": 0.002, "max": 0.008 }
+      },
+      "untreated": {
+        "fi_cp1": { "min": 0.60, "mode": 0.88, "max": 1.0 },
+        "dt_cp1_hours": { "min": 1, "mode": 12, "max": 72 },
+        "fi_cp2": { "min": 0.0, "mode": 0.10, "max": 0.30 },
+        "dt_cp2_hours": { "min": 24, "mode": 120, "max": 480 },
+        "fi_cp3": { "min": 0.0, "mode": 0.01, "max": 0.05 },
+        "p_evac": { "min": 0.01, "mode": 0.05, "max": 0.20 },
+        "p_locl": { "min": 0.0, "mode": 0.002, "max": 0.01 }
+      },
+      "risk_factor_multipliers": {},
+      "required_resources": { "antihistamine": 14, "epinephrine": 1 }
+    },
+    "late-insomnia": {
+      "conditionId": "late-insomnia",
+      "provenance": "tierA-nasa",
+      "source_ref": "research/imm_sources/validation/S20_walton_kerstman_2020_iss_quantification.md#late-insomnia",
+      "incidence": {
+        "distribution": "Gamma-Poisson",
+        "alpha": 2.0,
+        "beta": 1000,
+        "lambda_unit": "events-per-person-day"
+      },
+      "severity": { "worst_case_prob_alpha": 1.5, "worst_case_prob_beta": 3.5 },
+      "treated": {
+        "fi_cp1": { "min": 0.30, "mode": 0.65, "max": 0.90 },
+        "dt_cp1_hours": { "min": 1, "mode": 24, "max": 168 },
+        "fi_cp2": { "min": 0.0, "mode": 0.05, "max": 0.20 },
+        "dt_cp2_hours": { "min": 24, "mode": 168, "max": 720 },
+        "fi_cp3": { "min": 0.0, "mode": 0.0, "max": 0.03 },
+        "p_evac": { "min": 0.0, "mode": 0.005, "max": 0.02 },
+        "p_locl": { "min": 0.0, "mode": 0.0, "max": 0.002 }
+      },
+      "untreated": {
+        "fi_cp1": { "min": 0.40, "mode": 0.72, "max": 0.95 },
+        "dt_cp1_hours": { "min": 2, "mode": 48, "max": 336 },
+        "fi_cp2": { "min": 0.0, "mode": 0.10, "max": 0.30 },
+        "dt_cp2_hours": { "min": 48, "mode": 240, "max": 720 },
+        "fi_cp3": { "min": 0.0, "mode": 0.0, "max": 0.05 },
+        "p_evac": { "min": 0.0, "mode": 0.005, "max": 0.02 },
+        "p_locl": { "min": 0.0, "mode": 0.0, "max": 0.005 }
+      },
+      "risk_factor_multipliers": {},
+      "required_resources": { "sleep-aid": 30 }
+    },
+    "visual-impairment-and-intracranial-pressure-viip-space-adaptation": {
+      "conditionId": "visual-impairment-and-intracranial-pressure-viip-space-adaptation",
+      "provenance": "tierA-nasa",
+      "source_ref": "research/imm_sources/validation/S20_walton_kerstman_2020_iss_quantification.md#viip",
+      "incidence": {
+        "distribution": "Gamma-Poisson",
+        "alpha": 2.0,
+        "beta": 14195,
+        "lambda_unit": "events-per-person-day"
+      },
+      "severity": { "worst_case_prob_alpha": 2.0, "worst_case_prob_beta": 12.0 },
+      "treated": {
+        "fi_cp1": { "min": 0.20, "mode": 0.55, "max": 0.85 },
+        "dt_cp1_hours": { "min": 24, "mode": 168, "max": 720 },
+        "fi_cp2": { "min": 0.0, "mode": 0.20, "max": 0.50 },
+        "dt_cp2_hours": { "min": 168, "mode": 720, "max": 4320 },
+        "fi_cp3": { "min": 0.0, "mode": 0.05, "max": 0.25 },
+        "p_evac": { "min": 0.10, "mode": 0.35, "max": 0.70 },
+        "p_locl": { "min": 0.02, "mode": 0.10, "max": 0.30 }
+      },
+      "untreated": {
+        "fi_cp1": { "min": 0.30, "mode": 0.65, "max": 0.90 },
+        "dt_cp1_hours": { "min": 48, "mode": 336, "max": 2160 },
+        "fi_cp2": { "min": 0.0, "mode": 0.35, "max": 0.70 },
+        "dt_cp2_hours": { "min": 336, "mode": 1440, "max": 8640 },
+        "fi_cp3": { "min": 0.0, "mode": 0.15, "max": 0.50 },
+        "p_evac": { "min": 0.15, "mode": 0.50, "max": 0.90 },
+        "p_locl": { "min": 0.05, "mode": 0.20, "max": 0.55 }
+      },
+      "risk_factor_multipliers": {},
+      "required_resources": { "ophthalmic-exam": 3, "imaging": 2 }
     }
   },
   "global_calibration": {
