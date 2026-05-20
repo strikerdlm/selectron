@@ -45,7 +45,8 @@ export type IMMTrialResult = {
   perConditionLocl: Record<string, number>;
 };
 
-function applyRiskFactorMultiplier(baseLambda: number, member: IMMCrewMember, prior: IMMPrior): number {
+/** Exported for testability — internal helper. */
+export function applyRiskFactorMultiplier(baseLambda: number, member: IMMCrewMember, prior: IMMPrior): number {
   let lambda = baseLambda;
   const m = prior.risk_factor_multipliers;
   if (member.sex === "male" && m["sex-male"]) lambda *= m["sex-male"]!;

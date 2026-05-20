@@ -182,8 +182,8 @@ This is intentional triage — flag it now if Diego disagrees. The trade-off: ~5
 | IMM-23 | simulate.ts — SPE Poisson + ARS chain | DONE | 89f5ba7 | samplePoissonProcess in incidence.ts; pre-sampled SPE timeline per trial (all crew share same solar events); ARS Beta-Bernoulli per SPE event; timeDays preserved; Occurrence type extended with evacSampled/loclSampled (T25 bundled here) |
 | IMM-24 | simulate.ts — SA once-per-mission cap | DONE | 739f238 | processedSAOnce Set per crew member; space-adaptation-once skipped if cond.id already in set; timeDays=sampleBetaPert(0,2.5,5) for SA, sampleBetaPert(0,d/2,d) for VIIP; 1000-trial cap test passes |
 | IMM-25 | simulate.ts — per-event Bernoulli end-state | DONE | 22513c3 | evacSampled/loclSampled fields on Occurrence; sampled once per event (T23 bundled); perConditionEvac/Locl aggregation uses sampled values not 0.5 threshold; test verifies Bernoulli distinguishable from threshold by checking non-zero perConditionEvac with p_evac mode=0.1 |
-| IMM-26 | simulate.ts — concurrent FI QTL accounting | DONE | TBD | QTL=concurrentFI([fi_cp1,fi_cp2])×(dt_cp1+dt_cp2) per event; uses outcomes.concurrentFI; cross-event overlap deferred to v1.1 with comment; 2 unit tests pass |
-| IMM-27 | simulate.ts — risk-factor multipliers tested | PENDING | — | — |
+| IMM-26 | simulate.ts — concurrent FI QTL accounting | DONE | 2ee0daf | QTL=concurrentFI([fi_cp1,fi_cp2])×(dt_cp1+dt_cp2) per event; uses outcomes.concurrentFI; cross-event overlap deferred to v1.1 with comment; 2 unit tests pass |
+| IMM-27 | simulate.ts — risk-factor multipliers tested | DONE | TBD | applyRiskFactorMultiplier exported (internal helper comment); 5 direct unit tests: sex-male×2, sex-female×1.5, contacts×3, CAC-positive×4, abdominal-surgery-history×2.5 |
 | IMM-28 | simulate.ts — resource consumption + RAF re-comp | PENDING | — | — |
 | IMM-29 | simulate.ts — simulateIMM T-trial aggregation | PENDING | — | — |
 | IMM-30 | simulate.ts — σ<5% convergence assertion | PENDING | — | — |

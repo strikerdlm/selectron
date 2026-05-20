@@ -1,6 +1,6 @@
 // tests/imm/simulate.test.ts
 import { describe, it, expect, vi, afterEach } from "vitest";
-import { runIMMTrial } from "../../src/imm/simulate";
+import { runIMMTrial, applyRiskFactorMultiplier } from "../../src/imm/simulate";
 import { makeRng } from "../../src/engine/prng";
 import { IMM_KITS } from "../../src/imm/kits";
 import type { IMMMission, IMMCrewMember } from "../../src/imm/types";
@@ -86,6 +86,60 @@ function makeSinusPrior(pEvacMode: number): IMMPrior {
     risk_factor_multipliers: {},
   };
 }
+
+describe("T27: risk-factor multipliers", () => {
+  /** Minimal prior fixture with a known risk_factor_multipliers map. */
+  function makePriorWithMultiplier(multiplierKey: string, value: number): import("../../src/imm/types").IMMPrior {
+    const pert = (min: number, mode: number, max: number) => ({ min, mode, max });
+    return {
+      conditionId: "test",
+      provenance: "tierA-nasa" as const,
+      source_ref: "test",
+      incidence: { distribution: "Fixed", lambda_fixed: 1.0 },
+      severity: { worst_case_prob_alpha: 1, worst_case_prob_beta: 1 },
+      treated: {
+        fi_cp1: pert(0, 0, 0), dt_cp1_hours: pert(0, 0, 0),
+        fi_cp2: pert(0, 0, 0), dt_cp2_hours: pert(0, 0, 0),
+        fi_cp3: pert(0, 0, 0), p_evac: pert(0, 0, 0), p_locl: pert(0, 0, 0),
+      },
+      untreated: {
+        fi_cp1: pert(0, 0, 0), dt_cp1_hours: pert(0, 0, 0),
+        fi_cp2: pert(0, 0, 0), dt_cp2_hours: pert(0, 0, 0),
+        fi_cp3: pert(0, 0, 0), p_evac: pert(0, 0, 0), p_locl: pert(0, 0, 0),
+      },
+      required_resources: {},
+      risk_factor_multipliers: { [multiplierKey]: value },
+    };
+  }
+
+  const BASE = 1.0;
+  const maleCrew: IMMCrewMember = { id: "m", sex: "male", contacts: false, crowns: false, CAC_positive: false, abdominal_surgery_history: false, EVA_eligible: false, EVA_count: 0 };
+  const femaleCrew: IMMCrewMember = { id: "f", sex: "female", contacts: false, crowns: false, CAC_positive: false, abdominal_surgery_history: false, EVA_eligible: false, EVA_count: 0 };
+  const contactsCrew: IMMCrewMember = { id: "c", sex: "male", contacts: true, crowns: false, CAC_positive: false, abdominal_surgery_history: false, EVA_eligible: false, EVA_count: 0 };
+  const cacCrew: IMMCrewMember = { id: "cac", sex: "male", contacts: false, crowns: false, CAC_positive: true, abdominal_surgery_history: false, EVA_eligible: false, EVA_count: 0 };
+  const abdCrew: IMMCrewMember = { id: "abd", sex: "male", contacts: false, crowns: false, CAC_positive: false, abdominal_surgery_history: true, EVA_eligible: false, EVA_count: 0 };
+
+  it("sex-male=2.0: male crew → λ doubled", () => {
+    const prior = makePriorWithMultiplier("sex-male", 2.0);
+    expect(applyRiskFactorMultiplier(BASE, maleCrew, prior)).toBeCloseTo(2.0);
+  });
+  it("sex-female=1.5: female crew → λ × 1.5", () => {
+    const prior = makePriorWithMultiplier("sex-female", 1.5);
+    expect(applyRiskFactorMultiplier(BASE, femaleCrew, prior)).toBeCloseTo(1.5);
+  });
+  it("contacts=3.0: contacts=true crew → λ × 3", () => {
+    const prior = makePriorWithMultiplier("contacts", 3.0);
+    expect(applyRiskFactorMultiplier(BASE, contactsCrew, prior)).toBeCloseTo(3.0);
+  });
+  it("CAC-positive=4.0: CAC_positive=true crew → λ × 4", () => {
+    const prior = makePriorWithMultiplier("CAC-positive", 4.0);
+    expect(applyRiskFactorMultiplier(BASE, cacCrew, prior)).toBeCloseTo(4.0);
+  });
+  it("abdominal-surgery-history=2.5: abdominal_surgery_history=true → λ × 2.5", () => {
+    const prior = makePriorWithMultiplier("abdominal-surgery-history", 2.5);
+    expect(applyRiskFactorMultiplier(BASE, abdCrew, prior)).toBeCloseTo(2.5);
+  });
+});
 
 describe("T26: concurrent-FI QTL accounting", () => {
   it("concurrentFI([0.3, 0.4]) = 1 − 0.7×0.6 = 0.58", () => {
