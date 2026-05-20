@@ -174,8 +174,8 @@ This is intentional triage — flag it now if Diego disagrees. The trade-off: ~5
 | IMM-15 | P0 acceptance — full Phase-0 smoke | DONE | TBD | 18/18 vitest green (5 test files). Smoke: 100 conditions, 100 priors, 0 missing. Provenance: tierA=40, tierB=42, tierC=18. Vite build clean (1027.77 kB / 340.86 kB gzip). Pre-existing TS6133 only. |
 | IMM-16 | incidence.ts — general Poisson (Knuth + PTRS) | DONE | TBD | 3/3 vitest pass. Rng inlined (matches risk/ convention; prng.ts does not export the type). samplePoisson: Knuth λ<30, Hörmann PTRS λ≥30. |
 | IMM-17 | incidence.ts — Lognormal/Gamma/Beta-Bernoulli | DONE | TBD | 6/6 incidence vitest pass (3 existing + 3 new). sampleGamma called as (shape, rng) per gamma.ts convention — plan code had args reversed. Reused src/engine/gamma.ts, no duplicate sampler. 195/195 full suite. |
-| IMM-18 | severity.ts — worst-case Bernoulli | DONE | TBD | Beta-Bernoulli wrapper; alpha=0 → "best" |
-| IMM-19 | outcomes.ts — Beta-Pert sampler | PENDING | — | — |
+| IMM-18 | severity.ts — worst-case Bernoulli | DONE | 390c387 | Beta-Bernoulli wrapper; alpha=0 → "best" |
+| IMM-19 | outcomes.ts — Beta-Pert sampler | DONE | TBD | sampleBetaPert; mean=(a+4m+b)/6; degenerate+E_BAD_PRIOR guards |
 | IMM-20 | outcomes.ts — concurrent FI formula | PENDING | — | — |
 | IMM-21 | treatment.ts — RAF distribution shifting | PENDING | — | — |
 | IMM-22 | simulate.ts — runIMMTrial scaffold | PENDING | — | — |
