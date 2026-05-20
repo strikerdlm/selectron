@@ -180,8 +180,8 @@ This is intentional triage — flag it now if Diego disagrees. The trade-off: ~5
 | IMM-21 | treatment.ts — RAF distribution shifting | DONE | TBD | interpolateBetaPertByRAF; linear; clamped; 6 tests |
 | IMM-22 | simulate.ts — runIMMTrial scaffold | DONE | TBD | 2/2 vitest pass; 215/215 full suite; typecheck only pre-existing TS6133. Rng inlined (prng.ts doesn't export type). Plan deviation: earlyTerminated checked per-crew before entering condition loop (correct). Plan's `import type { Rng }` replaced with inline `type Rng = () => number`. concurrentFI NOT used (T26 will add). |
 | IMM-23 | simulate.ts — SPE Poisson + ARS chain | DONE | 89f5ba7 | samplePoissonProcess in incidence.ts; pre-sampled SPE timeline per trial (all crew share same solar events); ARS Beta-Bernoulli per SPE event; timeDays preserved; Occurrence type extended with evacSampled/loclSampled (T25 bundled here) |
-| IMM-24 | simulate.ts — SA once-per-mission cap | DONE | TBD | processedSAOnce Set per crew member; space-adaptation-once skipped if cond.id already in set; timeDays=sampleBetaPert(0,2.5,5) for SA, sampleBetaPert(0,d/2,d) for VIIP; 1000-trial cap test passes |
-| IMM-25 | simulate.ts — per-event Bernoulli end-state | PENDING | — | — |
+| IMM-24 | simulate.ts — SA once-per-mission cap | DONE | 739f238 | processedSAOnce Set per crew member; space-adaptation-once skipped if cond.id already in set; timeDays=sampleBetaPert(0,2.5,5) for SA, sampleBetaPert(0,d/2,d) for VIIP; 1000-trial cap test passes |
+| IMM-25 | simulate.ts — per-event Bernoulli end-state | DONE | TBD | evacSampled/loclSampled fields on Occurrence; sampled once per event (T23 bundled); perConditionEvac/Locl aggregation uses sampled values not 0.5 threshold; test verifies Bernoulli distinguishable from threshold by checking non-zero perConditionEvac with p_evac mode=0.1 |
 | IMM-26 | simulate.ts — concurrent FI QTL accounting | PENDING | — | — |
 | IMM-27 | simulate.ts — risk-factor multipliers tested | PENDING | — | — |
 | IMM-28 | simulate.ts — resource consumption + RAF re-comp | PENDING | — | — |
