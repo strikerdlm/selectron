@@ -68,7 +68,23 @@ The 12 modeled conditions span five clinical families: psychiatric (insomnia, de
 
 ### 2.4 NASA HSRB Likelihood × Consequence mapping
 
-<!-- T5: ~450 words; verbatim JSC-66705 Fig. 4 + §3.2.4 -->
+The NASA Human System Risk Board (HSRB) governs the agency's formal risk-posture process for human spaceflight, translating biomedical evidence into programmatic risk colors. The process is documented in JSC-66705 Revision A, *Human System Risk Management Plan* [@jsc66705], under the Agency Risk Management Procedural Requirements, NPR 8000.4C [@npr80004c]. Antonsen et al. (2023) describe recent updates to the HSRB process, including refinement of the five-level likelihood and consequence scales [@antonsen2023]. Selectron's contribution is the bridge from the Stage-B $\chi$ posterior (§2.3) to an HSRB risk color: $P(\chi < \chi^*)$ drives the likelihood level and $(1 - \chi_\mathrm{mean})$ drives the consequence level, translating the probabilistic mission-risk output into NASA's institutional risk language.
+
+The likelihood level $L \in \{1, \ldots, 5\}$ is assigned by bucketing $P(\chi < \chi^*)$ against the In-Mission quantitative thresholds from JSC-66705 Rev A Figure 4 (p. 28): L1, $P \le 0.01\%$; L2, $0.01\% < P \le 0.1\%$; L3, $0.1\% < P \le 1\%$; L4, $1\% < P \le 10\%$; L5, $P > 10\%$. Selectron applies the In-Mission column exclusively — not the Flight Recertification or Long Term Health columns — because the Stage-B posterior is a mission-bounded metric; it does not encode career-level or post-flight health trajectories to which the other columns apply.
+
+The consequence level $C \in \{1, \ldots, 5\}$ uses the Mission Objectives Impact sub-category from JSC-66705 Rev A §3.2.4. JSC-66705 §3.2.4 (p. 29) mandates: "Only one Sub-Impact Category shall be used to inform the LxC score for each Impact category." Selectron's consequence axis is $(1 - \chi_\mathrm{mean}) = \mathrm{QTL}/(t \cdot c)$, the fraction of total crew-days lost — a mission-time-lost rollup. The alternative In-Mission sub-category, Crew Health Impact, describes per-crewmember clinical severity; applying it here would conflate aggregate time loss with individual-event clinical outcomes, a metric mismatch. Mission Objectives Impact — descriptors spanning C1 ("Insignificant impact to crew performance") through C5 ("Loss of mission due to crew performance reductions") — is the principled operationalization of $(1 - \chi_\mathrm{mean})$.
+
+The priority-score grid (JSC-66705 Rev A Fig. 4, p. 28) is reproduced below; rows are L1–L5 and columns are C1–C5:
+
+| | C1 | C2 | C3 | C4 | C5 |
+|---|---|---|---|---|---|
+| **L1** | 1 | 3 | 5 | 8 | 12 |
+| **L2** | 2 | 6 | 11 | 14 | 17 |
+| **L3** | 4 | 9 | 15 | 19 | 21 |
+| **L4** | 7 | 13 | 18 | 22 | 24 |
+| **L5** | 10 | 16 | 20 | 23 | 25 |
+
+The color rule follows JSC-66705 §3.2.4 (p. 27) verbatim: "red (maximum LxC Score ≥ 20), yellow (11 ≤ maximum LxC Score ≤ 19), and green (maximum LxC Score ≤ 10)." Boundary cases at band edges — e.g., $1 - 0.70 = 0.30000000000000004$ from floating-point subtraction — are resolved by an IEEE-754 epsilon tolerance $\varepsilon = 10^{-9}$ in `src/risk/lxc.ts::bucketLikelihood` and `bucketConsequence`, well below any meaningful posterior resolution.
 
 ### 2.5 Implementation and reproducibility
 
