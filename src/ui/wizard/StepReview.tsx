@@ -24,22 +24,28 @@ export function StepReview() {
     [accessTier],
   );
 
+  // Clamp at the source — legacy persisted rawValues from before the
+  // EvidenceForm scale-transform fix can exceed [scale.min, scale.max]
+  // (Diego hit 112.5 on a [0,100] criterion). Clamping here defends
+  // EVERY downstream consumer: the table z-column, radar, scoresForEngine,
+  // CalculationTrace. One place, one fix.
   const scores: Record<string, number> = useMemo(() => {
     const m: Record<string, number> = {};
-    for (const e of criterionEntries) m[e.criterionId] = e.rawValue;
+    for (const e of criterionEntries) {
+      const c = visibleCriteria.find((v) => v.id === e.criterionId);
+      m[e.criterionId] = c
+        ? Math.max(c.scale.min, Math.min(c.scale.max, e.rawValue))
+        : e.rawValue;
+    }
     return m;
-  }, [criterionEntries]);
+  }, [criterionEntries, visibleCriteria]);
 
   // Fill any missing criterion scores with the criterion minimum so scoreCandidate
   // never throws E_BAD_SCORE (incomplete wizard state is valid during review).
-  // Also clamp to [scale.min, scale.max] — defends against legacy persisted values
-  // from before the EvidenceForm scale-transform fix (Diego hit 112.5 on a [0,100]
-  // criterion when the old slider double-multiplied the scaleTransform).
   const scoresForEngine = useMemo(() => {
     const m: Record<string, number> = {};
     for (const c of visibleCriteria) {
-      const raw = scores[c.id] ?? c.scale.min;
-      m[c.id] = Math.max(c.scale.min, Math.min(c.scale.max, raw));
+      m[c.id] = scores[c.id] ?? c.scale.min;
     }
     return m;
   }, [scores, visibleCriteria]);
