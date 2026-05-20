@@ -6122,6 +6122,1618 @@
       "required_resources": {
         "antifungal": 7
       }
+    },
+    "hypertension": {
+      "conditionId": "hypertension",
+      "provenance": "tierB-lit",
+      "source_ref": "research/evidence_tables/medical.md",
+      "incidence": {
+        "distribution": "Gamma-Poisson",
+        "alpha": 2.0,
+        "beta": 2000.0,
+        "lambda_unit": "events-per-person-day"
+      },
+      "severity": {
+        "worst_case_prob_alpha": 1.5,
+        "worst_case_prob_beta": 8.5
+      },
+      "treated": {
+        "fi_cp1": {
+          "min": 0,
+          "mode": 0.1,
+          "max": 0.3
+        },
+        "dt_cp1_hours": {
+          "min": 2,
+          "mode": 12,
+          "max": 48
+        },
+        "fi_cp2": {
+          "min": 0,
+          "mode": 0.02,
+          "max": 0.1
+        },
+        "dt_cp2_hours": {
+          "min": 12,
+          "mode": 48,
+          "max": 168
+        },
+        "fi_cp3": {
+          "min": 0,
+          "mode": 0,
+          "max": 0.02
+        },
+        "p_evac": {
+          "min": 0,
+          "mode": 0.005,
+          "max": 0.03
+        },
+        "p_locl": {
+          "min": 0,
+          "mode": 0,
+          "max": 0.005
+        }
+      },
+      "untreated": {
+        "fi_cp1": {
+          "min": 0.1,
+          "mode": 0.3,
+          "max": 0.65
+        },
+        "dt_cp1_hours": {
+          "min": 12,
+          "mode": 72,
+          "max": 336
+        },
+        "fi_cp2": {
+          "min": 0,
+          "mode": 0.05,
+          "max": 0.2
+        },
+        "dt_cp2_hours": {
+          "min": 48,
+          "mode": 168,
+          "max": 720
+        },
+        "fi_cp3": {
+          "min": 0,
+          "mode": 0.01,
+          "max": 0.08
+        },
+        "p_evac": {
+          "min": 0.02,
+          "mode": 0.08,
+          "max": 0.3
+        },
+        "p_locl": {
+          "min": 0.01,
+          "mode": 0.05,
+          "max": 0.15
+        }
+      },
+      "risk_factor_multipliers": {},
+      "required_resources": {
+        "antihypertensive": 30
+      }
+    },
+    "cardiogenic-shock-secondary-to-myocardial-infarction": {
+      "conditionId": "cardiogenic-shock-secondary-to-myocardial-infarction",
+      "provenance": "tierB-lit",
+      "source_ref": "research/evidence_tables/medical.md",
+      "incidence": {
+        "distribution": "Gamma-Poisson",
+        "alpha": 2.0,
+        "beta": 50000.0,
+        "lambda_unit": "events-per-person-day"
+      },
+      "severity": {
+        "worst_case_prob_alpha": 3.0,
+        "worst_case_prob_beta": 7.0
+      },
+      "treated": {
+        "fi_cp1": {
+          "min": 0.2,
+          "mode": 0.5,
+          "max": 0.8
+        },
+        "dt_cp1_hours": {
+          "min": 2,
+          "mode": 6,
+          "max": 24
+        },
+        "fi_cp2": {
+          "min": 0.1,
+          "mode": 0.3,
+          "max": 0.6
+        },
+        "dt_cp2_hours": {
+          "min": 6,
+          "mode": 24,
+          "max": 96
+        },
+        "fi_cp3": {
+          "min": 0.05,
+          "mode": 0.15,
+          "max": 0.4
+        },
+        "p_evac": {
+          "min": 0.2,
+          "mode": 0.5,
+          "max": 0.85
+        },
+        "p_locl": {
+          "min": 0.05,
+          "mode": 0.2,
+          "max": 0.5
+        }
+      },
+      "untreated": {
+        "fi_cp1": {
+          "min": 0.4,
+          "mode": 0.75,
+          "max": 0.95
+        },
+        "dt_cp1_hours": {
+          "min": 1,
+          "mode": 3,
+          "max": 12
+        },
+        "fi_cp2": {
+          "min": 0.2,
+          "mode": 0.5,
+          "max": 0.8
+        },
+        "dt_cp2_hours": {
+          "min": 3,
+          "mode": 12,
+          "max": 48
+        },
+        "fi_cp3": {
+          "min": 0.1,
+          "mode": 0.3,
+          "max": 0.7
+        },
+        "p_evac": {
+          "min": 0.4,
+          "mode": 0.75,
+          "max": 0.95
+        },
+        "p_locl": {
+          "min": 0.15,
+          "mode": 0.4,
+          "max": 0.7
+        }
+      },
+      "risk_factor_multipliers": {
+        "sex-male": 1.3,
+        "CAC-positive": 3.0
+      },
+      "required_resources": {
+        "defibrillator": 1,
+        "vasopressor": 3,
+        "analgesic-opioid": 5
+      }
+    },
+    "wrist-sprain-strain": {
+      "conditionId": "wrist-sprain-strain",
+      "provenance": "tierB-lit",
+      "source_ref": "research/evidence_tables/medical.md",
+      "incidence": {
+        "distribution": "Gamma-Poisson",
+        "alpha": 2.0,
+        "beta": 1000.0,
+        "lambda_unit": "events-per-person-day"
+      },
+      "severity": {
+        "worst_case_prob_alpha": 1.0,
+        "worst_case_prob_beta": 9.0
+      },
+      "treated": {
+        "fi_cp1": {
+          "min": 0,
+          "mode": 0.05,
+          "max": 0.2
+        },
+        "dt_cp1_hours": {
+          "min": 2,
+          "mode": 8,
+          "max": 48
+        },
+        "fi_cp2": {
+          "min": 0,
+          "mode": 0.01,
+          "max": 0.05
+        },
+        "dt_cp2_hours": {
+          "min": 8,
+          "mode": 24,
+          "max": 96
+        },
+        "fi_cp3": {
+          "min": 0,
+          "mode": 0,
+          "max": 0.01
+        },
+        "p_evac": {
+          "min": 0,
+          "mode": 0.001,
+          "max": 0.01
+        },
+        "p_locl": {
+          "min": 0,
+          "mode": 0,
+          "max": 0.001
+        }
+      },
+      "untreated": {
+        "fi_cp1": {
+          "min": 0.05,
+          "mode": 0.2,
+          "max": 0.5
+        },
+        "dt_cp1_hours": {
+          "min": 8,
+          "mode": 48,
+          "max": 168
+        },
+        "fi_cp2": {
+          "min": 0,
+          "mode": 0.05,
+          "max": 0.18
+        },
+        "dt_cp2_hours": {
+          "min": 24,
+          "mode": 96,
+          "max": 360
+        },
+        "fi_cp3": {
+          "min": 0,
+          "mode": 0.005,
+          "max": 0.05
+        },
+        "p_evac": {
+          "min": 0.01,
+          "mode": 0.05,
+          "max": 0.18
+        },
+        "p_locl": {
+          "min": 0,
+          "mode": 0.001,
+          "max": 0.02
+        }
+      },
+      "risk_factor_multipliers": {},
+      "required_resources": {
+        "analgesic-mild": 7,
+        "orthopedic-splint": 1
+      }
+    },
+    "shoulder-sprain-strain": {
+      "conditionId": "shoulder-sprain-strain",
+      "provenance": "tierB-lit",
+      "source_ref": "research/evidence_tables/medical.md",
+      "incidence": {
+        "distribution": "Gamma-Poisson",
+        "alpha": 2.0,
+        "beta": 700.0,
+        "lambda_unit": "events-per-person-day"
+      },
+      "severity": {
+        "worst_case_prob_alpha": 1.2,
+        "worst_case_prob_beta": 8.8
+      },
+      "treated": {
+        "fi_cp1": {
+          "min": 0,
+          "mode": 0.05,
+          "max": 0.2
+        },
+        "dt_cp1_hours": {
+          "min": 2,
+          "mode": 8,
+          "max": 48
+        },
+        "fi_cp2": {
+          "min": 0,
+          "mode": 0.01,
+          "max": 0.05
+        },
+        "dt_cp2_hours": {
+          "min": 8,
+          "mode": 24,
+          "max": 96
+        },
+        "fi_cp3": {
+          "min": 0,
+          "mode": 0,
+          "max": 0.01
+        },
+        "p_evac": {
+          "min": 0,
+          "mode": 0.001,
+          "max": 0.01
+        },
+        "p_locl": {
+          "min": 0,
+          "mode": 0,
+          "max": 0.001
+        }
+      },
+      "untreated": {
+        "fi_cp1": {
+          "min": 0.05,
+          "mode": 0.2,
+          "max": 0.55
+        },
+        "dt_cp1_hours": {
+          "min": 8,
+          "mode": 48,
+          "max": 240
+        },
+        "fi_cp2": {
+          "min": 0,
+          "mode": 0.05,
+          "max": 0.2
+        },
+        "dt_cp2_hours": {
+          "min": 24,
+          "mode": 120,
+          "max": 480
+        },
+        "fi_cp3": {
+          "min": 0,
+          "mode": 0.005,
+          "max": 0.08
+        },
+        "p_evac": {
+          "min": 0.01,
+          "mode": 0.06,
+          "max": 0.2
+        },
+        "p_locl": {
+          "min": 0,
+          "mode": 0.002,
+          "max": 0.02
+        }
+      },
+      "risk_factor_multipliers": {},
+      "required_resources": {
+        "analgesic-mild": 7,
+        "orthopedic-splint": 1
+      }
+    },
+    "hip-sprain-strain": {
+      "conditionId": "hip-sprain-strain",
+      "provenance": "tierB-lit",
+      "source_ref": "research/evidence_tables/medical.md",
+      "incidence": {
+        "distribution": "Gamma-Poisson",
+        "alpha": 2.0,
+        "beta": 1500.0,
+        "lambda_unit": "events-per-person-day"
+      },
+      "severity": {
+        "worst_case_prob_alpha": 1.0,
+        "worst_case_prob_beta": 9.0
+      },
+      "treated": {
+        "fi_cp1": {
+          "min": 0,
+          "mode": 0.05,
+          "max": 0.2
+        },
+        "dt_cp1_hours": {
+          "min": 2,
+          "mode": 8,
+          "max": 48
+        },
+        "fi_cp2": {
+          "min": 0,
+          "mode": 0.01,
+          "max": 0.05
+        },
+        "dt_cp2_hours": {
+          "min": 8,
+          "mode": 24,
+          "max": 96
+        },
+        "fi_cp3": {
+          "min": 0,
+          "mode": 0,
+          "max": 0.01
+        },
+        "p_evac": {
+          "min": 0,
+          "mode": 0.001,
+          "max": 0.01
+        },
+        "p_locl": {
+          "min": 0,
+          "mode": 0,
+          "max": 0.001
+        }
+      },
+      "untreated": {
+        "fi_cp1": {
+          "min": 0.05,
+          "mode": 0.2,
+          "max": 0.5
+        },
+        "dt_cp1_hours": {
+          "min": 8,
+          "mode": 48,
+          "max": 168
+        },
+        "fi_cp2": {
+          "min": 0,
+          "mode": 0.05,
+          "max": 0.18
+        },
+        "dt_cp2_hours": {
+          "min": 24,
+          "mode": 96,
+          "max": 360
+        },
+        "fi_cp3": {
+          "min": 0,
+          "mode": 0.005,
+          "max": 0.05
+        },
+        "p_evac": {
+          "min": 0.01,
+          "mode": 0.05,
+          "max": 0.18
+        },
+        "p_locl": {
+          "min": 0,
+          "mode": 0.001,
+          "max": 0.02
+        }
+      },
+      "risk_factor_multipliers": {},
+      "required_resources": {
+        "analgesic-mild": 7
+      }
+    },
+    "knee-sprain-strain": {
+      "conditionId": "knee-sprain-strain",
+      "provenance": "tierB-lit",
+      "source_ref": "research/evidence_tables/medical.md",
+      "incidence": {
+        "distribution": "Gamma-Poisson",
+        "alpha": 2.0,
+        "beta": 700.0,
+        "lambda_unit": "events-per-person-day"
+      },
+      "severity": {
+        "worst_case_prob_alpha": 1.0,
+        "worst_case_prob_beta": 9.0
+      },
+      "treated": {
+        "fi_cp1": {
+          "min": 0,
+          "mode": 0.05,
+          "max": 0.2
+        },
+        "dt_cp1_hours": {
+          "min": 2,
+          "mode": 8,
+          "max": 48
+        },
+        "fi_cp2": {
+          "min": 0,
+          "mode": 0.01,
+          "max": 0.05
+        },
+        "dt_cp2_hours": {
+          "min": 8,
+          "mode": 24,
+          "max": 96
+        },
+        "fi_cp3": {
+          "min": 0,
+          "mode": 0,
+          "max": 0.01
+        },
+        "p_evac": {
+          "min": 0,
+          "mode": 0.001,
+          "max": 0.01
+        },
+        "p_locl": {
+          "min": 0,
+          "mode": 0,
+          "max": 0.001
+        }
+      },
+      "untreated": {
+        "fi_cp1": {
+          "min": 0.05,
+          "mode": 0.2,
+          "max": 0.55
+        },
+        "dt_cp1_hours": {
+          "min": 8,
+          "mode": 48,
+          "max": 240
+        },
+        "fi_cp2": {
+          "min": 0,
+          "mode": 0.05,
+          "max": 0.18
+        },
+        "dt_cp2_hours": {
+          "min": 24,
+          "mode": 120,
+          "max": 480
+        },
+        "fi_cp3": {
+          "min": 0,
+          "mode": 0.005,
+          "max": 0.08
+        },
+        "p_evac": {
+          "min": 0.01,
+          "mode": 0.05,
+          "max": 0.2
+        },
+        "p_locl": {
+          "min": 0,
+          "mode": 0.001,
+          "max": 0.02
+        }
+      },
+      "risk_factor_multipliers": {},
+      "required_resources": {
+        "analgesic-mild": 7
+      }
+    },
+    "elbow-sprain-strain": {
+      "conditionId": "elbow-sprain-strain",
+      "provenance": "tierB-lit",
+      "source_ref": "research/evidence_tables/medical.md",
+      "incidence": {
+        "distribution": "Gamma-Poisson",
+        "alpha": 2.0,
+        "beta": 1000.0,
+        "lambda_unit": "events-per-person-day"
+      },
+      "severity": {
+        "worst_case_prob_alpha": 1.0,
+        "worst_case_prob_beta": 9.0
+      },
+      "treated": {
+        "fi_cp1": {
+          "min": 0,
+          "mode": 0.05,
+          "max": 0.2
+        },
+        "dt_cp1_hours": {
+          "min": 2,
+          "mode": 8,
+          "max": 48
+        },
+        "fi_cp2": {
+          "min": 0,
+          "mode": 0.01,
+          "max": 0.05
+        },
+        "dt_cp2_hours": {
+          "min": 8,
+          "mode": 24,
+          "max": 96
+        },
+        "fi_cp3": {
+          "min": 0,
+          "mode": 0,
+          "max": 0.01
+        },
+        "p_evac": {
+          "min": 0,
+          "mode": 0.001,
+          "max": 0.01
+        },
+        "p_locl": {
+          "min": 0,
+          "mode": 0,
+          "max": 0.001
+        }
+      },
+      "untreated": {
+        "fi_cp1": {
+          "min": 0.05,
+          "mode": 0.2,
+          "max": 0.5
+        },
+        "dt_cp1_hours": {
+          "min": 8,
+          "mode": 48,
+          "max": 168
+        },
+        "fi_cp2": {
+          "min": 0,
+          "mode": 0.05,
+          "max": 0.18
+        },
+        "dt_cp2_hours": {
+          "min": 24,
+          "mode": 96,
+          "max": 360
+        },
+        "fi_cp3": {
+          "min": 0,
+          "mode": 0.005,
+          "max": 0.05
+        },
+        "p_evac": {
+          "min": 0.01,
+          "mode": 0.05,
+          "max": 0.18
+        },
+        "p_locl": {
+          "min": 0,
+          "mode": 0.001,
+          "max": 0.02
+        }
+      },
+      "risk_factor_multipliers": {},
+      "required_resources": {
+        "analgesic-mild": 7
+      }
+    },
+    "dental-caries": {
+      "conditionId": "dental-caries",
+      "provenance": "tierB-lit",
+      "source_ref": "research/evidence_tables/medical.md",
+      "incidence": {
+        "distribution": "Gamma-Poisson",
+        "alpha": 2.0,
+        "beta": 1460.0,
+        "lambda_unit": "events-per-person-day"
+      },
+      "severity": {
+        "worst_case_prob_alpha": 1.0,
+        "worst_case_prob_beta": 9.0
+      },
+      "treated": {
+        "fi_cp1": {
+          "min": 0,
+          "mode": 0.05,
+          "max": 0.2
+        },
+        "dt_cp1_hours": {
+          "min": 4,
+          "mode": 24,
+          "max": 96
+        },
+        "fi_cp2": {
+          "min": 0,
+          "mode": 0.01,
+          "max": 0.05
+        },
+        "dt_cp2_hours": {
+          "min": 24,
+          "mode": 96,
+          "max": 336
+        },
+        "fi_cp3": {
+          "min": 0,
+          "mode": 0,
+          "max": 0.01
+        },
+        "p_evac": {
+          "min": 0,
+          "mode": 0.002,
+          "max": 0.01
+        },
+        "p_locl": {
+          "min": 0,
+          "mode": 0,
+          "max": 0.001
+        }
+      },
+      "untreated": {
+        "fi_cp1": {
+          "min": 0.05,
+          "mode": 0.2,
+          "max": 0.55
+        },
+        "dt_cp1_hours": {
+          "min": 12,
+          "mode": 96,
+          "max": 480
+        },
+        "fi_cp2": {
+          "min": 0,
+          "mode": 0.05,
+          "max": 0.2
+        },
+        "dt_cp2_hours": {
+          "min": 48,
+          "mode": 240,
+          "max": 1440
+        },
+        "fi_cp3": {
+          "min": 0,
+          "mode": 0.01,
+          "max": 0.08
+        },
+        "p_evac": {
+          "min": 0.01,
+          "mode": 0.05,
+          "max": 0.2
+        },
+        "p_locl": {
+          "min": 0,
+          "mode": 0.002,
+          "max": 0.02
+        }
+      },
+      "risk_factor_multipliers": {},
+      "required_resources": {
+        "dental-filling-material": 2,
+        "analgesic-mild": 5
+      }
+    },
+    "dental-exposed-pulp": {
+      "conditionId": "dental-exposed-pulp",
+      "provenance": "tierB-lit",
+      "source_ref": "research/evidence_tables/medical.md",
+      "incidence": {
+        "distribution": "Gamma-Poisson",
+        "alpha": 2.0,
+        "beta": 3000.0,
+        "lambda_unit": "events-per-person-day"
+      },
+      "severity": {
+        "worst_case_prob_alpha": 1.5,
+        "worst_case_prob_beta": 8.5
+      },
+      "treated": {
+        "fi_cp1": {
+          "min": 0,
+          "mode": 0.1,
+          "max": 0.3
+        },
+        "dt_cp1_hours": {
+          "min": 2,
+          "mode": 12,
+          "max": 48
+        },
+        "fi_cp2": {
+          "min": 0,
+          "mode": 0.02,
+          "max": 0.08
+        },
+        "dt_cp2_hours": {
+          "min": 12,
+          "mode": 48,
+          "max": 168
+        },
+        "fi_cp3": {
+          "min": 0,
+          "mode": 0,
+          "max": 0.02
+        },
+        "p_evac": {
+          "min": 0,
+          "mode": 0.003,
+          "max": 0.02
+        },
+        "p_locl": {
+          "min": 0,
+          "mode": 0,
+          "max": 0.002
+        }
+      },
+      "untreated": {
+        "fi_cp1": {
+          "min": 0.1,
+          "mode": 0.35,
+          "max": 0.7
+        },
+        "dt_cp1_hours": {
+          "min": 4,
+          "mode": 24,
+          "max": 96
+        },
+        "fi_cp2": {
+          "min": 0,
+          "mode": 0.08,
+          "max": 0.25
+        },
+        "dt_cp2_hours": {
+          "min": 24,
+          "mode": 96,
+          "max": 360
+        },
+        "fi_cp3": {
+          "min": 0,
+          "mode": 0.02,
+          "max": 0.12
+        },
+        "p_evac": {
+          "min": 0.02,
+          "mode": 0.1,
+          "max": 0.3
+        },
+        "p_locl": {
+          "min": 0,
+          "mode": 0.003,
+          "max": 0.03
+        }
+      },
+      "risk_factor_multipliers": {},
+      "required_resources": {
+        "dental-filling-material": 2,
+        "analgesic-opioid": 5,
+        "analgesic-mild": 7
+      }
+    },
+    "dental-avulsion-tooth-loss": {
+      "conditionId": "dental-avulsion-tooth-loss",
+      "provenance": "tierB-lit",
+      "source_ref": "research/evidence_tables/medical.md",
+      "incidence": {
+        "distribution": "Gamma-Poisson",
+        "alpha": 2.0,
+        "beta": 5000.0,
+        "lambda_unit": "events-per-person-day"
+      },
+      "severity": {
+        "worst_case_prob_alpha": 1.2,
+        "worst_case_prob_beta": 8.8
+      },
+      "treated": {
+        "fi_cp1": {
+          "min": 0,
+          "mode": 0.05,
+          "max": 0.25
+        },
+        "dt_cp1_hours": {
+          "min": 1,
+          "mode": 4,
+          "max": 12
+        },
+        "fi_cp2": {
+          "min": 0,
+          "mode": 0.01,
+          "max": 0.06
+        },
+        "dt_cp2_hours": {
+          "min": 4,
+          "mode": 12,
+          "max": 48
+        },
+        "fi_cp3": {
+          "min": 0,
+          "mode": 0,
+          "max": 0.01
+        },
+        "p_evac": {
+          "min": 0,
+          "mode": 0.002,
+          "max": 0.02
+        },
+        "p_locl": {
+          "min": 0,
+          "mode": 0,
+          "max": 0.002
+        }
+      },
+      "untreated": {
+        "fi_cp1": {
+          "min": 0.05,
+          "mode": 0.2,
+          "max": 0.5
+        },
+        "dt_cp1_hours": {
+          "min": 2,
+          "mode": 8,
+          "max": 24
+        },
+        "fi_cp2": {
+          "min": 0,
+          "mode": 0.05,
+          "max": 0.2
+        },
+        "dt_cp2_hours": {
+          "min": 8,
+          "mode": 24,
+          "max": 96
+        },
+        "fi_cp3": {
+          "min": 0,
+          "mode": 0.01,
+          "max": 0.08
+        },
+        "p_evac": {
+          "min": 0.01,
+          "mode": 0.05,
+          "max": 0.2
+        },
+        "p_locl": {
+          "min": 0,
+          "mode": 0.002,
+          "max": 0.02
+        }
+      },
+      "risk_factor_multipliers": {},
+      "required_resources": {
+        "dental-filling-material": 2,
+        "analgesic-mild": 5
+      }
+    },
+    "dental-crown-loss": {
+      "conditionId": "dental-crown-loss",
+      "provenance": "tierB-lit",
+      "source_ref": "research/evidence_tables/medical.md",
+      "incidence": {
+        "distribution": "Gamma-Poisson",
+        "alpha": 2.0,
+        "beta": 2000.0,
+        "lambda_unit": "events-per-person-day"
+      },
+      "severity": {
+        "worst_case_prob_alpha": 1.0,
+        "worst_case_prob_beta": 9.0
+      },
+      "treated": {
+        "fi_cp1": {
+          "min": 0,
+          "mode": 0.05,
+          "max": 0.2
+        },
+        "dt_cp1_hours": {
+          "min": 2,
+          "mode": 8,
+          "max": 24
+        },
+        "fi_cp2": {
+          "min": 0,
+          "mode": 0.01,
+          "max": 0.04
+        },
+        "dt_cp2_hours": {
+          "min": 8,
+          "mode": 24,
+          "max": 96
+        },
+        "fi_cp3": {
+          "min": 0,
+          "mode": 0,
+          "max": 0.01
+        },
+        "p_evac": {
+          "min": 0,
+          "mode": 0.001,
+          "max": 0.01
+        },
+        "p_locl": {
+          "min": 0,
+          "mode": 0,
+          "max": 0.001
+        }
+      },
+      "untreated": {
+        "fi_cp1": {
+          "min": 0.05,
+          "mode": 0.15,
+          "max": 0.4
+        },
+        "dt_cp1_hours": {
+          "min": 4,
+          "mode": 24,
+          "max": 96
+        },
+        "fi_cp2": {
+          "min": 0,
+          "mode": 0.03,
+          "max": 0.12
+        },
+        "dt_cp2_hours": {
+          "min": 12,
+          "mode": 48,
+          "max": 240
+        },
+        "fi_cp3": {
+          "min": 0,
+          "mode": 0.005,
+          "max": 0.04
+        },
+        "p_evac": {
+          "min": 0.005,
+          "mode": 0.02,
+          "max": 0.1
+        },
+        "p_locl": {
+          "min": 0,
+          "mode": 0.001,
+          "max": 0.01
+        }
+      },
+      "risk_factor_multipliers": {
+        "crowns": 2.0
+      },
+      "required_resources": {
+        "dental-crown-cement": 2,
+        "analgesic-mild": 3
+      }
+    },
+    "dental-filling-loss": {
+      "conditionId": "dental-filling-loss",
+      "provenance": "tierB-lit",
+      "source_ref": "research/evidence_tables/medical.md",
+      "incidence": {
+        "distribution": "Gamma-Poisson",
+        "alpha": 2.0,
+        "beta": 1500.0,
+        "lambda_unit": "events-per-person-day"
+      },
+      "severity": {
+        "worst_case_prob_alpha": 1.0,
+        "worst_case_prob_beta": 9.0
+      },
+      "treated": {
+        "fi_cp1": {
+          "min": 0,
+          "mode": 0.05,
+          "max": 0.15
+        },
+        "dt_cp1_hours": {
+          "min": 1,
+          "mode": 4,
+          "max": 12
+        },
+        "fi_cp2": {
+          "min": 0,
+          "mode": 0.01,
+          "max": 0.04
+        },
+        "dt_cp2_hours": {
+          "min": 4,
+          "mode": 12,
+          "max": 48
+        },
+        "fi_cp3": {
+          "min": 0,
+          "mode": 0,
+          "max": 0.005
+        },
+        "p_evac": {
+          "min": 0,
+          "mode": 0.001,
+          "max": 0.005
+        },
+        "p_locl": {
+          "min": 0,
+          "mode": 0,
+          "max": 0.001
+        }
+      },
+      "untreated": {
+        "fi_cp1": {
+          "min": 0.05,
+          "mode": 0.15,
+          "max": 0.4
+        },
+        "dt_cp1_hours": {
+          "min": 4,
+          "mode": 24,
+          "max": 96
+        },
+        "fi_cp2": {
+          "min": 0,
+          "mode": 0.03,
+          "max": 0.1
+        },
+        "dt_cp2_hours": {
+          "min": 12,
+          "mode": 48,
+          "max": 240
+        },
+        "fi_cp3": {
+          "min": 0,
+          "mode": 0.005,
+          "max": 0.03
+        },
+        "p_evac": {
+          "min": 0.005,
+          "mode": 0.02,
+          "max": 0.08
+        },
+        "p_locl": {
+          "min": 0,
+          "mode": 0.001,
+          "max": 0.01
+        }
+      },
+      "risk_factor_multipliers": {},
+      "required_resources": {
+        "dental-filling-material": 2
+      }
+    },
+    "abnormal-uterine-bleeding": {
+      "conditionId": "abnormal-uterine-bleeding",
+      "provenance": "tierB-lit",
+      "source_ref": "research/evidence_tables/medical.md",
+      "incidence": {
+        "distribution": "Gamma-Poisson",
+        "alpha": 2.0,
+        "beta": 1000.0,
+        "lambda_unit": "events-per-person-day"
+      },
+      "severity": {
+        "worst_case_prob_alpha": 1.5,
+        "worst_case_prob_beta": 8.5
+      },
+      "treated": {
+        "fi_cp1": {
+          "min": 0,
+          "mode": 0.05,
+          "max": 0.2
+        },
+        "dt_cp1_hours": {
+          "min": 2,
+          "mode": 12,
+          "max": 48
+        },
+        "fi_cp2": {
+          "min": 0,
+          "mode": 0.01,
+          "max": 0.06
+        },
+        "dt_cp2_hours": {
+          "min": 12,
+          "mode": 48,
+          "max": 168
+        },
+        "fi_cp3": {
+          "min": 0,
+          "mode": 0,
+          "max": 0.02
+        },
+        "p_evac": {
+          "min": 0,
+          "mode": 0.003,
+          "max": 0.02
+        },
+        "p_locl": {
+          "min": 0,
+          "mode": 0,
+          "max": 0.003
+        }
+      },
+      "untreated": {
+        "fi_cp1": {
+          "min": 0.05,
+          "mode": 0.2,
+          "max": 0.55
+        },
+        "dt_cp1_hours": {
+          "min": 8,
+          "mode": 48,
+          "max": 240
+        },
+        "fi_cp2": {
+          "min": 0,
+          "mode": 0.05,
+          "max": 0.2
+        },
+        "dt_cp2_hours": {
+          "min": 24,
+          "mode": 120,
+          "max": 480
+        },
+        "fi_cp3": {
+          "min": 0,
+          "mode": 0.01,
+          "max": 0.08
+        },
+        "p_evac": {
+          "min": 0.02,
+          "mode": 0.08,
+          "max": 0.3
+        },
+        "p_locl": {
+          "min": 0,
+          "mode": 0.003,
+          "max": 0.03
+        }
+      },
+      "risk_factor_multipliers": {
+        "sex-female": 1.0,
+        "sex-male": 0.0
+      },
+      "required_resources": {
+        "hormonal-contraceptive": 30,
+        "analgesic-mild": 14
+      }
+    },
+    "eye-corneal-ulcer": {
+      "conditionId": "eye-corneal-ulcer",
+      "provenance": "tierB-lit",
+      "source_ref": "research/evidence_tables/medical.md",
+      "incidence": {
+        "distribution": "Gamma-Poisson",
+        "alpha": 2.0,
+        "beta": 5000.0,
+        "lambda_unit": "events-per-person-day"
+      },
+      "severity": {
+        "worst_case_prob_alpha": 1.5,
+        "worst_case_prob_beta": 8.5
+      },
+      "treated": {
+        "fi_cp1": {
+          "min": 0,
+          "mode": 0.05,
+          "max": 0.25
+        },
+        "dt_cp1_hours": {
+          "min": 4,
+          "mode": 24,
+          "max": 96
+        },
+        "fi_cp2": {
+          "min": 0,
+          "mode": 0.02,
+          "max": 0.1
+        },
+        "dt_cp2_hours": {
+          "min": 24,
+          "mode": 96,
+          "max": 336
+        },
+        "fi_cp3": {
+          "min": 0,
+          "mode": 0.005,
+          "max": 0.05
+        },
+        "p_evac": {
+          "min": 0,
+          "mode": 0.005,
+          "max": 0.03
+        },
+        "p_locl": {
+          "min": 0,
+          "mode": 0,
+          "max": 0.003
+        }
+      },
+      "untreated": {
+        "fi_cp1": {
+          "min": 0.05,
+          "mode": 0.25,
+          "max": 0.6
+        },
+        "dt_cp1_hours": {
+          "min": 12,
+          "mode": 96,
+          "max": 480
+        },
+        "fi_cp2": {
+          "min": 0,
+          "mode": 0.1,
+          "max": 0.35
+        },
+        "dt_cp2_hours": {
+          "min": 48,
+          "mode": 240,
+          "max": 1440
+        },
+        "fi_cp3": {
+          "min": 0,
+          "mode": 0.02,
+          "max": 0.15
+        },
+        "p_evac": {
+          "min": 0.02,
+          "mode": 0.1,
+          "max": 0.35
+        },
+        "p_locl": {
+          "min": 0.01,
+          "mode": 0.05,
+          "max": 0.2
+        }
+      },
+      "risk_factor_multipliers": {
+        "contacts": 3.0
+      },
+      "required_resources": {
+        "ophthalmic-antibiotic": 14,
+        "ophthalmic-exam": 2
+      }
+    },
+    "eye-penetration-foreign-body": {
+      "conditionId": "eye-penetration-foreign-body",
+      "provenance": "tierB-lit",
+      "source_ref": "research/evidence_tables/medical.md",
+      "incidence": {
+        "distribution": "Gamma-Poisson",
+        "alpha": 2.0,
+        "beta": 10000.0,
+        "lambda_unit": "events-per-person-day"
+      },
+      "severity": {
+        "worst_case_prob_alpha": 2.0,
+        "worst_case_prob_beta": 8.0
+      },
+      "treated": {
+        "fi_cp1": {
+          "min": 0,
+          "mode": 0.1,
+          "max": 0.4
+        },
+        "dt_cp1_hours": {
+          "min": 2,
+          "mode": 8,
+          "max": 24
+        },
+        "fi_cp2": {
+          "min": 0,
+          "mode": 0.05,
+          "max": 0.2
+        },
+        "dt_cp2_hours": {
+          "min": 8,
+          "mode": 24,
+          "max": 96
+        },
+        "fi_cp3": {
+          "min": 0,
+          "mode": 0.01,
+          "max": 0.08
+        },
+        "p_evac": {
+          "min": 0.01,
+          "mode": 0.05,
+          "max": 0.2
+        },
+        "p_locl": {
+          "min": 0.005,
+          "mode": 0.02,
+          "max": 0.1
+        }
+      },
+      "untreated": {
+        "fi_cp1": {
+          "min": 0.1,
+          "mode": 0.4,
+          "max": 0.8
+        },
+        "dt_cp1_hours": {
+          "min": 2,
+          "mode": 8,
+          "max": 24
+        },
+        "fi_cp2": {
+          "min": 0.05,
+          "mode": 0.2,
+          "max": 0.5
+        },
+        "dt_cp2_hours": {
+          "min": 8,
+          "mode": 24,
+          "max": 96
+        },
+        "fi_cp3": {
+          "min": 0.01,
+          "mode": 0.08,
+          "max": 0.3
+        },
+        "p_evac": {
+          "min": 0.05,
+          "mode": 0.25,
+          "max": 0.6
+        },
+        "p_locl": {
+          "min": 0.02,
+          "mode": 0.1,
+          "max": 0.3
+        }
+      },
+      "risk_factor_multipliers": {
+        "EVA": 2.0
+      },
+      "required_resources": {
+        "ophthalmic-exam": 2,
+        "ophthalmic-antibiotic": 7,
+        "ophthalmic-irrigation": 2
+      }
+    },
+    "retinal-detachment": {
+      "conditionId": "retinal-detachment",
+      "provenance": "tierB-lit",
+      "source_ref": "research/evidence_tables/medical.md",
+      "incidence": {
+        "distribution": "Gamma-Poisson",
+        "alpha": 2.0,
+        "beta": 50000.0,
+        "lambda_unit": "events-per-person-day"
+      },
+      "severity": {
+        "worst_case_prob_alpha": 2.5,
+        "worst_case_prob_beta": 7.5
+      },
+      "treated": {
+        "fi_cp1": {
+          "min": 0,
+          "mode": 0.1,
+          "max": 0.4
+        },
+        "dt_cp1_hours": {
+          "min": 2,
+          "mode": 6,
+          "max": 24
+        },
+        "fi_cp2": {
+          "min": 0.05,
+          "mode": 0.2,
+          "max": 0.5
+        },
+        "dt_cp2_hours": {
+          "min": 6,
+          "mode": 24,
+          "max": 96
+        },
+        "fi_cp3": {
+          "min": 0.01,
+          "mode": 0.08,
+          "max": 0.25
+        },
+        "p_evac": {
+          "min": 0.05,
+          "mode": 0.25,
+          "max": 0.6
+        },
+        "p_locl": {
+          "min": 0.02,
+          "mode": 0.1,
+          "max": 0.3
+        }
+      },
+      "untreated": {
+        "fi_cp1": {
+          "min": 0.2,
+          "mode": 0.55,
+          "max": 0.85
+        },
+        "dt_cp1_hours": {
+          "min": 1,
+          "mode": 4,
+          "max": 24
+        },
+        "fi_cp2": {
+          "min": 0.1,
+          "mode": 0.4,
+          "max": 0.75
+        },
+        "dt_cp2_hours": {
+          "min": 4,
+          "mode": 24,
+          "max": 96
+        },
+        "fi_cp3": {
+          "min": 0.05,
+          "mode": 0.2,
+          "max": 0.55
+        },
+        "p_evac": {
+          "min": 0.15,
+          "mode": 0.5,
+          "max": 0.85
+        },
+        "p_locl": {
+          "min": 0.05,
+          "mode": 0.2,
+          "max": 0.5
+        }
+      },
+      "risk_factor_multipliers": {
+        "sex-male": 1.3
+      },
+      "required_resources": {
+        "ophthalmic-exam": 3
+      }
+    },
+    "acute-glaucoma": {
+      "conditionId": "acute-glaucoma",
+      "provenance": "tierB-lit",
+      "source_ref": "research/evidence_tables/medical.md",
+      "incidence": {
+        "distribution": "Gamma-Poisson",
+        "alpha": 2.0,
+        "beta": 50000.0,
+        "lambda_unit": "events-per-person-day"
+      },
+      "severity": {
+        "worst_case_prob_alpha": 2.0,
+        "worst_case_prob_beta": 8.0
+      },
+      "treated": {
+        "fi_cp1": {
+          "min": 0,
+          "mode": 0.1,
+          "max": 0.35
+        },
+        "dt_cp1_hours": {
+          "min": 1,
+          "mode": 4,
+          "max": 24
+        },
+        "fi_cp2": {
+          "min": 0.02,
+          "mode": 0.1,
+          "max": 0.3
+        },
+        "dt_cp2_hours": {
+          "min": 4,
+          "mode": 24,
+          "max": 96
+        },
+        "fi_cp3": {
+          "min": 0.01,
+          "mode": 0.05,
+          "max": 0.2
+        },
+        "p_evac": {
+          "min": 0.03,
+          "mode": 0.15,
+          "max": 0.4
+        },
+        "p_locl": {
+          "min": 0.01,
+          "mode": 0.05,
+          "max": 0.15
+        }
+      },
+      "untreated": {
+        "fi_cp1": {
+          "min": 0.15,
+          "mode": 0.45,
+          "max": 0.8
+        },
+        "dt_cp1_hours": {
+          "min": 1,
+          "mode": 4,
+          "max": 12
+        },
+        "fi_cp2": {
+          "min": 0.05,
+          "mode": 0.25,
+          "max": 0.6
+        },
+        "dt_cp2_hours": {
+          "min": 4,
+          "mode": 12,
+          "max": 48
+        },
+        "fi_cp3": {
+          "min": 0.02,
+          "mode": 0.15,
+          "max": 0.45
+        },
+        "p_evac": {
+          "min": 0.1,
+          "mode": 0.4,
+          "max": 0.75
+        },
+        "p_locl": {
+          "min": 0.03,
+          "mode": 0.15,
+          "max": 0.4
+        }
+      },
+      "risk_factor_multipliers": {
+        "sex-male": 1.2,
+        "sex-female": 1.2
+      },
+      "required_resources": {
+        "ophthalmic-exam": 2,
+        "ophthalmic-antiglaucoma": 14
+      }
     }
   },
   "global_calibration": {
