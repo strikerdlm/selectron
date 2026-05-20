@@ -14,7 +14,7 @@ import { IMM_CONDITIONS } from "./conditions";
 import { loadIMMPriors } from "./priors";
 import { samplePoisson, sampleLognormalPoisson, sampleGammaPoisson, sampleBetaBernoulli, samplePoissonProcess } from "./incidence";
 import { sampleSeverity } from "./severity";
-import { sampleBetaPert } from "./outcomes";
+import { sampleBetaPert, concurrentFI } from "./outcomes";
 import { interpolateBetaPertByRAF } from "./treatment";
 import { computeRAF } from "./kits";
 
@@ -199,13 +199,18 @@ export function runIMMTrial(
   // Aggregate trial outputs
   const tme = occurrences.length;
 
-  // QTL: per-crewmember concurrent FI × DT integration
-  // Simplification for v1: sum (fi_cp1 × dt_cp1) + (fi_cp2 × dt_cp2) per event; the full
-  // concurrent-FI accounting across overlapping events is a v1.1 enhancement (Task 26)
+  // T26: QTL with concurrent-FI per K15 §II.A.9: f_total = 1 − Π(1 − f_i).
+  // Within-event concurrent FI: compose fi_cp1 and fi_cp2 multiplicatively.
+  // QTL contribution = concurrentFI([fi_cp1, fi_cp2]) × (dt_cp1 + dt_cp2).
+  //
+  // DEFERRED: full cross-event concurrent FI (i.e., overlapping events from different
+  // conditions on the same crew member composed together) is a v1.1 enhancement.
+  // It requires a per-crew-member timeline integration of impairment intervals, which is
+  // complex and currently not supported (each event's duration phases are treated as sequential).
   let qtl = 0;
   for (const o of occurrences) {
-    qtl += o.outcomes.fi_cp1 * o.outcomes.dt_cp1_hours;
-    qtl += o.outcomes.fi_cp2 * o.outcomes.dt_cp2_hours;
+    const effectiveFI = concurrentFI([o.outcomes.fi_cp1, o.outcomes.fi_cp2]);
+    qtl += effectiveFI * (o.outcomes.dt_cp1_hours + o.outcomes.dt_cp2_hours);
   }
 
   // T25: EVAC/LOCL aggregation uses per-event Bernoulli samples (not 0.5 threshold).
