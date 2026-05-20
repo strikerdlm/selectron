@@ -1,6 +1,6 @@
 ---
 title: "Bayesian Multi-Criteria Decision Analysis with NASA Human-System-Risk-Board Likelihood × Consequence Mapping for Analog-Astronaut Selection"
-running_header: "Bayesian MCDA + NASA HSRB-LxC for analog-astronaut selection"
+running_header: "Bayesian MCDA + LxC for analog-astronaut selection"
 author:
   - name: "Diego L. Malpica, MD"
     affiliation: "Direction of Aerospace Medicine, Colombian Aerospace Force (FAC), Bogotá, Colombia"
