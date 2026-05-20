@@ -12,27 +12,89 @@
         "beta": 204.0,
         "lambda_unit": "events-per-person-day"
       },
-      "severity": { "worst_case_prob_alpha": 1.2, "worst_case_prob_beta": 4.8 },
+      "severity": {
+        "worst_case_prob_alpha": 1.2,
+        "worst_case_prob_beta": 4.8
+      },
       "treated": {
-        "fi_cp1": { "min": 0.0, "mode": 0.05, "max": 0.15 },
-        "dt_cp1_hours": { "min": 2, "mode": 6, "max": 24 },
-        "fi_cp2": { "min": 0.0, "mode": 0.0, "max": 0.05 },
-        "dt_cp2_hours": { "min": 0, "mode": 12, "max": 72 },
-        "fi_cp3": { "min": 0.0, "mode": 0.0, "max": 0.0 },
-        "p_evac": { "min": 0.0, "mode": 0.001, "max": 0.01 },
-        "p_locl": { "min": 0.0, "mode": 0.0, "max": 0.001 }
+        "fi_cp1": {
+          "min": 0.0,
+          "mode": 0.05,
+          "max": 0.15
+        },
+        "dt_cp1_hours": {
+          "min": 2,
+          "mode": 6,
+          "max": 24
+        },
+        "fi_cp2": {
+          "min": 0.0,
+          "mode": 0.0,
+          "max": 0.05
+        },
+        "dt_cp2_hours": {
+          "min": 0,
+          "mode": 12,
+          "max": 72
+        },
+        "fi_cp3": {
+          "min": 0.0,
+          "mode": 0.0,
+          "max": 0.0
+        },
+        "p_evac": {
+          "min": 0.0,
+          "mode": 0.001,
+          "max": 0.01
+        },
+        "p_locl": {
+          "min": 0.0,
+          "mode": 0.0,
+          "max": 0.001
+        }
       },
       "untreated": {
-        "fi_cp1": { "min": 0.05, "mode": 0.2, "max": 0.5 },
-        "dt_cp1_hours": { "min": 12, "mode": 48, "max": 168 },
-        "fi_cp2": { "min": 0.0, "mode": 0.05, "max": 0.2 },
-        "dt_cp2_hours": { "min": 12, "mode": 72, "max": 240 },
-        "fi_cp3": { "min": 0.0, "mode": 0.0, "max": 0.02 },
-        "p_evac": { "min": 0.01, "mode": 0.05, "max": 0.15 },
-        "p_locl": { "min": 0.0, "mode": 0.001, "max": 0.02 }
+        "fi_cp1": {
+          "min": 0.05,
+          "mode": 0.2,
+          "max": 0.5
+        },
+        "dt_cp1_hours": {
+          "min": 12,
+          "mode": 48,
+          "max": 168
+        },
+        "fi_cp2": {
+          "min": 0.0,
+          "mode": 0.05,
+          "max": 0.2
+        },
+        "dt_cp2_hours": {
+          "min": 12,
+          "mode": 72,
+          "max": 240
+        },
+        "fi_cp3": {
+          "min": 0.0,
+          "mode": 0.0,
+          "max": 0.02
+        },
+        "p_evac": {
+          "min": 0.01,
+          "mode": 0.05,
+          "max": 0.15
+        },
+        "p_locl": {
+          "min": 0.0,
+          "mode": 0.001,
+          "max": 0.02
+        }
       },
       "risk_factor_multipliers": {},
-      "required_resources": { "antibiotic-broad-spectrum": 7, "nasal-decongestant": 3 }
+      "required_resources": {
+        "antibiotic-broad-spectrum": 7,
+        "nasal-decongestant": 3
+      }
     },
     "influenza": {
       "conditionId": "influenza",
@@ -44,27 +106,89 @@
         "beta": 1429.0,
         "lambda_unit": "events-per-person-day"
       },
-      "severity": { "worst_case_prob_alpha": 1.2, "worst_case_prob_beta": 4.8 },
+      "severity": {
+        "worst_case_prob_alpha": 1.2,
+        "worst_case_prob_beta": 4.8
+      },
       "treated": {
-        "fi_cp1": { "min": 0.1, "mode": 0.3, "max": 0.6 },
-        "dt_cp1_hours": { "min": 24, "mode": 48, "max": 96 },
-        "fi_cp2": { "min": 0.0, "mode": 0.05, "max": 0.15 },
-        "dt_cp2_hours": { "min": 24, "mode": 72, "max": 168 },
-        "fi_cp3": { "min": 0.0, "mode": 0.0, "max": 0.0 },
-        "p_evac": { "min": 0.0, "mode": 0.002, "max": 0.02 },
-        "p_locl": { "min": 0.0, "mode": 0.0, "max": 0.002 }
+        "fi_cp1": {
+          "min": 0.1,
+          "mode": 0.3,
+          "max": 0.6
+        },
+        "dt_cp1_hours": {
+          "min": 24,
+          "mode": 48,
+          "max": 96
+        },
+        "fi_cp2": {
+          "min": 0.0,
+          "mode": 0.05,
+          "max": 0.15
+        },
+        "dt_cp2_hours": {
+          "min": 24,
+          "mode": 72,
+          "max": 168
+        },
+        "fi_cp3": {
+          "min": 0.0,
+          "mode": 0.0,
+          "max": 0.0
+        },
+        "p_evac": {
+          "min": 0.0,
+          "mode": 0.002,
+          "max": 0.02
+        },
+        "p_locl": {
+          "min": 0.0,
+          "mode": 0.0,
+          "max": 0.002
+        }
       },
       "untreated": {
-        "fi_cp1": { "min": 0.2, "mode": 0.5, "max": 0.8 },
-        "dt_cp1_hours": { "min": 48, "mode": 120, "max": 336 },
-        "fi_cp2": { "min": 0.05, "mode": 0.15, "max": 0.4 },
-        "dt_cp2_hours": { "min": 48, "mode": 120, "max": 360 },
-        "fi_cp3": { "min": 0.0, "mode": 0.0, "max": 0.05 },
-        "p_evac": { "min": 0.02, "mode": 0.08, "max": 0.25 },
-        "p_locl": { "min": 0.0, "mode": 0.002, "max": 0.05 }
+        "fi_cp1": {
+          "min": 0.2,
+          "mode": 0.5,
+          "max": 0.8
+        },
+        "dt_cp1_hours": {
+          "min": 48,
+          "mode": 120,
+          "max": 336
+        },
+        "fi_cp2": {
+          "min": 0.05,
+          "mode": 0.15,
+          "max": 0.4
+        },
+        "dt_cp2_hours": {
+          "min": 48,
+          "mode": 120,
+          "max": 360
+        },
+        "fi_cp3": {
+          "min": 0.0,
+          "mode": 0.0,
+          "max": 0.05
+        },
+        "p_evac": {
+          "min": 0.02,
+          "mode": 0.08,
+          "max": 0.25
+        },
+        "p_locl": {
+          "min": 0.0,
+          "mode": 0.002,
+          "max": 0.05
+        }
       },
       "risk_factor_multipliers": {},
-      "required_resources": { "antiviral": 7, "analgesic-mild": 14 }
+      "required_resources": {
+        "antiviral": 7,
+        "analgesic-mild": 14
+      }
     },
     "skin-laceration": {
       "conditionId": "skin-laceration",
@@ -76,27 +200,89 @@
         "beta": 741.0,
         "lambda_unit": "events-per-person-day"
       },
-      "severity": { "worst_case_prob_alpha": 1.2, "worst_case_prob_beta": 4.8 },
+      "severity": {
+        "worst_case_prob_alpha": 1.2,
+        "worst_case_prob_beta": 4.8
+      },
       "treated": {
-        "fi_cp1": { "min": 0.0, "mode": 0.05, "max": 0.2 },
-        "dt_cp1_hours": { "min": 1, "mode": 4, "max": 12 },
-        "fi_cp2": { "min": 0.0, "mode": 0.0, "max": 0.05 },
-        "dt_cp2_hours": { "min": 0, "mode": 24, "max": 72 },
-        "fi_cp3": { "min": 0.0, "mode": 0.0, "max": 0.02 },
-        "p_evac": { "min": 0.0, "mode": 0.005, "max": 0.05 },
-        "p_locl": { "min": 0.0, "mode": 0.0, "max": 0.002 }
+        "fi_cp1": {
+          "min": 0.0,
+          "mode": 0.05,
+          "max": 0.2
+        },
+        "dt_cp1_hours": {
+          "min": 1,
+          "mode": 4,
+          "max": 12
+        },
+        "fi_cp2": {
+          "min": 0.0,
+          "mode": 0.0,
+          "max": 0.05
+        },
+        "dt_cp2_hours": {
+          "min": 0,
+          "mode": 24,
+          "max": 72
+        },
+        "fi_cp3": {
+          "min": 0.0,
+          "mode": 0.0,
+          "max": 0.02
+        },
+        "p_evac": {
+          "min": 0.0,
+          "mode": 0.005,
+          "max": 0.05
+        },
+        "p_locl": {
+          "min": 0.0,
+          "mode": 0.0,
+          "max": 0.002
+        }
       },
       "untreated": {
-        "fi_cp1": { "min": 0.05, "mode": 0.15, "max": 0.4 },
-        "dt_cp1_hours": { "min": 4, "mode": 24, "max": 96 },
-        "fi_cp2": { "min": 0.0, "mode": 0.05, "max": 0.15 },
-        "dt_cp2_hours": { "min": 24, "mode": 72, "max": 240 },
-        "fi_cp3": { "min": 0.0, "mode": 0.01, "max": 0.08 },
-        "p_evac": { "min": 0.005, "mode": 0.03, "max": 0.15 },
-        "p_locl": { "min": 0.0, "mode": 0.001, "max": 0.03 }
+        "fi_cp1": {
+          "min": 0.05,
+          "mode": 0.15,
+          "max": 0.4
+        },
+        "dt_cp1_hours": {
+          "min": 4,
+          "mode": 24,
+          "max": 96
+        },
+        "fi_cp2": {
+          "min": 0.0,
+          "mode": 0.05,
+          "max": 0.15
+        },
+        "dt_cp2_hours": {
+          "min": 24,
+          "mode": 72,
+          "max": 240
+        },
+        "fi_cp3": {
+          "min": 0.0,
+          "mode": 0.01,
+          "max": 0.08
+        },
+        "p_evac": {
+          "min": 0.005,
+          "mode": 0.03,
+          "max": 0.15
+        },
+        "p_locl": {
+          "min": 0.0,
+          "mode": 0.001,
+          "max": 0.03
+        }
       },
       "risk_factor_multipliers": {},
-      "required_resources": { "wound-closure-strips": 5, "antiseptic": 2 }
+      "required_resources": {
+        "wound-closure-strips": 5,
+        "antiseptic": 2
+      }
     },
     "skin-abrasion": {
       "conditionId": "skin-abrasion",
@@ -108,27 +294,89 @@
         "beta": 556.0,
         "lambda_unit": "events-per-person-day"
       },
-      "severity": { "worst_case_prob_alpha": 1.2, "worst_case_prob_beta": 4.8 },
+      "severity": {
+        "worst_case_prob_alpha": 1.2,
+        "worst_case_prob_beta": 4.8
+      },
       "treated": {
-        "fi_cp1": { "min": 0.0, "mode": 0.02, "max": 0.1 },
-        "dt_cp1_hours": { "min": 0.5, "mode": 2, "max": 6 },
-        "fi_cp2": { "min": 0.0, "mode": 0.0, "max": 0.02 },
-        "dt_cp2_hours": { "min": 0, "mode": 12, "max": 48 },
-        "fi_cp3": { "min": 0.0, "mode": 0.0, "max": 0.0 },
-        "p_evac": { "min": 0.0, "mode": 0.0, "max": 0.005 },
-        "p_locl": { "min": 0.0, "mode": 0.0, "max": 0.0 }
+        "fi_cp1": {
+          "min": 0.0,
+          "mode": 0.02,
+          "max": 0.1
+        },
+        "dt_cp1_hours": {
+          "min": 0.5,
+          "mode": 2,
+          "max": 6
+        },
+        "fi_cp2": {
+          "min": 0.0,
+          "mode": 0.0,
+          "max": 0.02
+        },
+        "dt_cp2_hours": {
+          "min": 0,
+          "mode": 12,
+          "max": 48
+        },
+        "fi_cp3": {
+          "min": 0.0,
+          "mode": 0.0,
+          "max": 0.0
+        },
+        "p_evac": {
+          "min": 0.0,
+          "mode": 0.0,
+          "max": 0.005
+        },
+        "p_locl": {
+          "min": 0.0,
+          "mode": 0.0,
+          "max": 0.0
+        }
       },
       "untreated": {
-        "fi_cp1": { "min": 0.01, "mode": 0.08, "max": 0.2 },
-        "dt_cp1_hours": { "min": 2, "mode": 12, "max": 48 },
-        "fi_cp2": { "min": 0.0, "mode": 0.02, "max": 0.1 },
-        "dt_cp2_hours": { "min": 12, "mode": 36, "max": 120 },
-        "fi_cp3": { "min": 0.0, "mode": 0.0, "max": 0.01 },
-        "p_evac": { "min": 0.0, "mode": 0.002, "max": 0.02 },
-        "p_locl": { "min": 0.0, "mode": 0.0, "max": 0.002 }
+        "fi_cp1": {
+          "min": 0.01,
+          "mode": 0.08,
+          "max": 0.2
+        },
+        "dt_cp1_hours": {
+          "min": 2,
+          "mode": 12,
+          "max": 48
+        },
+        "fi_cp2": {
+          "min": 0.0,
+          "mode": 0.02,
+          "max": 0.1
+        },
+        "dt_cp2_hours": {
+          "min": 12,
+          "mode": 36,
+          "max": 120
+        },
+        "fi_cp3": {
+          "min": 0.0,
+          "mode": 0.0,
+          "max": 0.01
+        },
+        "p_evac": {
+          "min": 0.0,
+          "mode": 0.002,
+          "max": 0.02
+        },
+        "p_locl": {
+          "min": 0.0,
+          "mode": 0.0,
+          "max": 0.002
+        }
       },
       "risk_factor_multipliers": {},
-      "required_resources": { "antiseptic": 2, "bandage": 3 }
+      "required_resources": {
+        "antiseptic": 2,
+        "bandage": 3
+      }
     },
     "headache-co2-induced": {
       "conditionId": "headache-co2-induced",
@@ -140,27 +388,89 @@
         "beta": 167.0,
         "lambda_unit": "events-per-person-day"
       },
-      "severity": { "worst_case_prob_alpha": 1.2, "worst_case_prob_beta": 4.8 },
+      "severity": {
+        "worst_case_prob_alpha": 1.2,
+        "worst_case_prob_beta": 4.8
+      },
       "treated": {
-        "fi_cp1": { "min": 0.0, "mode": 0.1, "max": 0.3 },
-        "dt_cp1_hours": { "min": 1, "mode": 4, "max": 12 },
-        "fi_cp2": { "min": 0.0, "mode": 0.0, "max": 0.05 },
-        "dt_cp2_hours": { "min": 0, "mode": 4, "max": 24 },
-        "fi_cp3": { "min": 0.0, "mode": 0.0, "max": 0.0 },
-        "p_evac": { "min": 0.0, "mode": 0.0, "max": 0.005 },
-        "p_locl": { "min": 0.0, "mode": 0.0, "max": 0.0 }
+        "fi_cp1": {
+          "min": 0.0,
+          "mode": 0.1,
+          "max": 0.3
+        },
+        "dt_cp1_hours": {
+          "min": 1,
+          "mode": 4,
+          "max": 12
+        },
+        "fi_cp2": {
+          "min": 0.0,
+          "mode": 0.0,
+          "max": 0.05
+        },
+        "dt_cp2_hours": {
+          "min": 0,
+          "mode": 4,
+          "max": 24
+        },
+        "fi_cp3": {
+          "min": 0.0,
+          "mode": 0.0,
+          "max": 0.0
+        },
+        "p_evac": {
+          "min": 0.0,
+          "mode": 0.0,
+          "max": 0.005
+        },
+        "p_locl": {
+          "min": 0.0,
+          "mode": 0.0,
+          "max": 0.0
+        }
       },
       "untreated": {
-        "fi_cp1": { "min": 0.1, "mode": 0.3, "max": 0.6 },
-        "dt_cp1_hours": { "min": 4, "mode": 12, "max": 48 },
-        "fi_cp2": { "min": 0.0, "mode": 0.05, "max": 0.2 },
-        "dt_cp2_hours": { "min": 4, "mode": 24, "max": 96 },
-        "fi_cp3": { "min": 0.0, "mode": 0.0, "max": 0.02 },
-        "p_evac": { "min": 0.0, "mode": 0.01, "max": 0.08 },
-        "p_locl": { "min": 0.0, "mode": 0.0, "max": 0.005 }
+        "fi_cp1": {
+          "min": 0.1,
+          "mode": 0.3,
+          "max": 0.6
+        },
+        "dt_cp1_hours": {
+          "min": 4,
+          "mode": 12,
+          "max": 48
+        },
+        "fi_cp2": {
+          "min": 0.0,
+          "mode": 0.05,
+          "max": 0.2
+        },
+        "dt_cp2_hours": {
+          "min": 4,
+          "mode": 24,
+          "max": 96
+        },
+        "fi_cp3": {
+          "min": 0.0,
+          "mode": 0.0,
+          "max": 0.02
+        },
+        "p_evac": {
+          "min": 0.0,
+          "mode": 0.01,
+          "max": 0.08
+        },
+        "p_locl": {
+          "min": 0.0,
+          "mode": 0.0,
+          "max": 0.005
+        }
       },
       "risk_factor_multipliers": {},
-      "required_resources": { "analgesic-mild": 10, "oxygen-supplemental": 1 }
+      "required_resources": {
+        "analgesic-mild": 10,
+        "oxygen-supplemental": 1
+      }
     },
     "ankle-sprain-strain": {
       "conditionId": "ankle-sprain-strain",
@@ -172,27 +482,89 @@
         "beta": 2500.0,
         "lambda_unit": "events-per-person-day"
       },
-      "severity": { "worst_case_prob_alpha": 1.2, "worst_case_prob_beta": 4.8 },
+      "severity": {
+        "worst_case_prob_alpha": 1.2,
+        "worst_case_prob_beta": 4.8
+      },
       "treated": {
-        "fi_cp1": { "min": 0.05, "mode": 0.2, "max": 0.5 },
-        "dt_cp1_hours": { "min": 4, "mode": 24, "max": 96 },
-        "fi_cp2": { "min": 0.0, "mode": 0.1, "max": 0.3 },
-        "dt_cp2_hours": { "min": 24, "mode": 120, "max": 336 },
-        "fi_cp3": { "min": 0.0, "mode": 0.02, "max": 0.1 },
-        "p_evac": { "min": 0.0, "mode": 0.005, "max": 0.05 },
-        "p_locl": { "min": 0.0, "mode": 0.0, "max": 0.002 }
+        "fi_cp1": {
+          "min": 0.05,
+          "mode": 0.2,
+          "max": 0.5
+        },
+        "dt_cp1_hours": {
+          "min": 4,
+          "mode": 24,
+          "max": 96
+        },
+        "fi_cp2": {
+          "min": 0.0,
+          "mode": 0.1,
+          "max": 0.3
+        },
+        "dt_cp2_hours": {
+          "min": 24,
+          "mode": 120,
+          "max": 336
+        },
+        "fi_cp3": {
+          "min": 0.0,
+          "mode": 0.02,
+          "max": 0.1
+        },
+        "p_evac": {
+          "min": 0.0,
+          "mode": 0.005,
+          "max": 0.05
+        },
+        "p_locl": {
+          "min": 0.0,
+          "mode": 0.0,
+          "max": 0.002
+        }
       },
       "untreated": {
-        "fi_cp1": { "min": 0.2, "mode": 0.4, "max": 0.7 },
-        "dt_cp1_hours": { "min": 24, "mode": 96, "max": 336 },
-        "fi_cp2": { "min": 0.05, "mode": 0.2, "max": 0.5 },
-        "dt_cp2_hours": { "min": 72, "mode": 240, "max": 720 },
-        "fi_cp3": { "min": 0.0, "mode": 0.05, "max": 0.2 },
-        "p_evac": { "min": 0.01, "mode": 0.05, "max": 0.2 },
-        "p_locl": { "min": 0.0, "mode": 0.001, "max": 0.02 }
+        "fi_cp1": {
+          "min": 0.2,
+          "mode": 0.4,
+          "max": 0.7
+        },
+        "dt_cp1_hours": {
+          "min": 24,
+          "mode": 96,
+          "max": 336
+        },
+        "fi_cp2": {
+          "min": 0.05,
+          "mode": 0.2,
+          "max": 0.5
+        },
+        "dt_cp2_hours": {
+          "min": 72,
+          "mode": 240,
+          "max": 720
+        },
+        "fi_cp3": {
+          "min": 0.0,
+          "mode": 0.05,
+          "max": 0.2
+        },
+        "p_evac": {
+          "min": 0.01,
+          "mode": 0.05,
+          "max": 0.2
+        },
+        "p_locl": {
+          "min": 0.0,
+          "mode": 0.001,
+          "max": 0.02
+        }
       },
       "risk_factor_multipliers": {},
-      "required_resources": { "ace-bandage": 2, "analgesic-mild": 7 }
+      "required_resources": {
+        "ace-bandage": 2,
+        "analgesic-mild": 7
+      }
     },
     "diarrhea": {
       "conditionId": "diarrhea",
@@ -204,27 +576,89 @@
         "beta": 455.0,
         "lambda_unit": "events-per-person-day"
       },
-      "severity": { "worst_case_prob_alpha": 1.2, "worst_case_prob_beta": 4.8 },
+      "severity": {
+        "worst_case_prob_alpha": 1.2,
+        "worst_case_prob_beta": 4.8
+      },
       "treated": {
-        "fi_cp1": { "min": 0.05, "mode": 0.2, "max": 0.4 },
-        "dt_cp1_hours": { "min": 4, "mode": 12, "max": 48 },
-        "fi_cp2": { "min": 0.0, "mode": 0.05, "max": 0.15 },
-        "dt_cp2_hours": { "min": 12, "mode": 48, "max": 120 },
-        "fi_cp3": { "min": 0.0, "mode": 0.0, "max": 0.0 },
-        "p_evac": { "min": 0.0, "mode": 0.002, "max": 0.02 },
-        "p_locl": { "min": 0.0, "mode": 0.0, "max": 0.002 }
+        "fi_cp1": {
+          "min": 0.05,
+          "mode": 0.2,
+          "max": 0.4
+        },
+        "dt_cp1_hours": {
+          "min": 4,
+          "mode": 12,
+          "max": 48
+        },
+        "fi_cp2": {
+          "min": 0.0,
+          "mode": 0.05,
+          "max": 0.15
+        },
+        "dt_cp2_hours": {
+          "min": 12,
+          "mode": 48,
+          "max": 120
+        },
+        "fi_cp3": {
+          "min": 0.0,
+          "mode": 0.0,
+          "max": 0.0
+        },
+        "p_evac": {
+          "min": 0.0,
+          "mode": 0.002,
+          "max": 0.02
+        },
+        "p_locl": {
+          "min": 0.0,
+          "mode": 0.0,
+          "max": 0.002
+        }
       },
       "untreated": {
-        "fi_cp1": { "min": 0.1, "mode": 0.35, "max": 0.6 },
-        "dt_cp1_hours": { "min": 12, "mode": 48, "max": 168 },
-        "fi_cp2": { "min": 0.0, "mode": 0.1, "max": 0.3 },
-        "dt_cp2_hours": { "min": 24, "mode": 96, "max": 336 },
-        "fi_cp3": { "min": 0.0, "mode": 0.0, "max": 0.03 },
-        "p_evac": { "min": 0.005, "mode": 0.03, "max": 0.15 },
-        "p_locl": { "min": 0.0, "mode": 0.001, "max": 0.03 }
+        "fi_cp1": {
+          "min": 0.1,
+          "mode": 0.35,
+          "max": 0.6
+        },
+        "dt_cp1_hours": {
+          "min": 12,
+          "mode": 48,
+          "max": 168
+        },
+        "fi_cp2": {
+          "min": 0.0,
+          "mode": 0.1,
+          "max": 0.3
+        },
+        "dt_cp2_hours": {
+          "min": 24,
+          "mode": 96,
+          "max": 336
+        },
+        "fi_cp3": {
+          "min": 0.0,
+          "mode": 0.0,
+          "max": 0.03
+        },
+        "p_evac": {
+          "min": 0.005,
+          "mode": 0.03,
+          "max": 0.15
+        },
+        "p_locl": {
+          "min": 0.0,
+          "mode": 0.001,
+          "max": 0.03
+        }
       },
       "risk_factor_multipliers": {},
-      "required_resources": { "antidiarrheal": 5, "oral-rehydration-salts": 7 }
+      "required_resources": {
+        "antidiarrheal": 5,
+        "oral-rehydration-salts": 7
+      }
     },
     "eye-abrasion-foreign-body": {
       "conditionId": "eye-abrasion-foreign-body",
@@ -236,27 +670,89 @@
         "beta": 1667.0,
         "lambda_unit": "events-per-person-day"
       },
-      "severity": { "worst_case_prob_alpha": 1.2, "worst_case_prob_beta": 4.8 },
+      "severity": {
+        "worst_case_prob_alpha": 1.2,
+        "worst_case_prob_beta": 4.8
+      },
       "treated": {
-        "fi_cp1": { "min": 0.05, "mode": 0.15, "max": 0.35 },
-        "dt_cp1_hours": { "min": 1, "mode": 4, "max": 24 },
-        "fi_cp2": { "min": 0.0, "mode": 0.02, "max": 0.1 },
-        "dt_cp2_hours": { "min": 4, "mode": 24, "max": 72 },
-        "fi_cp3": { "min": 0.0, "mode": 0.0, "max": 0.02 },
-        "p_evac": { "min": 0.0, "mode": 0.002, "max": 0.02 },
-        "p_locl": { "min": 0.0, "mode": 0.0, "max": 0.001 }
+        "fi_cp1": {
+          "min": 0.05,
+          "mode": 0.15,
+          "max": 0.35
+        },
+        "dt_cp1_hours": {
+          "min": 1,
+          "mode": 4,
+          "max": 24
+        },
+        "fi_cp2": {
+          "min": 0.0,
+          "mode": 0.02,
+          "max": 0.1
+        },
+        "dt_cp2_hours": {
+          "min": 4,
+          "mode": 24,
+          "max": 72
+        },
+        "fi_cp3": {
+          "min": 0.0,
+          "mode": 0.0,
+          "max": 0.02
+        },
+        "p_evac": {
+          "min": 0.0,
+          "mode": 0.002,
+          "max": 0.02
+        },
+        "p_locl": {
+          "min": 0.0,
+          "mode": 0.0,
+          "max": 0.001
+        }
       },
       "untreated": {
-        "fi_cp1": { "min": 0.1, "mode": 0.3, "max": 0.6 },
-        "dt_cp1_hours": { "min": 4, "mode": 24, "max": 96 },
-        "fi_cp2": { "min": 0.02, "mode": 0.1, "max": 0.3 },
-        "dt_cp2_hours": { "min": 12, "mode": 72, "max": 240 },
-        "fi_cp3": { "min": 0.0, "mode": 0.02, "max": 0.1 },
-        "p_evac": { "min": 0.005, "mode": 0.05, "max": 0.2 },
-        "p_locl": { "min": 0.0, "mode": 0.001, "max": 0.03 }
+        "fi_cp1": {
+          "min": 0.1,
+          "mode": 0.3,
+          "max": 0.6
+        },
+        "dt_cp1_hours": {
+          "min": 4,
+          "mode": 24,
+          "max": 96
+        },
+        "fi_cp2": {
+          "min": 0.02,
+          "mode": 0.1,
+          "max": 0.3
+        },
+        "dt_cp2_hours": {
+          "min": 12,
+          "mode": 72,
+          "max": 240
+        },
+        "fi_cp3": {
+          "min": 0.0,
+          "mode": 0.02,
+          "max": 0.1
+        },
+        "p_evac": {
+          "min": 0.005,
+          "mode": 0.05,
+          "max": 0.2
+        },
+        "p_locl": {
+          "min": 0.0,
+          "mode": 0.001,
+          "max": 0.03
+        }
       },
       "risk_factor_multipliers": {},
-      "required_resources": { "eye-irrigation-kit": 1, "ophthalmic-antibiotic": 5 }
+      "required_resources": {
+        "eye-irrigation-kit": 1,
+        "ophthalmic-antibiotic": 5
+      }
     },
     "acute-cholecystitis-biliary-colic": {
       "conditionId": "acute-cholecystitis-biliary-colic",
@@ -268,27 +764,92 @@
         "sigma_log_lambda": 0.8,
         "lambda_unit": "events-per-person-day"
       },
-      "severity": { "worst_case_prob_alpha": 1.5, "worst_case_prob_beta": 3.5 },
+      "severity": {
+        "worst_case_prob_alpha": 1.5,
+        "worst_case_prob_beta": 3.5
+      },
       "treated": {
-        "fi_cp1": { "min": 0.05, "mode": 0.20, "max": 0.50 },
-        "dt_cp1_hours": { "min": 24, "mode": 72, "max": 168 },
-        "fi_cp2": { "min": 0.0, "mode": 0.05, "max": 0.15 },
-        "dt_cp2_hours": { "min": 48, "mode": 336, "max": 1008 },
-        "fi_cp3": { "min": 0.0, "mode": 0.0, "max": 0.02 },
-        "p_evac": { "min": 0.05, "mode": 0.20, "max": 0.50 },
-        "p_locl": { "min": 0.0, "mode": 0.005, "max": 0.02 }
+        "fi_cp1": {
+          "min": 0.05,
+          "mode": 0.2,
+          "max": 0.5
+        },
+        "dt_cp1_hours": {
+          "min": 24,
+          "mode": 72,
+          "max": 168
+        },
+        "fi_cp2": {
+          "min": 0.0,
+          "mode": 0.05,
+          "max": 0.15
+        },
+        "dt_cp2_hours": {
+          "min": 48,
+          "mode": 336,
+          "max": 1008
+        },
+        "fi_cp3": {
+          "min": 0.0,
+          "mode": 0.0,
+          "max": 0.02
+        },
+        "p_evac": {
+          "min": 0.05,
+          "mode": 0.2,
+          "max": 0.5
+        },
+        "p_locl": {
+          "min": 0.0,
+          "mode": 0.005,
+          "max": 0.02
+        }
       },
       "untreated": {
-        "fi_cp1": { "min": 0.30, "mode": 0.60, "max": 0.95 },
-        "dt_cp1_hours": { "min": 48, "mode": 168, "max": 720 },
-        "fi_cp2": { "min": 0.0, "mode": 0.10, "max": 0.30 },
-        "dt_cp2_hours": { "min": 168, "mode": 720, "max": 2880 },
-        "fi_cp3": { "min": 0.0, "mode": 0.02, "max": 0.10 },
-        "p_evac": { "min": 0.40, "mode": 0.70, "max": 0.95 },
-        "p_locl": { "min": 0.02, "mode": 0.10, "max": 0.40 }
+        "fi_cp1": {
+          "min": 0.3,
+          "mode": 0.6,
+          "max": 0.95
+        },
+        "dt_cp1_hours": {
+          "min": 48,
+          "mode": 168,
+          "max": 720
+        },
+        "fi_cp2": {
+          "min": 0.0,
+          "mode": 0.1,
+          "max": 0.3
+        },
+        "dt_cp2_hours": {
+          "min": 168,
+          "mode": 720,
+          "max": 2880
+        },
+        "fi_cp3": {
+          "min": 0.0,
+          "mode": 0.02,
+          "max": 0.1
+        },
+        "p_evac": {
+          "min": 0.4,
+          "mode": 0.7,
+          "max": 0.95
+        },
+        "p_locl": {
+          "min": 0.02,
+          "mode": 0.1,
+          "max": 0.4
+        }
       },
-      "risk_factor_multipliers": { "sex-female": 1.3 },
-      "required_resources": { "iv-fluid": 2, "antibiotic-broad-spectrum": 14, "analgesic-strong": 7 }
+      "risk_factor_multipliers": {
+        "sex-female": 1.3
+      },
+      "required_resources": {
+        "iv-fluid": 2,
+        "antibiotic-broad-spectrum": 14,
+        "analgesic-strong": 7
+      }
     },
     "appendicitis": {
       "conditionId": "appendicitis",
@@ -300,27 +861,92 @@
         "sigma_log_lambda": 0.1088,
         "lambda_unit": "events-per-person-day"
       },
-      "severity": { "worst_case_prob_alpha": 1.5, "worst_case_prob_beta": 3.5 },
+      "severity": {
+        "worst_case_prob_alpha": 1.5,
+        "worst_case_prob_beta": 3.5
+      },
       "treated": {
-        "fi_cp1": { "min": 0.05, "mode": 0.20, "max": 0.50 },
-        "dt_cp1_hours": { "min": 12, "mode": 48, "max": 120 },
-        "fi_cp2": { "min": 0.0, "mode": 0.05, "max": 0.15 },
-        "dt_cp2_hours": { "min": 24, "mode": 240, "max": 720 },
-        "fi_cp3": { "min": 0.0, "mode": 0.0, "max": 0.02 },
-        "p_evac": { "min": 0.10, "mode": 0.30, "max": 0.70 },
-        "p_locl": { "min": 0.0, "mode": 0.005, "max": 0.02 }
+        "fi_cp1": {
+          "min": 0.05,
+          "mode": 0.2,
+          "max": 0.5
+        },
+        "dt_cp1_hours": {
+          "min": 12,
+          "mode": 48,
+          "max": 120
+        },
+        "fi_cp2": {
+          "min": 0.0,
+          "mode": 0.05,
+          "max": 0.15
+        },
+        "dt_cp2_hours": {
+          "min": 24,
+          "mode": 240,
+          "max": 720
+        },
+        "fi_cp3": {
+          "min": 0.0,
+          "mode": 0.0,
+          "max": 0.02
+        },
+        "p_evac": {
+          "min": 0.1,
+          "mode": 0.3,
+          "max": 0.7
+        },
+        "p_locl": {
+          "min": 0.0,
+          "mode": 0.005,
+          "max": 0.02
+        }
       },
       "untreated": {
-        "fi_cp1": { "min": 0.40, "mode": 0.70, "max": 0.95 },
-        "dt_cp1_hours": { "min": 24, "mode": 96, "max": 480 },
-        "fi_cp2": { "min": 0.05, "mode": 0.20, "max": 0.50 },
-        "dt_cp2_hours": { "min": 72, "mode": 360, "max": 1440 },
-        "fi_cp3": { "min": 0.0, "mode": 0.05, "max": 0.20 },
-        "p_evac": { "min": 0.50, "mode": 0.80, "max": 0.98 },
-        "p_locl": { "min": 0.02, "mode": 0.15, "max": 0.50 }
+        "fi_cp1": {
+          "min": 0.4,
+          "mode": 0.7,
+          "max": 0.95
+        },
+        "dt_cp1_hours": {
+          "min": 24,
+          "mode": 96,
+          "max": 480
+        },
+        "fi_cp2": {
+          "min": 0.05,
+          "mode": 0.2,
+          "max": 0.5
+        },
+        "dt_cp2_hours": {
+          "min": 72,
+          "mode": 360,
+          "max": 1440
+        },
+        "fi_cp3": {
+          "min": 0.0,
+          "mode": 0.05,
+          "max": 0.2
+        },
+        "p_evac": {
+          "min": 0.5,
+          "mode": 0.8,
+          "max": 0.98
+        },
+        "p_locl": {
+          "min": 0.02,
+          "mode": 0.15,
+          "max": 0.5
+        }
       },
-      "risk_factor_multipliers": { "sex-male": 1.1 },
-      "required_resources": { "iv-fluid": 2, "antibiotic-broad-spectrum": 14, "analgesic-strong": 7 }
+      "risk_factor_multipliers": {
+        "sex-male": 1.1
+      },
+      "required_resources": {
+        "iv-fluid": 2,
+        "antibiotic-broad-spectrum": 14,
+        "analgesic-strong": 7
+      }
     },
     "atrial-fibrillation-atrial-flutter": {
       "conditionId": "atrial-fibrillation-atrial-flutter",
@@ -332,27 +958,92 @@
         "sigma_log_lambda": 0.2092,
         "lambda_unit": "events-per-person-day"
       },
-      "severity": { "worst_case_prob_alpha": 1.5, "worst_case_prob_beta": 3.5 },
+      "severity": {
+        "worst_case_prob_alpha": 1.5,
+        "worst_case_prob_beta": 3.5
+      },
       "treated": {
-        "fi_cp1": { "min": 0.05, "mode": 0.25, "max": 0.60 },
-        "dt_cp1_hours": { "min": 1, "mode": 6, "max": 24 },
-        "fi_cp2": { "min": 0.0, "mode": 0.05, "max": 0.20 },
-        "dt_cp2_hours": { "min": 6, "mode": 48, "max": 168 },
-        "fi_cp3": { "min": 0.0, "mode": 0.0, "max": 0.02 },
-        "p_evac": { "min": 0.05, "mode": 0.20, "max": 0.50 },
-        "p_locl": { "min": 0.0, "mode": 0.005, "max": 0.02 }
+        "fi_cp1": {
+          "min": 0.05,
+          "mode": 0.25,
+          "max": 0.6
+        },
+        "dt_cp1_hours": {
+          "min": 1,
+          "mode": 6,
+          "max": 24
+        },
+        "fi_cp2": {
+          "min": 0.0,
+          "mode": 0.05,
+          "max": 0.2
+        },
+        "dt_cp2_hours": {
+          "min": 6,
+          "mode": 48,
+          "max": 168
+        },
+        "fi_cp3": {
+          "min": 0.0,
+          "mode": 0.0,
+          "max": 0.02
+        },
+        "p_evac": {
+          "min": 0.05,
+          "mode": 0.2,
+          "max": 0.5
+        },
+        "p_locl": {
+          "min": 0.0,
+          "mode": 0.005,
+          "max": 0.02
+        }
       },
       "untreated": {
-        "fi_cp1": { "min": 0.20, "mode": 0.50, "max": 0.90 },
-        "dt_cp1_hours": { "min": 2, "mode": 24, "max": 168 },
-        "fi_cp2": { "min": 0.05, "mode": 0.20, "max": 0.50 },
-        "dt_cp2_hours": { "min": 24, "mode": 168, "max": 720 },
-        "fi_cp3": { "min": 0.0, "mode": 0.02, "max": 0.10 },
-        "p_evac": { "min": 0.15, "mode": 0.40, "max": 0.80 },
-        "p_locl": { "min": 0.01, "mode": 0.05, "max": 0.20 }
+        "fi_cp1": {
+          "min": 0.2,
+          "mode": 0.5,
+          "max": 0.9
+        },
+        "dt_cp1_hours": {
+          "min": 2,
+          "mode": 24,
+          "max": 168
+        },
+        "fi_cp2": {
+          "min": 0.05,
+          "mode": 0.2,
+          "max": 0.5
+        },
+        "dt_cp2_hours": {
+          "min": 24,
+          "mode": 168,
+          "max": 720
+        },
+        "fi_cp3": {
+          "min": 0.0,
+          "mode": 0.02,
+          "max": 0.1
+        },
+        "p_evac": {
+          "min": 0.15,
+          "mode": 0.4,
+          "max": 0.8
+        },
+        "p_locl": {
+          "min": 0.01,
+          "mode": 0.05,
+          "max": 0.2
+        }
       },
-      "risk_factor_multipliers": { "sex-male": 1.42, "sex-female": 0.46 },
-      "required_resources": { "antiarrhythmic": 14, "anticoagulant": 30 }
+      "risk_factor_multipliers": {
+        "sex-male": 1.42,
+        "sex-female": 0.46
+      },
+      "required_resources": {
+        "antiarrhythmic": 14,
+        "anticoagulant": 30
+      }
     },
     "nephrolithiasis": {
       "conditionId": "nephrolithiasis",
@@ -364,27 +1055,92 @@
         "sigma_log_lambda": 0.116,
         "lambda_unit": "events-per-person-day"
       },
-      "severity": { "worst_case_prob_alpha": 1.5, "worst_case_prob_beta": 3.5 },
+      "severity": {
+        "worst_case_prob_alpha": 1.5,
+        "worst_case_prob_beta": 3.5
+      },
       "treated": {
-        "fi_cp1": { "min": 0.10, "mode": 0.40, "max": 0.80 },
-        "dt_cp1_hours": { "min": 1, "mode": 6, "max": 48 },
-        "fi_cp2": { "min": 0.0, "mode": 0.05, "max": 0.20 },
-        "dt_cp2_hours": { "min": 12, "mode": 72, "max": 240 },
-        "fi_cp3": { "min": 0.0, "mode": 0.0, "max": 0.02 },
-        "p_evac": { "min": 0.05, "mode": 0.20, "max": 0.50 },
-        "p_locl": { "min": 0.0, "mode": 0.002, "max": 0.01 }
+        "fi_cp1": {
+          "min": 0.1,
+          "mode": 0.4,
+          "max": 0.8
+        },
+        "dt_cp1_hours": {
+          "min": 1,
+          "mode": 6,
+          "max": 48
+        },
+        "fi_cp2": {
+          "min": 0.0,
+          "mode": 0.05,
+          "max": 0.2
+        },
+        "dt_cp2_hours": {
+          "min": 12,
+          "mode": 72,
+          "max": 240
+        },
+        "fi_cp3": {
+          "min": 0.0,
+          "mode": 0.0,
+          "max": 0.02
+        },
+        "p_evac": {
+          "min": 0.05,
+          "mode": 0.2,
+          "max": 0.5
+        },
+        "p_locl": {
+          "min": 0.0,
+          "mode": 0.002,
+          "max": 0.01
+        }
       },
       "untreated": {
-        "fi_cp1": { "min": 0.30, "mode": 0.60, "max": 0.90 },
-        "dt_cp1_hours": { "min": 6, "mode": 48, "max": 336 },
-        "fi_cp2": { "min": 0.0, "mode": 0.10, "max": 0.30 },
-        "dt_cp2_hours": { "min": 48, "mode": 240, "max": 1440 },
-        "fi_cp3": { "min": 0.0, "mode": 0.01, "max": 0.08 },
-        "p_evac": { "min": 0.20, "mode": 0.50, "max": 0.85 },
-        "p_locl": { "min": 0.0, "mode": 0.02, "max": 0.10 }
+        "fi_cp1": {
+          "min": 0.3,
+          "mode": 0.6,
+          "max": 0.9
+        },
+        "dt_cp1_hours": {
+          "min": 6,
+          "mode": 48,
+          "max": 336
+        },
+        "fi_cp2": {
+          "min": 0.0,
+          "mode": 0.1,
+          "max": 0.3
+        },
+        "dt_cp2_hours": {
+          "min": 48,
+          "mode": 240,
+          "max": 1440
+        },
+        "fi_cp3": {
+          "min": 0.0,
+          "mode": 0.01,
+          "max": 0.08
+        },
+        "p_evac": {
+          "min": 0.2,
+          "mode": 0.5,
+          "max": 0.85
+        },
+        "p_locl": {
+          "min": 0.0,
+          "mode": 0.02,
+          "max": 0.1
+        }
       },
-      "risk_factor_multipliers": { "sex-male": 2.0, "sex-female": 0.5 },
-      "required_resources": { "analgesic-strong": 7, "iv-fluid": 1 }
+      "risk_factor_multipliers": {
+        "sex-male": 2.0,
+        "sex-female": 0.5
+      },
+      "required_resources": {
+        "analgesic-strong": 7,
+        "iv-fluid": 1
+      }
     },
     "seizures": {
       "conditionId": "seizures",
@@ -396,27 +1152,89 @@
         "sigma_log_lambda": 0.1061,
         "lambda_unit": "events-per-person-day"
       },
-      "severity": { "worst_case_prob_alpha": 1.5, "worst_case_prob_beta": 3.5 },
+      "severity": {
+        "worst_case_prob_alpha": 1.5,
+        "worst_case_prob_beta": 3.5
+      },
       "treated": {
-        "fi_cp1": { "min": 0.10, "mode": 0.40, "max": 0.80 },
-        "dt_cp1_hours": { "min": 0.5, "mode": 2, "max": 12 },
-        "fi_cp2": { "min": 0.0, "mode": 0.05, "max": 0.20 },
-        "dt_cp2_hours": { "min": 6, "mode": 48, "max": 168 },
-        "fi_cp3": { "min": 0.0, "mode": 0.0, "max": 0.02 },
-        "p_evac": { "min": 0.05, "mode": 0.15, "max": 0.40 },
-        "p_locl": { "min": 0.0, "mode": 0.003, "max": 0.02 }
+        "fi_cp1": {
+          "min": 0.1,
+          "mode": 0.4,
+          "max": 0.8
+        },
+        "dt_cp1_hours": {
+          "min": 0.5,
+          "mode": 2,
+          "max": 12
+        },
+        "fi_cp2": {
+          "min": 0.0,
+          "mode": 0.05,
+          "max": 0.2
+        },
+        "dt_cp2_hours": {
+          "min": 6,
+          "mode": 48,
+          "max": 168
+        },
+        "fi_cp3": {
+          "min": 0.0,
+          "mode": 0.0,
+          "max": 0.02
+        },
+        "p_evac": {
+          "min": 0.05,
+          "mode": 0.15,
+          "max": 0.4
+        },
+        "p_locl": {
+          "min": 0.0,
+          "mode": 0.003,
+          "max": 0.02
+        }
       },
       "untreated": {
-        "fi_cp1": { "min": 0.20, "mode": 0.55, "max": 0.90 },
-        "dt_cp1_hours": { "min": 1, "mode": 12, "max": 96 },
-        "fi_cp2": { "min": 0.0, "mode": 0.10, "max": 0.30 },
-        "dt_cp2_hours": { "min": 24, "mode": 120, "max": 480 },
-        "fi_cp3": { "min": 0.0, "mode": 0.02, "max": 0.10 },
-        "p_evac": { "min": 0.20, "mode": 0.50, "max": 0.85 },
-        "p_locl": { "min": 0.01, "mode": 0.05, "max": 0.25 }
+        "fi_cp1": {
+          "min": 0.2,
+          "mode": 0.55,
+          "max": 0.9
+        },
+        "dt_cp1_hours": {
+          "min": 1,
+          "mode": 12,
+          "max": 96
+        },
+        "fi_cp2": {
+          "min": 0.0,
+          "mode": 0.1,
+          "max": 0.3
+        },
+        "dt_cp2_hours": {
+          "min": 24,
+          "mode": 120,
+          "max": 480
+        },
+        "fi_cp3": {
+          "min": 0.0,
+          "mode": 0.02,
+          "max": 0.1
+        },
+        "p_evac": {
+          "min": 0.2,
+          "mode": 0.5,
+          "max": 0.85
+        },
+        "p_locl": {
+          "min": 0.01,
+          "mode": 0.05,
+          "max": 0.25
+        }
       },
       "risk_factor_multipliers": {},
-      "required_resources": { "anticonvulsant": 30, "iv-fluid": 1 }
+      "required_resources": {
+        "anticonvulsant": 30,
+        "iv-fluid": 1
+      }
     },
     "herpes-zoster-reactivation-shingles": {
       "conditionId": "herpes-zoster-reactivation-shingles",
@@ -428,27 +1246,88 @@
         "beta": 176056,
         "lambda_unit": "events-per-person-day"
       },
-      "severity": { "worst_case_prob_alpha": 1.5, "worst_case_prob_beta": 3.5 },
+      "severity": {
+        "worst_case_prob_alpha": 1.5,
+        "worst_case_prob_beta": 3.5
+      },
       "treated": {
-        "fi_cp1": { "min": 0.60, "mode": 0.85, "max": 0.98 },
-        "dt_cp1_hours": { "min": 24, "mode": 72, "max": 240 },
-        "fi_cp2": { "min": 0.0, "mode": 0.10, "max": 0.30 },
-        "dt_cp2_hours": { "min": 48, "mode": 168, "max": 720 },
-        "fi_cp3": { "min": 0.0, "mode": 0.0, "max": 0.05 },
-        "p_evac": { "min": 0.02, "mode": 0.08, "max": 0.25 },
-        "p_locl": { "min": 0.0, "mode": 0.002, "max": 0.01 }
+        "fi_cp1": {
+          "min": 0.6,
+          "mode": 0.85,
+          "max": 0.98
+        },
+        "dt_cp1_hours": {
+          "min": 24,
+          "mode": 72,
+          "max": 240
+        },
+        "fi_cp2": {
+          "min": 0.0,
+          "mode": 0.1,
+          "max": 0.3
+        },
+        "dt_cp2_hours": {
+          "min": 48,
+          "mode": 168,
+          "max": 720
+        },
+        "fi_cp3": {
+          "min": 0.0,
+          "mode": 0.0,
+          "max": 0.05
+        },
+        "p_evac": {
+          "min": 0.02,
+          "mode": 0.08,
+          "max": 0.25
+        },
+        "p_locl": {
+          "min": 0.0,
+          "mode": 0.002,
+          "max": 0.01
+        }
       },
       "untreated": {
-        "fi_cp1": { "min": 0.70, "mode": 0.92, "max": 1.0 },
-        "dt_cp1_hours": { "min": 48, "mode": 120, "max": 480 },
-        "fi_cp2": { "min": 0.0, "mode": 0.20, "max": 0.50 },
-        "dt_cp2_hours": { "min": 96, "mode": 336, "max": 1440 },
-        "fi_cp3": { "min": 0.0, "mode": 0.05, "max": 0.20 },
-        "p_evac": { "min": 0.05, "mode": 0.20, "max": 0.50 },
-        "p_locl": { "min": 0.0, "mode": 0.01, "max": 0.05 }
+        "fi_cp1": {
+          "min": 0.7,
+          "mode": 0.92,
+          "max": 1.0
+        },
+        "dt_cp1_hours": {
+          "min": 48,
+          "mode": 120,
+          "max": 480
+        },
+        "fi_cp2": {
+          "min": 0.0,
+          "mode": 0.2,
+          "max": 0.5
+        },
+        "dt_cp2_hours": {
+          "min": 96,
+          "mode": 336,
+          "max": 1440
+        },
+        "fi_cp3": {
+          "min": 0.0,
+          "mode": 0.05,
+          "max": 0.2
+        },
+        "p_evac": {
+          "min": 0.05,
+          "mode": 0.2,
+          "max": 0.5
+        },
+        "p_locl": {
+          "min": 0.0,
+          "mode": 0.01,
+          "max": 0.05
+        }
       },
       "risk_factor_multipliers": {},
-      "required_resources": { "antiviral": 21 }
+      "required_resources": {
+        "antiviral": 21
+      }
     },
     "dental-abscess": {
       "conditionId": "dental-abscess",
@@ -460,27 +1339,89 @@
         "beta": 595059,
         "lambda_unit": "events-per-person-day"
       },
-      "severity": { "worst_case_prob_alpha": 1.5, "worst_case_prob_beta": 3.5 },
+      "severity": {
+        "worst_case_prob_alpha": 1.5,
+        "worst_case_prob_beta": 3.5
+      },
       "treated": {
-        "fi_cp1": { "min": 0.50, "mode": 0.80, "max": 0.95 },
-        "dt_cp1_hours": { "min": 4, "mode": 24, "max": 120 },
-        "fi_cp2": { "min": 0.0, "mode": 0.05, "max": 0.20 },
-        "dt_cp2_hours": { "min": 24, "mode": 120, "max": 480 },
-        "fi_cp3": { "min": 0.0, "mode": 0.0, "max": 0.05 },
-        "p_evac": { "min": 0.05, "mode": 0.15, "max": 0.40 },
-        "p_locl": { "min": 0.0, "mode": 0.001, "max": 0.01 }
+        "fi_cp1": {
+          "min": 0.5,
+          "mode": 0.8,
+          "max": 0.95
+        },
+        "dt_cp1_hours": {
+          "min": 4,
+          "mode": 24,
+          "max": 120
+        },
+        "fi_cp2": {
+          "min": 0.0,
+          "mode": 0.05,
+          "max": 0.2
+        },
+        "dt_cp2_hours": {
+          "min": 24,
+          "mode": 120,
+          "max": 480
+        },
+        "fi_cp3": {
+          "min": 0.0,
+          "mode": 0.0,
+          "max": 0.05
+        },
+        "p_evac": {
+          "min": 0.05,
+          "mode": 0.15,
+          "max": 0.4
+        },
+        "p_locl": {
+          "min": 0.0,
+          "mode": 0.001,
+          "max": 0.01
+        }
       },
       "untreated": {
-        "fi_cp1": { "min": 0.70, "mode": 0.92, "max": 1.0 },
-        "dt_cp1_hours": { "min": 12, "mode": 48, "max": 240 },
-        "fi_cp2": { "min": 0.0, "mode": 0.15, "max": 0.40 },
-        "dt_cp2_hours": { "min": 48, "mode": 240, "max": 720 },
-        "fi_cp3": { "min": 0.0, "mode": 0.02, "max": 0.10 },
-        "p_evac": { "min": 0.10, "mode": 0.30, "max": 0.65 },
-        "p_locl": { "min": 0.0, "mode": 0.01, "max": 0.05 }
+        "fi_cp1": {
+          "min": 0.7,
+          "mode": 0.92,
+          "max": 1.0
+        },
+        "dt_cp1_hours": {
+          "min": 12,
+          "mode": 48,
+          "max": 240
+        },
+        "fi_cp2": {
+          "min": 0.0,
+          "mode": 0.15,
+          "max": 0.4
+        },
+        "dt_cp2_hours": {
+          "min": 48,
+          "mode": 240,
+          "max": 720
+        },
+        "fi_cp3": {
+          "min": 0.0,
+          "mode": 0.02,
+          "max": 0.1
+        },
+        "p_evac": {
+          "min": 0.1,
+          "mode": 0.3,
+          "max": 0.65
+        },
+        "p_locl": {
+          "min": 0.0,
+          "mode": 0.01,
+          "max": 0.05
+        }
       },
       "risk_factor_multipliers": {},
-      "required_resources": { "antibiotic": 10, "analgesic": 5 }
+      "required_resources": {
+        "antibiotic": 10,
+        "analgesic": 5
+      }
     },
     "urinary-tract-infection": {
       "conditionId": "urinary-tract-infection",
@@ -492,27 +1433,88 @@
         "beta": 252525,
         "lambda_unit": "events-per-person-day"
       },
-      "severity": { "worst_case_prob_alpha": 1.5, "worst_case_prob_beta": 3.5 },
+      "severity": {
+        "worst_case_prob_alpha": 1.5,
+        "worst_case_prob_beta": 3.5
+      },
       "treated": {
-        "fi_cp1": { "min": 0.60, "mode": 0.85, "max": 0.98 },
-        "dt_cp1_hours": { "min": 12, "mode": 48, "max": 120 },
-        "fi_cp2": { "min": 0.0, "mode": 0.05, "max": 0.20 },
-        "dt_cp2_hours": { "min": 24, "mode": 120, "max": 480 },
-        "fi_cp3": { "min": 0.0, "mode": 0.0, "max": 0.03 },
-        "p_evac": { "min": 0.02, "mode": 0.05, "max": 0.20 },
-        "p_locl": { "min": 0.0, "mode": 0.001, "max": 0.005 }
+        "fi_cp1": {
+          "min": 0.6,
+          "mode": 0.85,
+          "max": 0.98
+        },
+        "dt_cp1_hours": {
+          "min": 12,
+          "mode": 48,
+          "max": 120
+        },
+        "fi_cp2": {
+          "min": 0.0,
+          "mode": 0.05,
+          "max": 0.2
+        },
+        "dt_cp2_hours": {
+          "min": 24,
+          "mode": 120,
+          "max": 480
+        },
+        "fi_cp3": {
+          "min": 0.0,
+          "mode": 0.0,
+          "max": 0.03
+        },
+        "p_evac": {
+          "min": 0.02,
+          "mode": 0.05,
+          "max": 0.2
+        },
+        "p_locl": {
+          "min": 0.0,
+          "mode": 0.001,
+          "max": 0.005
+        }
       },
       "untreated": {
-        "fi_cp1": { "min": 0.70, "mode": 0.90, "max": 1.0 },
-        "dt_cp1_hours": { "min": 24, "mode": 96, "max": 480 },
-        "fi_cp2": { "min": 0.0, "mode": 0.15, "max": 0.40 },
-        "dt_cp2_hours": { "min": 72, "mode": 240, "max": 720 },
-        "fi_cp3": { "min": 0.0, "mode": 0.02, "max": 0.10 },
-        "p_evac": { "min": 0.05, "mode": 0.15, "max": 0.40 },
-        "p_locl": { "min": 0.0, "mode": 0.01, "max": 0.05 }
+        "fi_cp1": {
+          "min": 0.7,
+          "mode": 0.9,
+          "max": 1.0
+        },
+        "dt_cp1_hours": {
+          "min": 24,
+          "mode": 96,
+          "max": 480
+        },
+        "fi_cp2": {
+          "min": 0.0,
+          "mode": 0.15,
+          "max": 0.4
+        },
+        "dt_cp2_hours": {
+          "min": 72,
+          "mode": 240,
+          "max": 720
+        },
+        "fi_cp3": {
+          "min": 0.0,
+          "mode": 0.02,
+          "max": 0.1
+        },
+        "p_evac": {
+          "min": 0.05,
+          "mode": 0.15,
+          "max": 0.4
+        },
+        "p_locl": {
+          "min": 0.0,
+          "mode": 0.01,
+          "max": 0.05
+        }
       },
       "risk_factor_multipliers": {},
-      "required_resources": { "antibiotic": 7 }
+      "required_resources": {
+        "antibiotic": 7
+      }
     },
     "sepsis": {
       "conditionId": "sepsis",
@@ -524,27 +1526,89 @@
         "beta": 870700,
         "lambda_unit": "events-per-person-day"
       },
-      "severity": { "worst_case_prob_alpha": 1.5, "worst_case_prob_beta": 3.5 },
+      "severity": {
+        "worst_case_prob_alpha": 1.5,
+        "worst_case_prob_beta": 3.5
+      },
       "treated": {
-        "fi_cp1": { "min": 0.50, "mode": 0.80, "max": 0.95 },
-        "dt_cp1_hours": { "min": 6, "mode": 48, "max": 240 },
-        "fi_cp2": { "min": 0.0, "mode": 0.20, "max": 0.50 },
-        "dt_cp2_hours": { "min": 48, "mode": 240, "max": 720 },
-        "fi_cp3": { "min": 0.0, "mode": 0.05, "max": 0.20 },
-        "p_evac": { "min": 0.10, "mode": 0.30, "max": 0.65 },
-        "p_locl": { "min": 0.0, "mode": 0.05, "max": 0.20 }
+        "fi_cp1": {
+          "min": 0.5,
+          "mode": 0.8,
+          "max": 0.95
+        },
+        "dt_cp1_hours": {
+          "min": 6,
+          "mode": 48,
+          "max": 240
+        },
+        "fi_cp2": {
+          "min": 0.0,
+          "mode": 0.2,
+          "max": 0.5
+        },
+        "dt_cp2_hours": {
+          "min": 48,
+          "mode": 240,
+          "max": 720
+        },
+        "fi_cp3": {
+          "min": 0.0,
+          "mode": 0.05,
+          "max": 0.2
+        },
+        "p_evac": {
+          "min": 0.1,
+          "mode": 0.3,
+          "max": 0.65
+        },
+        "p_locl": {
+          "min": 0.0,
+          "mode": 0.05,
+          "max": 0.2
+        }
       },
       "untreated": {
-        "fi_cp1": { "min": 0.70, "mode": 0.92, "max": 1.0 },
-        "dt_cp1_hours": { "min": 12, "mode": 72, "max": 360 },
-        "fi_cp2": { "min": 0.0, "mode": 0.40, "max": 0.80 },
-        "dt_cp2_hours": { "min": 96, "mode": 480, "max": 1440 },
-        "fi_cp3": { "min": 0.0, "mode": 0.15, "max": 0.50 },
-        "p_evac": { "min": 0.20, "mode": 0.55, "max": 0.90 },
-        "p_locl": { "min": 0.05, "mode": 0.20, "max": 0.55 }
+        "fi_cp1": {
+          "min": 0.7,
+          "mode": 0.92,
+          "max": 1.0
+        },
+        "dt_cp1_hours": {
+          "min": 12,
+          "mode": 72,
+          "max": 360
+        },
+        "fi_cp2": {
+          "min": 0.0,
+          "mode": 0.4,
+          "max": 0.8
+        },
+        "dt_cp2_hours": {
+          "min": 96,
+          "mode": 480,
+          "max": 1440
+        },
+        "fi_cp3": {
+          "min": 0.0,
+          "mode": 0.15,
+          "max": 0.5
+        },
+        "p_evac": {
+          "min": 0.2,
+          "mode": 0.55,
+          "max": 0.9
+        },
+        "p_locl": {
+          "min": 0.05,
+          "mode": 0.2,
+          "max": 0.55
+        }
       },
       "risk_factor_multipliers": {},
-      "required_resources": { "antibiotic": 14, "iv-fluid": 3 }
+      "required_resources": {
+        "antibiotic": 14,
+        "iv-fluid": 3
+      }
     },
     "eye-chemical-burn": {
       "conditionId": "eye-chemical-burn",
@@ -556,27 +1620,91 @@
         "beta": 303366,
         "lambda_unit": "events-per-person-day"
       },
-      "severity": { "worst_case_prob_alpha": 1.5, "worst_case_prob_beta": 3.5 },
+      "severity": {
+        "worst_case_prob_alpha": 1.5,
+        "worst_case_prob_beta": 3.5
+      },
       "treated": {
-        "fi_cp1": { "min": 0.50, "mode": 0.80, "max": 0.95 },
-        "dt_cp1_hours": { "min": 1, "mode": 12, "max": 72 },
-        "fi_cp2": { "min": 0.0, "mode": 0.10, "max": 0.30 },
-        "dt_cp2_hours": { "min": 24, "mode": 120, "max": 480 },
-        "fi_cp3": { "min": 0.0, "mode": 0.02, "max": 0.10 },
-        "p_evac": { "min": 0.05, "mode": 0.15, "max": 0.40 },
-        "p_locl": { "min": 0.0, "mode": 0.005, "max": 0.02 }
+        "fi_cp1": {
+          "min": 0.5,
+          "mode": 0.8,
+          "max": 0.95
+        },
+        "dt_cp1_hours": {
+          "min": 1,
+          "mode": 12,
+          "max": 72
+        },
+        "fi_cp2": {
+          "min": 0.0,
+          "mode": 0.1,
+          "max": 0.3
+        },
+        "dt_cp2_hours": {
+          "min": 24,
+          "mode": 120,
+          "max": 480
+        },
+        "fi_cp3": {
+          "min": 0.0,
+          "mode": 0.02,
+          "max": 0.1
+        },
+        "p_evac": {
+          "min": 0.05,
+          "mode": 0.15,
+          "max": 0.4
+        },
+        "p_locl": {
+          "min": 0.0,
+          "mode": 0.005,
+          "max": 0.02
+        }
       },
       "untreated": {
-        "fi_cp1": { "min": 0.65, "mode": 0.88, "max": 1.0 },
-        "dt_cp1_hours": { "min": 2, "mode": 24, "max": 168 },
-        "fi_cp2": { "min": 0.0, "mode": 0.25, "max": 0.60 },
-        "dt_cp2_hours": { "min": 48, "mode": 240, "max": 720 },
-        "fi_cp3": { "min": 0.0, "mode": 0.08, "max": 0.30 },
-        "p_evac": { "min": 0.10, "mode": 0.30, "max": 0.65 },
-        "p_locl": { "min": 0.0, "mode": 0.02, "max": 0.10 }
+        "fi_cp1": {
+          "min": 0.65,
+          "mode": 0.88,
+          "max": 1.0
+        },
+        "dt_cp1_hours": {
+          "min": 2,
+          "mode": 24,
+          "max": 168
+        },
+        "fi_cp2": {
+          "min": 0.0,
+          "mode": 0.25,
+          "max": 0.6
+        },
+        "dt_cp2_hours": {
+          "min": 48,
+          "mode": 240,
+          "max": 720
+        },
+        "fi_cp3": {
+          "min": 0.0,
+          "mode": 0.08,
+          "max": 0.3
+        },
+        "p_evac": {
+          "min": 0.1,
+          "mode": 0.3,
+          "max": 0.65
+        },
+        "p_locl": {
+          "min": 0.0,
+          "mode": 0.02,
+          "max": 0.1
+        }
       },
-      "risk_factor_multipliers": { "EVA": 5.0 },
-      "required_resources": { "ophthalmic-irrigation": 2, "analgesic": 3 }
+      "risk_factor_multipliers": {
+        "EVA": 5.0
+      },
+      "required_resources": {
+        "ophthalmic-irrigation": 2,
+        "analgesic": 3
+      }
     },
     "stroke-cerebrovascular-accident": {
       "conditionId": "stroke-cerebrovascular-accident",
@@ -588,27 +1716,89 @@
         "beta": 1141358,
         "lambda_unit": "events-per-person-day"
       },
-      "severity": { "worst_case_prob_alpha": 1.5, "worst_case_prob_beta": 3.5 },
+      "severity": {
+        "worst_case_prob_alpha": 1.5,
+        "worst_case_prob_beta": 3.5
+      },
       "treated": {
-        "fi_cp1": { "min": 0.40, "mode": 0.70, "max": 0.90 },
-        "dt_cp1_hours": { "min": 1, "mode": 6, "max": 24 },
-        "fi_cp2": { "min": 0.0, "mode": 0.20, "max": 0.50 },
-        "dt_cp2_hours": { "min": 48, "mode": 240, "max": 720 },
-        "fi_cp3": { "min": 0.0, "mode": 0.05, "max": 0.20 },
-        "p_evac": { "min": 0.10, "mode": 0.35, "max": 0.70 },
-        "p_locl": { "min": 0.0, "mode": 0.05, "max": 0.20 }
+        "fi_cp1": {
+          "min": 0.4,
+          "mode": 0.7,
+          "max": 0.9
+        },
+        "dt_cp1_hours": {
+          "min": 1,
+          "mode": 6,
+          "max": 24
+        },
+        "fi_cp2": {
+          "min": 0.0,
+          "mode": 0.2,
+          "max": 0.5
+        },
+        "dt_cp2_hours": {
+          "min": 48,
+          "mode": 240,
+          "max": 720
+        },
+        "fi_cp3": {
+          "min": 0.0,
+          "mode": 0.05,
+          "max": 0.2
+        },
+        "p_evac": {
+          "min": 0.1,
+          "mode": 0.35,
+          "max": 0.7
+        },
+        "p_locl": {
+          "min": 0.0,
+          "mode": 0.05,
+          "max": 0.2
+        }
       },
       "untreated": {
-        "fi_cp1": { "min": 0.50, "mode": 0.82, "max": 1.0 },
-        "dt_cp1_hours": { "min": 2, "mode": 12, "max": 72 },
-        "fi_cp2": { "min": 0.0, "mode": 0.40, "max": 0.80 },
-        "dt_cp2_hours": { "min": 96, "mode": 480, "max": 1440 },
-        "fi_cp3": { "min": 0.0, "mode": 0.20, "max": 0.60 },
-        "p_evac": { "min": 0.20, "mode": 0.60, "max": 0.95 },
-        "p_locl": { "min": 0.05, "mode": 0.25, "max": 0.65 }
+        "fi_cp1": {
+          "min": 0.5,
+          "mode": 0.82,
+          "max": 1.0
+        },
+        "dt_cp1_hours": {
+          "min": 2,
+          "mode": 12,
+          "max": 72
+        },
+        "fi_cp2": {
+          "min": 0.0,
+          "mode": 0.4,
+          "max": 0.8
+        },
+        "dt_cp2_hours": {
+          "min": 96,
+          "mode": 480,
+          "max": 1440
+        },
+        "fi_cp3": {
+          "min": 0.0,
+          "mode": 0.2,
+          "max": 0.6
+        },
+        "p_evac": {
+          "min": 0.2,
+          "mode": 0.6,
+          "max": 0.95
+        },
+        "p_locl": {
+          "min": 0.05,
+          "mode": 0.25,
+          "max": 0.65
+        }
       },
       "risk_factor_multipliers": {},
-      "required_resources": { "antithrombotic": 1, "iv-fluid": 2 }
+      "required_resources": {
+        "antithrombotic": 1,
+        "iv-fluid": 2
+      }
     },
     "small-bowel-obstruction": {
       "conditionId": "small-bowel-obstruction",
@@ -620,27 +1810,89 @@
         "beta": 1184834,
         "lambda_unit": "events-per-person-day"
       },
-      "severity": { "worst_case_prob_alpha": 1.5, "worst_case_prob_beta": 3.5 },
+      "severity": {
+        "worst_case_prob_alpha": 1.5,
+        "worst_case_prob_beta": 3.5
+      },
       "treated": {
-        "fi_cp1": { "min": 0.50, "mode": 0.80, "max": 0.95 },
-        "dt_cp1_hours": { "min": 6, "mode": 48, "max": 240 },
-        "fi_cp2": { "min": 0.0, "mode": 0.15, "max": 0.40 },
-        "dt_cp2_hours": { "min": 48, "mode": 240, "max": 720 },
-        "fi_cp3": { "min": 0.0, "mode": 0.03, "max": 0.15 },
-        "p_evac": { "min": 0.10, "mode": 0.30, "max": 0.65 },
-        "p_locl": { "min": 0.0, "mode": 0.02, "max": 0.10 }
+        "fi_cp1": {
+          "min": 0.5,
+          "mode": 0.8,
+          "max": 0.95
+        },
+        "dt_cp1_hours": {
+          "min": 6,
+          "mode": 48,
+          "max": 240
+        },
+        "fi_cp2": {
+          "min": 0.0,
+          "mode": 0.15,
+          "max": 0.4
+        },
+        "dt_cp2_hours": {
+          "min": 48,
+          "mode": 240,
+          "max": 720
+        },
+        "fi_cp3": {
+          "min": 0.0,
+          "mode": 0.03,
+          "max": 0.15
+        },
+        "p_evac": {
+          "min": 0.1,
+          "mode": 0.3,
+          "max": 0.65
+        },
+        "p_locl": {
+          "min": 0.0,
+          "mode": 0.02,
+          "max": 0.1
+        }
       },
       "untreated": {
-        "fi_cp1": { "min": 0.65, "mode": 0.90, "max": 1.0 },
-        "dt_cp1_hours": { "min": 12, "mode": 72, "max": 360 },
-        "fi_cp2": { "min": 0.0, "mode": 0.30, "max": 0.70 },
-        "dt_cp2_hours": { "min": 96, "mode": 480, "max": 1440 },
-        "fi_cp3": { "min": 0.0, "mode": 0.10, "max": 0.40 },
-        "p_evac": { "min": 0.20, "mode": 0.55, "max": 0.90 },
-        "p_locl": { "min": 0.02, "mode": 0.15, "max": 0.45 }
+        "fi_cp1": {
+          "min": 0.65,
+          "mode": 0.9,
+          "max": 1.0
+        },
+        "dt_cp1_hours": {
+          "min": 12,
+          "mode": 72,
+          "max": 360
+        },
+        "fi_cp2": {
+          "min": 0.0,
+          "mode": 0.3,
+          "max": 0.7
+        },
+        "dt_cp2_hours": {
+          "min": 96,
+          "mode": 480,
+          "max": 1440
+        },
+        "fi_cp3": {
+          "min": 0.0,
+          "mode": 0.1,
+          "max": 0.4
+        },
+        "p_evac": {
+          "min": 0.2,
+          "mode": 0.55,
+          "max": 0.9
+        },
+        "p_locl": {
+          "min": 0.02,
+          "mode": 0.15,
+          "max": 0.45
+        }
       },
       "risk_factor_multipliers": {},
-      "required_resources": { "iv-fluid": 3, "analgesic": 5 }
+      "required_resources": {
+        "iv-fluid": 3,
+        "analgesic": 5
+      }
     },
     "wrist-fracture": {
       "conditionId": "wrist-fracture",
@@ -652,27 +1904,89 @@
         "beta": 1500813,
         "lambda_unit": "events-per-person-day"
       },
-      "severity": { "worst_case_prob_alpha": 1.5, "worst_case_prob_beta": 3.5 },
+      "severity": {
+        "worst_case_prob_alpha": 1.5,
+        "worst_case_prob_beta": 3.5
+      },
       "treated": {
-        "fi_cp1": { "min": 0.50, "mode": 0.80, "max": 0.95 },
-        "dt_cp1_hours": { "min": 1, "mode": 4, "max": 24 },
-        "fi_cp2": { "min": 0.0, "mode": 0.10, "max": 0.30 },
-        "dt_cp2_hours": { "min": 48, "mode": 240, "max": 720 },
-        "fi_cp3": { "min": 0.0, "mode": 0.0, "max": 0.05 },
-        "p_evac": { "min": 0.05, "mode": 0.15, "max": 0.40 },
-        "p_locl": { "min": 0.0, "mode": 0.005, "max": 0.02 }
+        "fi_cp1": {
+          "min": 0.5,
+          "mode": 0.8,
+          "max": 0.95
+        },
+        "dt_cp1_hours": {
+          "min": 1,
+          "mode": 4,
+          "max": 24
+        },
+        "fi_cp2": {
+          "min": 0.0,
+          "mode": 0.1,
+          "max": 0.3
+        },
+        "dt_cp2_hours": {
+          "min": 48,
+          "mode": 240,
+          "max": 720
+        },
+        "fi_cp3": {
+          "min": 0.0,
+          "mode": 0.0,
+          "max": 0.05
+        },
+        "p_evac": {
+          "min": 0.05,
+          "mode": 0.15,
+          "max": 0.4
+        },
+        "p_locl": {
+          "min": 0.0,
+          "mode": 0.005,
+          "max": 0.02
+        }
       },
       "untreated": {
-        "fi_cp1": { "min": 0.60, "mode": 0.85, "max": 0.98 },
-        "dt_cp1_hours": { "min": 2, "mode": 12, "max": 72 },
-        "fi_cp2": { "min": 0.0, "mode": 0.20, "max": 0.50 },
-        "dt_cp2_hours": { "min": 120, "mode": 480, "max": 1440 },
-        "fi_cp3": { "min": 0.0, "mode": 0.02, "max": 0.10 },
-        "p_evac": { "min": 0.10, "mode": 0.25, "max": 0.55 },
-        "p_locl": { "min": 0.0, "mode": 0.01, "max": 0.05 }
+        "fi_cp1": {
+          "min": 0.6,
+          "mode": 0.85,
+          "max": 0.98
+        },
+        "dt_cp1_hours": {
+          "min": 2,
+          "mode": 12,
+          "max": 72
+        },
+        "fi_cp2": {
+          "min": 0.0,
+          "mode": 0.2,
+          "max": 0.5
+        },
+        "dt_cp2_hours": {
+          "min": 120,
+          "mode": 480,
+          "max": 1440
+        },
+        "fi_cp3": {
+          "min": 0.0,
+          "mode": 0.02,
+          "max": 0.1
+        },
+        "p_evac": {
+          "min": 0.1,
+          "mode": 0.25,
+          "max": 0.55
+        },
+        "p_locl": {
+          "min": 0.0,
+          "mode": 0.01,
+          "max": 0.05
+        }
       },
       "risk_factor_multipliers": {},
-      "required_resources": { "splint": 1, "analgesic": 5 }
+      "required_resources": {
+        "splint": 1,
+        "analgesic": 5
+      }
     },
     "angina-myocardial-infarction": {
       "conditionId": "angina-myocardial-infarction",
@@ -684,27 +1998,90 @@
         "beta": 2217136,
         "lambda_unit": "events-per-person-day"
       },
-      "severity": { "worst_case_prob_alpha": 1.5, "worst_case_prob_beta": 3.5 },
+      "severity": {
+        "worst_case_prob_alpha": 1.5,
+        "worst_case_prob_beta": 3.5
+      },
       "treated": {
-        "fi_cp1": { "min": 0.40, "mode": 0.72, "max": 0.92 },
-        "dt_cp1_hours": { "min": 1, "mode": 6, "max": 24 },
-        "fi_cp2": { "min": 0.0, "mode": 0.20, "max": 0.50 },
-        "dt_cp2_hours": { "min": 48, "mode": 240, "max": 720 },
-        "fi_cp3": { "min": 0.0, "mode": 0.08, "max": 0.25 },
-        "p_evac": { "min": 0.10, "mode": 0.35, "max": 0.70 },
-        "p_locl": { "min": 0.0, "mode": 0.05, "max": 0.20 }
+        "fi_cp1": {
+          "min": 0.4,
+          "mode": 0.72,
+          "max": 0.92
+        },
+        "dt_cp1_hours": {
+          "min": 1,
+          "mode": 6,
+          "max": 24
+        },
+        "fi_cp2": {
+          "min": 0.0,
+          "mode": 0.2,
+          "max": 0.5
+        },
+        "dt_cp2_hours": {
+          "min": 48,
+          "mode": 240,
+          "max": 720
+        },
+        "fi_cp3": {
+          "min": 0.0,
+          "mode": 0.08,
+          "max": 0.25
+        },
+        "p_evac": {
+          "min": 0.1,
+          "mode": 0.35,
+          "max": 0.7
+        },
+        "p_locl": {
+          "min": 0.0,
+          "mode": 0.05,
+          "max": 0.2
+        }
       },
       "untreated": {
-        "fi_cp1": { "min": 0.55, "mode": 0.85, "max": 1.0 },
-        "dt_cp1_hours": { "min": 2, "mode": 12, "max": 72 },
-        "fi_cp2": { "min": 0.0, "mode": 0.40, "max": 0.80 },
-        "dt_cp2_hours": { "min": 96, "mode": 480, "max": 1440 },
-        "fi_cp3": { "min": 0.0, "mode": 0.20, "max": 0.60 },
-        "p_evac": { "min": 0.20, "mode": 0.60, "max": 0.95 },
-        "p_locl": { "min": 0.05, "mode": 0.25, "max": 0.65 }
+        "fi_cp1": {
+          "min": 0.55,
+          "mode": 0.85,
+          "max": 1.0
+        },
+        "dt_cp1_hours": {
+          "min": 2,
+          "mode": 12,
+          "max": 72
+        },
+        "fi_cp2": {
+          "min": 0.0,
+          "mode": 0.4,
+          "max": 0.8
+        },
+        "dt_cp2_hours": {
+          "min": 96,
+          "mode": 480,
+          "max": 1440
+        },
+        "fi_cp3": {
+          "min": 0.0,
+          "mode": 0.2,
+          "max": 0.6
+        },
+        "p_evac": {
+          "min": 0.2,
+          "mode": 0.6,
+          "max": 0.95
+        },
+        "p_locl": {
+          "min": 0.05,
+          "mode": 0.25,
+          "max": 0.65
+        }
       },
       "risk_factor_multipliers": {},
-      "required_resources": { "cardiac-monitor": 1, "antithrombotic": 1, "analgesic": 5 }
+      "required_resources": {
+        "cardiac-monitor": 1,
+        "antithrombotic": 1,
+        "analgesic": 5
+      }
     },
     "decompression-sickness-secondary-to-extravehicular-activity": {
       "conditionId": "decompression-sickness-secondary-to-extravehicular-activity",
@@ -716,27 +2093,90 @@
         "beta": 7307,
         "lambda_unit": "events-per-EVA"
       },
-      "severity": { "worst_case_prob_alpha": 1.5, "worst_case_prob_beta": 3.5 },
+      "severity": {
+        "worst_case_prob_alpha": 1.5,
+        "worst_case_prob_beta": 3.5
+      },
       "treated": {
-        "fi_cp1": { "min": 0.50, "mode": 0.80, "max": 0.95 },
-        "dt_cp1_hours": { "min": 1, "mode": 6, "max": 48 },
-        "fi_cp2": { "min": 0.0, "mode": 0.10, "max": 0.30 },
-        "dt_cp2_hours": { "min": 12, "mode": 72, "max": 480 },
-        "fi_cp3": { "min": 0.0, "mode": 0.0, "max": 0.05 },
-        "p_evac": { "min": 0.05, "mode": 0.15, "max": 0.40 },
-        "p_locl": { "min": 0.0, "mode": 0.005, "max": 0.02 }
+        "fi_cp1": {
+          "min": 0.5,
+          "mode": 0.8,
+          "max": 0.95
+        },
+        "dt_cp1_hours": {
+          "min": 1,
+          "mode": 6,
+          "max": 48
+        },
+        "fi_cp2": {
+          "min": 0.0,
+          "mode": 0.1,
+          "max": 0.3
+        },
+        "dt_cp2_hours": {
+          "min": 12,
+          "mode": 72,
+          "max": 480
+        },
+        "fi_cp3": {
+          "min": 0.0,
+          "mode": 0.0,
+          "max": 0.05
+        },
+        "p_evac": {
+          "min": 0.05,
+          "mode": 0.15,
+          "max": 0.4
+        },
+        "p_locl": {
+          "min": 0.0,
+          "mode": 0.005,
+          "max": 0.02
+        }
       },
       "untreated": {
-        "fi_cp1": { "min": 0.65, "mode": 0.90, "max": 1.0 },
-        "dt_cp1_hours": { "min": 2, "mode": 24, "max": 168 },
-        "fi_cp2": { "min": 0.0, "mode": 0.25, "max": 0.60 },
-        "dt_cp2_hours": { "min": 48, "mode": 240, "max": 720 },
-        "fi_cp3": { "min": 0.0, "mode": 0.05, "max": 0.20 },
-        "p_evac": { "min": 0.15, "mode": 0.40, "max": 0.80 },
-        "p_locl": { "min": 0.0, "mode": 0.10, "max": 0.35 }
+        "fi_cp1": {
+          "min": 0.65,
+          "mode": 0.9,
+          "max": 1.0
+        },
+        "dt_cp1_hours": {
+          "min": 2,
+          "mode": 24,
+          "max": 168
+        },
+        "fi_cp2": {
+          "min": 0.0,
+          "mode": 0.25,
+          "max": 0.6
+        },
+        "dt_cp2_hours": {
+          "min": 48,
+          "mode": 240,
+          "max": 720
+        },
+        "fi_cp3": {
+          "min": 0.0,
+          "mode": 0.05,
+          "max": 0.2
+        },
+        "p_evac": {
+          "min": 0.15,
+          "mode": 0.4,
+          "max": 0.8
+        },
+        "p_locl": {
+          "min": 0.0,
+          "mode": 0.1,
+          "max": 0.35
+        }
       },
-      "risk_factor_multipliers": { "EVA": 5.0 },
-      "required_resources": { "hyperbaric-oxygen": 1 }
+      "risk_factor_multipliers": {
+        "EVA": 5.0
+      },
+      "required_resources": {
+        "hyperbaric-oxygen": 1
+      }
     },
     "acute-diverticulitis": {
       "conditionId": "acute-diverticulitis",
@@ -748,27 +2188,89 @@
         "beta": 2646866,
         "lambda_unit": "events-per-person-day"
       },
-      "severity": { "worst_case_prob_alpha": 1.5, "worst_case_prob_beta": 3.5 },
+      "severity": {
+        "worst_case_prob_alpha": 1.5,
+        "worst_case_prob_beta": 3.5
+      },
       "treated": {
-        "fi_cp1": { "min": 0.50, "mode": 0.80, "max": 0.95 },
-        "dt_cp1_hours": { "min": 6, "mode": 48, "max": 240 },
-        "fi_cp2": { "min": 0.0, "mode": 0.10, "max": 0.30 },
-        "dt_cp2_hours": { "min": 48, "mode": 240, "max": 720 },
-        "fi_cp3": { "min": 0.0, "mode": 0.02, "max": 0.10 },
-        "p_evac": { "min": 0.05, "mode": 0.20, "max": 0.50 },
-        "p_locl": { "min": 0.0, "mode": 0.01, "max": 0.05 }
+        "fi_cp1": {
+          "min": 0.5,
+          "mode": 0.8,
+          "max": 0.95
+        },
+        "dt_cp1_hours": {
+          "min": 6,
+          "mode": 48,
+          "max": 240
+        },
+        "fi_cp2": {
+          "min": 0.0,
+          "mode": 0.1,
+          "max": 0.3
+        },
+        "dt_cp2_hours": {
+          "min": 48,
+          "mode": 240,
+          "max": 720
+        },
+        "fi_cp3": {
+          "min": 0.0,
+          "mode": 0.02,
+          "max": 0.1
+        },
+        "p_evac": {
+          "min": 0.05,
+          "mode": 0.2,
+          "max": 0.5
+        },
+        "p_locl": {
+          "min": 0.0,
+          "mode": 0.01,
+          "max": 0.05
+        }
       },
       "untreated": {
-        "fi_cp1": { "min": 0.65, "mode": 0.90, "max": 1.0 },
-        "dt_cp1_hours": { "min": 12, "mode": 72, "max": 360 },
-        "fi_cp2": { "min": 0.0, "mode": 0.25, "max": 0.60 },
-        "dt_cp2_hours": { "min": 96, "mode": 480, "max": 1440 },
-        "fi_cp3": { "min": 0.0, "mode": 0.08, "max": 0.30 },
-        "p_evac": { "min": 0.15, "mode": 0.45, "max": 0.85 },
-        "p_locl": { "min": 0.01, "mode": 0.10, "max": 0.35 }
+        "fi_cp1": {
+          "min": 0.65,
+          "mode": 0.9,
+          "max": 1.0
+        },
+        "dt_cp1_hours": {
+          "min": 12,
+          "mode": 72,
+          "max": 360
+        },
+        "fi_cp2": {
+          "min": 0.0,
+          "mode": 0.25,
+          "max": 0.6
+        },
+        "dt_cp2_hours": {
+          "min": 96,
+          "mode": 480,
+          "max": 1440
+        },
+        "fi_cp3": {
+          "min": 0.0,
+          "mode": 0.08,
+          "max": 0.3
+        },
+        "p_evac": {
+          "min": 0.15,
+          "mode": 0.45,
+          "max": 0.85
+        },
+        "p_locl": {
+          "min": 0.01,
+          "mode": 0.1,
+          "max": 0.35
+        }
       },
       "risk_factor_multipliers": {},
-      "required_resources": { "antibiotic": 14, "iv-fluid": 2 }
+      "required_resources": {
+        "antibiotic": 14,
+        "iv-fluid": 2
+      }
     },
     "neck-injury": {
       "conditionId": "neck-injury",
@@ -780,27 +2282,89 @@
         "beta": 2665503,
         "lambda_unit": "events-per-person-day"
       },
-      "severity": { "worst_case_prob_alpha": 1.5, "worst_case_prob_beta": 3.5 },
+      "severity": {
+        "worst_case_prob_alpha": 1.5,
+        "worst_case_prob_beta": 3.5
+      },
       "treated": {
-        "fi_cp1": { "min": 0.50, "mode": 0.78, "max": 0.95 },
-        "dt_cp1_hours": { "min": 1, "mode": 12, "max": 72 },
-        "fi_cp2": { "min": 0.0, "mode": 0.08, "max": 0.25 },
-        "dt_cp2_hours": { "min": 24, "mode": 120, "max": 480 },
-        "fi_cp3": { "min": 0.0, "mode": 0.0, "max": 0.05 },
-        "p_evac": { "min": 0.03, "mode": 0.10, "max": 0.30 },
-        "p_locl": { "min": 0.0, "mode": 0.002, "max": 0.01 }
+        "fi_cp1": {
+          "min": 0.5,
+          "mode": 0.78,
+          "max": 0.95
+        },
+        "dt_cp1_hours": {
+          "min": 1,
+          "mode": 12,
+          "max": 72
+        },
+        "fi_cp2": {
+          "min": 0.0,
+          "mode": 0.08,
+          "max": 0.25
+        },
+        "dt_cp2_hours": {
+          "min": 24,
+          "mode": 120,
+          "max": 480
+        },
+        "fi_cp3": {
+          "min": 0.0,
+          "mode": 0.0,
+          "max": 0.05
+        },
+        "p_evac": {
+          "min": 0.03,
+          "mode": 0.1,
+          "max": 0.3
+        },
+        "p_locl": {
+          "min": 0.0,
+          "mode": 0.002,
+          "max": 0.01
+        }
       },
       "untreated": {
-        "fi_cp1": { "min": 0.60, "mode": 0.85, "max": 0.98 },
-        "dt_cp1_hours": { "min": 2, "mode": 24, "max": 168 },
-        "fi_cp2": { "min": 0.0, "mode": 0.15, "max": 0.40 },
-        "dt_cp2_hours": { "min": 72, "mode": 336, "max": 960 },
-        "fi_cp3": { "min": 0.0, "mode": 0.02, "max": 0.10 },
-        "p_evac": { "min": 0.05, "mode": 0.20, "max": 0.50 },
-        "p_locl": { "min": 0.0, "mode": 0.01, "max": 0.05 }
+        "fi_cp1": {
+          "min": 0.6,
+          "mode": 0.85,
+          "max": 0.98
+        },
+        "dt_cp1_hours": {
+          "min": 2,
+          "mode": 24,
+          "max": 168
+        },
+        "fi_cp2": {
+          "min": 0.0,
+          "mode": 0.15,
+          "max": 0.4
+        },
+        "dt_cp2_hours": {
+          "min": 72,
+          "mode": 336,
+          "max": 960
+        },
+        "fi_cp3": {
+          "min": 0.0,
+          "mode": 0.02,
+          "max": 0.1
+        },
+        "p_evac": {
+          "min": 0.05,
+          "mode": 0.2,
+          "max": 0.5
+        },
+        "p_locl": {
+          "min": 0.0,
+          "mode": 0.01,
+          "max": 0.05
+        }
       },
       "risk_factor_multipliers": {},
-      "required_resources": { "analgesic": 5, "cervical-collar": 1 }
+      "required_resources": {
+        "analgesic": 5,
+        "cervical-collar": 1
+      }
     },
     "traumatic-hypovolemic-shock": {
       "conditionId": "traumatic-hypovolemic-shock",
@@ -812,27 +2376,91 @@
         "beta": 3826105,
         "lambda_unit": "events-per-person-day"
       },
-      "severity": { "worst_case_prob_alpha": 1.5, "worst_case_prob_beta": 3.5 },
+      "severity": {
+        "worst_case_prob_alpha": 1.5,
+        "worst_case_prob_beta": 3.5
+      },
       "treated": {
-        "fi_cp1": { "min": 0.40, "mode": 0.72, "max": 0.92 },
-        "dt_cp1_hours": { "min": 1, "mode": 6, "max": 24 },
-        "fi_cp2": { "min": 0.0, "mode": 0.25, "max": 0.60 },
-        "dt_cp2_hours": { "min": 24, "mode": 120, "max": 480 },
-        "fi_cp3": { "min": 0.0, "mode": 0.10, "max": 0.35 },
-        "p_evac": { "min": 0.15, "mode": 0.45, "max": 0.85 },
-        "p_locl": { "min": 0.02, "mode": 0.15, "max": 0.45 }
+        "fi_cp1": {
+          "min": 0.4,
+          "mode": 0.72,
+          "max": 0.92
+        },
+        "dt_cp1_hours": {
+          "min": 1,
+          "mode": 6,
+          "max": 24
+        },
+        "fi_cp2": {
+          "min": 0.0,
+          "mode": 0.25,
+          "max": 0.6
+        },
+        "dt_cp2_hours": {
+          "min": 24,
+          "mode": 120,
+          "max": 480
+        },
+        "fi_cp3": {
+          "min": 0.0,
+          "mode": 0.1,
+          "max": 0.35
+        },
+        "p_evac": {
+          "min": 0.15,
+          "mode": 0.45,
+          "max": 0.85
+        },
+        "p_locl": {
+          "min": 0.02,
+          "mode": 0.15,
+          "max": 0.45
+        }
       },
       "untreated": {
-        "fi_cp1": { "min": 0.55, "mode": 0.88, "max": 1.0 },
-        "dt_cp1_hours": { "min": 2, "mode": 12, "max": 72 },
-        "fi_cp2": { "min": 0.0, "mode": 0.50, "max": 0.90 },
-        "dt_cp2_hours": { "min": 48, "mode": 240, "max": 720 },
-        "fi_cp3": { "min": 0.0, "mode": 0.30, "max": 0.70 },
-        "p_evac": { "min": 0.30, "mode": 0.70, "max": 0.98 },
-        "p_locl": { "min": 0.10, "mode": 0.30, "max": 0.70 }
+        "fi_cp1": {
+          "min": 0.55,
+          "mode": 0.88,
+          "max": 1.0
+        },
+        "dt_cp1_hours": {
+          "min": 2,
+          "mode": 12,
+          "max": 72
+        },
+        "fi_cp2": {
+          "min": 0.0,
+          "mode": 0.5,
+          "max": 0.9
+        },
+        "dt_cp2_hours": {
+          "min": 48,
+          "mode": 240,
+          "max": 720
+        },
+        "fi_cp3": {
+          "min": 0.0,
+          "mode": 0.3,
+          "max": 0.7
+        },
+        "p_evac": {
+          "min": 0.3,
+          "mode": 0.7,
+          "max": 0.98
+        },
+        "p_locl": {
+          "min": 0.1,
+          "mode": 0.3,
+          "max": 0.7
+        }
       },
-      "risk_factor_multipliers": { "EVA": 5.0 },
-      "required_resources": { "iv-fluid": 5, "blood-products": 2 }
+      "risk_factor_multipliers": {
+        "EVA": 5.0
+      },
+      "required_resources": {
+        "iv-fluid": 5,
+        "blood-products": 2
+      }
     },
     "medication-overdose-adverse-reaction": {
       "conditionId": "medication-overdose-adverse-reaction",
@@ -844,27 +2472,89 @@
         "beta": 8114143,
         "lambda_unit": "events-per-person-day"
       },
-      "severity": { "worst_case_prob_alpha": 1.5, "worst_case_prob_beta": 3.5 },
+      "severity": {
+        "worst_case_prob_alpha": 1.5,
+        "worst_case_prob_beta": 3.5
+      },
       "treated": {
-        "fi_cp1": { "min": 0.50, "mode": 0.80, "max": 0.95 },
-        "dt_cp1_hours": { "min": 1, "mode": 12, "max": 72 },
-        "fi_cp2": { "min": 0.0, "mode": 0.10, "max": 0.30 },
-        "dt_cp2_hours": { "min": 24, "mode": 120, "max": 480 },
-        "fi_cp3": { "min": 0.0, "mode": 0.02, "max": 0.10 },
-        "p_evac": { "min": 0.05, "mode": 0.15, "max": 0.40 },
-        "p_locl": { "min": 0.0, "mode": 0.01, "max": 0.05 }
+        "fi_cp1": {
+          "min": 0.5,
+          "mode": 0.8,
+          "max": 0.95
+        },
+        "dt_cp1_hours": {
+          "min": 1,
+          "mode": 12,
+          "max": 72
+        },
+        "fi_cp2": {
+          "min": 0.0,
+          "mode": 0.1,
+          "max": 0.3
+        },
+        "dt_cp2_hours": {
+          "min": 24,
+          "mode": 120,
+          "max": 480
+        },
+        "fi_cp3": {
+          "min": 0.0,
+          "mode": 0.02,
+          "max": 0.1
+        },
+        "p_evac": {
+          "min": 0.05,
+          "mode": 0.15,
+          "max": 0.4
+        },
+        "p_locl": {
+          "min": 0.0,
+          "mode": 0.01,
+          "max": 0.05
+        }
       },
       "untreated": {
-        "fi_cp1": { "min": 0.55, "mode": 0.85, "max": 1.0 },
-        "dt_cp1_hours": { "min": 2, "mode": 24, "max": 168 },
-        "fi_cp2": { "min": 0.0, "mode": 0.20, "max": 0.55 },
-        "dt_cp2_hours": { "min": 48, "mode": 240, "max": 720 },
-        "fi_cp3": { "min": 0.0, "mode": 0.08, "max": 0.30 },
-        "p_evac": { "min": 0.10, "mode": 0.30, "max": 0.65 },
-        "p_locl": { "min": 0.0, "mode": 0.10, "max": 0.35 }
+        "fi_cp1": {
+          "min": 0.55,
+          "mode": 0.85,
+          "max": 1.0
+        },
+        "dt_cp1_hours": {
+          "min": 2,
+          "mode": 24,
+          "max": 168
+        },
+        "fi_cp2": {
+          "min": 0.0,
+          "mode": 0.2,
+          "max": 0.55
+        },
+        "dt_cp2_hours": {
+          "min": 48,
+          "mode": 240,
+          "max": 720
+        },
+        "fi_cp3": {
+          "min": 0.0,
+          "mode": 0.08,
+          "max": 0.3
+        },
+        "p_evac": {
+          "min": 0.1,
+          "mode": 0.3,
+          "max": 0.65
+        },
+        "p_locl": {
+          "min": 0.0,
+          "mode": 0.1,
+          "max": 0.35
+        }
       },
       "risk_factor_multipliers": {},
-      "required_resources": { "antidote": 1, "iv-fluid": 2 }
+      "required_resources": {
+        "antidote": 1,
+        "iv-fluid": 2
+      }
     },
     "sudden-cardiac-arrest": {
       "conditionId": "sudden-cardiac-arrest",
@@ -876,27 +2566,89 @@
         "beta": 20511744,
         "lambda_unit": "events-per-person-day"
       },
-      "severity": { "worst_case_prob_alpha": 1.5, "worst_case_prob_beta": 3.5 },
+      "severity": {
+        "worst_case_prob_alpha": 1.5,
+        "worst_case_prob_beta": 3.5
+      },
       "treated": {
-        "fi_cp1": { "min": 0.20, "mode": 0.50, "max": 0.80 },
-        "dt_cp1_hours": { "min": 0.1, "mode": 1, "max": 6 },
-        "fi_cp2": { "min": 0.0, "mode": 0.30, "max": 0.70 },
-        "dt_cp2_hours": { "min": 24, "mode": 168, "max": 720 },
-        "fi_cp3": { "min": 0.0, "mode": 0.15, "max": 0.50 },
-        "p_evac": { "min": 0.20, "mode": 0.55, "max": 0.90 },
-        "p_locl": { "min": 0.05, "mode": 0.25, "max": 0.65 }
+        "fi_cp1": {
+          "min": 0.2,
+          "mode": 0.5,
+          "max": 0.8
+        },
+        "dt_cp1_hours": {
+          "min": 0.1,
+          "mode": 1,
+          "max": 6
+        },
+        "fi_cp2": {
+          "min": 0.0,
+          "mode": 0.3,
+          "max": 0.7
+        },
+        "dt_cp2_hours": {
+          "min": 24,
+          "mode": 168,
+          "max": 720
+        },
+        "fi_cp3": {
+          "min": 0.0,
+          "mode": 0.15,
+          "max": 0.5
+        },
+        "p_evac": {
+          "min": 0.2,
+          "mode": 0.55,
+          "max": 0.9
+        },
+        "p_locl": {
+          "min": 0.05,
+          "mode": 0.25,
+          "max": 0.65
+        }
       },
       "untreated": {
-        "fi_cp1": { "min": 0.05, "mode": 0.20, "max": 0.50 },
-        "dt_cp1_hours": { "min": 0.1, "mode": 0.5, "max": 2 },
-        "fi_cp2": { "min": 0.0, "mode": 0.10, "max": 0.30 },
-        "dt_cp2_hours": { "min": 1, "mode": 12, "max": 72 },
-        "fi_cp3": { "min": 0.0, "mode": 0.05, "max": 0.20 },
-        "p_evac": { "min": 0.50, "mode": 0.85, "max": 1.0 },
-        "p_locl": { "min": 0.20, "mode": 0.60, "max": 0.95 }
+        "fi_cp1": {
+          "min": 0.05,
+          "mode": 0.2,
+          "max": 0.5
+        },
+        "dt_cp1_hours": {
+          "min": 0.1,
+          "mode": 0.5,
+          "max": 2
+        },
+        "fi_cp2": {
+          "min": 0.0,
+          "mode": 0.1,
+          "max": 0.3
+        },
+        "dt_cp2_hours": {
+          "min": 1,
+          "mode": 12,
+          "max": 72
+        },
+        "fi_cp3": {
+          "min": 0.0,
+          "mode": 0.05,
+          "max": 0.2
+        },
+        "p_evac": {
+          "min": 0.5,
+          "mode": 0.85,
+          "max": 1.0
+        },
+        "p_locl": {
+          "min": 0.2,
+          "mode": 0.6,
+          "max": 0.95
+        }
       },
       "risk_factor_multipliers": {},
-      "required_resources": { "aed": 1, "cardiac-monitor": 1 }
+      "required_resources": {
+        "aed": 1,
+        "cardiac-monitor": 1
+      }
     },
     "burns-secondary-to-fire": {
       "conditionId": "burns-secondary-to-fire",
@@ -908,27 +2660,90 @@
         "beta": 11715873,
         "lambda_unit": "events-per-person-day"
       },
-      "severity": { "worst_case_prob_alpha": 1.5, "worst_case_prob_beta": 3.5 },
+      "severity": {
+        "worst_case_prob_alpha": 1.5,
+        "worst_case_prob_beta": 3.5
+      },
       "treated": {
-        "fi_cp1": { "min": 0.40, "mode": 0.70, "max": 0.90 },
-        "dt_cp1_hours": { "min": 1, "mode": 12, "max": 72 },
-        "fi_cp2": { "min": 0.0, "mode": 0.15, "max": 0.40 },
-        "dt_cp2_hours": { "min": 48, "mode": 240, "max": 720 },
-        "fi_cp3": { "min": 0.0, "mode": 0.05, "max": 0.20 },
-        "p_evac": { "min": 0.10, "mode": 0.35, "max": 0.70 },
-        "p_locl": { "min": 0.02, "mode": 0.10, "max": 0.30 }
+        "fi_cp1": {
+          "min": 0.4,
+          "mode": 0.7,
+          "max": 0.9
+        },
+        "dt_cp1_hours": {
+          "min": 1,
+          "mode": 12,
+          "max": 72
+        },
+        "fi_cp2": {
+          "min": 0.0,
+          "mode": 0.15,
+          "max": 0.4
+        },
+        "dt_cp2_hours": {
+          "min": 48,
+          "mode": 240,
+          "max": 720
+        },
+        "fi_cp3": {
+          "min": 0.0,
+          "mode": 0.05,
+          "max": 0.2
+        },
+        "p_evac": {
+          "min": 0.1,
+          "mode": 0.35,
+          "max": 0.7
+        },
+        "p_locl": {
+          "min": 0.02,
+          "mode": 0.1,
+          "max": 0.3
+        }
       },
       "untreated": {
-        "fi_cp1": { "min": 0.50, "mode": 0.82, "max": 1.0 },
-        "dt_cp1_hours": { "min": 2, "mode": 24, "max": 168 },
-        "fi_cp2": { "min": 0.0, "mode": 0.30, "max": 0.70 },
-        "dt_cp2_hours": { "min": 96, "mode": 480, "max": 1440 },
-        "fi_cp3": { "min": 0.0, "mode": 0.15, "max": 0.50 },
-        "p_evac": { "min": 0.25, "mode": 0.60, "max": 0.95 },
-        "p_locl": { "min": 0.05, "mode": 0.25, "max": 0.65 }
+        "fi_cp1": {
+          "min": 0.5,
+          "mode": 0.82,
+          "max": 1.0
+        },
+        "dt_cp1_hours": {
+          "min": 2,
+          "mode": 24,
+          "max": 168
+        },
+        "fi_cp2": {
+          "min": 0.0,
+          "mode": 0.3,
+          "max": 0.7
+        },
+        "dt_cp2_hours": {
+          "min": 96,
+          "mode": 480,
+          "max": 1440
+        },
+        "fi_cp3": {
+          "min": 0.0,
+          "mode": 0.15,
+          "max": 0.5
+        },
+        "p_evac": {
+          "min": 0.25,
+          "mode": 0.6,
+          "max": 0.95
+        },
+        "p_locl": {
+          "min": 0.05,
+          "mode": 0.25,
+          "max": 0.65
+        }
       },
       "risk_factor_multipliers": {},
-      "required_resources": { "burn-dressing": 10, "iv-fluid": 3, "analgesic": 10 }
+      "required_resources": {
+        "burn-dressing": 10,
+        "iv-fluid": 3,
+        "analgesic": 10
+      }
     },
     "toxic-exposure-ammonia": {
       "conditionId": "toxic-exposure-ammonia",
@@ -940,27 +2755,89 @@
         "beta": 8486126,
         "lambda_unit": "events-per-person-day"
       },
-      "severity": { "worst_case_prob_alpha": 1.5, "worst_case_prob_beta": 3.5 },
+      "severity": {
+        "worst_case_prob_alpha": 1.5,
+        "worst_case_prob_beta": 3.5
+      },
       "treated": {
-        "fi_cp1": { "min": 0.40, "mode": 0.70, "max": 0.92 },
-        "dt_cp1_hours": { "min": 1, "mode": 12, "max": 72 },
-        "fi_cp2": { "min": 0.0, "mode": 0.15, "max": 0.40 },
-        "dt_cp2_hours": { "min": 24, "mode": 120, "max": 480 },
-        "fi_cp3": { "min": 0.0, "mode": 0.05, "max": 0.20 },
-        "p_evac": { "min": 0.10, "mode": 0.30, "max": 0.65 },
-        "p_locl": { "min": 0.02, "mode": 0.10, "max": 0.30 }
+        "fi_cp1": {
+          "min": 0.4,
+          "mode": 0.7,
+          "max": 0.92
+        },
+        "dt_cp1_hours": {
+          "min": 1,
+          "mode": 12,
+          "max": 72
+        },
+        "fi_cp2": {
+          "min": 0.0,
+          "mode": 0.15,
+          "max": 0.4
+        },
+        "dt_cp2_hours": {
+          "min": 24,
+          "mode": 120,
+          "max": 480
+        },
+        "fi_cp3": {
+          "min": 0.0,
+          "mode": 0.05,
+          "max": 0.2
+        },
+        "p_evac": {
+          "min": 0.1,
+          "mode": 0.3,
+          "max": 0.65
+        },
+        "p_locl": {
+          "min": 0.02,
+          "mode": 0.1,
+          "max": 0.3
+        }
       },
       "untreated": {
-        "fi_cp1": { "min": 0.55, "mode": 0.85, "max": 1.0 },
-        "dt_cp1_hours": { "min": 2, "mode": 24, "max": 168 },
-        "fi_cp2": { "min": 0.0, "mode": 0.30, "max": 0.70 },
-        "dt_cp2_hours": { "min": 48, "mode": 240, "max": 720 },
-        "fi_cp3": { "min": 0.0, "mode": 0.15, "max": 0.50 },
-        "p_evac": { "min": 0.20, "mode": 0.55, "max": 0.90 },
-        "p_locl": { "min": 0.05, "mode": 0.20, "max": 0.55 }
+        "fi_cp1": {
+          "min": 0.55,
+          "mode": 0.85,
+          "max": 1.0
+        },
+        "dt_cp1_hours": {
+          "min": 2,
+          "mode": 24,
+          "max": 168
+        },
+        "fi_cp2": {
+          "min": 0.0,
+          "mode": 0.3,
+          "max": 0.7
+        },
+        "dt_cp2_hours": {
+          "min": 48,
+          "mode": 240,
+          "max": 720
+        },
+        "fi_cp3": {
+          "min": 0.0,
+          "mode": 0.15,
+          "max": 0.5
+        },
+        "p_evac": {
+          "min": 0.2,
+          "mode": 0.55,
+          "max": 0.9
+        },
+        "p_locl": {
+          "min": 0.05,
+          "mode": 0.2,
+          "max": 0.55
+        }
       },
       "risk_factor_multipliers": {},
-      "required_resources": { "oxygen-supplemental": 2, "iv-fluid": 2 }
+      "required_resources": {
+        "oxygen-supplemental": 2,
+        "iv-fluid": 2
+      }
     },
     "head-injury": {
       "conditionId": "head-injury",
@@ -972,27 +2849,91 @@
         "beta": 11019361,
         "lambda_unit": "events-per-person-day"
       },
-      "severity": { "worst_case_prob_alpha": 1.5, "worst_case_prob_beta": 3.5 },
+      "severity": {
+        "worst_case_prob_alpha": 1.5,
+        "worst_case_prob_beta": 3.5
+      },
       "treated": {
-        "fi_cp1": { "min": 0.40, "mode": 0.72, "max": 0.92 },
-        "dt_cp1_hours": { "min": 1, "mode": 6, "max": 48 },
-        "fi_cp2": { "min": 0.0, "mode": 0.15, "max": 0.40 },
-        "dt_cp2_hours": { "min": 24, "mode": 168, "max": 720 },
-        "fi_cp3": { "min": 0.0, "mode": 0.05, "max": 0.20 },
-        "p_evac": { "min": 0.05, "mode": 0.20, "max": 0.50 },
-        "p_locl": { "min": 0.0, "mode": 0.05, "max": 0.20 }
+        "fi_cp1": {
+          "min": 0.4,
+          "mode": 0.72,
+          "max": 0.92
+        },
+        "dt_cp1_hours": {
+          "min": 1,
+          "mode": 6,
+          "max": 48
+        },
+        "fi_cp2": {
+          "min": 0.0,
+          "mode": 0.15,
+          "max": 0.4
+        },
+        "dt_cp2_hours": {
+          "min": 24,
+          "mode": 168,
+          "max": 720
+        },
+        "fi_cp3": {
+          "min": 0.0,
+          "mode": 0.05,
+          "max": 0.2
+        },
+        "p_evac": {
+          "min": 0.05,
+          "mode": 0.2,
+          "max": 0.5
+        },
+        "p_locl": {
+          "min": 0.0,
+          "mode": 0.05,
+          "max": 0.2
+        }
       },
       "untreated": {
-        "fi_cp1": { "min": 0.55, "mode": 0.85, "max": 1.0 },
-        "dt_cp1_hours": { "min": 2, "mode": 12, "max": 96 },
-        "fi_cp2": { "min": 0.0, "mode": 0.30, "max": 0.70 },
-        "dt_cp2_hours": { "min": 48, "mode": 336, "max": 1440 },
-        "fi_cp3": { "min": 0.0, "mode": 0.15, "max": 0.50 },
-        "p_evac": { "min": 0.15, "mode": 0.45, "max": 0.85 },
-        "p_locl": { "min": 0.02, "mode": 0.20, "max": 0.55 }
+        "fi_cp1": {
+          "min": 0.55,
+          "mode": 0.85,
+          "max": 1.0
+        },
+        "dt_cp1_hours": {
+          "min": 2,
+          "mode": 12,
+          "max": 96
+        },
+        "fi_cp2": {
+          "min": 0.0,
+          "mode": 0.3,
+          "max": 0.7
+        },
+        "dt_cp2_hours": {
+          "min": 48,
+          "mode": 336,
+          "max": 1440
+        },
+        "fi_cp3": {
+          "min": 0.0,
+          "mode": 0.15,
+          "max": 0.5
+        },
+        "p_evac": {
+          "min": 0.15,
+          "mode": 0.45,
+          "max": 0.85
+        },
+        "p_locl": {
+          "min": 0.02,
+          "mode": 0.2,
+          "max": 0.55
+        }
       },
-      "risk_factor_multipliers": { "EVA": 5.0 },
-      "required_resources": { "analgesic": 5, "imaging": 1 }
+      "risk_factor_multipliers": {
+        "EVA": 5.0
+      },
+      "required_resources": {
+        "analgesic": 5,
+        "imaging": 1
+      }
     },
     "chest-injury": {
       "conditionId": "chest-injury",
@@ -1004,27 +2945,91 @@
         "beta": 22370892,
         "lambda_unit": "events-per-person-day"
       },
-      "severity": { "worst_case_prob_alpha": 1.5, "worst_case_prob_beta": 3.5 },
+      "severity": {
+        "worst_case_prob_alpha": 1.5,
+        "worst_case_prob_beta": 3.5
+      },
       "treated": {
-        "fi_cp1": { "min": 0.40, "mode": 0.70, "max": 0.90 },
-        "dt_cp1_hours": { "min": 1, "mode": 12, "max": 72 },
-        "fi_cp2": { "min": 0.0, "mode": 0.20, "max": 0.50 },
-        "dt_cp2_hours": { "min": 48, "mode": 240, "max": 720 },
-        "fi_cp3": { "min": 0.0, "mode": 0.08, "max": 0.30 },
-        "p_evac": { "min": 0.10, "mode": 0.35, "max": 0.70 },
-        "p_locl": { "min": 0.02, "mode": 0.10, "max": 0.30 }
+        "fi_cp1": {
+          "min": 0.4,
+          "mode": 0.7,
+          "max": 0.9
+        },
+        "dt_cp1_hours": {
+          "min": 1,
+          "mode": 12,
+          "max": 72
+        },
+        "fi_cp2": {
+          "min": 0.0,
+          "mode": 0.2,
+          "max": 0.5
+        },
+        "dt_cp2_hours": {
+          "min": 48,
+          "mode": 240,
+          "max": 720
+        },
+        "fi_cp3": {
+          "min": 0.0,
+          "mode": 0.08,
+          "max": 0.3
+        },
+        "p_evac": {
+          "min": 0.1,
+          "mode": 0.35,
+          "max": 0.7
+        },
+        "p_locl": {
+          "min": 0.02,
+          "mode": 0.1,
+          "max": 0.3
+        }
       },
       "untreated": {
-        "fi_cp1": { "min": 0.55, "mode": 0.85, "max": 1.0 },
-        "dt_cp1_hours": { "min": 2, "mode": 24, "max": 168 },
-        "fi_cp2": { "min": 0.0, "mode": 0.40, "max": 0.80 },
-        "dt_cp2_hours": { "min": 96, "mode": 480, "max": 1440 },
-        "fi_cp3": { "min": 0.0, "mode": 0.20, "max": 0.60 },
-        "p_evac": { "min": 0.25, "mode": 0.65, "max": 0.98 },
-        "p_locl": { "min": 0.05, "mode": 0.25, "max": 0.65 }
+        "fi_cp1": {
+          "min": 0.55,
+          "mode": 0.85,
+          "max": 1.0
+        },
+        "dt_cp1_hours": {
+          "min": 2,
+          "mode": 24,
+          "max": 168
+        },
+        "fi_cp2": {
+          "min": 0.0,
+          "mode": 0.4,
+          "max": 0.8
+        },
+        "dt_cp2_hours": {
+          "min": 96,
+          "mode": 480,
+          "max": 1440
+        },
+        "fi_cp3": {
+          "min": 0.0,
+          "mode": 0.2,
+          "max": 0.6
+        },
+        "p_evac": {
+          "min": 0.25,
+          "mode": 0.65,
+          "max": 0.98
+        },
+        "p_locl": {
+          "min": 0.05,
+          "mode": 0.25,
+          "max": 0.65
+        }
       },
-      "risk_factor_multipliers": { "EVA": 5.0 },
-      "required_resources": { "analgesic": 5, "chest-tube": 1 }
+      "risk_factor_multipliers": {
+        "EVA": 5.0
+      },
+      "required_resources": {
+        "analgesic": 5,
+        "chest-tube": 1
+      }
     },
     "back-injury": {
       "conditionId": "back-injury",
@@ -1036,27 +3041,89 @@
         "beta": 4922471,
         "lambda_unit": "events-per-person-day"
       },
-      "severity": { "worst_case_prob_alpha": 1.5, "worst_case_prob_beta": 3.5 },
+      "severity": {
+        "worst_case_prob_alpha": 1.5,
+        "worst_case_prob_beta": 3.5
+      },
       "treated": {
-        "fi_cp1": { "min": 0.50, "mode": 0.78, "max": 0.95 },
-        "dt_cp1_hours": { "min": 1, "mode": 12, "max": 72 },
-        "fi_cp2": { "min": 0.0, "mode": 0.10, "max": 0.30 },
-        "dt_cp2_hours": { "min": 24, "mode": 120, "max": 480 },
-        "fi_cp3": { "min": 0.0, "mode": 0.0, "max": 0.05 },
-        "p_evac": { "min": 0.03, "mode": 0.10, "max": 0.30 },
-        "p_locl": { "min": 0.0, "mode": 0.002, "max": 0.01 }
+        "fi_cp1": {
+          "min": 0.5,
+          "mode": 0.78,
+          "max": 0.95
+        },
+        "dt_cp1_hours": {
+          "min": 1,
+          "mode": 12,
+          "max": 72
+        },
+        "fi_cp2": {
+          "min": 0.0,
+          "mode": 0.1,
+          "max": 0.3
+        },
+        "dt_cp2_hours": {
+          "min": 24,
+          "mode": 120,
+          "max": 480
+        },
+        "fi_cp3": {
+          "min": 0.0,
+          "mode": 0.0,
+          "max": 0.05
+        },
+        "p_evac": {
+          "min": 0.03,
+          "mode": 0.1,
+          "max": 0.3
+        },
+        "p_locl": {
+          "min": 0.0,
+          "mode": 0.002,
+          "max": 0.01
+        }
       },
       "untreated": {
-        "fi_cp1": { "min": 0.60, "mode": 0.85, "max": 0.98 },
-        "dt_cp1_hours": { "min": 2, "mode": 24, "max": 168 },
-        "fi_cp2": { "min": 0.0, "mode": 0.20, "max": 0.50 },
-        "dt_cp2_hours": { "min": 72, "mode": 336, "max": 960 },
-        "fi_cp3": { "min": 0.0, "mode": 0.02, "max": 0.10 },
-        "p_evac": { "min": 0.05, "mode": 0.20, "max": 0.50 },
-        "p_locl": { "min": 0.0, "mode": 0.01, "max": 0.05 }
+        "fi_cp1": {
+          "min": 0.6,
+          "mode": 0.85,
+          "max": 0.98
+        },
+        "dt_cp1_hours": {
+          "min": 2,
+          "mode": 24,
+          "max": 168
+        },
+        "fi_cp2": {
+          "min": 0.0,
+          "mode": 0.2,
+          "max": 0.5
+        },
+        "dt_cp2_hours": {
+          "min": 72,
+          "mode": 336,
+          "max": 960
+        },
+        "fi_cp3": {
+          "min": 0.0,
+          "mode": 0.02,
+          "max": 0.1
+        },
+        "p_evac": {
+          "min": 0.05,
+          "mode": 0.2,
+          "max": 0.5
+        },
+        "p_locl": {
+          "min": 0.0,
+          "mode": 0.01,
+          "max": 0.05
+        }
       },
       "risk_factor_multipliers": {},
-      "required_resources": { "analgesic": 5, "muscle-relaxant": 5 }
+      "required_resources": {
+        "analgesic": 5,
+        "muscle-relaxant": 5
+      }
     },
     "skin-infection": {
       "conditionId": "skin-infection",
@@ -1068,27 +3135,89 @@
         "beta": 6591624,
         "lambda_unit": "events-per-person-day"
       },
-      "severity": { "worst_case_prob_alpha": 1.5, "worst_case_prob_beta": 3.5 },
+      "severity": {
+        "worst_case_prob_alpha": 1.5,
+        "worst_case_prob_beta": 3.5
+      },
       "treated": {
-        "fi_cp1": { "min": 0.55, "mode": 0.82, "max": 0.97 },
-        "dt_cp1_hours": { "min": 12, "mode": 48, "max": 168 },
-        "fi_cp2": { "min": 0.0, "mode": 0.05, "max": 0.20 },
-        "dt_cp2_hours": { "min": 48, "mode": 168, "max": 720 },
-        "fi_cp3": { "min": 0.0, "mode": 0.0, "max": 0.03 },
-        "p_evac": { "min": 0.02, "mode": 0.05, "max": 0.20 },
-        "p_locl": { "min": 0.0, "mode": 0.001, "max": 0.005 }
+        "fi_cp1": {
+          "min": 0.55,
+          "mode": 0.82,
+          "max": 0.97
+        },
+        "dt_cp1_hours": {
+          "min": 12,
+          "mode": 48,
+          "max": 168
+        },
+        "fi_cp2": {
+          "min": 0.0,
+          "mode": 0.05,
+          "max": 0.2
+        },
+        "dt_cp2_hours": {
+          "min": 48,
+          "mode": 168,
+          "max": 720
+        },
+        "fi_cp3": {
+          "min": 0.0,
+          "mode": 0.0,
+          "max": 0.03
+        },
+        "p_evac": {
+          "min": 0.02,
+          "mode": 0.05,
+          "max": 0.2
+        },
+        "p_locl": {
+          "min": 0.0,
+          "mode": 0.001,
+          "max": 0.005
+        }
       },
       "untreated": {
-        "fi_cp1": { "min": 0.65, "mode": 0.88, "max": 1.0 },
-        "dt_cp1_hours": { "min": 24, "mode": 96, "max": 480 },
-        "fi_cp2": { "min": 0.0, "mode": 0.15, "max": 0.40 },
-        "dt_cp2_hours": { "min": 96, "mode": 480, "max": 1440 },
-        "fi_cp3": { "min": 0.0, "mode": 0.02, "max": 0.10 },
-        "p_evac": { "min": 0.05, "mode": 0.15, "max": 0.40 },
-        "p_locl": { "min": 0.0, "mode": 0.01, "max": 0.05 }
+        "fi_cp1": {
+          "min": 0.65,
+          "mode": 0.88,
+          "max": 1.0
+        },
+        "dt_cp1_hours": {
+          "min": 24,
+          "mode": 96,
+          "max": 480
+        },
+        "fi_cp2": {
+          "min": 0.0,
+          "mode": 0.15,
+          "max": 0.4
+        },
+        "dt_cp2_hours": {
+          "min": 96,
+          "mode": 480,
+          "max": 1440
+        },
+        "fi_cp3": {
+          "min": 0.0,
+          "mode": 0.02,
+          "max": 0.1
+        },
+        "p_evac": {
+          "min": 0.05,
+          "mode": 0.15,
+          "max": 0.4
+        },
+        "p_locl": {
+          "min": 0.0,
+          "mode": 0.01,
+          "max": 0.05
+        }
       },
       "risk_factor_multipliers": {},
-      "required_resources": { "antibiotic": 7, "wound-care": 5 }
+      "required_resources": {
+        "antibiotic": 7,
+        "wound-care": 5
+      }
     },
     "behavioral-emergency": {
       "conditionId": "behavioral-emergency",
@@ -1100,27 +3229,89 @@
         "beta": 400000,
         "lambda_unit": "events-per-person-day"
       },
-      "severity": { "worst_case_prob_alpha": 1.5, "worst_case_prob_beta": 3.5 },
+      "severity": {
+        "worst_case_prob_alpha": 1.5,
+        "worst_case_prob_beta": 3.5
+      },
       "treated": {
-        "fi_cp1": { "min": 0.40, "mode": 0.70, "max": 0.90 },
-        "dt_cp1_hours": { "min": 1, "mode": 12, "max": 72 },
-        "fi_cp2": { "min": 0.0, "mode": 0.15, "max": 0.40 },
-        "dt_cp2_hours": { "min": 24, "mode": 120, "max": 480 },
-        "fi_cp3": { "min": 0.0, "mode": 0.05, "max": 0.20 },
-        "p_evac": { "min": 0.10, "mode": 0.30, "max": 0.65 },
-        "p_locl": { "min": 0.0, "mode": 0.05, "max": 0.20 }
+        "fi_cp1": {
+          "min": 0.4,
+          "mode": 0.7,
+          "max": 0.9
+        },
+        "dt_cp1_hours": {
+          "min": 1,
+          "mode": 12,
+          "max": 72
+        },
+        "fi_cp2": {
+          "min": 0.0,
+          "mode": 0.15,
+          "max": 0.4
+        },
+        "dt_cp2_hours": {
+          "min": 24,
+          "mode": 120,
+          "max": 480
+        },
+        "fi_cp3": {
+          "min": 0.0,
+          "mode": 0.05,
+          "max": 0.2
+        },
+        "p_evac": {
+          "min": 0.1,
+          "mode": 0.3,
+          "max": 0.65
+        },
+        "p_locl": {
+          "min": 0.0,
+          "mode": 0.05,
+          "max": 0.2
+        }
       },
       "untreated": {
-        "fi_cp1": { "min": 0.55, "mode": 0.85, "max": 1.0 },
-        "dt_cp1_hours": { "min": 2, "mode": 24, "max": 168 },
-        "fi_cp2": { "min": 0.0, "mode": 0.30, "max": 0.70 },
-        "dt_cp2_hours": { "min": 48, "mode": 240, "max": 720 },
-        "fi_cp3": { "min": 0.0, "mode": 0.15, "max": 0.50 },
-        "p_evac": { "min": 0.20, "mode": 0.55, "max": 0.90 },
-        "p_locl": { "min": 0.02, "mode": 0.20, "max": 0.55 }
+        "fi_cp1": {
+          "min": 0.55,
+          "mode": 0.85,
+          "max": 1.0
+        },
+        "dt_cp1_hours": {
+          "min": 2,
+          "mode": 24,
+          "max": 168
+        },
+        "fi_cp2": {
+          "min": 0.0,
+          "mode": 0.3,
+          "max": 0.7
+        },
+        "dt_cp2_hours": {
+          "min": 48,
+          "mode": 240,
+          "max": 720
+        },
+        "fi_cp3": {
+          "min": 0.0,
+          "mode": 0.15,
+          "max": 0.5
+        },
+        "p_evac": {
+          "min": 0.2,
+          "mode": 0.55,
+          "max": 0.9
+        },
+        "p_locl": {
+          "min": 0.02,
+          "mode": 0.2,
+          "max": 0.55
+        }
       },
       "risk_factor_multipliers": {},
-      "required_resources": { "psychotropic": 14, "sedative": 5 }
+      "required_resources": {
+        "psychotropic": 14,
+        "sedative": 5
+      }
     },
     "anxiety": {
       "conditionId": "anxiety",
@@ -1132,27 +3323,88 @@
         "beta": 25000,
         "lambda_unit": "events-per-person-day"
       },
-      "severity": { "worst_case_prob_alpha": 1.5, "worst_case_prob_beta": 3.5 },
+      "severity": {
+        "worst_case_prob_alpha": 1.5,
+        "worst_case_prob_beta": 3.5
+      },
       "treated": {
-        "fi_cp1": { "min": 0.40, "mode": 0.70, "max": 0.90 },
-        "dt_cp1_hours": { "min": 1, "mode": 6, "max": 48 },
-        "fi_cp2": { "min": 0.0, "mode": 0.05, "max": 0.20 },
-        "dt_cp2_hours": { "min": 24, "mode": 120, "max": 480 },
-        "fi_cp3": { "min": 0.0, "mode": 0.0, "max": 0.05 },
-        "p_evac": { "min": 0.02, "mode": 0.08, "max": 0.25 },
-        "p_locl": { "min": 0.0, "mode": 0.005, "max": 0.02 }
+        "fi_cp1": {
+          "min": 0.4,
+          "mode": 0.7,
+          "max": 0.9
+        },
+        "dt_cp1_hours": {
+          "min": 1,
+          "mode": 6,
+          "max": 48
+        },
+        "fi_cp2": {
+          "min": 0.0,
+          "mode": 0.05,
+          "max": 0.2
+        },
+        "dt_cp2_hours": {
+          "min": 24,
+          "mode": 120,
+          "max": 480
+        },
+        "fi_cp3": {
+          "min": 0.0,
+          "mode": 0.0,
+          "max": 0.05
+        },
+        "p_evac": {
+          "min": 0.02,
+          "mode": 0.08,
+          "max": 0.25
+        },
+        "p_locl": {
+          "min": 0.0,
+          "mode": 0.005,
+          "max": 0.02
+        }
       },
       "untreated": {
-        "fi_cp1": { "min": 0.50, "mode": 0.78, "max": 0.95 },
-        "dt_cp1_hours": { "min": 2, "mode": 12, "max": 96 },
-        "fi_cp2": { "min": 0.0, "mode": 0.10, "max": 0.30 },
-        "dt_cp2_hours": { "min": 48, "mode": 240, "max": 720 },
-        "fi_cp3": { "min": 0.0, "mode": 0.01, "max": 0.08 },
-        "p_evac": { "min": 0.05, "mode": 0.15, "max": 0.40 },
-        "p_locl": { "min": 0.0, "mode": 0.005, "max": 0.02 }
+        "fi_cp1": {
+          "min": 0.5,
+          "mode": 0.78,
+          "max": 0.95
+        },
+        "dt_cp1_hours": {
+          "min": 2,
+          "mode": 12,
+          "max": 96
+        },
+        "fi_cp2": {
+          "min": 0.0,
+          "mode": 0.1,
+          "max": 0.3
+        },
+        "dt_cp2_hours": {
+          "min": 48,
+          "mode": 240,
+          "max": 720
+        },
+        "fi_cp3": {
+          "min": 0.0,
+          "mode": 0.01,
+          "max": 0.08
+        },
+        "p_evac": {
+          "min": 0.05,
+          "mode": 0.15,
+          "max": 0.4
+        },
+        "p_locl": {
+          "min": 0.0,
+          "mode": 0.005,
+          "max": 0.02
+        }
       },
       "risk_factor_multipliers": {},
-      "required_resources": { "anxiolytic": 14 }
+      "required_resources": {
+        "anxiolytic": 14
+      }
     },
     "indigestion": {
       "conditionId": "indigestion",
@@ -1164,27 +3416,88 @@
         "beta": 4000,
         "lambda_unit": "events-per-person-day"
       },
-      "severity": { "worst_case_prob_alpha": 1.5, "worst_case_prob_beta": 3.5 },
+      "severity": {
+        "worst_case_prob_alpha": 1.5,
+        "worst_case_prob_beta": 3.5
+      },
       "treated": {
-        "fi_cp1": { "min": 0.50, "mode": 0.82, "max": 0.97 },
-        "dt_cp1_hours": { "min": 0.5, "mode": 4, "max": 24 },
-        "fi_cp2": { "min": 0.0, "mode": 0.02, "max": 0.10 },
-        "dt_cp2_hours": { "min": 12, "mode": 48, "max": 240 },
-        "fi_cp3": { "min": 0.0, "mode": 0.0, "max": 0.02 },
-        "p_evac": { "min": 0.0, "mode": 0.005, "max": 0.02 },
-        "p_locl": { "min": 0.0, "mode": 0.001, "max": 0.005 }
+        "fi_cp1": {
+          "min": 0.5,
+          "mode": 0.82,
+          "max": 0.97
+        },
+        "dt_cp1_hours": {
+          "min": 0.5,
+          "mode": 4,
+          "max": 24
+        },
+        "fi_cp2": {
+          "min": 0.0,
+          "mode": 0.02,
+          "max": 0.1
+        },
+        "dt_cp2_hours": {
+          "min": 12,
+          "mode": 48,
+          "max": 240
+        },
+        "fi_cp3": {
+          "min": 0.0,
+          "mode": 0.0,
+          "max": 0.02
+        },
+        "p_evac": {
+          "min": 0.0,
+          "mode": 0.005,
+          "max": 0.02
+        },
+        "p_locl": {
+          "min": 0.0,
+          "mode": 0.001,
+          "max": 0.005
+        }
       },
       "untreated": {
-        "fi_cp1": { "min": 0.60, "mode": 0.88, "max": 1.0 },
-        "dt_cp1_hours": { "min": 1, "mode": 8, "max": 72 },
-        "fi_cp2": { "min": 0.0, "mode": 0.05, "max": 0.20 },
-        "dt_cp2_hours": { "min": 24, "mode": 120, "max": 480 },
-        "fi_cp3": { "min": 0.0, "mode": 0.0, "max": 0.05 },
-        "p_evac": { "min": 0.0, "mode": 0.01, "max": 0.05 },
-        "p_locl": { "min": 0.0, "mode": 0.001, "max": 0.005 }
+        "fi_cp1": {
+          "min": 0.6,
+          "mode": 0.88,
+          "max": 1.0
+        },
+        "dt_cp1_hours": {
+          "min": 1,
+          "mode": 8,
+          "max": 72
+        },
+        "fi_cp2": {
+          "min": 0.0,
+          "mode": 0.05,
+          "max": 0.2
+        },
+        "dt_cp2_hours": {
+          "min": 24,
+          "mode": 120,
+          "max": 480
+        },
+        "fi_cp3": {
+          "min": 0.0,
+          "mode": 0.0,
+          "max": 0.05
+        },
+        "p_evac": {
+          "min": 0.0,
+          "mode": 0.01,
+          "max": 0.05
+        },
+        "p_locl": {
+          "min": 0.0,
+          "mode": 0.001,
+          "max": 0.005
+        }
       },
       "risk_factor_multipliers": {},
-      "required_resources": { "antacid": 14 }
+      "required_resources": {
+        "antacid": 14
+      }
     },
     "allergic-reaction-mild-to-moderate": {
       "conditionId": "allergic-reaction-mild-to-moderate",
@@ -1196,27 +3509,89 @@
         "beta": 20000,
         "lambda_unit": "events-per-person-day"
       },
-      "severity": { "worst_case_prob_alpha": 1.5, "worst_case_prob_beta": 3.5 },
+      "severity": {
+        "worst_case_prob_alpha": 1.5,
+        "worst_case_prob_beta": 3.5
+      },
       "treated": {
-        "fi_cp1": { "min": 0.55, "mode": 0.85, "max": 0.98 },
-        "dt_cp1_hours": { "min": 0.5, "mode": 4, "max": 24 },
-        "fi_cp2": { "min": 0.0, "mode": 0.03, "max": 0.12 },
-        "dt_cp2_hours": { "min": 12, "mode": 48, "max": 240 },
-        "fi_cp3": { "min": 0.0, "mode": 0.0, "max": 0.02 },
-        "p_evac": { "min": 0.0, "mode": 0.01, "max": 0.05 },
-        "p_locl": { "min": 0.0, "mode": 0.002, "max": 0.008 }
+        "fi_cp1": {
+          "min": 0.55,
+          "mode": 0.85,
+          "max": 0.98
+        },
+        "dt_cp1_hours": {
+          "min": 0.5,
+          "mode": 4,
+          "max": 24
+        },
+        "fi_cp2": {
+          "min": 0.0,
+          "mode": 0.03,
+          "max": 0.12
+        },
+        "dt_cp2_hours": {
+          "min": 12,
+          "mode": 48,
+          "max": 240
+        },
+        "fi_cp3": {
+          "min": 0.0,
+          "mode": 0.0,
+          "max": 0.02
+        },
+        "p_evac": {
+          "min": 0.0,
+          "mode": 0.01,
+          "max": 0.05
+        },
+        "p_locl": {
+          "min": 0.0,
+          "mode": 0.002,
+          "max": 0.008
+        }
       },
       "untreated": {
-        "fi_cp1": { "min": 0.60, "mode": 0.88, "max": 1.0 },
-        "dt_cp1_hours": { "min": 1, "mode": 12, "max": 72 },
-        "fi_cp2": { "min": 0.0, "mode": 0.10, "max": 0.30 },
-        "dt_cp2_hours": { "min": 24, "mode": 120, "max": 480 },
-        "fi_cp3": { "min": 0.0, "mode": 0.01, "max": 0.05 },
-        "p_evac": { "min": 0.01, "mode": 0.05, "max": 0.20 },
-        "p_locl": { "min": 0.0, "mode": 0.002, "max": 0.01 }
+        "fi_cp1": {
+          "min": 0.6,
+          "mode": 0.88,
+          "max": 1.0
+        },
+        "dt_cp1_hours": {
+          "min": 1,
+          "mode": 12,
+          "max": 72
+        },
+        "fi_cp2": {
+          "min": 0.0,
+          "mode": 0.1,
+          "max": 0.3
+        },
+        "dt_cp2_hours": {
+          "min": 24,
+          "mode": 120,
+          "max": 480
+        },
+        "fi_cp3": {
+          "min": 0.0,
+          "mode": 0.01,
+          "max": 0.05
+        },
+        "p_evac": {
+          "min": 0.01,
+          "mode": 0.05,
+          "max": 0.2
+        },
+        "p_locl": {
+          "min": 0.0,
+          "mode": 0.002,
+          "max": 0.01
+        }
       },
       "risk_factor_multipliers": {},
-      "required_resources": { "antihistamine": 14, "epinephrine": 1 }
+      "required_resources": {
+        "antihistamine": 14,
+        "epinephrine": 1
+      }
     },
     "late-insomnia": {
       "conditionId": "late-insomnia",
@@ -1228,27 +3603,88 @@
         "beta": 1000,
         "lambda_unit": "events-per-person-day"
       },
-      "severity": { "worst_case_prob_alpha": 1.5, "worst_case_prob_beta": 3.5 },
+      "severity": {
+        "worst_case_prob_alpha": 1.5,
+        "worst_case_prob_beta": 3.5
+      },
       "treated": {
-        "fi_cp1": { "min": 0.30, "mode": 0.65, "max": 0.90 },
-        "dt_cp1_hours": { "min": 1, "mode": 24, "max": 168 },
-        "fi_cp2": { "min": 0.0, "mode": 0.05, "max": 0.20 },
-        "dt_cp2_hours": { "min": 24, "mode": 168, "max": 720 },
-        "fi_cp3": { "min": 0.0, "mode": 0.0, "max": 0.03 },
-        "p_evac": { "min": 0.0, "mode": 0.005, "max": 0.02 },
-        "p_locl": { "min": 0.0, "mode": 0.0, "max": 0.002 }
+        "fi_cp1": {
+          "min": 0.3,
+          "mode": 0.65,
+          "max": 0.9
+        },
+        "dt_cp1_hours": {
+          "min": 1,
+          "mode": 24,
+          "max": 168
+        },
+        "fi_cp2": {
+          "min": 0.0,
+          "mode": 0.05,
+          "max": 0.2
+        },
+        "dt_cp2_hours": {
+          "min": 24,
+          "mode": 168,
+          "max": 720
+        },
+        "fi_cp3": {
+          "min": 0.0,
+          "mode": 0.0,
+          "max": 0.03
+        },
+        "p_evac": {
+          "min": 0.0,
+          "mode": 0.005,
+          "max": 0.02
+        },
+        "p_locl": {
+          "min": 0.0,
+          "mode": 0.0,
+          "max": 0.002
+        }
       },
       "untreated": {
-        "fi_cp1": { "min": 0.40, "mode": 0.72, "max": 0.95 },
-        "dt_cp1_hours": { "min": 2, "mode": 48, "max": 336 },
-        "fi_cp2": { "min": 0.0, "mode": 0.10, "max": 0.30 },
-        "dt_cp2_hours": { "min": 48, "mode": 240, "max": 720 },
-        "fi_cp3": { "min": 0.0, "mode": 0.0, "max": 0.05 },
-        "p_evac": { "min": 0.0, "mode": 0.005, "max": 0.02 },
-        "p_locl": { "min": 0.0, "mode": 0.0, "max": 0.005 }
+        "fi_cp1": {
+          "min": 0.4,
+          "mode": 0.72,
+          "max": 0.95
+        },
+        "dt_cp1_hours": {
+          "min": 2,
+          "mode": 48,
+          "max": 336
+        },
+        "fi_cp2": {
+          "min": 0.0,
+          "mode": 0.1,
+          "max": 0.3
+        },
+        "dt_cp2_hours": {
+          "min": 48,
+          "mode": 240,
+          "max": 720
+        },
+        "fi_cp3": {
+          "min": 0.0,
+          "mode": 0.0,
+          "max": 0.05
+        },
+        "p_evac": {
+          "min": 0.0,
+          "mode": 0.005,
+          "max": 0.02
+        },
+        "p_locl": {
+          "min": 0.0,
+          "mode": 0.0,
+          "max": 0.005
+        }
       },
       "risk_factor_multipliers": {},
-      "required_resources": { "sleep-aid": 30 }
+      "required_resources": {
+        "sleep-aid": 30
+      }
     },
     "visual-impairment-and-intracranial-pressure-viip-space-adaptation": {
       "conditionId": "visual-impairment-and-intracranial-pressure-viip-space-adaptation",
@@ -1260,34 +3696,2439 @@
         "beta": 14195,
         "lambda_unit": "events-per-person-day"
       },
-      "severity": { "worst_case_prob_alpha": 2.0, "worst_case_prob_beta": 12.0 },
+      "severity": {
+        "worst_case_prob_alpha": 2.0,
+        "worst_case_prob_beta": 12.0
+      },
       "treated": {
-        "fi_cp1": { "min": 0.20, "mode": 0.55, "max": 0.85 },
-        "dt_cp1_hours": { "min": 24, "mode": 168, "max": 720 },
-        "fi_cp2": { "min": 0.0, "mode": 0.20, "max": 0.50 },
-        "dt_cp2_hours": { "min": 168, "mode": 720, "max": 4320 },
-        "fi_cp3": { "min": 0.0, "mode": 0.05, "max": 0.25 },
-        "p_evac": { "min": 0.10, "mode": 0.35, "max": 0.70 },
-        "p_locl": { "min": 0.02, "mode": 0.10, "max": 0.30 }
+        "fi_cp1": {
+          "min": 0.2,
+          "mode": 0.55,
+          "max": 0.85
+        },
+        "dt_cp1_hours": {
+          "min": 24,
+          "mode": 168,
+          "max": 720
+        },
+        "fi_cp2": {
+          "min": 0.0,
+          "mode": 0.2,
+          "max": 0.5
+        },
+        "dt_cp2_hours": {
+          "min": 168,
+          "mode": 720,
+          "max": 4320
+        },
+        "fi_cp3": {
+          "min": 0.0,
+          "mode": 0.05,
+          "max": 0.25
+        },
+        "p_evac": {
+          "min": 0.1,
+          "mode": 0.35,
+          "max": 0.7
+        },
+        "p_locl": {
+          "min": 0.02,
+          "mode": 0.1,
+          "max": 0.3
+        }
       },
       "untreated": {
-        "fi_cp1": { "min": 0.30, "mode": 0.65, "max": 0.90 },
-        "dt_cp1_hours": { "min": 48, "mode": 336, "max": 2160 },
-        "fi_cp2": { "min": 0.0, "mode": 0.35, "max": 0.70 },
-        "dt_cp2_hours": { "min": 336, "mode": 1440, "max": 8640 },
-        "fi_cp3": { "min": 0.0, "mode": 0.15, "max": 0.50 },
-        "p_evac": { "min": 0.15, "mode": 0.50, "max": 0.90 },
-        "p_locl": { "min": 0.05, "mode": 0.20, "max": 0.55 }
+        "fi_cp1": {
+          "min": 0.3,
+          "mode": 0.65,
+          "max": 0.9
+        },
+        "dt_cp1_hours": {
+          "min": 48,
+          "mode": 336,
+          "max": 2160
+        },
+        "fi_cp2": {
+          "min": 0.0,
+          "mode": 0.35,
+          "max": 0.7
+        },
+        "dt_cp2_hours": {
+          "min": 336,
+          "mode": 1440,
+          "max": 8640
+        },
+        "fi_cp3": {
+          "min": 0.0,
+          "mode": 0.15,
+          "max": 0.5
+        },
+        "p_evac": {
+          "min": 0.15,
+          "mode": 0.5,
+          "max": 0.9
+        },
+        "p_locl": {
+          "min": 0.05,
+          "mode": 0.2,
+          "max": 0.55
+        }
       },
       "risk_factor_multipliers": {},
-      "required_resources": { "ophthalmic-exam": 3, "imaging": 2 }
+      "required_resources": {
+        "ophthalmic-exam": 3,
+        "imaging": 2
+      }
+    },
+    "back-pain-space-adaptation": {
+      "conditionId": "back-pain-space-adaptation",
+      "provenance": "tierB-lit",
+      "source_ref": "research/evidence/pagel-chouker-2016-effects-isolation-confinement.md",
+      "incidence": {
+        "distribution": "Beta-Bernoulli",
+        "alpha": 7,
+        "beta": 3,
+        "lambda_unit": "events-per-person-day"
+      },
+      "severity": {
+        "worst_case_prob_alpha": 1.0,
+        "worst_case_prob_beta": 9.0
+      },
+      "treated": {
+        "fi_cp1": {
+          "min": 0,
+          "mode": 0.1,
+          "max": 0.3
+        },
+        "dt_cp1_hours": {
+          "min": 2,
+          "mode": 8,
+          "max": 48
+        },
+        "fi_cp2": {
+          "min": 0,
+          "mode": 0.02,
+          "max": 0.08
+        },
+        "dt_cp2_hours": {
+          "min": 0,
+          "mode": 24,
+          "max": 168
+        },
+        "fi_cp3": {
+          "min": 0,
+          "mode": 0,
+          "max": 0.01
+        },
+        "p_evac": {
+          "min": 0,
+          "mode": 0.003,
+          "max": 0.02
+        },
+        "p_locl": {
+          "min": 0,
+          "mode": 0,
+          "max": 0.002
+        }
+      },
+      "untreated": {
+        "fi_cp1": {
+          "min": 0.05,
+          "mode": 0.25,
+          "max": 0.6
+        },
+        "dt_cp1_hours": {
+          "min": 12,
+          "mode": 72,
+          "max": 336
+        },
+        "fi_cp2": {
+          "min": 0,
+          "mode": 0.1,
+          "max": 0.3
+        },
+        "dt_cp2_hours": {
+          "min": 24,
+          "mode": 168,
+          "max": 720
+        },
+        "fi_cp3": {
+          "min": 0,
+          "mode": 0.02,
+          "max": 0.1
+        },
+        "p_evac": {
+          "min": 0.02,
+          "mode": 0.1,
+          "max": 0.35
+        },
+        "p_locl": {
+          "min": 0,
+          "mode": 0.01,
+          "max": 0.05
+        }
+      },
+      "risk_factor_multipliers": {},
+      "required_resources": {
+        "analgesic-mild": 14
+      }
+    },
+    "constipation-space-adaptation": {
+      "conditionId": "constipation-space-adaptation",
+      "provenance": "tierB-lit",
+      "source_ref": "research/evidence/shved-2022-isolation-crowding-countermeasures.md",
+      "incidence": {
+        "distribution": "Beta-Bernoulli",
+        "alpha": 5,
+        "beta": 5,
+        "lambda_unit": "events-per-person-day"
+      },
+      "severity": {
+        "worst_case_prob_alpha": 1.0,
+        "worst_case_prob_beta": 9.0
+      },
+      "treated": {
+        "fi_cp1": {
+          "min": 0,
+          "mode": 0.1,
+          "max": 0.25
+        },
+        "dt_cp1_hours": {
+          "min": 2,
+          "mode": 6,
+          "max": 24
+        },
+        "fi_cp2": {
+          "min": 0,
+          "mode": 0.02,
+          "max": 0.06
+        },
+        "dt_cp2_hours": {
+          "min": 0,
+          "mode": 12,
+          "max": 72
+        },
+        "fi_cp3": {
+          "min": 0,
+          "mode": 0,
+          "max": 0.01
+        },
+        "p_evac": {
+          "min": 0,
+          "mode": 0.001,
+          "max": 0.01
+        },
+        "p_locl": {
+          "min": 0,
+          "mode": 0,
+          "max": 0.001
+        }
+      },
+      "untreated": {
+        "fi_cp1": {
+          "min": 0.05,
+          "mode": 0.2,
+          "max": 0.5
+        },
+        "dt_cp1_hours": {
+          "min": 12,
+          "mode": 48,
+          "max": 240
+        },
+        "fi_cp2": {
+          "min": 0,
+          "mode": 0.08,
+          "max": 0.25
+        },
+        "dt_cp2_hours": {
+          "min": 24,
+          "mode": 120,
+          "max": 480
+        },
+        "fi_cp3": {
+          "min": 0,
+          "mode": 0.01,
+          "max": 0.08
+        },
+        "p_evac": {
+          "min": 0.01,
+          "mode": 0.05,
+          "max": 0.2
+        },
+        "p_locl": {
+          "min": 0,
+          "mode": 0.005,
+          "max": 0.03
+        }
+      },
+      "risk_factor_multipliers": {},
+      "required_resources": {
+        "laxative": 7
+      }
+    },
+    "headache-space-adaptation": {
+      "conditionId": "headache-space-adaptation",
+      "provenance": "tierB-lit",
+      "source_ref": "research/evidence/pagel-chouker-2016-effects-isolation-confinement.md",
+      "incidence": {
+        "distribution": "Beta-Bernoulli",
+        "alpha": 6,
+        "beta": 4,
+        "lambda_unit": "events-per-person-day"
+      },
+      "severity": {
+        "worst_case_prob_alpha": 1.0,
+        "worst_case_prob_beta": 9.0
+      },
+      "treated": {
+        "fi_cp1": {
+          "min": 0,
+          "mode": 0.1,
+          "max": 0.3
+        },
+        "dt_cp1_hours": {
+          "min": 1,
+          "mode": 4,
+          "max": 12
+        },
+        "fi_cp2": {
+          "min": 0,
+          "mode": 0.01,
+          "max": 0.05
+        },
+        "dt_cp2_hours": {
+          "min": 0,
+          "mode": 4,
+          "max": 24
+        },
+        "fi_cp3": {
+          "min": 0,
+          "mode": 0,
+          "max": 0.01
+        },
+        "p_evac": {
+          "min": 0,
+          "mode": 0.001,
+          "max": 0.005
+        },
+        "p_locl": {
+          "min": 0,
+          "mode": 0,
+          "max": 0.001
+        }
+      },
+      "untreated": {
+        "fi_cp1": {
+          "min": 0.05,
+          "mode": 0.25,
+          "max": 0.6
+        },
+        "dt_cp1_hours": {
+          "min": 4,
+          "mode": 24,
+          "max": 72
+        },
+        "fi_cp2": {
+          "min": 0,
+          "mode": 0.05,
+          "max": 0.2
+        },
+        "dt_cp2_hours": {
+          "min": 12,
+          "mode": 48,
+          "max": 168
+        },
+        "fi_cp3": {
+          "min": 0,
+          "mode": 0.01,
+          "max": 0.05
+        },
+        "p_evac": {
+          "min": 0.005,
+          "mode": 0.02,
+          "max": 0.1
+        },
+        "p_locl": {
+          "min": 0,
+          "mode": 0.002,
+          "max": 0.02
+        }
+      },
+      "risk_factor_multipliers": {},
+      "required_resources": {
+        "analgesic-mild": 7
+      }
+    },
+    "insomnia-space-adaptation": {
+      "conditionId": "insomnia-space-adaptation",
+      "provenance": "tierB-lit",
+      "source_ref": "research/evidence/palinkas-2004-antarctic-psychiatric-disorders.md",
+      "incidence": {
+        "distribution": "Beta-Bernoulli",
+        "alpha": 7,
+        "beta": 3,
+        "lambda_unit": "events-per-person-day"
+      },
+      "severity": {
+        "worst_case_prob_alpha": 1.2,
+        "worst_case_prob_beta": 8.8
+      },
+      "treated": {
+        "fi_cp1": {
+          "min": 0,
+          "mode": 0.2,
+          "max": 0.5
+        },
+        "dt_cp1_hours": {
+          "min": 2,
+          "mode": 24,
+          "max": 72
+        },
+        "fi_cp2": {
+          "min": 0,
+          "mode": 0.05,
+          "max": 0.2
+        },
+        "dt_cp2_hours": {
+          "min": 24,
+          "mode": 72,
+          "max": 336
+        },
+        "fi_cp3": {
+          "min": 0,
+          "mode": 0,
+          "max": 0.05
+        },
+        "p_evac": {
+          "min": 0,
+          "mode": 0.005,
+          "max": 0.02
+        },
+        "p_locl": {
+          "min": 0,
+          "mode": 0,
+          "max": 0.003
+        }
+      },
+      "untreated": {
+        "fi_cp1": {
+          "min": 0.1,
+          "mode": 0.4,
+          "max": 0.8
+        },
+        "dt_cp1_hours": {
+          "min": 24,
+          "mode": 168,
+          "max": 720
+        },
+        "fi_cp2": {
+          "min": 0,
+          "mode": 0.15,
+          "max": 0.45
+        },
+        "dt_cp2_hours": {
+          "min": 72,
+          "mode": 360,
+          "max": 2160
+        },
+        "fi_cp3": {
+          "min": 0,
+          "mode": 0.02,
+          "max": 0.15
+        },
+        "p_evac": {
+          "min": 0.02,
+          "mode": 0.08,
+          "max": 0.25
+        },
+        "p_locl": {
+          "min": 0,
+          "mode": 0.005,
+          "max": 0.03
+        }
+      },
+      "risk_factor_multipliers": {
+        "sex-female": 1.3
+      },
+      "required_resources": {
+        "sleep-medication": 14
+      }
+    },
+    "nasal-congestion-space-adaptation": {
+      "conditionId": "nasal-congestion-space-adaptation",
+      "provenance": "tierB-lit",
+      "source_ref": "research/evidence/pagel-chouker-2016-effects-isolation-confinement.md",
+      "incidence": {
+        "distribution": "Beta-Bernoulli",
+        "alpha": 8,
+        "beta": 2,
+        "lambda_unit": "events-per-person-day"
+      },
+      "severity": {
+        "worst_case_prob_alpha": 1.0,
+        "worst_case_prob_beta": 9.0
+      },
+      "treated": {
+        "fi_cp1": {
+          "min": 0,
+          "mode": 0.05,
+          "max": 0.2
+        },
+        "dt_cp1_hours": {
+          "min": 1,
+          "mode": 3,
+          "max": 12
+        },
+        "fi_cp2": {
+          "min": 0,
+          "mode": 0.01,
+          "max": 0.04
+        },
+        "dt_cp2_hours": {
+          "min": 0,
+          "mode": 6,
+          "max": 24
+        },
+        "fi_cp3": {
+          "min": 0,
+          "mode": 0,
+          "max": 0.005
+        },
+        "p_evac": {
+          "min": 0,
+          "mode": 0.001,
+          "max": 0.005
+        },
+        "p_locl": {
+          "min": 0,
+          "mode": 0,
+          "max": 0.001
+        }
+      },
+      "untreated": {
+        "fi_cp1": {
+          "min": 0.05,
+          "mode": 0.2,
+          "max": 0.5
+        },
+        "dt_cp1_hours": {
+          "min": 6,
+          "mode": 24,
+          "max": 168
+        },
+        "fi_cp2": {
+          "min": 0,
+          "mode": 0.05,
+          "max": 0.15
+        },
+        "dt_cp2_hours": {
+          "min": 12,
+          "mode": 48,
+          "max": 240
+        },
+        "fi_cp3": {
+          "min": 0,
+          "mode": 0.01,
+          "max": 0.05
+        },
+        "p_evac": {
+          "min": 0.005,
+          "mode": 0.02,
+          "max": 0.08
+        },
+        "p_locl": {
+          "min": 0,
+          "mode": 0.001,
+          "max": 0.01
+        }
+      },
+      "risk_factor_multipliers": {},
+      "required_resources": {
+        "nasal-decongestant": 7
+      }
+    },
+    "nose-bleed-space-adaptation": {
+      "conditionId": "nose-bleed-space-adaptation",
+      "provenance": "tierB-lit",
+      "source_ref": "research/evidence/pagel-chouker-2016-effects-isolation-confinement.md",
+      "incidence": {
+        "distribution": "Beta-Bernoulli",
+        "alpha": 4,
+        "beta": 6,
+        "lambda_unit": "events-per-person-day"
+      },
+      "severity": {
+        "worst_case_prob_alpha": 1.0,
+        "worst_case_prob_beta": 9.0
+      },
+      "treated": {
+        "fi_cp1": {
+          "min": 0,
+          "mode": 0.02,
+          "max": 0.1
+        },
+        "dt_cp1_hours": {
+          "min": 0,
+          "mode": 1,
+          "max": 4
+        },
+        "fi_cp2": {
+          "min": 0,
+          "mode": 0.005,
+          "max": 0.02
+        },
+        "dt_cp2_hours": {
+          "min": 0,
+          "mode": 2,
+          "max": 12
+        },
+        "fi_cp3": {
+          "min": 0,
+          "mode": 0,
+          "max": 0.005
+        },
+        "p_evac": {
+          "min": 0,
+          "mode": 0.001,
+          "max": 0.005
+        },
+        "p_locl": {
+          "min": 0,
+          "mode": 0,
+          "max": 0.001
+        }
+      },
+      "untreated": {
+        "fi_cp1": {
+          "min": 0.02,
+          "mode": 0.1,
+          "max": 0.3
+        },
+        "dt_cp1_hours": {
+          "min": 1,
+          "mode": 4,
+          "max": 24
+        },
+        "fi_cp2": {
+          "min": 0,
+          "mode": 0.02,
+          "max": 0.08
+        },
+        "dt_cp2_hours": {
+          "min": 4,
+          "mode": 12,
+          "max": 48
+        },
+        "fi_cp3": {
+          "min": 0,
+          "mode": 0.005,
+          "max": 0.02
+        },
+        "p_evac": {
+          "min": 0.005,
+          "mode": 0.02,
+          "max": 0.08
+        },
+        "p_locl": {
+          "min": 0,
+          "mode": 0.001,
+          "max": 0.01
+        }
+      },
+      "risk_factor_multipliers": {},
+      "required_resources": {
+        "nasal-decongestant": 3
+      }
+    },
+    "space-motion-sickness-space-adaptation": {
+      "conditionId": "space-motion-sickness-space-adaptation",
+      "provenance": "tierB-lit",
+      "source_ref": "research/evidence/pagel-chouker-2016-effects-isolation-confinement.md",
+      "incidence": {
+        "distribution": "Beta-Bernoulli",
+        "alpha": 7,
+        "beta": 3,
+        "lambda_unit": "events-per-person-day"
+      },
+      "severity": {
+        "worst_case_prob_alpha": 1.0,
+        "worst_case_prob_beta": 9.0
+      },
+      "treated": {
+        "fi_cp1": {
+          "min": 0,
+          "mode": 0.15,
+          "max": 0.4
+        },
+        "dt_cp1_hours": {
+          "min": 2,
+          "mode": 8,
+          "max": 24
+        },
+        "fi_cp2": {
+          "min": 0,
+          "mode": 0.03,
+          "max": 0.1
+        },
+        "dt_cp2_hours": {
+          "min": 8,
+          "mode": 24,
+          "max": 72
+        },
+        "fi_cp3": {
+          "min": 0,
+          "mode": 0,
+          "max": 0.02
+        },
+        "p_evac": {
+          "min": 0,
+          "mode": 0.002,
+          "max": 0.01
+        },
+        "p_locl": {
+          "min": 0,
+          "mode": 0,
+          "max": 0.001
+        }
+      },
+      "untreated": {
+        "fi_cp1": {
+          "min": 0.1,
+          "mode": 0.35,
+          "max": 0.7
+        },
+        "dt_cp1_hours": {
+          "min": 8,
+          "mode": 48,
+          "max": 168
+        },
+        "fi_cp2": {
+          "min": 0,
+          "mode": 0.1,
+          "max": 0.3
+        },
+        "dt_cp2_hours": {
+          "min": 24,
+          "mode": 96,
+          "max": 336
+        },
+        "fi_cp3": {
+          "min": 0,
+          "mode": 0.01,
+          "max": 0.1
+        },
+        "p_evac": {
+          "min": 0.01,
+          "mode": 0.05,
+          "max": 0.15
+        },
+        "p_locl": {
+          "min": 0,
+          "mode": 0.002,
+          "max": 0.01
+        }
+      },
+      "risk_factor_multipliers": {},
+      "required_resources": {
+        "promethazine": 3,
+        "scopolamine": 3
+      }
+    },
+    "urinary-incontinence-space-adaptation": {
+      "conditionId": "urinary-incontinence-space-adaptation",
+      "provenance": "tierB-lit",
+      "source_ref": "research/evidence/pagel-chouker-2016-effects-isolation-confinement.md",
+      "incidence": {
+        "distribution": "Beta-Bernoulli",
+        "alpha": 3,
+        "beta": 7,
+        "lambda_unit": "events-per-person-day"
+      },
+      "severity": {
+        "worst_case_prob_alpha": 1.0,
+        "worst_case_prob_beta": 9.0
+      },
+      "treated": {
+        "fi_cp1": {
+          "min": 0,
+          "mode": 0.05,
+          "max": 0.2
+        },
+        "dt_cp1_hours": {
+          "min": 2,
+          "mode": 12,
+          "max": 48
+        },
+        "fi_cp2": {
+          "min": 0,
+          "mode": 0.01,
+          "max": 0.05
+        },
+        "dt_cp2_hours": {
+          "min": 12,
+          "mode": 48,
+          "max": 168
+        },
+        "fi_cp3": {
+          "min": 0,
+          "mode": 0,
+          "max": 0.01
+        },
+        "p_evac": {
+          "min": 0,
+          "mode": 0.001,
+          "max": 0.01
+        },
+        "p_locl": {
+          "min": 0,
+          "mode": 0,
+          "max": 0.002
+        }
+      },
+      "untreated": {
+        "fi_cp1": {
+          "min": 0.05,
+          "mode": 0.2,
+          "max": 0.5
+        },
+        "dt_cp1_hours": {
+          "min": 12,
+          "mode": 72,
+          "max": 336
+        },
+        "fi_cp2": {
+          "min": 0,
+          "mode": 0.05,
+          "max": 0.2
+        },
+        "dt_cp2_hours": {
+          "min": 24,
+          "mode": 168,
+          "max": 720
+        },
+        "fi_cp3": {
+          "min": 0,
+          "mode": 0.01,
+          "max": 0.08
+        },
+        "p_evac": {
+          "min": 0.01,
+          "mode": 0.05,
+          "max": 0.2
+        },
+        "p_locl": {
+          "min": 0,
+          "mode": 0.005,
+          "max": 0.03
+        }
+      },
+      "risk_factor_multipliers": {
+        "sex-female": 1.5
+      },
+      "required_resources": {
+        "pelvic-floor-trainer": 1
+      }
+    },
+    "urinary-retention-space-adaptation": {
+      "conditionId": "urinary-retention-space-adaptation",
+      "provenance": "tierB-lit",
+      "source_ref": "research/evidence/pagel-chouker-2016-effects-isolation-confinement.md",
+      "incidence": {
+        "distribution": "Beta-Bernoulli",
+        "alpha": 2,
+        "beta": 8,
+        "lambda_unit": "events-per-person-day"
+      },
+      "severity": {
+        "worst_case_prob_alpha": 1.2,
+        "worst_case_prob_beta": 8.8
+      },
+      "treated": {
+        "fi_cp1": {
+          "min": 0,
+          "mode": 0.05,
+          "max": 0.2
+        },
+        "dt_cp1_hours": {
+          "min": 2,
+          "mode": 8,
+          "max": 24
+        },
+        "fi_cp2": {
+          "min": 0,
+          "mode": 0.01,
+          "max": 0.05
+        },
+        "dt_cp2_hours": {
+          "min": 12,
+          "mode": 48,
+          "max": 168
+        },
+        "fi_cp3": {
+          "min": 0,
+          "mode": 0,
+          "max": 0.01
+        },
+        "p_evac": {
+          "min": 0,
+          "mode": 0.002,
+          "max": 0.02
+        },
+        "p_locl": {
+          "min": 0,
+          "mode": 0,
+          "max": 0.003
+        }
+      },
+      "untreated": {
+        "fi_cp1": {
+          "min": 0.05,
+          "mode": 0.2,
+          "max": 0.5
+        },
+        "dt_cp1_hours": {
+          "min": 8,
+          "mode": 48,
+          "max": 168
+        },
+        "fi_cp2": {
+          "min": 0,
+          "mode": 0.05,
+          "max": 0.2
+        },
+        "dt_cp2_hours": {
+          "min": 24,
+          "mode": 120,
+          "max": 480
+        },
+        "fi_cp3": {
+          "min": 0,
+          "mode": 0.01,
+          "max": 0.08
+        },
+        "p_evac": {
+          "min": 0.02,
+          "mode": 0.08,
+          "max": 0.25
+        },
+        "p_locl": {
+          "min": 0,
+          "mode": 0.005,
+          "max": 0.03
+        }
+      },
+      "risk_factor_multipliers": {
+        "sex-male": 1.5
+      },
+      "required_resources": {
+        "catheter-urinary": 2
+      }
+    },
+    "depression": {
+      "conditionId": "depression",
+      "provenance": "tierB-lit",
+      "source_ref": "research/evidence/palinkas-2004-antarctic-psychiatric-disorders.md",
+      "incidence": {
+        "distribution": "Gamma-Poisson",
+        "alpha": 2.0,
+        "beta": 4545.0,
+        "lambda_unit": "events-per-person-day"
+      },
+      "severity": {
+        "worst_case_prob_alpha": 1.5,
+        "worst_case_prob_beta": 8.5
+      },
+      "treated": {
+        "fi_cp1": {
+          "min": 0.05,
+          "mode": 0.2,
+          "max": 0.5
+        },
+        "dt_cp1_hours": {
+          "min": 24,
+          "mode": 168,
+          "max": 720
+        },
+        "fi_cp2": {
+          "min": 0,
+          "mode": 0.05,
+          "max": 0.2
+        },
+        "dt_cp2_hours": {
+          "min": 168,
+          "mode": 720,
+          "max": 2880
+        },
+        "fi_cp3": {
+          "min": 0,
+          "mode": 0,
+          "max": 0.05
+        },
+        "p_evac": {
+          "min": 0,
+          "mode": 0.01,
+          "max": 0.05
+        },
+        "p_locl": {
+          "min": 0,
+          "mode": 0.001,
+          "max": 0.01
+        }
+      },
+      "untreated": {
+        "fi_cp1": {
+          "min": 0.1,
+          "mode": 0.4,
+          "max": 0.8
+        },
+        "dt_cp1_hours": {
+          "min": 72,
+          "mode": 360,
+          "max": 2160
+        },
+        "fi_cp2": {
+          "min": 0,
+          "mode": 0.1,
+          "max": 0.4
+        },
+        "dt_cp2_hours": {
+          "min": 360,
+          "mode": 1440,
+          "max": 8640
+        },
+        "fi_cp3": {
+          "min": 0,
+          "mode": 0.02,
+          "max": 0.15
+        },
+        "p_evac": {
+          "min": 0.03,
+          "mode": 0.12,
+          "max": 0.4
+        },
+        "p_locl": {
+          "min": 0,
+          "mode": 0.005,
+          "max": 0.05
+        }
+      },
+      "risk_factor_multipliers": {
+        "sex-female": 1.3
+      },
+      "required_resources": {
+        "antidepressant": 30,
+        "anxiolytic": 14
+      }
+    },
+    "gastroenteritis": {
+      "conditionId": "gastroenteritis",
+      "provenance": "tierB-lit",
+      "source_ref": "research/evidence/ponomarev-2021-immunological-aspects-isolation-confinement.md",
+      "incidence": {
+        "distribution": "Gamma-Poisson",
+        "alpha": 2.0,
+        "beta": 370.0,
+        "lambda_unit": "events-per-person-day"
+      },
+      "severity": {
+        "worst_case_prob_alpha": 1.2,
+        "worst_case_prob_beta": 8.8
+      },
+      "treated": {
+        "fi_cp1": {
+          "min": 0,
+          "mode": 0.2,
+          "max": 0.5
+        },
+        "dt_cp1_hours": {
+          "min": 4,
+          "mode": 24,
+          "max": 72
+        },
+        "fi_cp2": {
+          "min": 0,
+          "mode": 0.05,
+          "max": 0.15
+        },
+        "dt_cp2_hours": {
+          "min": 24,
+          "mode": 72,
+          "max": 168
+        },
+        "fi_cp3": {
+          "min": 0,
+          "mode": 0,
+          "max": 0.02
+        },
+        "p_evac": {
+          "min": 0,
+          "mode": 0.005,
+          "max": 0.02
+        },
+        "p_locl": {
+          "min": 0,
+          "mode": 0.001,
+          "max": 0.01
+        }
+      },
+      "untreated": {
+        "fi_cp1": {
+          "min": 0.05,
+          "mode": 0.3,
+          "max": 0.7
+        },
+        "dt_cp1_hours": {
+          "min": 12,
+          "mode": 72,
+          "max": 240
+        },
+        "fi_cp2": {
+          "min": 0,
+          "mode": 0.1,
+          "max": 0.3
+        },
+        "dt_cp2_hours": {
+          "min": 48,
+          "mode": 168,
+          "max": 480
+        },
+        "fi_cp3": {
+          "min": 0,
+          "mode": 0.01,
+          "max": 0.08
+        },
+        "p_evac": {
+          "min": 0.02,
+          "mode": 0.08,
+          "max": 0.25
+        },
+        "p_locl": {
+          "min": 0,
+          "mode": 0.005,
+          "max": 0.04
+        }
+      },
+      "risk_factor_multipliers": {},
+      "required_resources": {
+        "oral-rehydration-salts": 5,
+        "antidiarrheal": 5
+      }
+    },
+    "respiratory-infection": {
+      "conditionId": "respiratory-infection",
+      "provenance": "tierB-lit",
+      "source_ref": "research/evidence/ponomarev-2021-immunological-aspects-isolation-confinement.md",
+      "incidence": {
+        "distribution": "Gamma-Poisson",
+        "alpha": 2.0,
+        "beta": 278.0,
+        "lambda_unit": "events-per-person-day"
+      },
+      "severity": {
+        "worst_case_prob_alpha": 1.2,
+        "worst_case_prob_beta": 8.8
+      },
+      "treated": {
+        "fi_cp1": {
+          "min": 0,
+          "mode": 0.15,
+          "max": 0.4
+        },
+        "dt_cp1_hours": {
+          "min": 12,
+          "mode": 48,
+          "max": 120
+        },
+        "fi_cp2": {
+          "min": 0,
+          "mode": 0.03,
+          "max": 0.12
+        },
+        "dt_cp2_hours": {
+          "min": 24,
+          "mode": 96,
+          "max": 240
+        },
+        "fi_cp3": {
+          "min": 0,
+          "mode": 0,
+          "max": 0.02
+        },
+        "p_evac": {
+          "min": 0,
+          "mode": 0.003,
+          "max": 0.02
+        },
+        "p_locl": {
+          "min": 0,
+          "mode": 0.001,
+          "max": 0.01
+        }
+      },
+      "untreated": {
+        "fi_cp1": {
+          "min": 0.05,
+          "mode": 0.3,
+          "max": 0.65
+        },
+        "dt_cp1_hours": {
+          "min": 24,
+          "mode": 120,
+          "max": 360
+        },
+        "fi_cp2": {
+          "min": 0,
+          "mode": 0.05,
+          "max": 0.2
+        },
+        "dt_cp2_hours": {
+          "min": 72,
+          "mode": 240,
+          "max": 720
+        },
+        "fi_cp3": {
+          "min": 0,
+          "mode": 0.01,
+          "max": 0.08
+        },
+        "p_evac": {
+          "min": 0.02,
+          "mode": 0.08,
+          "max": 0.25
+        },
+        "p_locl": {
+          "min": 0,
+          "mode": 0.003,
+          "max": 0.03
+        }
+      },
+      "risk_factor_multipliers": {},
+      "required_resources": {
+        "antibiotic-broad-spectrum": 10,
+        "analgesic-mild": 14
+      }
+    },
+    "pharyngitis": {
+      "conditionId": "pharyngitis",
+      "provenance": "tierB-lit",
+      "source_ref": "research/evidence/ponomarev-2021-immunological-aspects-isolation-confinement.md",
+      "incidence": {
+        "distribution": "Gamma-Poisson",
+        "alpha": 2.0,
+        "beta": 400.0,
+        "lambda_unit": "events-per-person-day"
+      },
+      "severity": {
+        "worst_case_prob_alpha": 1.0,
+        "worst_case_prob_beta": 9.0
+      },
+      "treated": {
+        "fi_cp1": {
+          "min": 0,
+          "mode": 0.1,
+          "max": 0.3
+        },
+        "dt_cp1_hours": {
+          "min": 4,
+          "mode": 24,
+          "max": 72
+        },
+        "fi_cp2": {
+          "min": 0,
+          "mode": 0.02,
+          "max": 0.08
+        },
+        "dt_cp2_hours": {
+          "min": 12,
+          "mode": 48,
+          "max": 168
+        },
+        "fi_cp3": {
+          "min": 0,
+          "mode": 0,
+          "max": 0.01
+        },
+        "p_evac": {
+          "min": 0,
+          "mode": 0.001,
+          "max": 0.01
+        },
+        "p_locl": {
+          "min": 0,
+          "mode": 0,
+          "max": 0.001
+        }
+      },
+      "untreated": {
+        "fi_cp1": {
+          "min": 0.05,
+          "mode": 0.2,
+          "max": 0.55
+        },
+        "dt_cp1_hours": {
+          "min": 12,
+          "mode": 72,
+          "max": 240
+        },
+        "fi_cp2": {
+          "min": 0,
+          "mode": 0.05,
+          "max": 0.2
+        },
+        "dt_cp2_hours": {
+          "min": 24,
+          "mode": 120,
+          "max": 480
+        },
+        "fi_cp3": {
+          "min": 0,
+          "mode": 0.005,
+          "max": 0.05
+        },
+        "p_evac": {
+          "min": 0.01,
+          "mode": 0.05,
+          "max": 0.18
+        },
+        "p_locl": {
+          "min": 0,
+          "mode": 0.002,
+          "max": 0.02
+        }
+      },
+      "risk_factor_multipliers": {},
+      "required_resources": {
+        "antibiotic-broad-spectrum": 10,
+        "analgesic-mild": 7
+      }
+    },
+    "otitis-externa": {
+      "conditionId": "otitis-externa",
+      "provenance": "tierB-lit",
+      "source_ref": "research/evidence/malpica-2024-thor-isolation-confinement-responses.md",
+      "incidence": {
+        "distribution": "Gamma-Poisson",
+        "alpha": 2.0,
+        "beta": 1000.0,
+        "lambda_unit": "events-per-person-day"
+      },
+      "severity": {
+        "worst_case_prob_alpha": 1.0,
+        "worst_case_prob_beta": 9.0
+      },
+      "treated": {
+        "fi_cp1": {
+          "min": 0,
+          "mode": 0.05,
+          "max": 0.2
+        },
+        "dt_cp1_hours": {
+          "min": 4,
+          "mode": 24,
+          "max": 72
+        },
+        "fi_cp2": {
+          "min": 0,
+          "mode": 0.01,
+          "max": 0.05
+        },
+        "dt_cp2_hours": {
+          "min": 12,
+          "mode": 48,
+          "max": 168
+        },
+        "fi_cp3": {
+          "min": 0,
+          "mode": 0,
+          "max": 0.01
+        },
+        "p_evac": {
+          "min": 0,
+          "mode": 0.001,
+          "max": 0.01
+        },
+        "p_locl": {
+          "min": 0,
+          "mode": 0,
+          "max": 0.001
+        }
+      },
+      "untreated": {
+        "fi_cp1": {
+          "min": 0.05,
+          "mode": 0.2,
+          "max": 0.5
+        },
+        "dt_cp1_hours": {
+          "min": 12,
+          "mode": 72,
+          "max": 240
+        },
+        "fi_cp2": {
+          "min": 0,
+          "mode": 0.05,
+          "max": 0.15
+        },
+        "dt_cp2_hours": {
+          "min": 24,
+          "mode": 120,
+          "max": 480
+        },
+        "fi_cp3": {
+          "min": 0,
+          "mode": 0.005,
+          "max": 0.05
+        },
+        "p_evac": {
+          "min": 0.01,
+          "mode": 0.05,
+          "max": 0.18
+        },
+        "p_locl": {
+          "min": 0,
+          "mode": 0.001,
+          "max": 0.02
+        }
+      },
+      "risk_factor_multipliers": {},
+      "required_resources": {
+        "antibiotic-otic": 10
+      }
+    },
+    "otitis-media": {
+      "conditionId": "otitis-media",
+      "provenance": "tierB-lit",
+      "source_ref": "research/evidence/malpica-2024-thor-isolation-confinement-responses.md",
+      "incidence": {
+        "distribution": "Gamma-Poisson",
+        "alpha": 2.0,
+        "beta": 1500.0,
+        "lambda_unit": "events-per-person-day"
+      },
+      "severity": {
+        "worst_case_prob_alpha": 1.2,
+        "worst_case_prob_beta": 8.8
+      },
+      "treated": {
+        "fi_cp1": {
+          "min": 0,
+          "mode": 0.05,
+          "max": 0.25
+        },
+        "dt_cp1_hours": {
+          "min": 4,
+          "mode": 24,
+          "max": 96
+        },
+        "fi_cp2": {
+          "min": 0,
+          "mode": 0.01,
+          "max": 0.06
+        },
+        "dt_cp2_hours": {
+          "min": 12,
+          "mode": 72,
+          "max": 240
+        },
+        "fi_cp3": {
+          "min": 0,
+          "mode": 0,
+          "max": 0.02
+        },
+        "p_evac": {
+          "min": 0,
+          "mode": 0.002,
+          "max": 0.015
+        },
+        "p_locl": {
+          "min": 0,
+          "mode": 0,
+          "max": 0.002
+        }
+      },
+      "untreated": {
+        "fi_cp1": {
+          "min": 0.05,
+          "mode": 0.25,
+          "max": 0.55
+        },
+        "dt_cp1_hours": {
+          "min": 12,
+          "mode": 96,
+          "max": 336
+        },
+        "fi_cp2": {
+          "min": 0,
+          "mode": 0.05,
+          "max": 0.2
+        },
+        "dt_cp2_hours": {
+          "min": 48,
+          "mode": 168,
+          "max": 720
+        },
+        "fi_cp3": {
+          "min": 0,
+          "mode": 0.01,
+          "max": 0.08
+        },
+        "p_evac": {
+          "min": 0.02,
+          "mode": 0.08,
+          "max": 0.25
+        },
+        "p_locl": {
+          "min": 0,
+          "mode": 0.003,
+          "max": 0.03
+        }
+      },
+      "risk_factor_multipliers": {},
+      "required_resources": {
+        "antibiotic-broad-spectrum": 10,
+        "analgesic-mild": 7
+      }
+    },
+    "skin-rash": {
+      "conditionId": "skin-rash",
+      "provenance": "tierB-lit",
+      "source_ref": "research/evidence/ponomarev-2021-immunological-aspects-isolation-confinement.md",
+      "incidence": {
+        "distribution": "Gamma-Poisson",
+        "alpha": 2.0,
+        "beta": 500.0,
+        "lambda_unit": "events-per-person-day"
+      },
+      "severity": {
+        "worst_case_prob_alpha": 1.0,
+        "worst_case_prob_beta": 9.0
+      },
+      "treated": {
+        "fi_cp1": {
+          "min": 0,
+          "mode": 0.05,
+          "max": 0.2
+        },
+        "dt_cp1_hours": {
+          "min": 2,
+          "mode": 12,
+          "max": 48
+        },
+        "fi_cp2": {
+          "min": 0,
+          "mode": 0.01,
+          "max": 0.05
+        },
+        "dt_cp2_hours": {
+          "min": 12,
+          "mode": 48,
+          "max": 168
+        },
+        "fi_cp3": {
+          "min": 0,
+          "mode": 0,
+          "max": 0.01
+        },
+        "p_evac": {
+          "min": 0,
+          "mode": 0.001,
+          "max": 0.01
+        },
+        "p_locl": {
+          "min": 0,
+          "mode": 0,
+          "max": 0.001
+        }
+      },
+      "untreated": {
+        "fi_cp1": {
+          "min": 0.05,
+          "mode": 0.15,
+          "max": 0.4
+        },
+        "dt_cp1_hours": {
+          "min": 12,
+          "mode": 48,
+          "max": 168
+        },
+        "fi_cp2": {
+          "min": 0,
+          "mode": 0.03,
+          "max": 0.12
+        },
+        "dt_cp2_hours": {
+          "min": 24,
+          "mode": 96,
+          "max": 360
+        },
+        "fi_cp3": {
+          "min": 0,
+          "mode": 0.005,
+          "max": 0.04
+        },
+        "p_evac": {
+          "min": 0.005,
+          "mode": 0.02,
+          "max": 0.1
+        },
+        "p_locl": {
+          "min": 0,
+          "mode": 0.001,
+          "max": 0.01
+        }
+      },
+      "risk_factor_multipliers": {},
+      "required_resources": {
+        "antihistamine": 14,
+        "topical-corticosteroid": 14
+      }
+    },
+    "eye-infection": {
+      "conditionId": "eye-infection",
+      "provenance": "tierB-lit",
+      "source_ref": "research/evidence/ponomarev-2021-immunological-aspects-isolation-confinement.md",
+      "incidence": {
+        "distribution": "Gamma-Poisson",
+        "alpha": 2.0,
+        "beta": 1000.0,
+        "lambda_unit": "events-per-person-day"
+      },
+      "severity": {
+        "worst_case_prob_alpha": 1.0,
+        "worst_case_prob_beta": 9.0
+      },
+      "treated": {
+        "fi_cp1": {
+          "min": 0,
+          "mode": 0.05,
+          "max": 0.2
+        },
+        "dt_cp1_hours": {
+          "min": 2,
+          "mode": 12,
+          "max": 48
+        },
+        "fi_cp2": {
+          "min": 0,
+          "mode": 0.01,
+          "max": 0.04
+        },
+        "dt_cp2_hours": {
+          "min": 12,
+          "mode": 48,
+          "max": 168
+        },
+        "fi_cp3": {
+          "min": 0,
+          "mode": 0,
+          "max": 0.01
+        },
+        "p_evac": {
+          "min": 0,
+          "mode": 0.001,
+          "max": 0.01
+        },
+        "p_locl": {
+          "min": 0,
+          "mode": 0,
+          "max": 0.001
+        }
+      },
+      "untreated": {
+        "fi_cp1": {
+          "min": 0.05,
+          "mode": 0.2,
+          "max": 0.5
+        },
+        "dt_cp1_hours": {
+          "min": 8,
+          "mode": 48,
+          "max": 168
+        },
+        "fi_cp2": {
+          "min": 0,
+          "mode": 0.05,
+          "max": 0.2
+        },
+        "dt_cp2_hours": {
+          "min": 24,
+          "mode": 96,
+          "max": 360
+        },
+        "fi_cp3": {
+          "min": 0,
+          "mode": 0.005,
+          "max": 0.05
+        },
+        "p_evac": {
+          "min": 0.01,
+          "mode": 0.05,
+          "max": 0.18
+        },
+        "p_locl": {
+          "min": 0,
+          "mode": 0.001,
+          "max": 0.02
+        }
+      },
+      "risk_factor_multipliers": {},
+      "required_resources": {
+        "ophthalmic-antibiotic": 10
+      }
+    },
+    "mouth-ulcer": {
+      "conditionId": "mouth-ulcer",
+      "provenance": "tierB-lit",
+      "source_ref": "research/evidence/shved-2022-isolation-crowding-countermeasures.md",
+      "incidence": {
+        "distribution": "Gamma-Poisson",
+        "alpha": 2.0,
+        "beta": 500.0,
+        "lambda_unit": "events-per-person-day"
+      },
+      "severity": {
+        "worst_case_prob_alpha": 1.0,
+        "worst_case_prob_beta": 9.0
+      },
+      "treated": {
+        "fi_cp1": {
+          "min": 0,
+          "mode": 0.05,
+          "max": 0.15
+        },
+        "dt_cp1_hours": {
+          "min": 1,
+          "mode": 6,
+          "max": 24
+        },
+        "fi_cp2": {
+          "min": 0,
+          "mode": 0.01,
+          "max": 0.04
+        },
+        "dt_cp2_hours": {
+          "min": 6,
+          "mode": 24,
+          "max": 72
+        },
+        "fi_cp3": {
+          "min": 0,
+          "mode": 0,
+          "max": 0.005
+        },
+        "p_evac": {
+          "min": 0,
+          "mode": 0.001,
+          "max": 0.005
+        },
+        "p_locl": {
+          "min": 0,
+          "mode": 0,
+          "max": 0.001
+        }
+      },
+      "untreated": {
+        "fi_cp1": {
+          "min": 0.05,
+          "mode": 0.15,
+          "max": 0.4
+        },
+        "dt_cp1_hours": {
+          "min": 12,
+          "mode": 48,
+          "max": 168
+        },
+        "fi_cp2": {
+          "min": 0,
+          "mode": 0.03,
+          "max": 0.1
+        },
+        "dt_cp2_hours": {
+          "min": 24,
+          "mode": 96,
+          "max": 360
+        },
+        "fi_cp3": {
+          "min": 0,
+          "mode": 0.005,
+          "max": 0.03
+        },
+        "p_evac": {
+          "min": 0.005,
+          "mode": 0.02,
+          "max": 0.08
+        },
+        "p_locl": {
+          "min": 0,
+          "mode": 0.001,
+          "max": 0.01
+        }
+      },
+      "risk_factor_multipliers": {},
+      "required_resources": {
+        "antiseptic-oral": 7
+      }
+    },
+    "hemorrhoids": {
+      "conditionId": "hemorrhoids",
+      "provenance": "tierB-lit",
+      "source_ref": "research/evidence/shved-2022-isolation-crowding-countermeasures.md",
+      "incidence": {
+        "distribution": "Gamma-Poisson",
+        "alpha": 2.0,
+        "beta": 1000.0,
+        "lambda_unit": "events-per-person-day"
+      },
+      "severity": {
+        "worst_case_prob_alpha": 1.0,
+        "worst_case_prob_beta": 9.0
+      },
+      "treated": {
+        "fi_cp1": {
+          "min": 0,
+          "mode": 0.05,
+          "max": 0.2
+        },
+        "dt_cp1_hours": {
+          "min": 2,
+          "mode": 12,
+          "max": 48
+        },
+        "fi_cp2": {
+          "min": 0,
+          "mode": 0.01,
+          "max": 0.05
+        },
+        "dt_cp2_hours": {
+          "min": 12,
+          "mode": 48,
+          "max": 168
+        },
+        "fi_cp3": {
+          "min": 0,
+          "mode": 0,
+          "max": 0.01
+        },
+        "p_evac": {
+          "min": 0,
+          "mode": 0.001,
+          "max": 0.01
+        },
+        "p_locl": {
+          "min": 0,
+          "mode": 0,
+          "max": 0.001
+        }
+      },
+      "untreated": {
+        "fi_cp1": {
+          "min": 0.05,
+          "mode": 0.2,
+          "max": 0.5
+        },
+        "dt_cp1_hours": {
+          "min": 12,
+          "mode": 72,
+          "max": 240
+        },
+        "fi_cp2": {
+          "min": 0,
+          "mode": 0.05,
+          "max": 0.2
+        },
+        "dt_cp2_hours": {
+          "min": 48,
+          "mode": 168,
+          "max": 720
+        },
+        "fi_cp3": {
+          "min": 0,
+          "mode": 0.01,
+          "max": 0.08
+        },
+        "p_evac": {
+          "min": 0.01,
+          "mode": 0.05,
+          "max": 0.2
+        },
+        "p_locl": {
+          "min": 0,
+          "mode": 0.002,
+          "max": 0.02
+        }
+      },
+      "risk_factor_multipliers": {},
+      "required_resources": {
+        "topical-hemorrhoid-cream": 7
+      }
+    },
+    "barotrauma-ear-sinus-block": {
+      "conditionId": "barotrauma-ear-sinus-block",
+      "provenance": "tierB-lit",
+      "source_ref": "research/evidence/malpica-2024-thor-isolation-confinement-responses.md",
+      "incidence": {
+        "distribution": "Gamma-Poisson",
+        "alpha": 2.0,
+        "beta": 1000.0,
+        "lambda_unit": "events-per-person-day"
+      },
+      "severity": {
+        "worst_case_prob_alpha": 1.0,
+        "worst_case_prob_beta": 9.0
+      },
+      "treated": {
+        "fi_cp1": {
+          "min": 0,
+          "mode": 0.05,
+          "max": 0.2
+        },
+        "dt_cp1_hours": {
+          "min": 2,
+          "mode": 8,
+          "max": 24
+        },
+        "fi_cp2": {
+          "min": 0,
+          "mode": 0.01,
+          "max": 0.04
+        },
+        "dt_cp2_hours": {
+          "min": 8,
+          "mode": 24,
+          "max": 96
+        },
+        "fi_cp3": {
+          "min": 0,
+          "mode": 0,
+          "max": 0.01
+        },
+        "p_evac": {
+          "min": 0,
+          "mode": 0.001,
+          "max": 0.01
+        },
+        "p_locl": {
+          "min": 0,
+          "mode": 0,
+          "max": 0.001
+        }
+      },
+      "untreated": {
+        "fi_cp1": {
+          "min": 0.05,
+          "mode": 0.2,
+          "max": 0.5
+        },
+        "dt_cp1_hours": {
+          "min": 8,
+          "mode": 48,
+          "max": 168
+        },
+        "fi_cp2": {
+          "min": 0,
+          "mode": 0.05,
+          "max": 0.18
+        },
+        "dt_cp2_hours": {
+          "min": 24,
+          "mode": 96,
+          "max": 360
+        },
+        "fi_cp3": {
+          "min": 0,
+          "mode": 0.005,
+          "max": 0.05
+        },
+        "p_evac": {
+          "min": 0.01,
+          "mode": 0.05,
+          "max": 0.18
+        },
+        "p_locl": {
+          "min": 0,
+          "mode": 0.001,
+          "max": 0.02
+        }
+      },
+      "risk_factor_multipliers": {},
+      "required_resources": {
+        "nasal-decongestant": 5
+      }
+    },
+    "headache-late": {
+      "conditionId": "headache-late",
+      "provenance": "tierB-lit",
+      "source_ref": "research/evidence/basner-2014-mars500-psychological-behavioral-changes.md",
+      "incidence": {
+        "distribution": "Gamma-Poisson",
+        "alpha": 2.0,
+        "beta": 700.0,
+        "lambda_unit": "events-per-person-day"
+      },
+      "severity": {
+        "worst_case_prob_alpha": 1.0,
+        "worst_case_prob_beta": 9.0
+      },
+      "treated": {
+        "fi_cp1": {
+          "min": 0,
+          "mode": 0.05,
+          "max": 0.2
+        },
+        "dt_cp1_hours": {
+          "min": 1,
+          "mode": 4,
+          "max": 12
+        },
+        "fi_cp2": {
+          "min": 0,
+          "mode": 0.01,
+          "max": 0.04
+        },
+        "dt_cp2_hours": {
+          "min": 4,
+          "mode": 12,
+          "max": 48
+        },
+        "fi_cp3": {
+          "min": 0,
+          "mode": 0,
+          "max": 0.01
+        },
+        "p_evac": {
+          "min": 0,
+          "mode": 0.001,
+          "max": 0.005
+        },
+        "p_locl": {
+          "min": 0,
+          "mode": 0,
+          "max": 0.001
+        }
+      },
+      "untreated": {
+        "fi_cp1": {
+          "min": 0.05,
+          "mode": 0.2,
+          "max": 0.55
+        },
+        "dt_cp1_hours": {
+          "min": 4,
+          "mode": 24,
+          "max": 96
+        },
+        "fi_cp2": {
+          "min": 0,
+          "mode": 0.03,
+          "max": 0.12
+        },
+        "dt_cp2_hours": {
+          "min": 12,
+          "mode": 48,
+          "max": 168
+        },
+        "fi_cp3": {
+          "min": 0,
+          "mode": 0.005,
+          "max": 0.04
+        },
+        "p_evac": {
+          "min": 0.005,
+          "mode": 0.02,
+          "max": 0.1
+        },
+        "p_locl": {
+          "min": 0,
+          "mode": 0.001,
+          "max": 0.01
+        }
+      },
+      "risk_factor_multipliers": {},
+      "required_resources": {
+        "analgesic-mild": 10
+      }
+    },
+    "hearing-loss": {
+      "conditionId": "hearing-loss",
+      "provenance": "tierB-lit",
+      "source_ref": "research/evidence/pagel-chouker-2016-effects-isolation-confinement.md",
+      "incidence": {
+        "distribution": "Gamma-Poisson",
+        "alpha": 2.0,
+        "beta": 3600.0,
+        "lambda_unit": "events-per-person-day"
+      },
+      "severity": {
+        "worst_case_prob_alpha": 1.5,
+        "worst_case_prob_beta": 8.5
+      },
+      "treated": {
+        "fi_cp1": {
+          "min": 0,
+          "mode": 0.05,
+          "max": 0.3
+        },
+        "dt_cp1_hours": {
+          "min": 24,
+          "mode": 168,
+          "max": 720
+        },
+        "fi_cp2": {
+          "min": 0,
+          "mode": 0.02,
+          "max": 0.1
+        },
+        "dt_cp2_hours": {
+          "min": 168,
+          "mode": 720,
+          "max": 2880
+        },
+        "fi_cp3": {
+          "min": 0,
+          "mode": 0.005,
+          "max": 0.05
+        },
+        "p_evac": {
+          "min": 0,
+          "mode": 0.01,
+          "max": 0.05
+        },
+        "p_locl": {
+          "min": 0,
+          "mode": 0.005,
+          "max": 0.03
+        }
+      },
+      "untreated": {
+        "fi_cp1": {
+          "min": 0.1,
+          "mode": 0.4,
+          "max": 0.8
+        },
+        "dt_cp1_hours": {
+          "min": 72,
+          "mode": 720,
+          "max": 4320
+        },
+        "fi_cp2": {
+          "min": 0,
+          "mode": 0.1,
+          "max": 0.4
+        },
+        "dt_cp2_hours": {
+          "min": 720,
+          "mode": 2880,
+          "max": 17280
+        },
+        "fi_cp3": {
+          "min": 0,
+          "mode": 0.02,
+          "max": 0.15
+        },
+        "p_evac": {
+          "min": 0.02,
+          "mode": 0.1,
+          "max": 0.35
+        },
+        "p_locl": {
+          "min": 0.01,
+          "mode": 0.05,
+          "max": 0.2
+        }
+      },
+      "risk_factor_multipliers": {},
+      "required_resources": {
+        "audiometry": 2
+      }
+    },
+    "paresthesias": {
+      "conditionId": "paresthesias",
+      "provenance": "tierB-lit",
+      "source_ref": "research/evidence/malpica-2024-thor-isolation-confinement-responses.md",
+      "incidence": {
+        "distribution": "Beta-Bernoulli",
+        "alpha": 3,
+        "beta": 17,
+        "lambda_unit": "events-per-EVA"
+      },
+      "severity": {
+        "worst_case_prob_alpha": 1.0,
+        "worst_case_prob_beta": 9.0
+      },
+      "treated": {
+        "fi_cp1": {
+          "min": 0,
+          "mode": 0.05,
+          "max": 0.2
+        },
+        "dt_cp1_hours": {
+          "min": 1,
+          "mode": 4,
+          "max": 12
+        },
+        "fi_cp2": {
+          "min": 0,
+          "mode": 0.01,
+          "max": 0.04
+        },
+        "dt_cp2_hours": {
+          "min": 4,
+          "mode": 12,
+          "max": 48
+        },
+        "fi_cp3": {
+          "min": 0,
+          "mode": 0,
+          "max": 0.01
+        },
+        "p_evac": {
+          "min": 0,
+          "mode": 0.001,
+          "max": 0.01
+        },
+        "p_locl": {
+          "min": 0,
+          "mode": 0,
+          "max": 0.001
+        }
+      },
+      "untreated": {
+        "fi_cp1": {
+          "min": 0.05,
+          "mode": 0.2,
+          "max": 0.5
+        },
+        "dt_cp1_hours": {
+          "min": 4,
+          "mode": 24,
+          "max": 72
+        },
+        "fi_cp2": {
+          "min": 0,
+          "mode": 0.05,
+          "max": 0.18
+        },
+        "dt_cp2_hours": {
+          "min": 12,
+          "mode": 48,
+          "max": 168
+        },
+        "fi_cp3": {
+          "min": 0,
+          "mode": 0.005,
+          "max": 0.05
+        },
+        "p_evac": {
+          "min": 0.01,
+          "mode": 0.05,
+          "max": 0.18
+        },
+        "p_locl": {
+          "min": 0,
+          "mode": 0.001,
+          "max": 0.02
+        }
+      },
+      "risk_factor_multipliers": {},
+      "required_resources": {
+        "analgesic-mild": 5
+      }
+    },
+    "fingernail-delamination": {
+      "conditionId": "fingernail-delamination",
+      "provenance": "tierB-lit",
+      "source_ref": "research/evidence/malpica-2024-thor-isolation-confinement-responses.md",
+      "incidence": {
+        "distribution": "Beta-Bernoulli",
+        "alpha": 2,
+        "beta": 18,
+        "lambda_unit": "events-per-EVA"
+      },
+      "severity": {
+        "worst_case_prob_alpha": 1.0,
+        "worst_case_prob_beta": 9.0
+      },
+      "treated": {
+        "fi_cp1": {
+          "min": 0,
+          "mode": 0.05,
+          "max": 0.15
+        },
+        "dt_cp1_hours": {
+          "min": 1,
+          "mode": 4,
+          "max": 12
+        },
+        "fi_cp2": {
+          "min": 0,
+          "mode": 0.01,
+          "max": 0.04
+        },
+        "dt_cp2_hours": {
+          "min": 4,
+          "mode": 12,
+          "max": 48
+        },
+        "fi_cp3": {
+          "min": 0,
+          "mode": 0,
+          "max": 0.005
+        },
+        "p_evac": {
+          "min": 0,
+          "mode": 0.001,
+          "max": 0.005
+        },
+        "p_locl": {
+          "min": 0,
+          "mode": 0,
+          "max": 0.001
+        }
+      },
+      "untreated": {
+        "fi_cp1": {
+          "min": 0.05,
+          "mode": 0.15,
+          "max": 0.4
+        },
+        "dt_cp1_hours": {
+          "min": 4,
+          "mode": 24,
+          "max": 72
+        },
+        "fi_cp2": {
+          "min": 0,
+          "mode": 0.03,
+          "max": 0.1
+        },
+        "dt_cp2_hours": {
+          "min": 12,
+          "mode": 48,
+          "max": 120
+        },
+        "fi_cp3": {
+          "min": 0,
+          "mode": 0.005,
+          "max": 0.03
+        },
+        "p_evac": {
+          "min": 0.005,
+          "mode": 0.02,
+          "max": 0.1
+        },
+        "p_locl": {
+          "min": 0,
+          "mode": 0.001,
+          "max": 0.01
+        }
+      },
+      "risk_factor_multipliers": {},
+      "required_resources": {
+        "wound-dressing": 3
+      }
+    },
+    "vaginal-yeast-infection": {
+      "conditionId": "vaginal-yeast-infection",
+      "provenance": "tierB-lit",
+      "source_ref": "research/evidence/ponomarev-2021-immunological-aspects-isolation-confinement.md",
+      "incidence": {
+        "distribution": "Gamma-Poisson",
+        "alpha": 2.0,
+        "beta": 700.0,
+        "lambda_unit": "events-per-person-day"
+      },
+      "severity": {
+        "worst_case_prob_alpha": 1.0,
+        "worst_case_prob_beta": 9.0
+      },
+      "treated": {
+        "fi_cp1": {
+          "min": 0,
+          "mode": 0.05,
+          "max": 0.2
+        },
+        "dt_cp1_hours": {
+          "min": 2,
+          "mode": 12,
+          "max": 48
+        },
+        "fi_cp2": {
+          "min": 0,
+          "mode": 0.01,
+          "max": 0.05
+        },
+        "dt_cp2_hours": {
+          "min": 12,
+          "mode": 48,
+          "max": 168
+        },
+        "fi_cp3": {
+          "min": 0,
+          "mode": 0,
+          "max": 0.01
+        },
+        "p_evac": {
+          "min": 0,
+          "mode": 0.001,
+          "max": 0.01
+        },
+        "p_locl": {
+          "min": 0,
+          "mode": 0,
+          "max": 0.001
+        }
+      },
+      "untreated": {
+        "fi_cp1": {
+          "min": 0.05,
+          "mode": 0.2,
+          "max": 0.5
+        },
+        "dt_cp1_hours": {
+          "min": 12,
+          "mode": 72,
+          "max": 240
+        },
+        "fi_cp2": {
+          "min": 0,
+          "mode": 0.05,
+          "max": 0.2
+        },
+        "dt_cp2_hours": {
+          "min": 48,
+          "mode": 168,
+          "max": 720
+        },
+        "fi_cp3": {
+          "min": 0,
+          "mode": 0.01,
+          "max": 0.08
+        },
+        "p_evac": {
+          "min": 0.01,
+          "mode": 0.05,
+          "max": 0.2
+        },
+        "p_locl": {
+          "min": 0,
+          "mode": 0.002,
+          "max": 0.02
+        }
+      },
+      "risk_factor_multipliers": {
+        "sex-female": 1.0,
+        "sex-male": 0.0
+      },
+      "required_resources": {
+        "antifungal": 7
+      }
     }
   },
   "global_calibration": {
-    "tierC_multiplier_iss_hms": 1.00,
-    "tierC_multiplier_iss_none": 1.00,
-    "tierC_multiplier_iss_unlimited": 1.00,
-    "fit_against": "K15 Table 1 (ISS 6mo/6crew); A22 4-step trial verbatim; M18 σ<5% convergence; TM21 AMM/SMM",
+    "tierC_multiplier_iss_hms": 1.0,
+    "tierC_multiplier_iss_none": 1.0,
+    "tierC_multiplier_iss_unlimited": 1.0,
+    "fit_against": "K15 Table 1 (ISS 6mo/6crew); A22 4-step trial verbatim; M18 \u03c3<5% convergence; TM21 AMM/SMM",
     "fit_residuals_within_CI95": false
   }
 }
