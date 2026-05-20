@@ -7734,6 +7734,1644 @@
         "ophthalmic-exam": 2,
         "ophthalmic-antiglaucoma": 14
       }
+    },
+    "abdominal-injury": {
+      "conditionId": "abdominal-injury",
+      "provenance": "tierC-synth",
+      "source_ref": "back-fit placeholder; calibrated to K15 Table 1 in Task 31",
+      "incidence": {
+        "distribution": "Gamma-Poisson",
+        "alpha": 2.0,
+        "beta": 2000.0,
+        "lambda_unit": "events-per-person-day"
+      },
+      "severity": {
+        "worst_case_prob_alpha": 1.2,
+        "worst_case_prob_beta": 4.8
+      },
+      "treated": {
+        "fi_cp1": {
+          "min": 0,
+          "mode": 0.05,
+          "max": 0.2
+        },
+        "dt_cp1_hours": {
+          "min": 2,
+          "mode": 8,
+          "max": 48
+        },
+        "fi_cp2": {
+          "min": 0,
+          "mode": 0.02,
+          "max": 0.08
+        },
+        "dt_cp2_hours": {
+          "min": 0,
+          "mode": 24,
+          "max": 168
+        },
+        "fi_cp3": {
+          "min": 0,
+          "mode": 0,
+          "max": 0.02
+        },
+        "p_evac": {
+          "min": 0,
+          "mode": 0.005,
+          "max": 0.03
+        },
+        "p_locl": {
+          "min": 0,
+          "mode": 0,
+          "max": 0.005
+        }
+      },
+      "untreated": {
+        "fi_cp1": {
+          "min": 0.05,
+          "mode": 0.25,
+          "max": 0.6
+        },
+        "dt_cp1_hours": {
+          "min": 12,
+          "mode": 72,
+          "max": 336
+        },
+        "fi_cp2": {
+          "min": 0,
+          "mode": 0.1,
+          "max": 0.3
+        },
+        "dt_cp2_hours": {
+          "min": 24,
+          "mode": 168,
+          "max": 720
+        },
+        "fi_cp3": {
+          "min": 0,
+          "mode": 0.02,
+          "max": 0.1
+        },
+        "p_evac": {
+          "min": 0.02,
+          "mode": 0.1,
+          "max": 0.35
+        },
+        "p_locl": {
+          "min": 0,
+          "mode": 0.01,
+          "max": 0.05
+        }
+      },
+      "risk_factor_multipliers": {},
+      "required_resources": {}
+    },
+    "abdominal-wall-hernia": {
+      "conditionId": "abdominal-wall-hernia",
+      "provenance": "tierC-synth",
+      "source_ref": "back-fit placeholder; calibrated to K15 Table 1 in Task 31",
+      "incidence": {
+        "distribution": "Gamma-Poisson",
+        "alpha": 2.0,
+        "beta": 2000.0,
+        "lambda_unit": "events-per-person-day"
+      },
+      "severity": {
+        "worst_case_prob_alpha": 1.2,
+        "worst_case_prob_beta": 4.8
+      },
+      "treated": {
+        "fi_cp1": {
+          "min": 0,
+          "mode": 0.05,
+          "max": 0.2
+        },
+        "dt_cp1_hours": {
+          "min": 2,
+          "mode": 8,
+          "max": 48
+        },
+        "fi_cp2": {
+          "min": 0,
+          "mode": 0.02,
+          "max": 0.08
+        },
+        "dt_cp2_hours": {
+          "min": 0,
+          "mode": 24,
+          "max": 168
+        },
+        "fi_cp3": {
+          "min": 0,
+          "mode": 0,
+          "max": 0.02
+        },
+        "p_evac": {
+          "min": 0,
+          "mode": 0.005,
+          "max": 0.03
+        },
+        "p_locl": {
+          "min": 0,
+          "mode": 0,
+          "max": 0.005
+        }
+      },
+      "untreated": {
+        "fi_cp1": {
+          "min": 0.05,
+          "mode": 0.25,
+          "max": 0.6
+        },
+        "dt_cp1_hours": {
+          "min": 12,
+          "mode": 72,
+          "max": 336
+        },
+        "fi_cp2": {
+          "min": 0,
+          "mode": 0.1,
+          "max": 0.3
+        },
+        "dt_cp2_hours": {
+          "min": 24,
+          "mode": 168,
+          "max": 720
+        },
+        "fi_cp3": {
+          "min": 0,
+          "mode": 0.02,
+          "max": 0.1
+        },
+        "p_evac": {
+          "min": 0.02,
+          "mode": 0.1,
+          "max": 0.35
+        },
+        "p_locl": {
+          "min": 0,
+          "mode": 0.01,
+          "max": 0.05
+        }
+      },
+      "risk_factor_multipliers": {},
+      "required_resources": {}
+    },
+    "acute-arthritis": {
+      "conditionId": "acute-arthritis",
+      "provenance": "tierC-synth",
+      "source_ref": "back-fit placeholder; calibrated to K15 Table 1 in Task 31",
+      "incidence": {
+        "distribution": "Gamma-Poisson",
+        "alpha": 2.0,
+        "beta": 2000.0,
+        "lambda_unit": "events-per-person-day"
+      },
+      "severity": {
+        "worst_case_prob_alpha": 1.2,
+        "worst_case_prob_beta": 4.8
+      },
+      "treated": {
+        "fi_cp1": {
+          "min": 0,
+          "mode": 0.05,
+          "max": 0.2
+        },
+        "dt_cp1_hours": {
+          "min": 2,
+          "mode": 8,
+          "max": 48
+        },
+        "fi_cp2": {
+          "min": 0,
+          "mode": 0.02,
+          "max": 0.08
+        },
+        "dt_cp2_hours": {
+          "min": 0,
+          "mode": 24,
+          "max": 168
+        },
+        "fi_cp3": {
+          "min": 0,
+          "mode": 0,
+          "max": 0.02
+        },
+        "p_evac": {
+          "min": 0,
+          "mode": 0.005,
+          "max": 0.03
+        },
+        "p_locl": {
+          "min": 0,
+          "mode": 0,
+          "max": 0.005
+        }
+      },
+      "untreated": {
+        "fi_cp1": {
+          "min": 0.05,
+          "mode": 0.25,
+          "max": 0.6
+        },
+        "dt_cp1_hours": {
+          "min": 12,
+          "mode": 72,
+          "max": 336
+        },
+        "fi_cp2": {
+          "min": 0,
+          "mode": 0.1,
+          "max": 0.3
+        },
+        "dt_cp2_hours": {
+          "min": 24,
+          "mode": 168,
+          "max": 720
+        },
+        "fi_cp3": {
+          "min": 0,
+          "mode": 0.02,
+          "max": 0.1
+        },
+        "p_evac": {
+          "min": 0.02,
+          "mode": 0.1,
+          "max": 0.35
+        },
+        "p_locl": {
+          "min": 0,
+          "mode": 0.01,
+          "max": 0.05
+        }
+      },
+      "risk_factor_multipliers": {},
+      "required_resources": {}
+    },
+    "acute-compartment-syndrome": {
+      "conditionId": "acute-compartment-syndrome",
+      "provenance": "tierC-synth",
+      "source_ref": "back-fit placeholder; calibrated to K15 Table 1 in Task 31",
+      "incidence": {
+        "distribution": "Gamma-Poisson",
+        "alpha": 2.0,
+        "beta": 2000.0,
+        "lambda_unit": "events-per-person-day"
+      },
+      "severity": {
+        "worst_case_prob_alpha": 1.2,
+        "worst_case_prob_beta": 4.8
+      },
+      "treated": {
+        "fi_cp1": {
+          "min": 0,
+          "mode": 0.05,
+          "max": 0.2
+        },
+        "dt_cp1_hours": {
+          "min": 2,
+          "mode": 8,
+          "max": 48
+        },
+        "fi_cp2": {
+          "min": 0,
+          "mode": 0.02,
+          "max": 0.08
+        },
+        "dt_cp2_hours": {
+          "min": 0,
+          "mode": 24,
+          "max": 168
+        },
+        "fi_cp3": {
+          "min": 0,
+          "mode": 0,
+          "max": 0.02
+        },
+        "p_evac": {
+          "min": 0,
+          "mode": 0.005,
+          "max": 0.03
+        },
+        "p_locl": {
+          "min": 0,
+          "mode": 0,
+          "max": 0.005
+        }
+      },
+      "untreated": {
+        "fi_cp1": {
+          "min": 0.05,
+          "mode": 0.25,
+          "max": 0.6
+        },
+        "dt_cp1_hours": {
+          "min": 12,
+          "mode": 72,
+          "max": 336
+        },
+        "fi_cp2": {
+          "min": 0,
+          "mode": 0.1,
+          "max": 0.3
+        },
+        "dt_cp2_hours": {
+          "min": 24,
+          "mode": 168,
+          "max": 720
+        },
+        "fi_cp3": {
+          "min": 0,
+          "mode": 0.02,
+          "max": 0.1
+        },
+        "p_evac": {
+          "min": 0.02,
+          "mode": 0.1,
+          "max": 0.35
+        },
+        "p_locl": {
+          "min": 0,
+          "mode": 0.01,
+          "max": 0.05
+        }
+      },
+      "risk_factor_multipliers": {},
+      "required_resources": {}
+    },
+    "acute-pancreatitis": {
+      "conditionId": "acute-pancreatitis",
+      "provenance": "tierC-synth",
+      "source_ref": "back-fit placeholder; calibrated to K15 Table 1 in Task 31",
+      "incidence": {
+        "distribution": "Gamma-Poisson",
+        "alpha": 2.0,
+        "beta": 2000.0,
+        "lambda_unit": "events-per-person-day"
+      },
+      "severity": {
+        "worst_case_prob_alpha": 1.2,
+        "worst_case_prob_beta": 4.8
+      },
+      "treated": {
+        "fi_cp1": {
+          "min": 0,
+          "mode": 0.05,
+          "max": 0.2
+        },
+        "dt_cp1_hours": {
+          "min": 2,
+          "mode": 8,
+          "max": 48
+        },
+        "fi_cp2": {
+          "min": 0,
+          "mode": 0.02,
+          "max": 0.08
+        },
+        "dt_cp2_hours": {
+          "min": 0,
+          "mode": 24,
+          "max": 168
+        },
+        "fi_cp3": {
+          "min": 0,
+          "mode": 0,
+          "max": 0.02
+        },
+        "p_evac": {
+          "min": 0,
+          "mode": 0.005,
+          "max": 0.03
+        },
+        "p_locl": {
+          "min": 0,
+          "mode": 0,
+          "max": 0.005
+        }
+      },
+      "untreated": {
+        "fi_cp1": {
+          "min": 0.05,
+          "mode": 0.25,
+          "max": 0.6
+        },
+        "dt_cp1_hours": {
+          "min": 12,
+          "mode": 72,
+          "max": 336
+        },
+        "fi_cp2": {
+          "min": 0,
+          "mode": 0.1,
+          "max": 0.3
+        },
+        "dt_cp2_hours": {
+          "min": 24,
+          "mode": 168,
+          "max": 720
+        },
+        "fi_cp3": {
+          "min": 0,
+          "mode": 0.02,
+          "max": 0.1
+        },
+        "p_evac": {
+          "min": 0.02,
+          "mode": 0.1,
+          "max": 0.35
+        },
+        "p_locl": {
+          "min": 0,
+          "mode": 0.01,
+          "max": 0.05
+        }
+      },
+      "risk_factor_multipliers": {},
+      "required_resources": {}
+    },
+    "acute-prostatitis": {
+      "conditionId": "acute-prostatitis",
+      "provenance": "tierC-synth",
+      "source_ref": "back-fit placeholder; calibrated to K15 Table 1 in Task 31",
+      "incidence": {
+        "distribution": "Gamma-Poisson",
+        "alpha": 2.0,
+        "beta": 2000.0,
+        "lambda_unit": "events-per-person-day"
+      },
+      "severity": {
+        "worst_case_prob_alpha": 1.2,
+        "worst_case_prob_beta": 4.8
+      },
+      "treated": {
+        "fi_cp1": {
+          "min": 0,
+          "mode": 0.05,
+          "max": 0.2
+        },
+        "dt_cp1_hours": {
+          "min": 2,
+          "mode": 8,
+          "max": 48
+        },
+        "fi_cp2": {
+          "min": 0,
+          "mode": 0.02,
+          "max": 0.08
+        },
+        "dt_cp2_hours": {
+          "min": 0,
+          "mode": 24,
+          "max": 168
+        },
+        "fi_cp3": {
+          "min": 0,
+          "mode": 0,
+          "max": 0.02
+        },
+        "p_evac": {
+          "min": 0,
+          "mode": 0.005,
+          "max": 0.03
+        },
+        "p_locl": {
+          "min": 0,
+          "mode": 0,
+          "max": 0.005
+        }
+      },
+      "untreated": {
+        "fi_cp1": {
+          "min": 0.05,
+          "mode": 0.25,
+          "max": 0.6
+        },
+        "dt_cp1_hours": {
+          "min": 12,
+          "mode": 72,
+          "max": 336
+        },
+        "fi_cp2": {
+          "min": 0,
+          "mode": 0.1,
+          "max": 0.3
+        },
+        "dt_cp2_hours": {
+          "min": 24,
+          "mode": 168,
+          "max": 720
+        },
+        "fi_cp3": {
+          "min": 0,
+          "mode": 0.02,
+          "max": 0.1
+        },
+        "p_evac": {
+          "min": 0.02,
+          "mode": 0.1,
+          "max": 0.35
+        },
+        "p_locl": {
+          "min": 0,
+          "mode": 0.01,
+          "max": 0.05
+        }
+      },
+      "risk_factor_multipliers": {},
+      "required_resources": {}
+    },
+    "acute-radiation-syndrome": {
+      "conditionId": "acute-radiation-syndrome",
+      "provenance": "tierC-synth",
+      "source_ref": "back-fit placeholder; calibrated to K15 Table 1 in Task 31",
+      "incidence": {
+        "distribution": "Beta-Bernoulli",
+        "alpha": 2,
+        "beta": 18,
+        "lambda_unit": "events-per-SPE"
+      },
+      "severity": {
+        "worst_case_prob_alpha": 1.2,
+        "worst_case_prob_beta": 4.8
+      },
+      "treated": {
+        "fi_cp1": {
+          "min": 0,
+          "mode": 0.05,
+          "max": 0.2
+        },
+        "dt_cp1_hours": {
+          "min": 2,
+          "mode": 8,
+          "max": 48
+        },
+        "fi_cp2": {
+          "min": 0,
+          "mode": 0.02,
+          "max": 0.08
+        },
+        "dt_cp2_hours": {
+          "min": 0,
+          "mode": 24,
+          "max": 168
+        },
+        "fi_cp3": {
+          "min": 0,
+          "mode": 0,
+          "max": 0.02
+        },
+        "p_evac": {
+          "min": 0,
+          "mode": 0.005,
+          "max": 0.03
+        },
+        "p_locl": {
+          "min": 0,
+          "mode": 0,
+          "max": 0.005
+        }
+      },
+      "untreated": {
+        "fi_cp1": {
+          "min": 0.05,
+          "mode": 0.25,
+          "max": 0.6
+        },
+        "dt_cp1_hours": {
+          "min": 12,
+          "mode": 72,
+          "max": 336
+        },
+        "fi_cp2": {
+          "min": 0,
+          "mode": 0.1,
+          "max": 0.3
+        },
+        "dt_cp2_hours": {
+          "min": 24,
+          "mode": 168,
+          "max": 720
+        },
+        "fi_cp3": {
+          "min": 0,
+          "mode": 0.02,
+          "max": 0.1
+        },
+        "p_evac": {
+          "min": 0.02,
+          "mode": 0.1,
+          "max": 0.35
+        },
+        "p_locl": {
+          "min": 0,
+          "mode": 0.01,
+          "max": 0.05
+        }
+      },
+      "risk_factor_multipliers": {},
+      "required_resources": {}
+    },
+    "altitude-sickness": {
+      "conditionId": "altitude-sickness",
+      "provenance": "tierC-synth",
+      "source_ref": "back-fit placeholder; calibrated to K15 Table 1 in Task 31",
+      "incidence": {
+        "distribution": "Gamma-Poisson",
+        "alpha": 2.0,
+        "beta": 2000.0,
+        "lambda_unit": "events-per-person-day"
+      },
+      "severity": {
+        "worst_case_prob_alpha": 1.2,
+        "worst_case_prob_beta": 4.8
+      },
+      "treated": {
+        "fi_cp1": {
+          "min": 0,
+          "mode": 0.05,
+          "max": 0.2
+        },
+        "dt_cp1_hours": {
+          "min": 2,
+          "mode": 8,
+          "max": 48
+        },
+        "fi_cp2": {
+          "min": 0,
+          "mode": 0.02,
+          "max": 0.08
+        },
+        "dt_cp2_hours": {
+          "min": 0,
+          "mode": 24,
+          "max": 168
+        },
+        "fi_cp3": {
+          "min": 0,
+          "mode": 0,
+          "max": 0.02
+        },
+        "p_evac": {
+          "min": 0,
+          "mode": 0.005,
+          "max": 0.03
+        },
+        "p_locl": {
+          "min": 0,
+          "mode": 0,
+          "max": 0.005
+        }
+      },
+      "untreated": {
+        "fi_cp1": {
+          "min": 0.05,
+          "mode": 0.25,
+          "max": 0.6
+        },
+        "dt_cp1_hours": {
+          "min": 12,
+          "mode": 72,
+          "max": 336
+        },
+        "fi_cp2": {
+          "min": 0,
+          "mode": 0.1,
+          "max": 0.3
+        },
+        "dt_cp2_hours": {
+          "min": 24,
+          "mode": 168,
+          "max": 720
+        },
+        "fi_cp3": {
+          "min": 0,
+          "mode": 0.02,
+          "max": 0.1
+        },
+        "p_evac": {
+          "min": 0.02,
+          "mode": 0.1,
+          "max": 0.35
+        },
+        "p_locl": {
+          "min": 0,
+          "mode": 0.01,
+          "max": 0.05
+        }
+      },
+      "risk_factor_multipliers": {},
+      "required_resources": {}
+    },
+    "anaphylaxis": {
+      "conditionId": "anaphylaxis",
+      "provenance": "tierC-synth",
+      "source_ref": "back-fit placeholder; calibrated to K15 Table 1 in Task 31",
+      "incidence": {
+        "distribution": "Gamma-Poisson",
+        "alpha": 2.0,
+        "beta": 2000.0,
+        "lambda_unit": "events-per-person-day"
+      },
+      "severity": {
+        "worst_case_prob_alpha": 1.2,
+        "worst_case_prob_beta": 4.8
+      },
+      "treated": {
+        "fi_cp1": {
+          "min": 0,
+          "mode": 0.05,
+          "max": 0.2
+        },
+        "dt_cp1_hours": {
+          "min": 2,
+          "mode": 8,
+          "max": 48
+        },
+        "fi_cp2": {
+          "min": 0,
+          "mode": 0.02,
+          "max": 0.08
+        },
+        "dt_cp2_hours": {
+          "min": 0,
+          "mode": 24,
+          "max": 168
+        },
+        "fi_cp3": {
+          "min": 0,
+          "mode": 0,
+          "max": 0.02
+        },
+        "p_evac": {
+          "min": 0,
+          "mode": 0.005,
+          "max": 0.03
+        },
+        "p_locl": {
+          "min": 0,
+          "mode": 0,
+          "max": 0.005
+        }
+      },
+      "untreated": {
+        "fi_cp1": {
+          "min": 0.05,
+          "mode": 0.25,
+          "max": 0.6
+        },
+        "dt_cp1_hours": {
+          "min": 12,
+          "mode": 72,
+          "max": 336
+        },
+        "fi_cp2": {
+          "min": 0,
+          "mode": 0.1,
+          "max": 0.3
+        },
+        "dt_cp2_hours": {
+          "min": 24,
+          "mode": 168,
+          "max": 720
+        },
+        "fi_cp3": {
+          "min": 0,
+          "mode": 0.02,
+          "max": 0.1
+        },
+        "p_evac": {
+          "min": 0.02,
+          "mode": 0.1,
+          "max": 0.35
+        },
+        "p_locl": {
+          "min": 0,
+          "mode": 0.01,
+          "max": 0.05
+        }
+      },
+      "risk_factor_multipliers": {},
+      "required_resources": {}
+    },
+    "choking-obstructed-airway": {
+      "conditionId": "choking-obstructed-airway",
+      "provenance": "tierC-synth",
+      "source_ref": "back-fit placeholder; calibrated to K15 Table 1 in Task 31",
+      "incidence": {
+        "distribution": "Gamma-Poisson",
+        "alpha": 2.0,
+        "beta": 2000.0,
+        "lambda_unit": "events-per-person-day"
+      },
+      "severity": {
+        "worst_case_prob_alpha": 1.2,
+        "worst_case_prob_beta": 4.8
+      },
+      "treated": {
+        "fi_cp1": {
+          "min": 0,
+          "mode": 0.05,
+          "max": 0.2
+        },
+        "dt_cp1_hours": {
+          "min": 2,
+          "mode": 8,
+          "max": 48
+        },
+        "fi_cp2": {
+          "min": 0,
+          "mode": 0.02,
+          "max": 0.08
+        },
+        "dt_cp2_hours": {
+          "min": 0,
+          "mode": 24,
+          "max": 168
+        },
+        "fi_cp3": {
+          "min": 0,
+          "mode": 0,
+          "max": 0.02
+        },
+        "p_evac": {
+          "min": 0,
+          "mode": 0.005,
+          "max": 0.03
+        },
+        "p_locl": {
+          "min": 0,
+          "mode": 0,
+          "max": 0.005
+        }
+      },
+      "untreated": {
+        "fi_cp1": {
+          "min": 0.05,
+          "mode": 0.25,
+          "max": 0.6
+        },
+        "dt_cp1_hours": {
+          "min": 12,
+          "mode": 72,
+          "max": 336
+        },
+        "fi_cp2": {
+          "min": 0,
+          "mode": 0.1,
+          "max": 0.3
+        },
+        "dt_cp2_hours": {
+          "min": 24,
+          "mode": 168,
+          "max": 720
+        },
+        "fi_cp3": {
+          "min": 0,
+          "mode": 0.02,
+          "max": 0.1
+        },
+        "p_evac": {
+          "min": 0.02,
+          "mode": 0.1,
+          "max": 0.35
+        },
+        "p_locl": {
+          "min": 0,
+          "mode": 0.01,
+          "max": 0.05
+        }
+      },
+      "risk_factor_multipliers": {},
+      "required_resources": {}
+    },
+    "elbow-dislocation": {
+      "conditionId": "elbow-dislocation",
+      "provenance": "tierC-synth",
+      "source_ref": "back-fit placeholder; calibrated to K15 Table 1 in Task 31",
+      "incidence": {
+        "distribution": "Gamma-Poisson",
+        "alpha": 2.0,
+        "beta": 2000.0,
+        "lambda_unit": "events-per-person-day"
+      },
+      "severity": {
+        "worst_case_prob_alpha": 1.2,
+        "worst_case_prob_beta": 4.8
+      },
+      "treated": {
+        "fi_cp1": {
+          "min": 0,
+          "mode": 0.05,
+          "max": 0.2
+        },
+        "dt_cp1_hours": {
+          "min": 2,
+          "mode": 8,
+          "max": 48
+        },
+        "fi_cp2": {
+          "min": 0,
+          "mode": 0.02,
+          "max": 0.08
+        },
+        "dt_cp2_hours": {
+          "min": 0,
+          "mode": 24,
+          "max": 168
+        },
+        "fi_cp3": {
+          "min": 0,
+          "mode": 0,
+          "max": 0.02
+        },
+        "p_evac": {
+          "min": 0,
+          "mode": 0.005,
+          "max": 0.03
+        },
+        "p_locl": {
+          "min": 0,
+          "mode": 0,
+          "max": 0.005
+        }
+      },
+      "untreated": {
+        "fi_cp1": {
+          "min": 0.05,
+          "mode": 0.25,
+          "max": 0.6
+        },
+        "dt_cp1_hours": {
+          "min": 12,
+          "mode": 72,
+          "max": 336
+        },
+        "fi_cp2": {
+          "min": 0,
+          "mode": 0.1,
+          "max": 0.3
+        },
+        "dt_cp2_hours": {
+          "min": 24,
+          "mode": 168,
+          "max": 720
+        },
+        "fi_cp3": {
+          "min": 0,
+          "mode": 0.02,
+          "max": 0.1
+        },
+        "p_evac": {
+          "min": 0.02,
+          "mode": 0.1,
+          "max": 0.35
+        },
+        "p_locl": {
+          "min": 0,
+          "mode": 0.01,
+          "max": 0.05
+        }
+      },
+      "risk_factor_multipliers": {},
+      "required_resources": {}
+    },
+    "finger-dislocation": {
+      "conditionId": "finger-dislocation",
+      "provenance": "tierC-synth",
+      "source_ref": "back-fit placeholder; calibrated to K15 Table 1 in Task 31",
+      "incidence": {
+        "distribution": "Gamma-Poisson",
+        "alpha": 2.0,
+        "beta": 2000.0,
+        "lambda_unit": "events-per-person-day"
+      },
+      "severity": {
+        "worst_case_prob_alpha": 1.2,
+        "worst_case_prob_beta": 4.8
+      },
+      "treated": {
+        "fi_cp1": {
+          "min": 0,
+          "mode": 0.05,
+          "max": 0.2
+        },
+        "dt_cp1_hours": {
+          "min": 2,
+          "mode": 8,
+          "max": 48
+        },
+        "fi_cp2": {
+          "min": 0,
+          "mode": 0.02,
+          "max": 0.08
+        },
+        "dt_cp2_hours": {
+          "min": 0,
+          "mode": 24,
+          "max": 168
+        },
+        "fi_cp3": {
+          "min": 0,
+          "mode": 0,
+          "max": 0.02
+        },
+        "p_evac": {
+          "min": 0,
+          "mode": 0.005,
+          "max": 0.03
+        },
+        "p_locl": {
+          "min": 0,
+          "mode": 0,
+          "max": 0.005
+        }
+      },
+      "untreated": {
+        "fi_cp1": {
+          "min": 0.05,
+          "mode": 0.25,
+          "max": 0.6
+        },
+        "dt_cp1_hours": {
+          "min": 12,
+          "mode": 72,
+          "max": 336
+        },
+        "fi_cp2": {
+          "min": 0,
+          "mode": 0.1,
+          "max": 0.3
+        },
+        "dt_cp2_hours": {
+          "min": 24,
+          "mode": 168,
+          "max": 720
+        },
+        "fi_cp3": {
+          "min": 0,
+          "mode": 0.02,
+          "max": 0.1
+        },
+        "p_evac": {
+          "min": 0.02,
+          "mode": 0.1,
+          "max": 0.35
+        },
+        "p_locl": {
+          "min": 0,
+          "mode": 0.01,
+          "max": 0.05
+        }
+      },
+      "risk_factor_multipliers": {},
+      "required_resources": {}
+    },
+    "hip-proximal-femur-fracture": {
+      "conditionId": "hip-proximal-femur-fracture",
+      "provenance": "tierC-synth",
+      "source_ref": "back-fit placeholder; calibrated to K15 Table 1 in Task 31",
+      "incidence": {
+        "distribution": "Gamma-Poisson",
+        "alpha": 2.0,
+        "beta": 2000.0,
+        "lambda_unit": "events-per-person-day"
+      },
+      "severity": {
+        "worst_case_prob_alpha": 1.2,
+        "worst_case_prob_beta": 4.8
+      },
+      "treated": {
+        "fi_cp1": {
+          "min": 0,
+          "mode": 0.05,
+          "max": 0.2
+        },
+        "dt_cp1_hours": {
+          "min": 2,
+          "mode": 8,
+          "max": 48
+        },
+        "fi_cp2": {
+          "min": 0,
+          "mode": 0.02,
+          "max": 0.08
+        },
+        "dt_cp2_hours": {
+          "min": 0,
+          "mode": 24,
+          "max": 168
+        },
+        "fi_cp3": {
+          "min": 0,
+          "mode": 0,
+          "max": 0.02
+        },
+        "p_evac": {
+          "min": 0,
+          "mode": 0.005,
+          "max": 0.03
+        },
+        "p_locl": {
+          "min": 0,
+          "mode": 0,
+          "max": 0.005
+        }
+      },
+      "untreated": {
+        "fi_cp1": {
+          "min": 0.05,
+          "mode": 0.25,
+          "max": 0.6
+        },
+        "dt_cp1_hours": {
+          "min": 12,
+          "mode": 72,
+          "max": 336
+        },
+        "fi_cp2": {
+          "min": 0,
+          "mode": 0.1,
+          "max": 0.3
+        },
+        "dt_cp2_hours": {
+          "min": 24,
+          "mode": 168,
+          "max": 720
+        },
+        "fi_cp3": {
+          "min": 0,
+          "mode": 0.02,
+          "max": 0.1
+        },
+        "p_evac": {
+          "min": 0.02,
+          "mode": 0.1,
+          "max": 0.35
+        },
+        "p_locl": {
+          "min": 0,
+          "mode": 0.01,
+          "max": 0.05
+        }
+      },
+      "risk_factor_multipliers": {},
+      "required_resources": {}
+    },
+    "lower-extremity-le-stress-fracture": {
+      "conditionId": "lower-extremity-le-stress-fracture",
+      "provenance": "tierC-synth",
+      "source_ref": "back-fit placeholder; calibrated to K15 Table 1 in Task 31",
+      "incidence": {
+        "distribution": "Gamma-Poisson",
+        "alpha": 2.0,
+        "beta": 2000.0,
+        "lambda_unit": "events-per-person-day"
+      },
+      "severity": {
+        "worst_case_prob_alpha": 1.2,
+        "worst_case_prob_beta": 4.8
+      },
+      "treated": {
+        "fi_cp1": {
+          "min": 0,
+          "mode": 0.05,
+          "max": 0.2
+        },
+        "dt_cp1_hours": {
+          "min": 2,
+          "mode": 8,
+          "max": 48
+        },
+        "fi_cp2": {
+          "min": 0,
+          "mode": 0.02,
+          "max": 0.08
+        },
+        "dt_cp2_hours": {
+          "min": 0,
+          "mode": 24,
+          "max": 168
+        },
+        "fi_cp3": {
+          "min": 0,
+          "mode": 0,
+          "max": 0.02
+        },
+        "p_evac": {
+          "min": 0,
+          "mode": 0.005,
+          "max": 0.03
+        },
+        "p_locl": {
+          "min": 0,
+          "mode": 0,
+          "max": 0.005
+        }
+      },
+      "untreated": {
+        "fi_cp1": {
+          "min": 0.05,
+          "mode": 0.25,
+          "max": 0.6
+        },
+        "dt_cp1_hours": {
+          "min": 12,
+          "mode": 72,
+          "max": 336
+        },
+        "fi_cp2": {
+          "min": 0,
+          "mode": 0.1,
+          "max": 0.3
+        },
+        "dt_cp2_hours": {
+          "min": 24,
+          "mode": 168,
+          "max": 720
+        },
+        "fi_cp3": {
+          "min": 0,
+          "mode": 0.02,
+          "max": 0.1
+        },
+        "p_evac": {
+          "min": 0.02,
+          "mode": 0.1,
+          "max": 0.35
+        },
+        "p_locl": {
+          "min": 0,
+          "mode": 0.01,
+          "max": 0.05
+        }
+      },
+      "risk_factor_multipliers": {},
+      "required_resources": {}
+    },
+    "lumbar-spine-fracture": {
+      "conditionId": "lumbar-spine-fracture",
+      "provenance": "tierC-synth",
+      "source_ref": "back-fit placeholder; calibrated to K15 Table 1 in Task 31",
+      "incidence": {
+        "distribution": "Gamma-Poisson",
+        "alpha": 2.0,
+        "beta": 2000.0,
+        "lambda_unit": "events-per-person-day"
+      },
+      "severity": {
+        "worst_case_prob_alpha": 1.2,
+        "worst_case_prob_beta": 4.8
+      },
+      "treated": {
+        "fi_cp1": {
+          "min": 0,
+          "mode": 0.05,
+          "max": 0.2
+        },
+        "dt_cp1_hours": {
+          "min": 2,
+          "mode": 8,
+          "max": 48
+        },
+        "fi_cp2": {
+          "min": 0,
+          "mode": 0.02,
+          "max": 0.08
+        },
+        "dt_cp2_hours": {
+          "min": 0,
+          "mode": 24,
+          "max": 168
+        },
+        "fi_cp3": {
+          "min": 0,
+          "mode": 0,
+          "max": 0.02
+        },
+        "p_evac": {
+          "min": 0,
+          "mode": 0.005,
+          "max": 0.03
+        },
+        "p_locl": {
+          "min": 0,
+          "mode": 0,
+          "max": 0.005
+        }
+      },
+      "untreated": {
+        "fi_cp1": {
+          "min": 0.05,
+          "mode": 0.25,
+          "max": 0.6
+        },
+        "dt_cp1_hours": {
+          "min": 12,
+          "mode": 72,
+          "max": 336
+        },
+        "fi_cp2": {
+          "min": 0,
+          "mode": 0.1,
+          "max": 0.3
+        },
+        "dt_cp2_hours": {
+          "min": 24,
+          "mode": 168,
+          "max": 720
+        },
+        "fi_cp3": {
+          "min": 0,
+          "mode": 0.02,
+          "max": 0.1
+        },
+        "p_evac": {
+          "min": 0.02,
+          "mode": 0.1,
+          "max": 0.35
+        },
+        "p_locl": {
+          "min": 0,
+          "mode": 0.01,
+          "max": 0.05
+        }
+      },
+      "risk_factor_multipliers": {},
+      "required_resources": {}
+    },
+    "neurogenic-shock": {
+      "conditionId": "neurogenic-shock",
+      "provenance": "tierC-synth",
+      "source_ref": "back-fit placeholder; calibrated to K15 Table 1 in Task 31",
+      "incidence": {
+        "distribution": "Gamma-Poisson",
+        "alpha": 2.0,
+        "beta": 2000.0,
+        "lambda_unit": "events-per-person-day"
+      },
+      "severity": {
+        "worst_case_prob_alpha": 1.2,
+        "worst_case_prob_beta": 4.8
+      },
+      "treated": {
+        "fi_cp1": {
+          "min": 0,
+          "mode": 0.05,
+          "max": 0.2
+        },
+        "dt_cp1_hours": {
+          "min": 2,
+          "mode": 8,
+          "max": 48
+        },
+        "fi_cp2": {
+          "min": 0,
+          "mode": 0.02,
+          "max": 0.08
+        },
+        "dt_cp2_hours": {
+          "min": 0,
+          "mode": 24,
+          "max": 168
+        },
+        "fi_cp3": {
+          "min": 0,
+          "mode": 0,
+          "max": 0.02
+        },
+        "p_evac": {
+          "min": 0,
+          "mode": 0.005,
+          "max": 0.03
+        },
+        "p_locl": {
+          "min": 0,
+          "mode": 0,
+          "max": 0.005
+        }
+      },
+      "untreated": {
+        "fi_cp1": {
+          "min": 0.05,
+          "mode": 0.25,
+          "max": 0.6
+        },
+        "dt_cp1_hours": {
+          "min": 12,
+          "mode": 72,
+          "max": 336
+        },
+        "fi_cp2": {
+          "min": 0,
+          "mode": 0.1,
+          "max": 0.3
+        },
+        "dt_cp2_hours": {
+          "min": 24,
+          "mode": 168,
+          "max": 720
+        },
+        "fi_cp3": {
+          "min": 0,
+          "mode": 0.02,
+          "max": 0.1
+        },
+        "p_evac": {
+          "min": 0.02,
+          "mode": 0.1,
+          "max": 0.35
+        },
+        "p_locl": {
+          "min": 0,
+          "mode": 0.01,
+          "max": 0.05
+        }
+      },
+      "risk_factor_multipliers": {},
+      "required_resources": {}
+    },
+    "shoulder-dislocation": {
+      "conditionId": "shoulder-dislocation",
+      "provenance": "tierC-synth",
+      "source_ref": "back-fit placeholder; calibrated to K15 Table 1 in Task 31",
+      "incidence": {
+        "distribution": "Gamma-Poisson",
+        "alpha": 2.0,
+        "beta": 2000.0,
+        "lambda_unit": "events-per-person-day"
+      },
+      "severity": {
+        "worst_case_prob_alpha": 1.2,
+        "worst_case_prob_beta": 4.8
+      },
+      "treated": {
+        "fi_cp1": {
+          "min": 0,
+          "mode": 0.05,
+          "max": 0.2
+        },
+        "dt_cp1_hours": {
+          "min": 2,
+          "mode": 8,
+          "max": 48
+        },
+        "fi_cp2": {
+          "min": 0,
+          "mode": 0.02,
+          "max": 0.08
+        },
+        "dt_cp2_hours": {
+          "min": 0,
+          "mode": 24,
+          "max": 168
+        },
+        "fi_cp3": {
+          "min": 0,
+          "mode": 0,
+          "max": 0.02
+        },
+        "p_evac": {
+          "min": 0,
+          "mode": 0.005,
+          "max": 0.03
+        },
+        "p_locl": {
+          "min": 0,
+          "mode": 0,
+          "max": 0.005
+        }
+      },
+      "untreated": {
+        "fi_cp1": {
+          "min": 0.05,
+          "mode": 0.25,
+          "max": 0.6
+        },
+        "dt_cp1_hours": {
+          "min": 12,
+          "mode": 72,
+          "max": 336
+        },
+        "fi_cp2": {
+          "min": 0,
+          "mode": 0.1,
+          "max": 0.3
+        },
+        "dt_cp2_hours": {
+          "min": 24,
+          "mode": 168,
+          "max": 720
+        },
+        "fi_cp3": {
+          "min": 0,
+          "mode": 0.02,
+          "max": 0.1
+        },
+        "p_evac": {
+          "min": 0.02,
+          "mode": 0.1,
+          "max": 0.35
+        },
+        "p_locl": {
+          "min": 0,
+          "mode": 0.01,
+          "max": 0.05
+        }
+      },
+      "risk_factor_multipliers": {},
+      "required_resources": {}
+    },
+    "smoke-inhalation": {
+      "conditionId": "smoke-inhalation",
+      "provenance": "tierC-synth",
+      "source_ref": "back-fit placeholder; calibrated to K15 Table 1 in Task 31",
+      "incidence": {
+        "distribution": "Gamma-Poisson",
+        "alpha": 2.0,
+        "beta": 2000.0,
+        "lambda_unit": "events-per-person-day"
+      },
+      "severity": {
+        "worst_case_prob_alpha": 1.2,
+        "worst_case_prob_beta": 4.8
+      },
+      "treated": {
+        "fi_cp1": {
+          "min": 0,
+          "mode": 0.05,
+          "max": 0.2
+        },
+        "dt_cp1_hours": {
+          "min": 2,
+          "mode": 8,
+          "max": 48
+        },
+        "fi_cp2": {
+          "min": 0,
+          "mode": 0.02,
+          "max": 0.08
+        },
+        "dt_cp2_hours": {
+          "min": 0,
+          "mode": 24,
+          "max": 168
+        },
+        "fi_cp3": {
+          "min": 0,
+          "mode": 0,
+          "max": 0.02
+        },
+        "p_evac": {
+          "min": 0,
+          "mode": 0.005,
+          "max": 0.03
+        },
+        "p_locl": {
+          "min": 0,
+          "mode": 0,
+          "max": 0.005
+        }
+      },
+      "untreated": {
+        "fi_cp1": {
+          "min": 0.05,
+          "mode": 0.25,
+          "max": 0.6
+        },
+        "dt_cp1_hours": {
+          "min": 12,
+          "mode": 72,
+          "max": 336
+        },
+        "fi_cp2": {
+          "min": 0,
+          "mode": 0.1,
+          "max": 0.3
+        },
+        "dt_cp2_hours": {
+          "min": 24,
+          "mode": 168,
+          "max": 720
+        },
+        "fi_cp3": {
+          "min": 0,
+          "mode": 0.02,
+          "max": 0.1
+        },
+        "p_evac": {
+          "min": 0.02,
+          "mode": 0.1,
+          "max": 0.35
+        },
+        "p_locl": {
+          "min": 0,
+          "mode": 0.01,
+          "max": 0.05
+        }
+      },
+      "risk_factor_multipliers": {},
+      "required_resources": {}
     }
   },
   "global_calibration": {
