@@ -4,17 +4,19 @@
 
 **A Bayesian multi-criteria scoring engine for analog-astronaut selection.**
 
-*Calibrated uncertainty over candidate fitness, not a point estimate.*
+*Calibrated uncertainty over candidate fitness — and a NASA-grounded mission-risk verdict — instead of a point estimate.*
 
 ---
 
-![status](https://img.shields.io/badge/status-Iter%201%20%E2%80%94%20vertical%20slice%20green-success)
-![tests](https://img.shields.io/badge/tests-21%20%2F%2021%20passing-success)
+![status](https://img.shields.io/badge/status-Iter%203%20%E2%80%94%20NASA%20HSRB%20LxC%20%2B%20Monte%20Carlo%20live-success)
+![tests](https://img.shields.io/badge/tests-171%20%2F%20171%20passing-success)
+![e2e](https://img.shields.io/badge/e2e-7%20%2F%207%20Playwright-success)
 ![typescript](https://img.shields.io/badge/TypeScript-5.5-3178c6?logo=typescript&logoColor=white)
 ![vite](https://img.shields.io/badge/Vite-5.3-646cff?logo=vite&logoColor=white)
 ![react](https://img.shields.io/badge/React-18.3-61dafb?logo=react&logoColor=white)
-![tailwind](https://img.shields.io/badge/Tailwind-3.4-38bdf8?logo=tailwind-css&logoColor=white)
+![tailwind](https://img.shields.io/badge/Tailwind-3.4-38bdf8?logo=tailwind&logoColor=white)
 ![echarts](https://img.shields.io/badge/ECharts-6.0-aa344d)
+![dexie](https://img.shields.io/badge/Dexie-4.x-1a6acb)
 ![license](https://img.shields.io/badge/license-private-lightgrey)
 
 </div>
@@ -25,18 +27,19 @@
 
 A working TypeScript application and a methodology paper, in one repository.
 
-Selection panels for human-spaceflight analog missions (D-MARS, AMADEE, HI-SEAS, MDRS, and the broader ASTRA framework proposed by Apollonio et al. at AIAA ASCEND 2026) routinely collapse genuine uncertainty into false ordinal rankings of candidates. Selectron treats each candidate's total score as a **posterior distribution**, not a number — so a 90 % credible interval narrows when the evidence is clean and widens when it isn't, and two candidates whose posteriors overlap by more than a configurable threshold are flagged as *statistically tied* rather than silently ranked first / second.
+Selection panels for human-spaceflight analog missions (D-MARS, AMADEE, HI-SEAS, MDRS, and the broader ASTRA framework proposed by Apollonio et al. at AIAA ASCEND 2026) routinely collapse genuine uncertainty into false ordinal rankings. Selectron does two things instead:
 
-The math is Bayesian Multi-Criteria Decision Analysis with Dirichlet weight priors and exact-form moment checks. The frontend is pure TypeScript on Vite + React + Tailwind, with the Bayesian sampler in-browser (no backend, no Python). Sampling 5 000 Metropolis-traced posterior draws over ~15 criteria takes < 500 ms in any modern browser.
+1. **Stage A — Bayesian MCDA.** Each candidate's total score is a **posterior distribution**, not a number. Weights are drawn from a Dirichlet prior elicited from Diego against the Phase-0 literature; a 90 % / 95 % credible interval propagates that uncertainty into the ranking. Two candidates whose posteriors overlap by more than a configurable threshold are flagged as *statistically tied* rather than silently ranked first / second.
+2. **Stage B — Mission-risk Monte Carlo.** A NASA-Integrated-Medical-Model-style 4-step forward simulation (occurrence → severity → treatment → CHI/QTL aggregation) at the canonical *T* = 100 000 trials per [M18] / [A22] produces the mission-level **Crew Health Index** (χ), the early-termination probability **P(χ < χ\*)**, and the expected lost crew-days. The result is plotted on NASA's official **Likelihood × Consequence matrix** per **JSC-66705 Rev A** (Human System Risk Board) so the verdict speaks the same language as the institutional process.
 
-The deliverable is a peer-reviewed methodology paper. The repository is the working artifact that backs every number in it.
+The math is in pure TypeScript and runs in-browser. There is no backend, no Python, no SaaS. The methodology paper's numbers and the application's outputs are produced by the same source, so they cannot drift.
 
 ## What Selectron is *not*
 
 - **Not a registry or applicant-tracking database.** That is what ASTRA's *Analog Astronaut Database* (AAD) proposes. Selectron is methodological, not infrastructural.
 - **Not a clinical decision-support tool.** It does not diagnose, treat, or medically clear anyone for spaceflight.
-- **Not a multi-user platform.** No auth, no shared backend, no SaaS — the spec explicitly forecloses these.
-- **Not a replacement for human judgement** in selection panels. It is a defensible, audit-friendly input to that judgement.
+- **Not a multi-user platform.** No auth, no shared backend, no SaaS — the spec explicitly forecloses these. Data lives in IndexedDB on the operator's own machine.
+- **Not a replacement for human judgement** in selection panels. It is a defensible, audit-friendly input to that judgement — the NASA HSRB color is decision-support, not a verdict.
 
 ## Quick start
 
@@ -45,7 +48,8 @@ git clone https://github.com/strikerdlm/selectron.git
 cd selectron
 npm install
 npm run dev          # http://localhost:5173
-npm test             # 21 tests across 8 vitest suites
+npm test             # 171 vitest tests across 23 suites
+npm run e2e          # 7 Playwright tests (figure snapshots + smoke)
 npm run typecheck    # tsc --noEmit
 npm run build        # production bundle in dist/
 ```
@@ -54,49 +58,80 @@ npm run build        # production bundle in dist/
 
 ```mermaid
 flowchart LR
-    P0[Phase 0<br/>6-agent literature fan-out<br/><i>parallel, complete</i>] --> I1
-    I1[Iter 1 ✓<br/>vertical slice<br/>5 placeholder criteria<br/>end-to-end pipeline] --> I2
-    I2[Iter 2<br/>literature-driven criteria<br/>multi-candidate comparison<br/>credible-interval ranks] --> I3
-    I3[Iter 3<br/>sensitivity analysis<br/>prior elicitation UI<br/>Sobol + OAT indices] --> I4
+    P0[Phase 0 ✓<br/>6-agent literature fan-out<br/>parallel, complete] --> I1
+    I1[Iter 1 ✓<br/>vertical slice<br/>Bayesian MCDA<br/>5 placeholder criteria] --> I2
+    I2[Iter 2 ✓<br/>12 verified criteria<br/>3-tier scenarios<br/>multi-candidate comparison] --> I3
+    I3[Iter 3<br/>NASA IMM Monte Carlo<br/>NASA HSRB LxC verdict<br/>mission risk + per-mission compare]
+    I3 --> I4
     I4[Iter 4<br/>IMRaD manuscript<br/>figures from src/<br/>journal submission]
     classDef done fill:#16a34a,stroke:#15803d,color:#fff
-    classDef next fill:#eab308,stroke:#a16207,color:#fff
-    class P0,I1 done
-    class I2 next
+    classDef active fill:#eab308,stroke:#a16207,color:#fff
+    class P0,I1,I2 done
+    class I3 active
 ```
 
-**Iter 1 is feature-complete.** The vertical slice ships a Metropolis-Hastings sampler validated against closed-form Dirichlet moments (mean error 1×10⁻⁵, variance error 2.7×10⁻³ on 50 000 samples), a React UI that re-samples the posterior on every slider change, and 21 passing tests. The full plan lives in [`docs/superpowers/plans/`](docs/superpowers/plans/).
+**Iter 3 is the active iteration.** It ships:
 
-## Bayesian MCDA in one diagram
+- a forward Monte-Carlo IMM trial at *T* = 100 000 (NASA canonical per [M18] / [A22]) over 12 modeled medical conditions × 6 synthetic crewmembers, with σ < 5 % convergence check across the last two 1 000-trial increments;
+- the closed-form Poisson-Gamma conjugate sanity test (V&V Factor 1) per NASA-STD-7009;
+- the **NASA HSRB Likelihood × Consequence matrix** per JSC-66705 Rev A Figure 4 — verbatim 5×5 priority-score grid, verbatim In-Mission likelihood thresholds (P ≤ 0.01 %, 0.01–0.1 %, 0.1–1 %, 1–10 %, > 10 %), Mission Objectives Impact consequence band, and the §3.2.4 color rule (red ≥ 20, yellow 11–19, green ≤ 10);
+- a step-by-step **CalculationTrace** UI (4 Stage-A steps + 6 IMM steps) that walks the operator through every transform between raw scores and posterior, with a plain-English lay layer for educational use;
+- a **three-tier accessibility model** (Minimum / Medium / Elite) so the same criteria taxonomy can serve a Colombian low-resource analog program at Tier-1 and a NASA-grade campaign at Tier-3 — the active tier dynamically filters K (Dirichlet weight 1/K is honest to the subset);
+- a **five-mission comparison panel** (D-MARS 7 d · AMADEE-class 22 d · MDRS short 45 d · HI-SEAS long · simulated Mars) with a per-mission LxC chip on every row.
+
+The full plan lives in [`docs/superpowers/plans/`](docs/superpowers/plans/). Current resume tracker is [`STATUS.md`](STATUS.md).
+
+## Two-stage pipeline in one diagram
 
 ```mermaid
 flowchart TB
-    subgraph Inputs
-        C[Candidate scores<br/>x_i,k]
-        A["Dirichlet prior α<br/>elicited by Diego"]
+    subgraph A[" Stage A — Bayesian MCDA · src/engine "]
+        direction TB
+        E_C[Candidate scores<br/>x_i,k after tier filter]
+        E_A[Dirichlet prior α<br/>elicited weights]
+        E_N["normalize z(x) → [0, 1]"]
+        E_S[Metropolis sampler<br/>5 000 simplex draws]
+        E_M[Aggregator<br/>S_i = Σ w_k · z_k]
+        E_CF[Closed-form moments<br/>ground-truth check]
+        E_P[Posterior of S_i<br/>mean · CI₉₀ · CI₉₅ · ESS]
+        E_C --> E_N --> E_M
+        E_A --> E_S --> E_M --> E_P
+        E_M -.validation.- E_CF
     end
-    subgraph Engine[" src/engine — pure TS, no runtime deps "]
-        N["normalize z(x)"]
-        S[Metropolis sampler]
-        M[MCDA aggregator<br/>S_i = Σ w_k · z_k]
-        CF[Closed-form moments<br/><i>ground-truth check</i>]
+
+    subgraph B[" Stage B — Mission Risk · src/risk "]
+        direction TB
+        R_S[Synthetic crew × mission<br/>= 6 members × 5 mission profiles]
+        R_PRIOR[Lognormal-Poisson<br/>hierarchical priors]
+        R_MC[4-step IMM trial × T=100 000<br/>occurrence → severity → treatment → χ aggregation]
+        R_OUT[Posterior:<br/>χ mean · CI · P χ&lt;χ* · E lost crew-days]
+        R_VV[σ &lt; 5 % convergence rule<br/>Poisson-Gamma conjugate test]
+        R_S --> R_MC
+        R_PRIOR --> R_MC --> R_OUT
+        R_MC -.V&V.- R_VV
     end
-    P[Posterior over S_i<br/>mean · CI₉₀ · CI₉₅ · ESS]
-    UI[React UI<br/>sliders · ScoreCard · ECharts histogram]
-    C --> N --> M
-    A --> S --> M --> P
-    M -.validation.- CF
-    P --> UI
+
+    subgraph V[" Verdict surface · src/ui/figures "]
+        direction TB
+        V_LXC["NASA HSRB LxC matrix<br/>per JSC-66705 Rev A Fig. 4"]
+        V_COLOR["Color: green ≤10 · yellow 11–19 · red ≥20"]
+        V_LAY[Plain-English lay layer<br/>χ-gap STRONG/ADEQUATE/MARGINAL/DEGRADED]
+        V_LXC --> V_COLOR
+    end
+
+    E_P --> R_S
+    R_OUT --> V_LXC
+    R_OUT --> V_LAY
 ```
 
-The whole pipeline runs in-browser. There is no server. There is no Python. The methodology paper's numbers and the application's outputs are produced by the same TypeScript source, so they cannot drift.
+The whole pipeline runs in-browser. Sampling 5 000 Stage-A draws over 8–12 active criteria takes < 500 ms; a full *T* = 100 000 Stage-B Monte Carlo over 6 crew × 12 conditions takes ~10 s on a commodity laptop with a non-blocking overlay (`flushSync` + rAF + 50 ms paint yield) so the page never appears frozen.
 
 ## Architecture
 
 ```
 selectron/
 ├── src/
-│   ├── engine/                # pure-TS scoring math, zero React deps
+│   ├── engine/                # Stage A — pure-TS scoring math, zero React deps
 │   │   ├── prng.ts            #   Mulberry32 seeded PRNG
 │   │   ├── gamma.ts           #   Marsaglia–Tsang Gamma(shape, 1)
 │   │   ├── dirichlet.ts       #   simplex sampling + closed-form moments
@@ -104,19 +139,53 @@ selectron/
 │   │   ├── normalize.ts       #   [scale.min, scale.max] → [0, 1]
 │   │   ├── synthetic.ts       #   seeded candidate generator
 │   │   └── errors.ts          #   structured SelectronError codes
-│   ├── ui/                    # React + Tailwind + ECharts
-│   │   ├── App.tsx
-│   │   └── components/
-│   ├── data/                  # criterion definitions (placeholder in Iter 1)
-│   └── types/                 # Criterion · Candidate · Posterior
-├── tests/engine/              # 21 vitest suites — math-first TDD
-├── research/                  # Phase-0 literature foundation (6 deliverables)
-├── docs/                      # spec + plans + decisions
-├── paper/                     # IMRaD manuscript draft (Iter 4)
-└── STATUS.md                  # disconnection-recovery resume tracker
+│   ├── risk/                  # Stage B — NASA IMM-style Monte Carlo + HSRB LxC
+│   │   ├── chi.ts             #   CHI = 1 − QTL/(t·c) closed-form
+│   │   ├── conditions.ts      #   12 modeled medical conditions catalogue
+│   │   ├── incidence.ts       #   Poisson incidence sampler
+│   │   ├── progression.ts     #   severity (treated/untreated) Bernoulli step
+│   │   ├── treatment.ts       #   condition → treatment partial-credit
+│   │   ├── simulate.ts        #   forward MC trial loop · T=100 000 default
+│   │   ├── lxc-definitions.ts #   verbatim JSC-66705 Rev A Fig. 4 tables
+│   │   ├── lxc.ts             #   posterior → (L, C, score, color) assessor
+│   │   └── priorsSchema.ts    #   priors.json runtime validator
+│   ├── ui/
+│   │   ├── App.tsx            #   view switcher (Dashboard / Wizard / Sim)
+│   │   ├── views/             #   top-level routes
+│   │   ├── wizard/            #   4-step wizard: Candidate → Criteria → Review → Mission/Sim
+│   │   ├── figures/           #   ECharts F1–F7 + LxCMatrix + CHIExplainer + CalculationTrace
+│   │   ├── dashboard/         #   candidate roster + recent sim cards
+│   │   ├── components/        #   ErrorBoundary · MissionPicker · ScoreCard · RiskCard · ToastHost
+│   │   └── testing/           #   TestFigureHost (DEV-only e2e fixture host)
+│   ├── contexts/              #   WizardContext (4-step state + Dexie autosave)
+│   ├── db/                    #   Dexie 4 schema + repository (IndexedDB persistence)
+│   ├── data/                  #   12 verified criteria · 5 analog missions · synthetic priors
+│   └── types/                 #   Criterion · Candidate · Posterior · AccessTier · risk types
+├── tests/
+│   ├── engine/                #   Stage-A math, math-first TDD
+│   ├── risk/                  #   IMM trial, convergence, Poisson-Gamma conjugate, LxC
+│   ├── data/                  #   criteria + missions catalogue invariants
+│   ├── db/                    #   Dexie repository (fake-indexeddb, jsdom-scoped)
+│   ├── ui/                    #   React-Testing-Library on wizard + scenario selector
+│   ├── types/                 #   type-level invariants
+│   └── e2e/                   #   Playwright snapshot + smoke (7 tests)
+├── research/                  #   Phase-0 literature foundation + tier-criteria evidence
+├── docs/                      #   specs + plans + NASA Monte-Carlo audit + V&V dossier
+├── paper/                     #   IMRaD manuscript draft (Iter 4)
+└── STATUS.md                  #   disconnection-recovery resume tracker
 ```
 
-## The research foundation (Phase 0)
+## Verification & Validation (V&V)
+
+The Iter-3 V&V dossier maps Selectron against NASA-STD-7009A's eight credibility factors:
+
+- **Factor 1 (Verification)** — closed-form Poisson-Gamma conjugate sanity test (5 cases) and verbatim-grid check of the JSC-66705 Fig. 4 priority-score matrix.
+- **Factor 2 (Validation)** — convergence at the NASA-canonical *T* = 100 000 trials per [M18] / [A22], σ < 5 % rule across the last two 1 000-trial increments.
+- **Factor 3 (Input Pedigree)** — 18 of 19 references verified with DOIs via Scite citation intelligence; corrections logged for Cooper 1968 and Petrides 2007.
+
+See [`docs/iter3_vv_dossier.md`](docs/iter3_vv_dossier.md) and [`docs/iter3_nasa_monte_carlo_audit.md`](docs/iter3_nasa_monte_carlo_audit.md) for the verbatim NASA quotes that ground these numbers.
+
+## The research foundation (Phase 0 + tier evidence)
 
 Six independent agents fanned out across the analog-selection literature in parallel before any criterion was hard-coded. Their deliverables sit in [`research/`](research/):
 
@@ -128,27 +197,32 @@ Six independent agents fanned out across the analog-selection literature in para
 | [`evidence_tables/medical.md`](research/evidence_tables/medical.md) | Medical / physiological screening criteria | 11 domains; 9 with explicit numeric thresholds |
 | [`evidence_tables/behavioral.md`](research/evidence_tables/behavioral.md) | BBI / team-performance constructs | 9 constructs; BBI / Salas Big Five / BHP |
 | [`methodology_precedents.md`](research/methodology_precedents.md) | Bayesian MCDA in adjacent domains | 7 precedents; novelty claim grounded |
-| [`02_criterion_taxonomy.md`](research/02_criterion_taxonomy.md) | Synthesizer's proposal — **20 criteria, 4 families** | Awaiting ratification → `docs/criteria.md` |
+| [`02_criterion_taxonomy.md`](research/02_criterion_taxonomy.md) | Synthesizer's proposal | 20 criteria, 4 families |
+| [`2026-05-19_test_battery_tiers.md`](research/2026-05-19_test_battery_tiers.md) | Tier-1/2/3 instrument evidence (Iter-3 scope expansion) | CogScreen ↔ NASA Cognition Battery alternatives; PVT-B iOS accessibility |
 
-**A finding worth flagging up front:** the methodology-precedents agent recovered seven Bayesian MCDA papers from adjacent domains (clinical trials, healthcare technology assessment, multi-stakeholder ranking), and **zero** that apply Bayesian MCDA to astronaut, aircrew, or analog-astronaut selection. That gap is the paper.
+**A finding worth flagging up front:** the methodology-precedents agent recovered seven Bayesian MCDA papers from adjacent domains (clinical trials, healthcare technology assessment, multi-stakeholder ranking), and **zero** that apply Bayesian MCDA to astronaut, aircrew, or analog-astronaut selection. The combination of Bayesian MCDA + NASA HSRB LxC mapping is the paper.
 
-## Methodology, in one paragraph
+## Methodology, in two paragraphs
 
-For each candidate `i`, Selectron models the total score
+**Stage A — Bayesian MCDA.** For each candidate `i`, Selectron models the total score
 
 $$S_i \;=\; \sum_{k=1}^{K} w_k \cdot z(x_{i,k})$$
 
-where weights $w \sim \mathrm{Dirichlet}(\alpha)$ are drawn from a prior elicited from Diego against the Phase-0 evidence, $x_{i,k}$ are the raw assessment scores, and $z(\cdot)$ is a literature-grounded normalization onto $[0,1]$. The posterior of $S_i$ is therefore a distribution, not a number; its 90 % and 95 % credible intervals propagate the weight uncertainty into the ranking. The Iter 1 sampler is hand-rolled Metropolis–Hastings on the simplex, validated against the closed-form Dirichlet moments — every test in `tests/engine/` is statistical, not snapshot-based. Iter 3 adds a sensitivity-analysis layer (Sobol + one-at-a-time) so panels can see which criterion's weight most affects the top-N ranking.
+where weights $w \sim \mathrm{Dirichlet}(\alpha)$ are drawn from a prior elicited from Diego against the Phase-0 evidence, $x_{i,k}$ are the raw assessment scores (in canonical units after tier-aware scale transform), and $z(\cdot)$ is a literature-grounded normalization onto $[0, 1]$. The posterior of $S_i$ is therefore a distribution, not a number; its 90 % and 95 % credible intervals propagate the weight uncertainty into the ranking. The sampler is hand-rolled Metropolis–Hastings on the simplex, validated against the closed-form Dirichlet moments — every Stage-A test in `tests/engine/` is statistical, not snapshot-based.
 
-See [`docs/superpowers/specs/2026-05-18-selectron-design.md`](docs/superpowers/specs/2026-05-18-selectron-design.md) for the full design, including the explicit out-of-scope list.
+**Stage B — Mission-risk Monte Carlo.** Stage A's posterior conditions a synthetic crew of 6 members per analog mission. A 4-step forward simulation (occurrence → severity → treatment → CHI aggregation) is run at the NASA-canonical *T* = 100 000 trials per [M18] / [A22], using lognormal-Poisson hierarchical priors over 12 modeled medical conditions. The mission posterior carries χ (Crew Health Index, χ = 1 − QTL/(t·c)), the early-termination probability **P(χ < χ\*)** at a configurable operational floor (default χ\* = 0.7 per NASA reference programs), and the expected lost crew-days. These three numbers feed the **NASA HSRB Likelihood × Consequence matrix** verbatim from JSC-66705 Rev A Figure 4 — likelihood bucketed by P(χ < χ\*), consequence bucketed by 1 − χ_mean (= fraction of mission crew-days lost) under the Mission Objectives Impact sub-category, then looked up in the 5×5 priority-score grid and mapped to a NASA color per §3.2.4 (red ≥ 20, yellow 11–19, green ≤ 10).
+
+See [`docs/superpowers/specs/2026-05-18-selectron-iter3-risk.md`](docs/superpowers/specs/2026-05-18-selectron-iter3-risk.md) for the full Iter-3 design and the explicit out-of-scope list.
 
 ## Status
 
-- **Iter 1 vertical slice:** code-complete, all tests green, dev server live at `http://localhost:5173`.
+- **Iter 1 vertical slice:** code-complete, math validated, all engine tests green.
+- **Iter 2 criteria + tiers:** 12 evidence-grounded criteria with verified DOIs, 3-tier accessibility model (Minimum / Medium / Elite), tier-aware scale transforms.
+- **Iter 3 risk + LxC (active):** NASA IMM Monte Carlo at *T* = 100 000, NASA HSRB LxC verdict per JSC-66705 Rev A, CHIExplainer + LxCMatrix UI, per-mission LxC chips in the comparison panel.
 - **Phase 0 literature fan-out:** complete; all 6 agent deliverables under `research/`.
-- **Synthesis proposal:** [`research/02_criterion_taxonomy.md`](research/02_criterion_taxonomy.md) — 20 rows, 5 elicitation calls flagged for Diego.
-- **Active branch:** `iter1-phase0` (40 commits, awaiting final release commit after manual UI sanity).
-- **Next:** Diego ratifies the criterion taxonomy → `docs/criteria.md` → **Iter 2 starts**.
+- **Active branch:** `iter1-phase0` (still the working branch name from Iter-1; rebased history carries Iter-2 and Iter-3 work).
+- **Test suite:** 171 vitest tests across 23 suites + 7 Playwright e2e — all green.
+- **Next:** Diego's manual UI sanity sign-off → Iter-4 manuscript pass.
 
 The live resume tracker is [`STATUS.md`](STATUS.md). It is updated as the single source of truth at the end of every task, so any new session (or any new agent) can pick up cleanly from a disconnection.
 
@@ -158,7 +232,11 @@ The live resume tracker is [`STATUS.md`](STATUS.md). It is updated as the single
 
 > Apollonio, E., Kring, J., Berry, K., & Sawyer, M. (2026). *ASTRA Framework for Enhancing Human Performance and Safety in Analog Missions: A Pathway to Optimizing Analog Astronaut Selection.* AIAA ASCEND 2026, paper 2026-3000. [doi:10.2514/6.2026-3000](https://doi.org/10.2514/6.2026-3000)
 
-ASTRA proposes the *Analog Astronaut Database* (AAD) — standardized infrastructure. Selectron proposes a standardized **methodology** — a Bayesian scoring engine with explicit uncertainty and a sensitivity audit. The two are complementary, not competitive.
+ASTRA proposes the *Analog Astronaut Database* (AAD) — standardized infrastructure. Selectron proposes a standardized **methodology** — a Bayesian scoring engine plus a NASA-HSRB-grounded mission-risk verdict, both with explicit uncertainty and a sensitivity audit. The two are complementary, not competitive.
+
+**Primary NASA reference for the mission-risk verdict:**
+
+> NASA Johnson Space Center, Health and Medical Technical Authority (2020). *Human System Risk Management Plan*, JSC-66705 Revision A. Figure 4 (Likelihood × Consequence Scale Definitions and LxC Matrix used for scoring Risks) and §3.2.4 (LxC Assessment and Colors). [NTRS PDF](https://ntrs.nasa.gov/api/citations/20205008887/downloads/FINAL_JSC-66705%20Human%20System%20Risk%20Management%20Plan%20Rev%20B.pdf).
 
 ## Author
 
