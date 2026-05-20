@@ -32,10 +32,14 @@ export function StepReview() {
 
   // Fill any missing criterion scores with the criterion minimum so scoreCandidate
   // never throws E_BAD_SCORE (incomplete wizard state is valid during review).
+  // Also clamp to [scale.min, scale.max] — defends against legacy persisted values
+  // from before the EvidenceForm scale-transform fix (Diego hit 112.5 on a [0,100]
+  // criterion when the old slider double-multiplied the scaleTransform).
   const scoresForEngine = useMemo(() => {
     const m: Record<string, number> = {};
     for (const c of visibleCriteria) {
-      m[c.id] = scores[c.id] ?? c.scale.min;
+      const raw = scores[c.id] ?? c.scale.min;
+      m[c.id] = Math.max(c.scale.min, Math.min(c.scale.max, raw));
     }
     return m;
   }, [scores, visibleCriteria]);

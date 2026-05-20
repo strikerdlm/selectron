@@ -28,8 +28,17 @@ export function EvidenceForm({
   const transform = tierInst?.scaleTransform;
   const tierNotes = tierInst?.notes;
 
-  const midpoint = (criterion.scale.min + criterion.scale.max) / 2;
-  const stepSize = (criterion.scale.max - criterion.scale.min) / 100;
+  // Slider semantics — when a tier-specific scaleTransform.multiplier exists,
+  // the underlying instrument has a different native range than the
+  // criterion's canonical scale (e.g. CD-RISC-10 is 0–40; ×2.5 → canonical
+  // 0–100 of CD-RISC-25). The user interacts in instrument-native units;
+  // we multiply on write and divide on read so the persisted rawValue is
+  // always in canonical [scale.min, scale.max].
+  const multiplier = transform?.multiplier ?? 1;
+  const nativeMin = criterion.scale.min / multiplier;
+  const nativeMax = criterion.scale.max / multiplier;
+  const nativeMidpoint = (nativeMin + nativeMax) / 2;
+  const stepSize = (nativeMax - nativeMin) / 100;
 
   // liveValue is the SINGLE SOURCE OF TRUTH for the slider position during
   // drag. Previously the slider was bound to `entry?.rawValue ?? midpoint`,
@@ -41,18 +50,25 @@ export function EvidenceForm({
   // commit to context). This decouples drag-smoothness from autosave debounce.
   const [liveValue, setLiveValue] = useState<number | undefined>(entry?.rawValue);
 
-  // Reconcile local liveValue with entry.rawValue when the DB-side value
-  // changes for a reason OTHER than this slider (e.g. tier switch causes a
-  // criterion to reappear, or another tab edits). We treat the entry as
-  // canonical when the user isn't actively dragging.
+  // Reconcile local liveValue (instrument-native) with entry.rawValue
+  // (canonical) when the DB-side value changes for a reason OTHER than this
+  // slider (e.g. tier switch causes a criterion to reappear, or another tab
+  // edits). Convert canonical → native via /multiplier; clamp to the native
+  // range so any legacy bad data persisted before this fix is rendered as
+  // an in-range slider position (the engine boundary also clamps below).
   const draggingRef = useRef(false);
   useEffect(() => {
     if (!draggingRef.current && entry?.rawValue !== undefined) {
-      setLiveValue(entry.rawValue);
+      const native = entry.rawValue / multiplier;
+      const clamped = Math.max(nativeMin, Math.min(nativeMax, native));
+      setLiveValue(clamped);
     }
-  }, [entry?.rawValue]);
+  }, [entry?.rawValue, multiplier, nativeMin, nativeMax]);
 
-  const currentValue = liveValue ?? entry?.rawValue ?? midpoint;
+  // currentValue is always in INSTRUMENT-NATIVE units (what the user sees).
+  const currentValue = liveValue ?? (entry?.rawValue !== undefined
+    ? Math.max(nativeMin, Math.min(nativeMax, entry.rawValue / multiplier))
+    : nativeMidpoint);
 
   function patch(partial: Partial<CriterionEntry>) {
     enqueueCriterionPatch(criterion.id, partial);
@@ -62,9 +78,14 @@ export function EvidenceForm({
   // 300 ms IDB write happens downstream). Called on pointerup / keyup —
   // NOT on every onChange — so drag is bounded by browser paint, not by
   // React re-renders cascading through the context.
-  function commitSliderValue(raw: number) {
-    const transformed = transform?.multiplier ? raw * transform.multiplier : raw;
-    patch({ rawValue: transformed });
+  // `native` is in instrument-native units; we multiply by the tier
+  // scale-transform to persist the canonical value (engine-side scale).
+  function commitSliderValue(native: number) {
+    const canonical = native * multiplier;
+    // Defensive clamp: the slider's min/max already prevents out-of-range,
+    // but float arithmetic on the multiplication could drift by ε.
+    const clamped = Math.max(criterion.scale.min, Math.min(criterion.scale.max, canonical));
+    patch({ rawValue: clamped });
     draggingRef.current = false;
   }
   // units is not part of the Criterion type in Iter 1 but may be added later
@@ -100,8 +121,8 @@ export function EvidenceForm({
         <div className="flex items-center gap-3">
           <input
             type="range"
-            min={criterion.scale.min}
-            max={criterion.scale.max}
+            min={nativeMin}
+            max={nativeMax}
             step={stepSize}
             value={currentValue}
             onChange={(e) => {
@@ -118,8 +139,13 @@ export function EvidenceForm({
           </span>
         </div>
         <p className="mono mt-1 text-[10px] text-ink-3">
-          scale: {criterion.scale.min}–{criterion.scale.max}
+          scale: {nativeMin}–{nativeMax}
           {units ? ` ${units}` : ""}
+          {multiplier !== 1 && (
+            <span className="ml-2">
+              · canonical {criterion.scale.min}–{criterion.scale.max} (×{multiplier} applied)
+            </span>
+          )}
         </p>
       </div>
 
