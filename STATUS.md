@@ -183,8 +183,8 @@ This is intentional triage — flag it now if Diego disagrees. The trade-off: ~5
 | IMM-24 | simulate.ts — SA once-per-mission cap | DONE | 739f238 | processedSAOnce Set per crew member; space-adaptation-once skipped if cond.id already in set; timeDays=sampleBetaPert(0,2.5,5) for SA, sampleBetaPert(0,d/2,d) for VIIP; 1000-trial cap test passes |
 | IMM-25 | simulate.ts — per-event Bernoulli end-state | DONE | 22513c3 | evacSampled/loclSampled fields on Occurrence; sampled once per event (T23 bundled); perConditionEvac/Locl aggregation uses sampled values not 0.5 threshold; test verifies Bernoulli distinguishable from threshold by checking non-zero perConditionEvac with p_evac mode=0.1 |
 | IMM-26 | simulate.ts — concurrent FI QTL accounting | DONE | 2ee0daf | QTL=concurrentFI([fi_cp1,fi_cp2])×(dt_cp1+dt_cp2) per event; uses outcomes.concurrentFI; cross-event overlap deferred to v1.1 with comment; 2 unit tests pass |
-| IMM-27 | simulate.ts — risk-factor multipliers tested | DONE | TBD | applyRiskFactorMultiplier exported (internal helper comment); 5 direct unit tests: sex-male×2, sex-female×1.5, contacts×3, CAC-positive×4, abdominal-surgery-history×2.5 |
-| IMM-28 | simulate.ts — resource consumption + RAF re-comp | PENDING | — | — |
+| IMM-27 | simulate.ts — risk-factor multipliers tested | DONE | de791a5 | applyRiskFactorMultiplier exported (internal helper comment); 5 direct unit tests: sex-male×2, sex-female×1.5, contacts×3, CAC-positive×4, abdominal-surgery-history×2.5 |
+| IMM-28 | simulate.ts — resource consumption + RAF re-comp | DONE | TBD | IMMTrialOpts.traceRAF flag added; rafHistory[] populated per-event when flag set; test: kit=5 antibiotics, lambda_fixed=6 → first 5 RAF=1, 6th RAF=0; p_evac=0 fixture prevents early termination |
 | IMM-29 | simulate.ts — simulateIMM T-trial aggregation | PENDING | — | — |
 | IMM-30 | simulate.ts — σ<5% convergence assertion | PENDING | — | — |
 | IMM-31 | calibration.ts — Tier-C global multiplier fit | PENDING | — | — |

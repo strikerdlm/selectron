@@ -158,6 +158,64 @@ describe("T26: concurrent-FI QTL accounting", () => {
   });
 });
 
+import { customKit } from "../../src/imm/kits";
+
+describe("T28: resource consumption + RAF re-computation", () => {
+  it("RAF drops to 0 after kit is exhausted across 6 events requiring 1 unit each", () => {
+    // Construct a kit with exactly 5 antibiotic-broad-spectrum units.
+    // Mock acute-sinusitis to: lambda_fixed=6 (guarantees 6 events in 1-day mission),
+    // required_resources={antibiotic-broad-spectrum: 1}, p_evac=0 (no early termination).
+    // First 5 events: RAF=1 (kit has stock). 6th event: RAF=0 (kit empty).
+    const antibioticKit = customKit({ "antibiotic-broad-spectrum": 5 });
+    const realPriors = priorsModule.loadIMMPriors();
+    const pert0 = { min: 0, mode: 0, max: 0 };
+    const pert1 = { min: 0, mode: 0.5, max: 1 };
+    const sinus6: import("../../src/imm/types").IMMPrior = {
+      conditionId: "acute-sinusitis",
+      provenance: "tierA-nasa" as const,
+      source_ref: "test",
+      incidence: { distribution: "Fixed", lambda_fixed: 6.0 },
+      severity: { worst_case_prob_alpha: 1, worst_case_prob_beta: 1 },
+      treated: {
+        fi_cp1: pert1, dt_cp1_hours: pert1,
+        fi_cp2: pert0, dt_cp2_hours: pert0,
+        fi_cp3: pert0, p_evac: pert0, p_locl: pert0,
+      },
+      untreated: {
+        fi_cp1: pert1, dt_cp1_hours: pert1,
+        fi_cp2: pert0, dt_cp2_hours: pert0,
+        fi_cp3: pert0, p_evac: pert0, p_locl: pert0,
+      },
+      required_resources: { "antibiotic-broad-spectrum": 1 },
+      risk_factor_multipliers: {},
+    };
+    vi.spyOn(priorsModule, "loadIMMPriors").mockReturnValue({
+      ...realPriors,
+      conditions: { ...realPriors.conditions, "acute-sinusitis": sinus6 },
+    });
+
+    // Run one trial with traceRAF to capture per-event RAF.
+    // Use seed that produces Poisson(6)≥6; run several seeds to find one with ≥6 events.
+    let sinusRafs: number[] = [];
+    for (let seed = 0; seed < 100; seed++) {
+      const rng = makeRng(seed);
+      const result = runIMMTrial(rng, oneCrew, oneDayMission, antibioticKit, { traceRAF: true });
+      sinusRafs = result.rafHistory!
+        .filter(h => h.conditionId === "acute-sinusitis")
+        .map(h => h.raf);
+      if (sinusRafs.length >= 6) break;
+    }
+
+    expect(sinusRafs.length).toBeGreaterThanOrEqual(6);
+    // First 5 events: kit has stock → RAF=1.
+    for (let i = 0; i < 5; i++) {
+      expect(sinusRafs[i]).toBe(1);
+    }
+    // 6th event: kit is empty → RAF=0.
+    expect(sinusRafs[5]).toBe(0);
+  });
+});
+
 describe("T25: per-event Bernoulli end-state", () => {
   it("perConditionEvac aggregates using Bernoulli sample, not 0.5 threshold", () => {
     // Verify that the Bernoulli Occurrence.evacSampled is used for perConditionEvac.

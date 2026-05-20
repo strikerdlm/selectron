@@ -43,6 +43,13 @@ export type IMMTrialResult = {
   perConditionCounts: Record<string, number>;
   perConditionEvac: Record<string, number>;
   perConditionLocl: Record<string, number>;
+  /** Per-event RAF history (conditionId → raf). Populated only when opts.traceRAF=true. */
+  rafHistory?: Array<{ conditionId: string; raf: number }>;
+};
+
+export type IMMTrialOpts = {
+  /** Development-only trace flag — returns per-event RAF history in the result. */
+  traceRAF?: boolean;
 };
 
 /** Exported for testability — internal helper. */
@@ -72,11 +79,13 @@ export function runIMMTrial(
   crew: IMMCrewMember[],
   mission: IMMMission,
   kit: IMMKitScenario,
+  opts: IMMTrialOpts = {},
 ): IMMTrialResult {
   const priors = loadIMMPriors();
   const availableResources: Record<string, number> = { ...kit.resources };
   const occurrences: Occurrence[] = [];
   const earlyTerminated = new Set<number>();
+  const rafHistory: Array<{ conditionId: string; raf: number }> = [];
 
   // T23: Pre-sample SPE event times once per trial (one solar event affects all crew).
   // λ_SPE = LAMBDA_SPE_PER_DAY (solar max estimate per K15 §II.A.4).
@@ -172,6 +181,7 @@ export function runIMMTrial(
         if (earlyTerminated.has(cIdx)) break;
         const severity = sampleSeverity(rng, prior.severity.worst_case_prob_alpha, prior.severity.worst_case_prob_beta);
         const raf = computeRAF(prior.required_resources, availableResources);
+        if (opts.traceRAF) rafHistory.push({ conditionId: cond.id, raf });
         const fi_cp1 = sampleBetaPert(rng, ...Object.values(interpolateBetaPertByRAF(prior.treated.fi_cp1, prior.untreated.fi_cp1, raf)) as [number, number, number]);
         const dt_cp1 = sampleBetaPert(rng, ...Object.values(interpolateBetaPertByRAF(prior.treated.dt_cp1_hours, prior.untreated.dt_cp1_hours, raf)) as [number, number, number]);
         const fi_cp2 = sampleBetaPert(rng, ...Object.values(interpolateBetaPertByRAF(prior.treated.fi_cp2, prior.untreated.fi_cp2, raf)) as [number, number, number]);
@@ -231,5 +241,8 @@ export function runIMMTrial(
     if (o.loclSampled) perConditionLocl[o.conditionId] = (perConditionLocl[o.conditionId] ?? 0) + 1;
   }
 
-  return { tme, qtl, evac, locl, perConditionCounts, perConditionEvac, perConditionLocl };
+  return {
+    tme, qtl, evac, locl, perConditionCounts, perConditionEvac, perConditionLocl,
+    ...(opts.traceRAF ? { rafHistory } : {}),
+  };
 }
