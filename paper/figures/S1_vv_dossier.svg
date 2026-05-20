@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1120" height="340" viewBox="0 0 1120 340">
+  <rect width="100%" height="100%" fill="white"/>
+  
+  <rect x="16" y="16" width="1088" height="28" fill="#0f172a" />
+  <text x="24" y="36" font-family="ui-sans-serif, sans-serif" font-size="13" font-weight="700" fill="#ffffff">NASA-STD-7009A factor</text>
+  <text x="238" y="36" font-family="ui-sans-serif, sans-serif" font-size="13" font-weight="700" fill="#ffffff">Test (this paper)</text>
+  <text x="712" y="36" font-family="ui-sans-serif, sans-serif" font-size="13" font-weight="700" fill="#ffffff">Evidence path</text>
+
+  
+    <rect x="16" y="36" width="1088" height="96" fill="#f8fafc" stroke="#cbd5e1" stroke-width="0.5" />
+    <text x="24" y="58" font-family="ui-monospace, monospace" font-size="11" fill="#0f172a">1 — Verification</text>
+    <text x="238" y="58" font-family="ui-monospace, monospace" font-size="11" fill="#0f172a">Closed-form Dirichlet moments; verbatim JSC-66705 Rev A Fig.</text>
+<text x="238" y="74" font-family="ui-monospace, monospace" font-size="11" fill="#0f172a">4 grid check</text>
+    <text x="712" y="58" font-family="ui-monospace, monospace" font-size="11" fill="#0f172a">tests/engine/dirichlet.test.ts;</text>
+<text x="712" y="74" font-family="ui-monospace, monospace" font-size="11" fill="#0f172a">tests/risk/lxc.test.ts</text>
+  
+
+    <rect x="16" y="132" width="1088" height="96" fill="#ffffff" stroke="#cbd5e1" stroke-width="0.5" />
+    <text x="24" y="154" font-family="ui-monospace, monospace" font-size="11" fill="#0f172a">2 — Validation</text>
+    <text x="238" y="154" font-family="ui-monospace, monospace" font-size="11" fill="#0f172a">Poisson-Gamma conjugate check; σ &lt; 5 % convergence rule at T</text>
+<text x="238" y="170" font-family="ui-monospace, monospace" font-size="11" fill="#0f172a">= 100 000</text>
+    <text x="712" y="154" font-family="ui-monospace, monospace" font-size="11" fill="#0f172a">tests/risk/poisson_gamma_conjugate.test.ts;</text>
+<text x="712" y="170" font-family="ui-monospace, monospace" font-size="11" fill="#0f172a">tests/risk/m18_convergence.test.ts</text>
+  
+
+    <rect x="16" y="228" width="1088" height="96" fill="#f8fafc" stroke="#cbd5e1" stroke-width="0.5" />
+    <text x="24" y="250" font-family="ui-monospace, monospace" font-size="11" fill="#0f172a">3 — Input Pedigree</text>
+    <text x="238" y="250" font-family="ui-monospace, monospace" font-size="11" fill="#0f172a">Crossref-verified DOIs for every cited reference; Phase-0</text>
+<text x="238" y="266" font-family="ui-monospace, monospace" font-size="11" fill="#0f172a">evidence-table provenance</text>
+    <text x="712" y="250" font-family="ui-monospace, monospace" font-size="11" fill="#0f172a">paper/references.bib (Crossref-checked);</text>
+<text x="712" y="266" font-family="ui-monospace, monospace" font-size="11" fill="#0f172a">research/evidence_tables/</text>
+  
+</svg>

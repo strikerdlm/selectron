@@ -17,7 +17,7 @@
 ![tailwind](https://img.shields.io/badge/Tailwind-3.4-38bdf8?logo=tailwind&logoColor=white)
 ![echarts](https://img.shields.io/badge/ECharts-6.0-aa344d)
 ![dexie](https://img.shields.io/badge/Dexie-4.x-1a6acb)
-![license](https://img.shields.io/badge/license-private-lightgrey)
+![license](https://img.shields.io/badge/license-MIT-blue)
 
 </div>
 
@@ -246,4 +246,4 @@ ASTRA proposes the *Analog Astronaut Database* (AAD) — standardized infrastruc
 
 ---
 
-<sub>This repository is private and the methodology paper is in preparation. Please do not redistribute without permission.</sub>
+<sub>Released under the MIT License. Methodology paper accompanying this artifact: Malpica (2026), in preparation.</sub>
