@@ -104,6 +104,10 @@ Factor 2 (Validation) — leave-one-mission-out cross-validation against analog-
 
 **Figure 1.** Selectron pipeline: Stage A produces a Bayesian posterior over each candidate's total score; Stage B runs an IMM-style forward Monte Carlo at the NASA-canonical T = 100 000 trials per [M18] and [A22], whose posterior is then mapped to the NASA HSRB 5×5 Likelihood × Consequence matrix per JSC-66705 Rev A (Figure 4 and §3.2.4 color rule).
 
+![](figures/F2_criterion_tiers.png){#fig:tiers width=80%}
+
+**Figure 2.** Criterion taxonomy × accessibility-tier matrix. Of the 12 evidence-grounded criteria, eight are active at Tier-1 (Minimum), ten at Tier-2 (Medium), and all twelve at Tier-3 (Elite). The Dirichlet weight per active criterion is 1/K so the posterior is internally honest about the active subset.
+
 <!-- T16: ~1800 words; worked example walking F3–F7 -->
 
 ## 4. Discussion
