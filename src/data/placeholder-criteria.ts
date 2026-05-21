@@ -148,6 +148,12 @@ export const PLACEHOLDER_CRITERIA: readonly Criterion[] = [
     // Operational range of the composite z relative to astronaut-cohort norms ≈ [-3, +3]
     scale: { min: -3, max: 3 },
     higherIsBetter: true,
+    // Gate B — cognitive floor: composite z < -2.0 (2 SDs below the astronaut-cohort norm) is the
+    // select-out threshold derived from Basner et al. 2015 normative data for the NASA Cognition
+    // Battery. A z ≤ -2 corresponds to the 2nd percentile of the astronaut-cohort distribution —
+    // operationally inconsistent with mission-critical decision-making under sleep restriction / G-load.
+    // Authority: Basner M, Mollicone D, Dinges DF (2011); Basner M et al. (2015) 10.3357/amhp.4343.2015.
+    gateThreshold: { operator: "fail-if-below", value: -2.0 },
     citations: ["10.3357/amhp.4343.2015", "10.3389/fphys.2024.1451269", "10.1038/s41526-020-00124-6"],
     minimumTier: "medium",
     tierInstruments: {
@@ -317,6 +323,12 @@ export const PLACEHOLDER_CRITERIA: readonly Criterion[] = [
     instrument: "MMPI-2-RF EID T-score (M=50, SD=10); reversed",
     scale: { min: 30, max: 120 },
     higherIsBetter: false,
+    // Gate A — psychiatric select-out: EID T ≥ 65 is the NASA/ESA/Antarctic operational
+    // disqualification threshold (2 SDs above population mean on an internalizingdysfunction scale).
+    // fail-if-above: 65 means any candidate with raw EID T-score > 65 is disqualified.
+    // Authority: Ben-Porath & Tellegen (2008/2011) MMPI-2-RF manual; Santy (1994) astronaut selection
+    // psychiatric standards; NASA OCHMO-STD-100.1A §4.3 behavioural health clearance criteria.
+    gateThreshold: { operator: "fail-if-above", value: 65 },
     citations: ["10.1037/0033-2909.130.5.661"],
     minimumTier: "elite",
     tierInstruments: {
