@@ -1,9 +1,12 @@
 import { SelectronError } from "@/engine/errors";
 import { makeRng } from "@/engine/prng";
+import { zScoreAgainstScale } from "@/engine/normalize-cohort";
+import { PLACEHOLDER_CRITERIA } from "@/data/placeholder-criteria";
 import type {
   AnalogMission,
   Candidate,
   Condition,
+  Criterion,
   CredibleInterval,
   PosteriorSummary,
   RiskPosterior,
@@ -63,19 +66,35 @@ function sampleFromPosterior(rng: Rng, samples: readonly number[]): number {
 }
 
 // Build z-vector for a crew member by looking up the criteria the condition
-// flags as vulnerability drivers. Iter-3 v1 uses raw candidate.scores directly
-// — the caller is responsible for standardisation (typically a z-score against
-// a reference cohort). For the unit-test fixtures we use scores ≈ 0.5 and small
-// β so the multiplier stays close to 1.
+// flags as vulnerability drivers. Z-scores each raw score against the
+// criterion's operational scale (scale [min,max] = ±2 SD range, 4 SDs total).
+//
+// Sign convention: HIGH-quality candidate → SMALL λ multiplier.
+// β is negative in SYNTHETIC_PRIORS (G6). So we need β·z < 0 for high-quality,
+// meaning z > 0 for high-quality candidates.
+//
+// For higherIsBetter=true:  HIGH raw = high quality → zVal > 0 → use zVal directly.
+// For higherIsBetter=false: HIGH raw = BAD (e.g., high MMPI-EID) → must FLIP so z < 0
+//                           for high-quality (low raw) candidates: use -zVal.
+//
+// Verification:
+//   VO₂max=70 (max, good; higherIsBetter=true):  z=+2, β=-0.2 → exp(-0.4)≈0.67 (λ↓) ✓
+//   VO₂max=20 (min, bad):                        z=-2, β=-0.2 → exp(+0.4)≈1.49 (λ↑) ✓
+//   MMPI-EID=120 (max, bad; higherIsBetter=false): zVal=+2, z=-2, β=-0.2 → exp(+0.4)≈1.49 (λ↑) ✓
 function vulnerabilityVector(
   member: Candidate,
   criterionIds: readonly string[],
+  criteriaIndex: ReadonlyMap<string, Criterion>,
 ): Record<string, number> {
   const z: Record<string, number> = {};
   for (const cid of criterionIds) {
     const raw = member.scores[cid];
-    if (raw === undefined || !Number.isFinite(raw)) continue;
-    z[cid] = raw;
+    const c = criteriaIndex.get(cid);
+    if (raw === undefined || !Number.isFinite(raw) || !c) continue;
+    const zVal = zScoreAgainstScale(raw, c.scale);
+    // higherIsBetter=true:  high raw = high quality → z positive → β·z < 0 → λ↓
+    // higherIsBetter=false: high raw = bad → flip so bad candidates get z > 0
+    z[cid] = c.higherIsBetter ? zVal : -zVal;
   }
   return z;
 }
@@ -103,6 +122,7 @@ export function runMissionTrial(
   priors: PriorsJson,
   conditions: readonly Condition[],
   rng: Rng,
+  criteriaIndex?: ReadonlyMap<string, Criterion>,
 ): TrialResult {
   let totalQTL = 0;
   const perCondition: Record<string, number> = {};
@@ -116,7 +136,7 @@ export function runMissionTrial(
     for (const member of crew) {
       const logLambda = sampleFromPosterior(rng, missionPrior.log_lambda_samples);
       const baseLambda = Math.exp(logLambda);
-      const z = vulnerabilityVector(member, c.vulnerabilityCriteria);
+      const z = vulnerabilityVector(member, c.vulnerabilityCriteria, criteriaIndex ?? new Map());
       const lambdaI = applyVulnerabilityMultiplier(
         baseLambda,
         condPrior.vulnerability_beta,
@@ -247,6 +267,12 @@ export function simulateMission(
   const chiStar = options.chiStar ?? DEFAULT_CHI_STAR;
   const rng = makeRng(options.seed);
 
+  // Build criteria index once per simulation call (option (a) from plan G5:
+  // testable, avoids re-importing inside the hot trial loop).
+  const criteriaIndex: Map<string, Criterion> = new Map(
+    PLACEHOLDER_CRITERIA.map((c) => [c.id, c]),
+  );
+
   const trials = options.trials;
   const chiSamples = new Array<number>(trials);
   const qtlSamples = new Array<number>(trials);
@@ -254,7 +280,7 @@ export function simulateMission(
   for (const c of conditions) perConditionSamples[c.id] = new Array<number>(trials).fill(0);
 
   for (let t = 0; t < trials; t++) {
-    const result = runMissionTrial(crew, mission, priors, conditions, rng);
+    const result = runMissionTrial(crew, mission, priors, conditions, rng, criteriaIndex);
     chiSamples[t] = result.chi;
     qtlSamples[t] = result.qtl;
     for (const cid of Object.keys(perConditionSamples)) {
