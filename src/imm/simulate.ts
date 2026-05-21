@@ -1,4 +1,6 @@
 // src/imm/simulate.ts
+import { makeRng } from "../engine/prng";
+import type { IMMOutcome, PosteriorSummary } from "./types";
 // Rng inlined — prng.ts does not export this type (matches incidence.ts convention)
 type Rng = () => number;
 
@@ -244,5 +246,82 @@ export function runIMMTrial(
   return {
     tme, qtl, evac, locl, perConditionCounts, perConditionEvac, perConditionLocl,
     ...(opts.traceRAF ? { rafHistory } : {}),
+  };
+}
+
+// ── Task 29: posteriorSummary + simulateIMM ───────────────────────────────────
+
+function posteriorSummary(values: number[]): PosteriorSummary {
+  const n = values.length;
+  if (n === 0) return { mean: 0, ci90: [0, 0], ci95: [0, 0], sd: 0 };
+  const sorted = [...values].sort((a, b) => a - b);
+  const mean = values.reduce((a, b) => a + b, 0) / n;
+  const variance = values.reduce((a, b) => a + (b - mean) ** 2, 0) / n;
+  const sd = Math.sqrt(variance);
+  return {
+    mean,
+    ci90: [sorted[Math.floor(n * 0.05)], sorted[Math.floor(n * 0.95)]],
+    ci95: [sorted[Math.floor(n * 0.025)], sorted[Math.floor(n * 0.975)]],
+    sd,
+  };
+}
+
+export function simulateIMM(opts: {
+  crew: IMMCrewMember[];
+  mission: IMMMission;
+  kit: IMMKitScenario;
+  trials: number;
+  seed: number;
+}): IMMOutcome {
+  const { crew, mission, kit, trials, seed } = opts;
+  const rng = makeRng(seed);
+  const L_hours = mission.durationDays * 24;
+  const denom = L_hours * crew.length;
+
+  const tmes: number[] = [], chis: number[] = [], evacs: number[] = [], locls: number[] = [];
+  const sigmaCheckpoints: number[] = [];
+  const sigmaChi: number[] = [];
+  const sigmaPevac: number[] = [];
+  const perConditionCountsSum: Record<string, number> = {};
+  const perConditionEvacSum: Record<string, number> = {};
+  const perConditionLoclSum: Record<string, number> = {};
+
+  for (let t = 1; t <= trials; t++) {
+    const r = runIMMTrial(rng, crew, mission, kit);
+    tmes.push(r.tme);
+    // CHI clamped at [0, 100] — QTL can exceed denom under pathological priors (v1 analogue of risk/simulate.ts §3.5 guard).
+    chis.push(Math.max(0, Math.min(100, 100 * (1 - r.qtl / denom))));
+    evacs.push(r.evac);
+    locls.push(r.locl);
+    for (const [k, v] of Object.entries(r.perConditionCounts)) perConditionCountsSum[k] = (perConditionCountsSum[k] ?? 0) + v;
+    for (const [k, v] of Object.entries(r.perConditionEvac))   perConditionEvacSum[k]   = (perConditionEvacSum[k]   ?? 0) + v;
+    for (const [k, v] of Object.entries(r.perConditionLocl))   perConditionLoclSum[k]   = (perConditionLoclSum[k]   ?? 0) + v;
+    if (t % 1000 === 0) {
+      const lastChi  = chis.slice(-1000);
+      const lastEvac = evacs.slice(-1000);
+      const meanChi  = lastChi.reduce((a, b) => a + b, 0) / 1000;
+      const meanEvac = lastEvac.reduce((a, b) => a + b, 0) / 1000;
+      const sChi  = Math.sqrt(lastChi.reduce((a, b) => a + (b - meanChi) ** 2, 0) / 1000);
+      const sEvac = Math.sqrt(lastEvac.reduce((a, b) => a + (b - meanEvac) ** 2, 0) / 1000);
+      sigmaCheckpoints.push(t);
+      sigmaChi.push(sChi);
+      sigmaPevac.push(sEvac);
+    }
+  }
+
+  const drivers = IMM_CONDITIONS.map(c => ({
+    conditionId: c.id,
+    pEvacContrib: (perConditionEvacSum[c.id] ?? 0) / trials,
+    pLoclContrib: (perConditionLoclSum[c.id] ?? 0) / trials,
+    tmeContrib:   (perConditionCountsSum[c.id] ?? 0) / trials,
+  }));
+
+  return {
+    tme:   posteriorSummary(tmes),
+    chi:   posteriorSummary(chis),
+    pEvac: posteriorSummary(evacs.map(x => x * 100)),
+    pLocl: posteriorSummary(locls.map(x => x * 100)),
+    perConditionDrivers: drivers,
+    convergence: { trialCheckpoints: sigmaCheckpoints, sigmaChi, sigmaPevac },
   };
 }

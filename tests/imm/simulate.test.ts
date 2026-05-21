@@ -249,3 +249,25 @@ describe("T25: per-event Bernoulli end-state", () => {
     expect(rate).toBeLessThan(0.5);    // Must not be degenerate
   });
 });
+
+// ── Task 29: simulateIMM wrapper ─────────────────────────────────────────────
+import { simulateIMM } from "../../src/imm/simulate";
+
+describe("simulateIMM", () => {
+  it("T=2000 returns IMMOutcome with all 4 PosteriorSummary shapes", () => {
+    const out = simulateIMM({ crew: oneCrew, mission: oneDayMission, kit: IMM_KITS.issHMS, trials: 2000, seed: 0xc0ffee });
+    expect(out.tme.mean).toBeGreaterThanOrEqual(0);
+    expect(out.chi.mean).toBeGreaterThanOrEqual(0);
+    expect(out.chi.mean).toBeLessThanOrEqual(100);
+    expect(out.pEvac.mean).toBeGreaterThanOrEqual(0);
+    expect(out.pEvac.mean).toBeLessThanOrEqual(100);
+    expect(out.pLocl.mean).toBeGreaterThanOrEqual(0);
+    expect(out.pLocl.mean).toBeLessThanOrEqual(100);
+  });
+  it("deterministic on the same seed", () => {
+    const a = simulateIMM({ crew: oneCrew, mission: oneDayMission, kit: IMM_KITS.issHMS, trials: 1000, seed: 12345 });
+    const b = simulateIMM({ crew: oneCrew, mission: oneDayMission, kit: IMM_KITS.issHMS, trials: 1000, seed: 12345 });
+    expect(a.tme.mean).toBe(b.tme.mean);
+    expect(a.chi.mean).toBe(b.chi.mean);
+  });
+});
