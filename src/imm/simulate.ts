@@ -11,15 +11,40 @@ type Rng = () => number;
  */
 const LAMBDA_SPE_PER_DAY = 1.5e-3;
 
-import type { IMMCrewMember, IMMMission, IMMKitScenario, IMMPrior } from "./types";
+import type { IMMCrewMember, IMMMission, IMMKitScenario, IMMPrior, IMMConditionFamily } from "./types";
 import { IMM_CONDITIONS } from "./conditions";
 import { loadIMMPriors } from "./priors";
 import { samplePoisson, sampleLognormal, sampleLognormalPoisson, sampleGammaPoisson, sampleBetaBernoulli, samplePoissonProcess } from "./incidence";
+import { applyVulnerabilityMultiplier } from "../risk/incidence";
+import { zScoreAgainstScale } from "../engine/normalize-cohort";
 import { sampleGamma } from "../engine/gamma";
 import { sampleSeverity } from "./severity";
 import { sampleBetaPert, concurrentFI } from "./outcomes";
 import { interpolateBetaPertByRAF } from "./treatment";
 import { computeRAF } from "./kits";
+import type { Criterion } from "../types";
+
+/**
+ * Family-specific β coefficients for Stage A z-scored vulnerability multiplier.
+ * Negative β: HIGH-quality candidate (z>0 on higherIsBetter criteria) → exp(β·z) < 1 → λ↓.
+ * Magnitudes calibrated so a ±2 SD spread produces a 2–4× incidence multiplier spread.
+ * Same values as SYNTHETIC_PRIORS in src/data/synthetic-iter3.ts — these are the
+ * authoritative operational values pending Phase 3B PyMC fit.
+ */
+const FAMILY_BETA: Partial<Record<IMMConditionFamily, number>> = {
+  psychiatric:      -0.4,
+  behavioral:       -0.3,
+  neurologic:       -0.3,
+  infectious:       -0.25,
+  cardiovascular:   -0.25,
+  musculoskeletal:  -0.2,
+  respiratory:      -0.2,
+  GI:               -0.15,
+  renal:            -0.15,
+  // "space-adaptation", "traumatic", "dental", "dermatologic", "ENT",
+  // "endocrine", "GU", "hematologic", "ophthalmologic", "toxicologic" → default -0.2
+};
+const FAMILY_BETA_DEFAULT = -0.2;
 
 type Occurrence = {
   conditionId: string;
@@ -60,7 +85,59 @@ export type IMMTrialOpts = {
    * Used by calibrateTierCMultipliers() for coordinate-descent back-fitting to K15 Table 1.
    */
   tierCMultiplier?: number;
+  /**
+   * IC-5: Optional criteria index for Stage A z-scored vulnerability multiplier.
+   * When provided, per-member stageAScores are z-scored and applied as an
+   * additional lambda multiplier for conditions with non-empty vulnerabilityCriteria.
+   * Missing when simulateIMM is called without a criteria catalog.
+   */
+  criteriaIndex?: ReadonlyMap<string, Criterion>;
 };
+
+/**
+ * IC-5: Compute Stage A z-scored vulnerability multiplier for a condition.
+ *
+ * For each criterion referenced in vulnerabilityCriteria:
+ *   1. Look up the criterion in criteriaIndex to get scale + higherIsBetter.
+ *   2. Z-score the member's raw score: zScoreAgainstScale(raw, scale).
+ *   3. Apply sign convention: higherIsBetter ? z : -z
+ *      (HIGH raw on higherIsBetter=true → z>0; with β<0 → exp<1 → λ↓).
+ *   4. Look up family β from FAMILY_BETA (default -0.2).
+ *
+ * Returns modifiedLambda = applyVulnerabilityMultiplier(baseLambda, beta, z).
+ * Falls through to baseLambda when no criteria are present or no stageAScores.
+ *
+ * Production conditions currently have empty vulnerabilityCriteria (auto-generated
+ * conditions.ts). This path becomes active once conditions are updated with real
+ * criterion linkages (Iter-2+).
+ */
+export function applyStageAVulnerabilityMultiplier(
+  baseLambda: number,
+  member: IMMCrewMember,
+  family: IMMConditionFamily,
+  vulnerabilityCriteria: string[],
+  criteriaIndex: ReadonlyMap<string, Criterion>,
+): number {
+  if (vulnerabilityCriteria.length === 0 || !member.stageAScores) return baseLambda;
+
+  const beta: Record<string, number> = {};
+  const z: Record<string, number> = {};
+  const familyBeta = FAMILY_BETA[family] ?? FAMILY_BETA_DEFAULT;
+
+  for (const cid of vulnerabilityCriteria) {
+    const raw = member.stageAScores[cid];
+    if (raw === undefined || !Number.isFinite(raw)) continue;
+    const c = criteriaIndex.get(cid);
+    if (!c) continue;
+    const zRaw = zScoreAgainstScale(raw, c.scale);
+    const zSigned = c.higherIsBetter ? zRaw : -zRaw;
+    beta[cid] = familyBeta;
+    z[cid] = zSigned;
+  }
+
+  if (Object.keys(beta).length === 0) return baseLambda;
+  return applyVulnerabilityMultiplier(baseLambda, beta, z);
+}
 
 /** Exported for testability — internal helper. */
 export function applyRiskFactorMultiplier(baseLambda: number, member: IMMCrewMember, prior: IMMPrior): number {
@@ -82,7 +159,8 @@ export function applyRiskFactorMultiplier(baseLambda: number, member: IMMCrewMem
  * The count must be scaled by mission duration before Poisson sampling:
  *   1. Draw λ_per_day from the prior's hierarchical distribution.
  *   2. Apply per-person risk-factor multipliers to λ_per_day.
- *   3. Sample Poisson(λ_per_day × durationDays).
+ *   3. IC-5: Apply Stage A z-scored vulnerability multiplier (if criteriaIndex provided).
+ *   4. Sample Poisson(λ_modulated × durationDays).
  *
  * Beta-Bernoulli and Fixed distributions retain their existing semantics and are
  * handled directly in the general-Poisson branch of runIMMTrial.
@@ -94,17 +172,22 @@ function sampleGeneralPoissonCount(
   prior: IMMPrior,
   member: IMMCrewMember,
   durationDays: number,
+  family: IMMConditionFamily,
+  vulnerabilityCriteria: string[],
+  criteriaIndex: ReadonlyMap<string, Criterion>,
 ): number {
   const inc = prior.incidence;
   if (inc.distribution === "Lognormal-Poisson") {
     const lambdaPerDay = sampleLognormal(rng, inc.mu_log_lambda!, inc.sigma_log_lambda!);
-    const scaledLambda = applyRiskFactorMultiplier(lambdaPerDay, member, prior) * durationDays;
-    return samplePoisson(rng, scaledLambda);
+    const rfmLambda = applyRiskFactorMultiplier(lambdaPerDay, member, prior);
+    const modLambda = applyStageAVulnerabilityMultiplier(rfmLambda, member, family, vulnerabilityCriteria, criteriaIndex);
+    return samplePoisson(rng, modLambda * durationDays);
   }
   if (inc.distribution === "Gamma-Poisson") {
     const lambdaPerDay = sampleGamma(inc.alpha!, rng) / inc.beta!;
-    const scaledLambda = applyRiskFactorMultiplier(lambdaPerDay, member, prior) * durationDays;
-    return samplePoisson(rng, scaledLambda);
+    const rfmLambda = applyRiskFactorMultiplier(lambdaPerDay, member, prior);
+    const modLambda = applyStageAVulnerabilityMultiplier(rfmLambda, member, family, vulnerabilityCriteria, criteriaIndex);
+    return samplePoisson(rng, modLambda * durationDays);
   }
   // Fixed: already handled inline in the caller (lambda_fixed is a rate-per-day too)
   throw new Error(`E_BAD_PRIOR: sampleGeneralPoissonCount called with unsupported distribution ${inc.distribution}`);
@@ -129,6 +212,8 @@ export function runIMMTrial(
   const priors = loadIMMPriors();
   // T31: Tier-C global multiplier (default 1.0 → no change, preserves existing behaviour).
   const tierCMult = opts.tierCMultiplier ?? 1.0;
+  // IC-5: criteria index for Stage A z-scored vulnerability multiplier.
+  const criteriaIndex: ReadonlyMap<string, Criterion> = opts.criteriaIndex ?? new Map();
   const availableResources: Record<string, number> = { ...kit.resources };
   const occurrences: Occurrence[] = [];
   const earlyTerminated = new Set<number>();
@@ -153,13 +238,15 @@ export function runIMMTrial(
       if (cond.processType === "general-Poisson") {
         if (prior.incidence.distribution === "Fixed") {
           // Fixed: lambda_fixed is a per-person-day rate; scale by duration, then apply RFM.
-          const baseLambda = prior.incidence.lambda_fixed! * mission.durationDays;
-          count = samplePoisson(rng, applyRiskFactorMultiplier(baseLambda, member, prior));
+          // IC-5: apply Stage A vulnerability multiplier on top of RFM.
+          const baseLambdaPerDay = prior.incidence.lambda_fixed!;
+          const rfmLambdaPerDay = applyRiskFactorMultiplier(baseLambdaPerDay, member, prior);
+          const modLambdaPerDay = applyStageAVulnerabilityMultiplier(rfmLambdaPerDay, member, cond.family, cond.vulnerabilityCriteria, criteriaIndex);
+          count = samplePoisson(rng, modLambdaPerDay * mission.durationDays);
         } else {
           // Gamma-Poisson / Lognormal-Poisson: draw λ/day from hierarchical prior, apply RFM,
-          // then scale by mission duration before Poisson sampling.
-          // sampleGeneralPoissonCount handles the draw + RFM + duration scaling.
-          count = sampleGeneralPoissonCount(rng, prior, member, mission.durationDays);
+          // IC-5 Stage A multiplier, then scale by mission duration before Poisson sampling.
+          count = sampleGeneralPoissonCount(rng, prior, member, mission.durationDays, cond.family, cond.vulnerabilityCriteria, criteriaIndex);
         }
       } else if (cond.processType === "space-adaptation-once") {
         // T24: once-per-mission cap — skip if this crew member already had this condition.
@@ -332,9 +419,20 @@ export function simulateIMM(opts: {
    * Defaults to 0.7 (70%) per spec §3.5 / Palinkas 2004 Antarctic anchor.
    */
   chiStar?: number;
+  /**
+   * IC-5: Optional criteria catalog for Stage A z-scored vulnerability multiplier.
+   * When provided, per-member stageAScores are z-scored and applied as an
+   * additional Poisson lambda multiplier for conditions with non-empty
+   * vulnerabilityCriteria. Built as a ReadonlyMap before the trial loop.
+   */
+  criteria?: readonly Criterion[];
 }): IMMOutcome {
   const { crew, mission, kit, trials, seed } = opts;
   const chiStar = opts.chiStar ?? 0.7;
+  // IC-5: build criteria index once, pass to each trial.
+  const criteriaIndex: ReadonlyMap<string, Criterion> = opts.criteria
+    ? new Map(opts.criteria.map(c => [c.id, c]))
+    : new Map();
   const chiStarPct = chiStar * 100;
   const rng = makeRng(seed);
   const L_hours = mission.durationDays * 24;
@@ -350,7 +448,7 @@ export function simulateIMM(opts: {
   const perConditionLoclSum: Record<string, number> = {};
 
   for (let t = 1; t <= trials; t++) {
-    const r = runIMMTrial(rng, crew, mission, kit, { tierCMultiplier: opts.tierCMultiplier });
+    const r = runIMMTrial(rng, crew, mission, kit, { tierCMultiplier: opts.tierCMultiplier, criteriaIndex });
     tmes.push(r.tme);
     // CHI clamped at [0, 100] — QTL can exceed denom under pathological priors (v1 analogue of risk/simulate.ts §3.5 guard).
     const chiForTrial = Math.max(0, Math.min(100, 100 * (1 - r.qtl / denom)));

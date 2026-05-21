@@ -322,6 +322,106 @@ describe("General-Poisson duration scaling", () => {
   });
 });
 
+// ── IC-5: Stage A z-scored vulnerability multiplier ──────────────────────────
+import { applyStageAVulnerabilityMultiplier } from "../../src/imm/simulate";
+import type { IMMConditionFamily } from "../../src/imm/types";
+import type { Criterion } from "../../src/types";
+
+describe("applyStageAVulnerabilityMultiplier (IC-5)", () => {
+  const CRIT_A: Criterion = {
+    id: "psych.score_a",
+    family: "psychological",
+    label: "Score A",
+    description: "",
+    instrument: "test",
+    scale: { min: 0, max: 100 },
+    higherIsBetter: true,  // high raw → high z → β×z < 0 → exp < 1 → λ↓
+    citations: [],
+    minimumTier: "minimum",
+  };
+  const criteriaIndex = new Map<string, Criterion>([["psych.score_a", CRIT_A]]);
+
+  it("returns baseLambda unchanged when vulnerabilityCriteria is empty", () => {
+    const member: IMMCrewMember = {
+      id: "m", sex: "male", contacts: false, crowns: false,
+      CAC_positive: false, abdominal_surgery_history: false,
+      EVA_eligible: false, EVA_count: 0,
+      stageAScores: { "psych.score_a": 75 },
+    };
+    expect(applyStageAVulnerabilityMultiplier(1.0, member, "psychiatric", [], criteriaIndex)).toBe(1.0);
+  });
+
+  it("returns baseLambda unchanged when member has no stageAScores", () => {
+    const member: IMMCrewMember = {
+      id: "m", sex: "male", contacts: false, crowns: false,
+      CAC_positive: false, abdominal_surgery_history: false,
+      EVA_eligible: false, EVA_count: 0,
+      // stageAScores absent
+    };
+    expect(applyStageAVulnerabilityMultiplier(1.0, member, "psychiatric", ["psych.score_a"], criteriaIndex)).toBe(1.0);
+  });
+
+  it("high score (higherIsBetter=true) reduces lambda for psychiatric family (β=-0.4)", () => {
+    // score=100 → z=+2 → β×z = -0.4×2 = -0.8 → exp(-0.8) ≈ 0.449 → λ↓
+    const member: IMMCrewMember = {
+      id: "m", sex: "male", contacts: false, crowns: false,
+      CAC_positive: false, abdominal_surgery_history: false,
+      EVA_eligible: false, EVA_count: 0,
+      stageAScores: { "psych.score_a": 100 },
+    };
+    const result = applyStageAVulnerabilityMultiplier(1.0, member, "psychiatric" as IMMConditionFamily, ["psych.score_a"], criteriaIndex);
+    // z=+2, β=-0.4, exp(-0.8) ≈ 0.449
+    expect(result).toBeCloseTo(Math.exp(-0.4 * 2), 5);
+    expect(result).toBeLessThan(1.0);
+  });
+
+  it("low score (higherIsBetter=true) increases lambda for psychiatric family", () => {
+    // score=0 → z=-2 → β×z = -0.4×(-2) = +0.8 → exp(+0.8) ≈ 2.225 → λ↑
+    const member: IMMCrewMember = {
+      id: "m", sex: "male", contacts: false, crowns: false,
+      CAC_positive: false, abdominal_surgery_history: false,
+      EVA_eligible: false, EVA_count: 0,
+      stageAScores: { "psych.score_a": 0 },
+    };
+    const result = applyStageAVulnerabilityMultiplier(1.0, member, "psychiatric" as IMMConditionFamily, ["psych.score_a"], criteriaIndex);
+    expect(result).toBeCloseTo(Math.exp(0.4 * 2), 5);
+    expect(result).toBeGreaterThan(1.0);
+  });
+
+  it("midpoint score produces multiplier ≈ 1.0 (no modulation at z=0)", () => {
+    // score=50 → z=0 → exp(0) = 1.0 → no modulation
+    const member: IMMCrewMember = {
+      id: "m", sex: "male", contacts: false, crowns: false,
+      CAC_positive: false, abdominal_surgery_history: false,
+      EVA_eligible: false, EVA_count: 0,
+      stageAScores: { "psych.score_a": 50 },
+    };
+    const result = applyStageAVulnerabilityMultiplier(2.0, member, "psychiatric" as IMMConditionFamily, ["psych.score_a"], criteriaIndex);
+    expect(result).toBeCloseTo(2.0, 5);
+  });
+
+  it("simulateIMM accepts criteria param and runs without throwing", () => {
+    // The production path is dormant (real IMM conditions have empty vulnerabilityCriteria).
+    // This test verifies the simulateIMM API accepts the criteria param without throwing
+    // and returns a valid IMMOutcome. Multiplier unit tests above cover the math.
+    const out = simulateIMM({
+      crew: [{
+        id: "c1", sex: "male", contacts: false, crowns: false,
+        CAC_positive: false, abdominal_surgery_history: false,
+        EVA_eligible: false, EVA_count: 0,
+        stageAScores: { "psych.score_a": 90 },
+      }],
+      mission: oneDayMission,
+      kit: IMM_KITS.issHMS,
+      trials: 500,
+      seed: 0xf00d,
+      criteria: [CRIT_A],
+    });
+    expect(out.chi.mean).toBeGreaterThanOrEqual(0);
+    expect(out.chi.mean).toBeLessThanOrEqual(100);
+  });
+});
+
 // ── IC-4: missionSuccess MSP tracking ────────────────────────────────────────
 describe("simulateIMM missionSuccess (IC-4)", () => {
   it("missionSuccess is a valid PosteriorSummary in [0, 100] percent scale", () => {
