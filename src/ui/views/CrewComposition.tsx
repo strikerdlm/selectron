@@ -17,6 +17,7 @@ import { aggregateCrewComposite } from "../../imm/composite";
 import { evaluateCrewGates } from "../../imm/crew-gates";
 import { CrewMemberCard } from "../components/CrewMemberCard";
 import { CompositeCrewPanel } from "../components/CompositeCrewPanel";
+import { CriterionMiniFigure } from "../figures/CriterionMiniFigure";
 
 // ─── safe default score generation ───────────────────────────────────────────
 // Rules (from advisor):
@@ -134,6 +135,17 @@ export function CrewComposition() {
       else next.add(id);
       return next;
     });
+  }
+
+  function handleScoreChange(memberId: string, criterionId: string, value: number) {
+    setState((s) => ({
+      ...s,
+      members: s.members.map((m) =>
+        m.id === memberId
+          ? { ...m, stageAScores: { ...m.stageAScores, [criterionId]: value } }
+          : m,
+      ),
+    }));
   }
 
   return (
@@ -274,6 +286,22 @@ export function CrewComposition() {
             state.members.map((member, idx) => {
               const memberGate = gateResult.perMemberResults[member.id];
               const memberScore = composite.perMemberScores[idx] ?? 0;
+              // Build figures map only when expanded (lazy rendering)
+              const isExpanded = expandedIds.has(member.id);
+              const figures: Record<string, React.ReactNode> = {};
+              if (isExpanded) {
+                for (const c of PLACEHOLDER_CRITERIA) {
+                  const score = member.stageAScores?.[c.id] ?? c.scale.min + 0.5 * (c.scale.max - c.scale.min);
+                  figures[c.id] = (
+                    <CriterionMiniFigure
+                      key={`${member.id}-${c.id}-${score}`}
+                      criterion={c}
+                      rawScore={score}
+                    />
+                  );
+                }
+              }
+
               return (
                 <CrewMemberCard
                   key={member.id}
@@ -281,8 +309,11 @@ export function CrewComposition() {
                   compositeScore={memberScore}
                   gateVerdict={memberGate?.verdict ?? "qualified"}
                   failedGates={memberGate?.failedGates ?? []}
-                  expanded={expandedIds.has(member.id)}
+                  expanded={isExpanded}
                   onToggle={() => toggleMember(member.id)}
+                  criteria={PLACEHOLDER_CRITERIA}
+                  onScoreChange={handleScoreChange}
+                  figures={figures}
                 />
               );
             })
