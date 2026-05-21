@@ -119,7 +119,7 @@ Update rules:
 | 88 | Phase 3F acceptance — Diego manual sign-off | **AWAITING-DIEGO** | — | Diego runs `npm run dev` + `npm run e2e`; reviews all 7 figures in browser (F1–F7); signs off Phase 3F complete. |
 | 84 | F7 MissionComparison on-demand small multiples | **DONE** | `b49c1ae` |
 | IC-1 | IMM composite types: stageAScores, CrewComposite, CrewGateResult, missionSuccess | **IN_PROGRESS** | — | `src/imm/types.ts` patched; `tests/imm/composite_types.test.ts` (8 tests) added; `simulate.ts` missionSuccess stub added. |
-| IC-2 | `src/imm/composite.ts` + tests/imm/composite.test.ts | **PENDING** | — | aggregateCrewComposite (mean / worst-link / geometric-mean) |
+| IC-2 | `src/imm/composite.ts` + tests/imm/composite.test.ts | **IN_PROGRESS** | — | aggregateCrewComposite (mean / worst-link / geometric-mean) |
 | IC-3 | `src/imm/crew-gates.ts` + tests/imm/crew-gates.test.ts | **PENDING** | — | evaluateCrewGates per-member gate evaluation |
 | IC-4 | simulateIMM MSP tracking (replace stub) | **PENDING** | — | Per-trial missionSuccess flag → posteriorSummary |
 | IC-5 | simulateIMM per-member stageAScores vulnerability multiplier | **PENDING** | — | gate-then-modulate inside runIMMTrial |
