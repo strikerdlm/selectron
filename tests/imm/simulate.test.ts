@@ -273,6 +273,55 @@ describe("simulateIMM", () => {
   });
 });
 
+// ── Bug #2: duration-scaling test ────────────────────────────────────────────
+describe("General-Poisson duration scaling", () => {
+  it("Gamma-Poisson with λ=0.01/person-day × 180 days ≈ 1.8 events/person", () => {
+    // alpha=1, beta=100 → E[λ/day] = 0.01 exactly.
+    // 1 crew member, 180-day mission → expected count ≈ 0.01 × 180 = 1.8 per trial.
+    // Without duration scaling the expected count would be ~0.01 (≈ 0), not 1.8.
+    const realPriors = priorsModule.loadIMMPriors();
+    const pert0 = { min: 0, mode: 0, max: 0 };
+    const gammaScalePrior: import("../../src/imm/types").IMMPrior = {
+      conditionId: "acute-sinusitis",
+      provenance: "tierA-nasa" as const,
+      source_ref: "test-duration-scaling",
+      incidence: { distribution: "Gamma-Poisson", alpha: 1.0, beta: 100.0 },
+      severity: { worst_case_prob_alpha: 1, worst_case_prob_beta: 1 },
+      treated: {
+        fi_cp1: pert0, dt_cp1_hours: pert0, fi_cp2: pert0, dt_cp2_hours: pert0,
+        fi_cp3: pert0, p_evac: pert0, p_locl: pert0,
+      },
+      untreated: {
+        fi_cp1: pert0, dt_cp1_hours: pert0, fi_cp2: pert0, dt_cp2_hours: pert0,
+        fi_cp3: pert0, p_evac: pert0, p_locl: pert0,
+      },
+      required_resources: {},
+      risk_factor_multipliers: {},
+    };
+    vi.spyOn(priorsModule, "loadIMMPriors").mockReturnValue({
+      ...realPriors,
+      conditions: { ...realPriors.conditions, "acute-sinusitis": gammaScalePrior },
+    });
+
+    const missionD180: IMMMission = {
+      id: "test-180d", label: "180-day test",
+      durationDays: 180, crewSize: 1, totalEVAs: 0, evaSchedule: [],
+    };
+    const N = 10_000;
+    let totalEvents = 0;
+    for (let i = 0; i < N; i++) {
+      const rng = makeRng(i);
+      const out = runIMMTrial(rng, oneCrew, missionD180, IMM_KITS.none);
+      totalEvents += out.perConditionCounts["acute-sinusitis"] ?? 0;
+    }
+    const empiricalMean = totalEvents / N;
+    // Expected: 0.01 × 180 = 1.8 events per person per mission.
+    // Allow ±25% tolerance (Monte Carlo noise at N=10k).
+    expect(empiricalMean).toBeGreaterThan(1.8 * 0.75); // > 1.35
+    expect(empiricalMean).toBeLessThan(1.8 * 1.25);    // < 2.25
+  });
+});
+
 // ── Task 30: σ<5% convergence (M18/A22 rule) ─────────────────────────────────
 describe("σ<5% convergence (M18/A22 rule)", () => {
   it("at T=100k, ISS 6mo / 6 crew / ISS HMS converges", () => {

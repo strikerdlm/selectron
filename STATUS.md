@@ -1,6 +1,6 @@
 # Selectron — STATUS
 
-**Last updated:** 2026-05-20 ~ 20:15 UTC (IMM P1 engine math COMPLETE — simulateIMM running, calibration in place, K15 reproduction pending T86 gate)
+**Last updated:** 2026-05-21 ~ 05:00 UTC (IMM engine bug-fix pass: 3 structural bugs fixed — Proxy spread, duration scaling, resource normalization)
 **Current branch:** `iter1-phase0`
 **Active plan (Iter 1):** [`docs/superpowers/plans/2026-05-18-selectron-iter1-phase0.md`](docs/superpowers/plans/2026-05-18-selectron-iter1-phase0.md)
 **Active plan (Iter 3):** [`docs/superpowers/plans/2026-05-18-selectron-iter3-risk.md`](docs/superpowers/plans/2026-05-18-selectron-iter3-risk.md)

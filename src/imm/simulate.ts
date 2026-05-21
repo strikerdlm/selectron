@@ -14,7 +14,8 @@ const LAMBDA_SPE_PER_DAY = 1.5e-3;
 import type { IMMCrewMember, IMMMission, IMMKitScenario, IMMPrior } from "./types";
 import { IMM_CONDITIONS } from "./conditions";
 import { loadIMMPriors } from "./priors";
-import { samplePoisson, sampleLognormalPoisson, sampleGammaPoisson, sampleBetaBernoulli, samplePoissonProcess } from "./incidence";
+import { samplePoisson, sampleLognormal, sampleLognormalPoisson, sampleGammaPoisson, sampleBetaBernoulli, samplePoissonProcess } from "./incidence";
+import { sampleGamma } from "../engine/gamma";
 import { sampleSeverity } from "./severity";
 import { sampleBetaPert, concurrentFI } from "./outcomes";
 import { interpolateBetaPertByRAF } from "./treatment";
@@ -74,6 +75,41 @@ export function applyRiskFactorMultiplier(baseLambda: number, member: IMMCrewMem
   return lambda;
 }
 
+/**
+ * Sample a per-mission-per-person event count for a general-Poisson condition.
+ *
+ * For Gamma-Poisson and Lognormal-Poisson the prior encodes a RATE (λ per person-day).
+ * The count must be scaled by mission duration before Poisson sampling:
+ *   1. Draw λ_per_day from the prior's hierarchical distribution.
+ *   2. Apply per-person risk-factor multipliers to λ_per_day.
+ *   3. Sample Poisson(λ_per_day × durationDays).
+ *
+ * Beta-Bernoulli and Fixed distributions retain their existing semantics and are
+ * handled directly in the general-Poisson branch of runIMMTrial.
+ *
+ * @internal — called only by the general-Poisson branch. SA/EVA/SPE paths use sampleIncidence.
+ */
+function sampleGeneralPoissonCount(
+  rng: Rng,
+  prior: IMMPrior,
+  member: IMMCrewMember,
+  durationDays: number,
+): number {
+  const inc = prior.incidence;
+  if (inc.distribution === "Lognormal-Poisson") {
+    const lambdaPerDay = sampleLognormal(rng, inc.mu_log_lambda!, inc.sigma_log_lambda!);
+    const scaledLambda = applyRiskFactorMultiplier(lambdaPerDay, member, prior) * durationDays;
+    return samplePoisson(rng, scaledLambda);
+  }
+  if (inc.distribution === "Gamma-Poisson") {
+    const lambdaPerDay = sampleGamma(inc.alpha!, rng) / inc.beta!;
+    const scaledLambda = applyRiskFactorMultiplier(lambdaPerDay, member, prior) * durationDays;
+    return samplePoisson(rng, scaledLambda);
+  }
+  // Fixed: already handled inline in the caller (lambda_fixed is a rate-per-day too)
+  throw new Error(`E_BAD_PRIOR: sampleGeneralPoissonCount called with unsupported distribution ${inc.distribution}`);
+}
+
 function sampleIncidence(rng: Rng, prior: IMMPrior): number {
   const inc = prior.incidence;
   if (inc.distribution === "Lognormal-Poisson") return sampleLognormalPoisson(rng, inc.mu_log_lambda!, inc.sigma_log_lambda!);
@@ -115,15 +151,15 @@ export function runIMMTrial(
 
       let count = 0;
       if (cond.processType === "general-Poisson") {
-        const baseLambda = (prior.incidence.distribution === "Fixed")
-          ? prior.incidence.lambda_fixed! * mission.durationDays
-          : 0;
         if (prior.incidence.distribution === "Fixed") {
+          // Fixed: lambda_fixed is a per-person-day rate; scale by duration, then apply RFM.
+          const baseLambda = prior.incidence.lambda_fixed! * mission.durationDays;
           count = samplePoisson(rng, applyRiskFactorMultiplier(baseLambda, member, prior));
         } else {
-          // For LN-Poisson / Gamma-Poisson, the prior implicitly is per-person-day; multiply by duration.
-          const sampledOnePersonDay = sampleIncidence(rng, prior);
-          count = sampledOnePersonDay; // could rescale; conservative for now
+          // Gamma-Poisson / Lognormal-Poisson: draw λ/day from hierarchical prior, apply RFM,
+          // then scale by mission duration before Poisson sampling.
+          // sampleGeneralPoissonCount handles the draw + RFM + duration scaling.
+          count = sampleGeneralPoissonCount(rng, prior, member, mission.durationDays);
         }
       } else if (cond.processType === "space-adaptation-once") {
         // T24: once-per-mission cap — skip if this crew member already had this condition.
