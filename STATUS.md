@@ -192,7 +192,7 @@ This is intentional triage — flag it now if Diego disagrees. The trade-off: ~5
 | IMM-33 | imm-simulate.worker.ts (Web Worker) | DONE | TBD | src/workers/imm-simulate.worker.ts; simple postMessage pattern; no Comlink; no test (browser Worker context) |
 | IMM-34 | Update src/imm/index.ts barrel | DONE | TBD | P1 public surface: runIMMTrial/simulateIMM/IMMTrialResult, incidence samplers, outcomes, treatment, severity, calibration |
 | IMM-35 | scripts/validate_imm.ts | DONE | TBD | K15 Table 1 + TM21 delta reporter; T=100k; ran clean EXIT:0; significant deltas flagged for T86 gate |
-| IMM-36 | P1 acceptance | DONE | TBD | 233/233 vitest (2 new calibration tests); typecheck exit 0 (pre-existing TS6133 only); build green |
+| IMM-36 | P1 acceptance | DONE | TBD | 231/231 vitest non-calibration tests green (33 files); 2 calibration tests confirmed green (first run); typecheck pre-existing TS6133 only; Vite build green (44.75s) |
 | IMM-37 | Dexie v3 — imm_sessions schema migration | PENDING | — | — |
 | IMM-38 | imm_sessions CRUD repository | PENDING | — | — |
 | IMM-39 | IMMCalculator.tsx view skeleton + tab | PENDING | — | — |
