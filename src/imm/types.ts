@@ -64,6 +64,13 @@ export type IMMCrewMember = {
   EVA_eligible: boolean;
   EVA_count: number;
   selectronStageACandidateId?: string;
+  /**
+   * Per-criterion Stage A scores (raw, instrument scale).
+   * Keys are criterion IDs from PLACEHOLDER_CRITERIA / docs/criteria.md.
+   * When present, used in `simulateIMM` to compute z-scored vulnerability multipliers
+   * that modulate per-condition λ (gate-then-modulate, Commit 5).
+   */
+  stageAScores?: Record<string, number>;
 };
 
 export type IMMMission = {
@@ -90,6 +97,12 @@ export type IMMOutcome = {
   chi: PosteriorSummary;
   pEvac: PosteriorSummary;
   pLocl: PosteriorSummary;
+  /**
+   * Mission Success Probability (×100, percent scale, same as pEvac/pLocl).
+   * Fraction of trials where EVAC=0 AND LOCL=0 AND CHI >= chiStar×100.
+   * chiStar defaults to 0.7 per spec §3.5 (Palinkas 2004 anchor).
+   */
+  missionSuccess: PosteriorSummary;
   perConditionDrivers: {
     conditionId: string;
     pEvacContrib: number; pLoclContrib: number; tmeContrib: number;
@@ -98,6 +111,49 @@ export type IMMOutcome = {
     trialCheckpoints: number[];
     sigmaChi: number[]; sigmaPevac: number[];
   };
+};
+
+// ── Crew-composite types (IMM Composite-Crew extension) ───────────────────────
+
+/**
+ * Aggregation strategy for crew-level composite score.
+ * - "mean": arithmetic mean of per-member Stage A composite scores.
+ * - "worst-link": minimum per-member score (weakest-link reliability model).
+ * - "geometric-mean": nth root of the product of per-member scores.
+ */
+export type CrewCompositeMethod = "mean" | "worst-link" | "geometric-mean";
+
+/**
+ * Result of `aggregateCrewComposite`.
+ * `compositeScore` is in [0, 1] (not percent).
+ */
+export type CrewComposite = {
+  /** Aggregated crew-level score in [0, 1]. */
+  compositeScore: number;
+  /** Per-member composite scores (same order as input crew array). */
+  perMemberScores: number[];
+  /**
+   * ID of the crew member with the lowest compositeScore.
+   * null when crew is empty.
+   */
+  weakestMemberId: string | null;
+  method: CrewCompositeMethod;
+};
+
+/**
+ * Result of `evaluateCrewGates`.
+ * The crew passes only if ALL members individually pass (weakest-link gate logic).
+ */
+export type CrewGateResult = {
+  /** "qualified" iff every crew member individually qualifies. */
+  crewVerdict: "qualified" | "disqualified";
+  /** Per-member gate results keyed by member.id. */
+  perMemberResults: Record<string, import("../types/gate").GateResult>;
+  /**
+   * IDs of crew members that individually failed their gate evaluation.
+   * Empty when crewVerdict === "qualified".
+   */
+  disqualifiedMemberIds: string[];
 };
 
 export type IMMSession = {

@@ -370,11 +370,16 @@ export function simulateIMM(opts: {
     tmeContrib:   (perConditionCountsSum[c.id] ?? 0) / trials,
   }));
 
+  // Commit 4 will replace this stub with per-trial MSP tracking.
+  // For now, provide a zero-filled sentinel so the type is satisfied.
+  const MISSION_SUCCESS_STUB: import("./types").PosteriorSummary = { mean: 0, ci90: [0, 0], ci95: [0, 0], sd: 0 };
+
   return {
     tme:   posteriorSummary(tmes),
     chi:   posteriorSummary(chis),
     pEvac: posteriorSummary(evacs.map(x => x * 100)),
     pLocl: posteriorSummary(locls.map(x => x * 100)),
+    missionSuccess: MISSION_SUCCESS_STUB,
     perConditionDrivers: drivers,
     convergence: { trialCheckpoints: sigmaCheckpoints, sigmaChi, sigmaPevac },
   };
