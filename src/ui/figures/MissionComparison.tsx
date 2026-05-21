@@ -27,7 +27,7 @@ import type { SimSession } from "@/db/schema";
 import { notify } from "@/ui/components/Toast";
 import { FigureCaption } from "./FigureCaption";
 import { f7Caption } from "./captions/F7.captions";
-import type { AccessTier } from "@/types";
+import type { AccessTier, GateResult } from "@/types";
 import { assessLxC } from "@/risk/lxc";
 
 // NASA HSRB color → swatch fill for the per-mission LxC chip.
@@ -235,9 +235,12 @@ export type MissionComparisonProps = {
   // component doesn't need to call useWizard — Sim renders OUTSIDE the
   // WizardProvider, which previously caused a hard crash here.
   accessTier: AccessTier;
+  /** Optional gate verdict forwarded from Sim. When disqualified, all per-mission
+   *  LxC chips show RED L5×C5=25 to stay consistent with the headline CHIExplainer. */
+  gate?: GateResult;
 };
 
-export function MissionComparison({ candidateId, accessTier }: MissionComparisonProps) {
+export function MissionComparison({ candidateId, accessTier, gate }: MissionComparisonProps) {
   // Three-valued state:
   //   undefined → not yet checked (waiting for first loadCache)
   //   SimSession[] → checked; may be empty array (no comparison data yet)
@@ -487,10 +490,10 @@ export function MissionComparison({ candidateId, accessTier }: MissionComparison
               </div>
 
               {/* NASA HSRB LxC chip — Diego scope-add 2026-05-19, per JSC-66705
-                  Rev A Figure 4. Compact: shows (L, C) cell, priority score,
-                  and color. Tooltip lists the verbatim band definitions. */}
+                  Rev A Figure 4. Gate override applied when candidate is
+                  disqualified (forces RED L5×C5=25 for every mission panel). */}
               {(() => {
-                const lxc = assessLxC(row.posterior);
+                const lxc = assessLxC(row.posterior, gate);
                 return (
                   <div className="mt-2 pt-2 border-t border-line/40 flex items-center justify-between gap-2">
                     <span className="mono text-[9px] uppercase tracking-cap text-ink-3">

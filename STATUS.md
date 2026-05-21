@@ -1,6 +1,6 @@
 # Selectron — STATUS
 
-**Last updated:** 2026-05-21 ~ 09:10 UTC (G5 + G6 gate-then-modulate: z-score normalization helper, vulnerabilityVector uses criterion scale, SYNTHETIC_PRIORS β amplified to family-specific values; worst-vs-best CHI delta 53pp on hi-seas-45d)
+**Last updated:** 2026-05-21 ~ 10:15 UTC (G7 + G8 gate-then-modulate: DISQUALIFIED banner wired in Mission risk view, gate passed to MissionComparison chips, reproducer extended with DISQ candidate — gate override verified on all 5 missions)
 **Current branch:** `iter1-phase0`
 **Active plan (Iter 1):** [`docs/superpowers/plans/2026-05-18-selectron-iter1-phase0.md`](docs/superpowers/plans/2026-05-18-selectron-iter1-phase0.md)
 **Active plan (Iter 3):** [`docs/superpowers/plans/2026-05-18-selectron-iter3-risk.md`](docs/superpowers/plans/2026-05-18-selectron-iter3-risk.md)
@@ -417,3 +417,53 @@ This is intentional triage — flag it now if Diego disagrees. The trade-off: ~5
 | 2026-05-21 ~07:30 UTC | IMM-priors-rev2 implementer | DONE_WITH_CONCERNS — Per-event p_evac/p_locl rescale using first-principles K15 targets. Two iterations: iter1 applied new tier-specific Beta-Pert values (A: treated.p_evac mode=0.05, B: 0.001, C: 5e-5, D: 5e-7; untreated A: 0.60, B: 0.030, C: 1.4e-3, D: 2e-4); iter2 halved treated.p_evac for B/C/D only (dual-adjustment failed — doubling untreated C/D increased issHMS pEVAC via kit-fallthrough coupling: conditions not covered by issHMS kit use untreated path, so raising untreated p_evac raises issHMS pEVAC). Final K15 deltas (T=100k): none TME=149.40 Δ+51.10, CHI=48.87 Δ−10.33, pEVAC=19.36% Δ−47.54, pLOCL=0.67% Δ−2.22; issHMS TME=150.04 Δ+44.04, CHI=57.51 Δ−37.42, pEVAC=16.41% Δ+10.84, pLOCL=0.59% ✓ Δ+0.15; unlimited TME=151.12 Δ+45.12, CHI=83.88 Δ−11.10, pEVAC=8.89% Δ+3.96, pLOCL=0.54% Δ+0.09. AMM 426d: TME 203.7, CHI 57.36, pEVAC 25.77%, pLOCL 1.00%. SMM 923d: TME 394.5, CHI 57.94, pEVAC 48.17%, pLOCL 2.06%. Smoke gate 3/6: pLOCL(issHMS) ✓, pEVAC ordering (none>issHMS>unlimited) ✓, CHI ordering (none<issHMS<unlimited) ✓. TME and CHI flagged as incidence-OOS issues (not addressable by p_evac/p_locl). pEVAC(issHMS)=16.41% vs target 5.57%: 1.64× off (within 2× budget); residual = kit-fallthrough coupling. T86 validation gate not clearable until incidence is recalibrated. Engineering finding: spec dual-adjustment rule (halve treated + double untreated simultaneously) does not compose when issHMS kit has partial coverage — treated-path share ≈ unlimited pEVAC (8.89%); untreated-leakage ≈ 7.5pp. Next work should address kit coverage expansion or incidence recalibration. |
 | 2026-05-21 ~09:05 UTC | G5 implementer | DONE `df31104` — Z-score normalization helper + vulnerabilityVector update. `src/engine/normalize-cohort.ts` created: `zScoreAgainstScale(raw, scale)` maps scale [min,max] as ±2 SD range (4 SDs total), midpoint → z=0, extremes → ±2. `tests/engine/normalize_cohort.test.ts`: 4 tests (midpoint, max, min, non-zero-anchored). vulnerabilityVector updated to z-score via criteriaIndex (ReadonlyMap<string, Criterion>): sign convention `c.higherIsBetter ? zVal : -zVal` — HIGH raw on higherIsBetter=true criterion yields z>0; with β<0, β·z<0 → exp<1 → λ↓ (good candidate, less risk). criteriaIndex threaded: simulateMission builds Map from PLACEHOLDER_CRITERIA once per call, passes to runMissionTrial (new optional arg), runMissionTrial passes to vulnerabilityVector. `tests/risk/coupling_amplitude.test.ts` created as FAILING TDD fixture (commits as failing; G6 greens it). All 154 existing tests still pass at G5 commit. |
 | 2026-05-21 ~09:10 UTC | G6 implementer | DONE `470a27b` — Amplify vulnerability_beta in SYNTHETIC_PRIORS. Replaced conservative β = -0.05 (psychiatric only) / 0.0 (all others) with family-specific operational values: psychiatric -0.4, behavioral -0.3, neurologic -0.3, infectious -0.25, cardiovascular -0.25, musculoskeletal -0.2, respiratory -0.2, GI -0.15, renal -0.15, default -0.2 (covers team, physiologic, performance). Future Iter-2 families compared via `(c.family as string)` cast to avoid TS2367 narrowing errors. coupling_amplitude.test.ts now PASSES: worst-vs-best CHI delta = 53pp on hi-seas-45d (well above the ≥5pp threshold). Full reproducer (T=20k): antarctic-winter-over ELCD 33→18; mars500-520d ELCD 24→13; hi-seas-90d CHI 87.8%→98.6%; hi-seas-45d WORST 41% pET=100% RED / BEST 94% green; mdrs-2wk WORST 68% pET=59% RED / BEST 97% green. Pre-existing TestFigureHost TS6133 is the only typecheck error (pre-existing, not new). Full vitest: all tests pass (coupling_amplitude included). |
+| 2026-05-21 ~10:15 UTC | G7 implementer | DONE — DISQUALIFIED banner + LxC RED override wired in Mission risk view. Sim.tsx now fetches candidate scores via getCandidateWithEvidence alongside recentSimsFor (parallel Promise.all). Builds Candidate shape from criterionEntries, calls evaluateGates(candidate, PLACEHOLDER_CRITERIA), passes gate (optional GateResult) to CHIExplainer and MissionComparison. CHIExplainer.tsx: gate prop added, assessLxC(posterior, gate) called, DISQUALIFIED banner (role="alert", data-testid="disqualified-banner") rendered when gate.verdict==="disqualified" above LxC matrix. MissionComparison.tsx: gate prop added, each per-mission chip passes gate to assessLxC — disqualified candidate sees RED L5×C5=25 on every mission panel. Smoke test: tests/ui/disqualified-banner.test.tsx (4 RTL tests, minimal mock banner) — all 4 pass. Targeted vitest (engine + lxc + ui + types): 79/79 pass. typecheck: pre-existing TS6133 only. Notable: missing-score auto-disqualifies (gate treats undefined as failed); psych.mmpi2rf_eid is minimumTier:"elite" and cognitive.nasa_cognition_battery is minimumTier:"medium" — minimum-tier candidates without these entries will auto-disqualify. Flagged for follow-up; not fixed. |
+| 2026-05-21 ~10:15 UTC | G8 implementer | DONE — Reproducer acceptance: DISQ red on every mission. scripts/reproducer_bad_candidate.ts extended with 4th candidate DISQUALIFIED (midrange everywhere, psych.mmpi2rf_eid forced to 120 — fails gate fail-if-above:65). evaluateGates now called inside per-mission loop; gate passed to assessLxC; verdict column shows DISQ:<failed_ids>. Acceptance verdict: DISQ → LxC red on all 5 missions (DISQ:psych.mmpi2rf_eid); BEST → green on all 5 missions; WORST → red on all 5 missions (fails BOTH gates: cognitive.nasa_cognition_battery=-3 < -2.0 AND psych.mmpi2rf_eid=120 > 65). Note: WORST is red on ALL missions (including EVA=0) because the gate override fires before CHI is consulted — WORST's cognitive.nasa_cognition_battery (score=-3, below gate threshold=-2) causes disqualification regardless of mission EVA count. MID also disqualified (mmpi2rf_eid=75 > 65). Only BEST escapes the gate (all scores within gate bounds). Reproducer output appended to STATUS.md. |
+
+## Gate-then-modulate validation (2026-05-21)
+
+```
+--- conditions with vulnerabilityCriteria ---
+  depression-anxiety: [psych.emotional_stability]
+  conflict-event: [behavioral.teamwork,psych.conscientiousness]
+  immune-incident: [physical.vo2max]
+  latent-virus-reactivation: [psych.emotional_stability]
+  musculoskeletal-injury: [physical.vo2max]
+  team-cohesion-loss: [behavioral.teamwork]
+  psychosocial-withdrawal: [psych.emotional_stability]
+  early-termination-request: [psych.emotional_stability,behavioral.teamwork,physical.vo2max]
+  8/12 conditions reference Selectron criteria
+
+--- Per-mission results (T=20k) ---
+
+=== antarctic-winter-over (365d, n=12, EVAs=0) ===
+  WORST | CHI 99.24% | pET 0.00% | ELCD 33.3 | LxC L5×C5=25 red | DISQ:cognitive.nasa_cognition_battery,psych.mmpi2rf_eid
+  MID   | CHI 99.47% | pET 0.00% | ELCD 23.2 | LxC L5×C5=25 red | DISQ:psych.mmpi2rf_eid
+  BEST  | CHI 99.59% | pET 0.00% | ELCD 17.9 | LxC L1×C1=1 green | qualified
+  DISQ  | CHI 99.47% | pET 0.00% | ELCD 23.2 | LxC L5×C5=25 red | DISQ:psych.mmpi2rf_eid
+
+=== mars500-520d (520d, n=6, EVAs=0) ===
+  WORST | CHI 99.24% | pET 0.00% | ELCD 23.6 | LxC L5×C5=25 red | DISQ:cognitive.nasa_cognition_battery,psych.mmpi2rf_eid
+  MID   | CHI 99.47% | pET 0.00% | ELCD 16.4 | LxC L5×C5=25 red | DISQ:psych.mmpi2rf_eid
+  BEST  | CHI 99.60% | pET 0.00% | ELCD 12.6 | LxC L1×C1=1 green | qualified
+  DISQ  | CHI 99.47% | pET 0.00% | ELCD 16.4 | LxC L5×C5=25 red | DISQ:psych.mmpi2rf_eid
+
+=== hi-seas-90d (90d, n=6, EVAs=12) ===
+  WORST | CHI 87.80% | pET 0.00% | ELCD 65.9 | LxC L5×C5=25 red | DISQ:cognitive.nasa_cognition_battery,psych.mmpi2rf_eid
+  MID   | CHI 97.11% | pET 0.00% | ELCD 15.6 | LxC L5×C5=25 red | DISQ:psych.mmpi2rf_eid
+  BEST  | CHI 98.64% | pET 0.00% | ELCD 7.3 | LxC L1×C2=3 green | qualified
+  DISQ  | CHI 97.11% | pET 0.00% | ELCD 15.6 | LxC L5×C5=25 red | DISQ:psych.mmpi2rf_eid
+
+=== hi-seas-45d (45d, n=6, EVAs=12) ===
+  WORST | CHI 41.02% | pET 100.00% | ELCD 159.3 | LxC L5×C5=25 red | DISQ:cognitive.nasa_cognition_battery,psych.mmpi2rf_eid
+  MID   | CHI 86.88% | pET 0.00% | ELCD 35.4 | LxC L5×C5=25 red | DISQ:psych.mmpi2rf_eid
+  BEST  | CHI 94.23% | pET 0.00% | ELCD 15.6 | LxC L1×C3=5 green | qualified
+  DISQ  | CHI 86.88% | pET 0.00% | ELCD 35.4 | LxC L5×C5=25 red | DISQ:psych.mmpi2rf_eid
+
+=== mdrs-2wk (14d, n=6, EVAs=5) ===
+  WORST | CHI 68.61% | pET 59.44% | ELCD 26.4 | LxC L5×C5=25 red | DISQ:cognitive.nasa_cognition_battery,psych.mmpi2rf_eid
+  MID   | CHI 93.22% | pET 0.00% | ELCD 5.7 | LxC L5×C5=25 red | DISQ:psych.mmpi2rf_eid
+  BEST  | CHI 97.06% | pET 0.00% | ELCD 2.5 | LxC L1×C2=3 green | qualified
+  DISQ  | CHI 93.22% | pET 0.00% | ELCD 5.7 | LxC L5×C5=25 red | DISQ:psych.mmpi2rf_eid
+```
+

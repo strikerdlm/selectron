@@ -1,15 +1,17 @@
 import { useEffect, useState } from "react";
 import type { SimSession } from "@/db/schema";
-import { recentSimsFor } from "@/db/repository";
+import { recentSimsFor, getCandidateWithEvidence } from "@/db/repository";
 import { ANALOG_CONDITIONS } from "@/risk/conditions";
 import { ANALOG_MISSIONS } from "@/data/analog-missions";
+import { PLACEHOLDER_CRITERIA } from "@/data/placeholder-criteria";
+import { evaluateGates } from "@/engine/gates";
 import { RiskCard } from "@/ui/components/RiskCard";
 import { RiskHistogram } from "@/ui/figures/RiskHistogram";
 import { ConditionContribution } from "@/ui/figures/ConditionContribution";
 import { MissionComparison } from "@/ui/figures/MissionComparison";
 import { IMMCalculationTrace } from "@/ui/figures/CalculationTrace";
 import { CHIExplainer } from "@/ui/figures/CHIExplainer";
-import type { AccessTier } from "@/types";
+import type { AccessTier, GateResult } from "@/types";
 import { ACCESS_TIERS } from "@/types";
 
 export function Sim({
@@ -23,16 +25,31 @@ export function Sim({
   // The distinction matters so the post-sim transition doesn't flash the "no sim sessions"
   // fallback during the async DB round-trip after the wizard hands off.
   const [latest, setLatest] = useState<SimSession | null | undefined>(undefined);
+  // Gate result: undefined = not yet computed (loading); null = candidate scores not found.
+  const [gate, setGate] = useState<GateResult | null | undefined>(undefined);
 
   useEffect(() => {
     let cancelled = false;
     setLatest(undefined);
+    setGate(undefined);
     (async () => {
-      const sims = await recentSimsFor(candidateId, 50);
+      const [sims, bundle] = await Promise.all([
+        recentSimsFor(candidateId, 50),
+        getCandidateWithEvidence(candidateId).catch(() => null),
+      ]);
       if (cancelled) return;
       // Pick the most recent NON-comparison-run sim as the "latest"
       const nonComparison = sims.filter((s) => !(s.notes ?? "").includes("comparison-run-"));
       setLatest(nonComparison[0] ?? null);
+      // Build Candidate shape from DB entries and evaluate gates
+      if (bundle) {
+        const scores: Record<string, number> = {};
+        for (const e of bundle.criterionEntries) scores[e.criterionId] = e.rawValue;
+        const candidate = { id: bundle.candidate.id, alias: bundle.candidate.alias, scores };
+        setGate(evaluateGates(candidate, PLACEHOLDER_CRITERIA));
+      } else {
+        setGate(null);
+      }
     })();
     return () => {
       cancelled = true;
@@ -98,11 +115,14 @@ export function Sim({
 
       {/* CHI EXPLAINER — Diego scope expansion 2026-05-19: define CHI and
           interpret this specific run for the mission. Lives directly below the
-          headline RiskCard + RiskHistogram row. */}
+          headline RiskCard + RiskHistogram row.
+          gate (optional) is passed so assessLxC can apply the disqualified override
+          and the DISQUALIFIED banner is shown when a candidate fails a clearance gate. */}
       <CHIExplainer
         posterior={latest.posterior}
         chiStar={latest.chiStar}
         missionId={latest.missionId}
+        gate={gate ?? undefined}
       />
 
       {/* CALCULATION TRACE — Diego scope expansion 2026-05-19: priority on
@@ -135,7 +155,11 @@ export function Sim({
         </section>
         {mission && (
           <section className="lg:col-span-12">
-            <MissionComparison candidateId={candidateId} accessTier={sessionTier} />
+            <MissionComparison
+              candidateId={candidateId}
+              accessTier={sessionTier}
+              gate={gate ?? undefined}
+            />
           </section>
         )}
       </div>

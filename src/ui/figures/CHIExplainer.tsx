@@ -5,6 +5,7 @@
 // of THIS run's specific numbers. No external dependencies — pure presentation.
 
 import type { RiskPosterior } from "@/types/risk";
+import type { GateResult } from "@/types";
 import { assessLxC } from "@/risk/lxc";
 import { LxCMatrix } from "./LxCMatrix";
 
@@ -12,6 +13,9 @@ type Props = {
   posterior: RiskPosterior;
   chiStar: number;
   missionId: string;
+  /** Optional gate verdict. When disqualified, assessLxC returns RED L5×C5=25
+   *  and the DISQUALIFIED banner is shown above the LxC matrix. */
+  gate?: GateResult;
 };
 
 const NASA_COLOR_TONE: Record<"green" | "yellow" | "red" | "gray", string> = {
@@ -89,7 +93,7 @@ function pctBucket(p: number): { label: string; tone: string } {
   return { label: "HIGH", tone: "text-warn" };
 }
 
-export function CHIExplainer({ posterior, chiStar, missionId }: Props) {
+export function CHIExplainer({ posterior, chiStar, missionId, gate }: Props) {
   const chi = posterior.chi.mean;
   const [chiLo, chiHi] = posterior.chi.ci90;
   const pET = posterior.pEarlyTermination.mean;
@@ -99,15 +103,41 @@ export function CHIExplainer({ posterior, chiStar, missionId }: Props) {
 
   const severity = severityBucket(chi, chiStar);
   const etBucket = pctBucket(pET);
-  // NASA HSRB LxC assessment driven by the Monte-Carlo posterior. This is
-  // the canonical verdict surface — the chi-gap "severity" above stays as a
-  // secondary lay-language layer below.
-  const lxc = assessLxC(posterior);
+  // NASA HSRB LxC assessment driven by the Monte-Carlo posterior (or the gate
+  // override). This is the canonical verdict surface — the chi-gap "severity"
+  // above stays as a secondary lay-language layer below.
+  const lxc = assessLxC(posterior, gate);
   const nasaTone = NASA_COLOR_TONE[lxc.color];
   const nasaBorder = NASA_COLOR_BORDER[lxc.color];
 
   return (
     <section className={`panel p-6 border-l-2 ${nasaBorder}`}>
+      {/* ── DISQUALIFIED BANNER ─────────────────────────────────────────── */}
+      {gate?.verdict === "disqualified" && (
+        <div
+          role="alert"
+          className="mb-5 panel border border-red-500 bg-red-50 rounded-md p-4"
+          data-testid="disqualified-banner"
+        >
+          <div className="font-semibold text-red-900 mb-2">
+            ⛔ DISQUALIFIED — clearance gate failed
+          </div>
+          <p className="text-sm text-red-800 mb-2">
+            The candidate failed one or more binary clearance gates. Stage B Monte
+            Carlo was not used to compute this LxC verdict; the matrix is RED on
+            principle per NASA selection process (failed clearance = exclusion).
+          </p>
+          <ul className="mt-2 list-disc list-inside text-sm text-red-800 font-mono">
+            {gate.failedGates.map((g) => (
+              <li key={g}>{g}</li>
+            ))}
+          </ul>
+          {gate.notes && (
+            <p className="text-xs text-red-700 mt-2 italic">Note: {gate.notes}</p>
+          )}
+        </div>
+      )}
+
       <header className="flex items-baseline justify-between mb-4 flex-wrap gap-2">
         <h2 className="display text-lg text-ink-0">
           Reading this result · NASA Risk Posture for the mission
