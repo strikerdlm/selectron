@@ -1,6 +1,6 @@
 # Selectron — STATUS
 
-**Last updated:** 2026-05-21 ~ 18:15 UTC (CC-3 DONE: CriterionMiniFigure ECharts bell-curve 80×200 with gate threshold + score marker; lazy render on expand)
+**Last updated:** 2026-05-21 ~ 18:30 UTC (CC-4 DONE: Web Worker simulation wiring + IMMOutcome results panel in CompositeCrewPanel)
 **Current branch:** `iter1-phase0`
 **Active plan (Iter 1):** [`docs/superpowers/plans/2026-05-18-selectron-iter1-phase0.md`](docs/superpowers/plans/2026-05-18-selectron-iter1-phase0.md)
 **Active plan (Iter 3):** [`docs/superpowers/plans/2026-05-18-selectron-iter3-risk.md`](docs/superpowers/plans/2026-05-18-selectron-iter3-risk.md)
@@ -134,8 +134,8 @@ Update rules:
 | IC-6 | scripts/reproducer_imm_composite.ts + acceptance output | **DONE** | pending | Comparison table: iss-6mo vs mars500; exports/2026-05-21_imm_composite_reproducer.txt written. |
 | CC-1 | CrewComposition skeleton view + App.tsx nav + CrewMemberCard + CompositeCrewPanel | **DONE** | `aecb80e` | 3-zone layout; 6 archetypal crew members with safe defaults (mmpi2rf_eid=35, nasa_cognition≥-1.5); live composite+gate aggregation; "Crew" nav tab in header; pre-existing TS6133 TestFigureHost fix bundled. typecheck exit 0; build green. |
 | CC-2 | Per-criterion sliders + CitationChip | **DONE** | `62873c7` | PerScoreCard.tsx (slider + citation chip with DOI/scite verified badge/relevance quote). CitationChip.tsx. CrewMemberCard updated to render PerScoreCards in expanded body. RTL tests: 10/10 pass (engine unit + gate + PerScoreCard smoke). typecheck exit 0. |
-| CC-3 | ECharts bell-curve mini-figures in PerScoreCard | **IN_PROGRESS** | — | CriterionMiniFigure.tsx: 80px-tall ECharts line+area chart (Gaussian PDF over criterion scale). Amber markLine at rawScore; dashed red markLine at gateThreshold.value. useMemo keyed on (criterionId, min, max, gateValue, clampedScore). Lazy: figures map only built when member card is expanded. typecheck exit 0. |
-| CC-4 | Web Worker simulation + IMMOutcome results panel | PENDING | — | Wire Run Simulation button to imm-simulate.worker.ts; show TME/CHI/pEVAC/pLOCL/MSP with CI95. |
+| CC-3 | ECharts bell-curve mini-figures in PerScoreCard | **DONE** | `029ca62` | CriterionMiniFigure.tsx: 80px-tall ECharts line+area chart (Gaussian PDF over criterion scale). Amber markLine at rawScore; dashed red markLine at gateThreshold.value. useMemo keyed on (criterionId, min, max, gateValue, clampedScore). Lazy: figures map only built when member card is expanded. typecheck exit 0. |
+| CC-4 | Web Worker simulation + IMMOutcome results panel | **IN_PROGRESS** | — | Web Worker via new Worker(new URL(...imm-simulate.worker.ts...)). Run Simulation button: idle→running→done/error states. SimState hook + workerRef + onmessage/onerror cleanup. CompositeCrewPanel extended with simState/simError/outcome/onRunSim props. Results panel: MSP/CHI/pEvac/pLocl/TME with CI₉₅ chips + convergence σ row. typecheck exit 0. |
 | CC-5 | Polish — ARIA labels, keyboard nav, error states, responsive | PENDING | — | Full a11y pass + empty-crew error state + Playwright snapshot test. |
 
 ---

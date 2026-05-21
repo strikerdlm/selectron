@@ -8,8 +8,8 @@
 // Commit 4: Web Worker simulation wiring.
 // Commit 5: polish + a11y.
 
-import { useMemo, useState } from "react";
-import type { IMMCrewMember, CrewCompositeMethod } from "../../imm/types";
+import { useCallback, useMemo, useRef, useState } from "react";
+import type { IMMCrewMember, CrewCompositeMethod, IMMOutcome } from "../../imm/types";
 import { PLACEHOLDER_CRITERIA } from "../../data/placeholder-criteria";
 import { IMM_MISSIONS } from "../../data/imm-missions";
 import { IMM_KITS } from "../../imm/kits";
@@ -18,6 +18,8 @@ import { evaluateCrewGates } from "../../imm/crew-gates";
 import { CrewMemberCard } from "../components/CrewMemberCard";
 import { CompositeCrewPanel } from "../components/CompositeCrewPanel";
 import { CriterionMiniFigure } from "../figures/CriterionMiniFigure";
+
+type SimState = "idle" | "running" | "done" | "error";
 
 // ─── safe default score generation ───────────────────────────────────────────
 // Rules (from advisor):
@@ -115,6 +117,10 @@ const INITIAL_STATE: CrewState = {
 export function CrewComposition() {
   const [state, setState] = useState<CrewState>(INITIAL_STATE);
   const [expandedIds, setExpandedIds] = useState<Set<string>>(new Set());
+  const [simState, setSimState] = useState<SimState>("idle");
+  const [simError, setSimError] = useState<string | undefined>();
+  const [outcome, setOutcome] = useState<IMMOutcome | undefined>();
+  const workerRef = useRef<Worker | null>(null);
 
   // ── live crew composite ─────────────────────────────────────────────────
   const composite = useMemo(
@@ -147,6 +153,56 @@ export function CrewComposition() {
       ),
     }));
   }
+
+  const runSimulation = useCallback(() => {
+    if (simState === "running") return;
+    if (state.members.length === 0) return;
+
+    // Terminate any previous worker
+    if (workerRef.current) {
+      workerRef.current.terminate();
+      workerRef.current = null;
+    }
+
+    setSimState("running");
+    setSimError(undefined);
+
+    const worker = new Worker(
+      new URL("../../workers/imm-simulate.worker.ts", import.meta.url),
+      { type: "module" },
+    );
+    workerRef.current = worker;
+
+    worker.onmessage = (e: MessageEvent<{ ok: true; result: IMMOutcome } | { ok: false; error: string }>) => {
+      if (e.data.ok) {
+        setOutcome(e.data.result);
+        setSimState("done");
+      } else {
+        setSimError(e.data.error);
+        setSimState("error");
+      }
+      worker.terminate();
+      workerRef.current = null;
+    };
+
+    worker.onerror = (err) => {
+      setSimError(err.message ?? "Worker error");
+      setSimState("error");
+      worker.terminate();
+      workerRef.current = null;
+    };
+
+    // Post the simulation payload (simulateIMM options)
+    worker.postMessage({
+      crew: state.members,
+      mission: state.mission,
+      kit: state.kit,
+      trials: state.trials,
+      seed: state.seed,
+      chiStar: state.chiStar,
+      criteria: PLACEHOLDER_CRITERIA,
+    });
+  }, [simState, state.members, state.mission, state.kit, state.trials, state.seed, state.chiStar]);
 
   return (
     <div className="flex flex-col gap-8">
@@ -330,6 +386,10 @@ export function CrewComposition() {
             crewVerdict={gateResult.crewVerdict}
             disqualifiedMemberIds={gateResult.disqualifiedMemberIds}
             onMethodChange={(m) => setState((s) => ({ ...s, aggregator: m }))}
+            simState={simState}
+            simError={simError}
+            outcome={outcome}
+            onRunSim={runSimulation}
           />
         </div>
 

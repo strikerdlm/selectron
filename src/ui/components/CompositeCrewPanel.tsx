@@ -1,8 +1,8 @@
 // src/ui/components/CompositeCrewPanel.tsx
 // Displays crew-level composite score + gate verdict + aggregator method selector.
-// No simulation output yet — that lands in Commit 4.
+// CC-4: Run Simulation button + IMMOutcome results panel.
 
-import type { CrewCompositeMethod } from "../../imm/types";
+import type { CrewCompositeMethod, IMMOutcome, PosteriorSummary } from "../../imm/types";
 
 interface CompositeCrewPanelProps {
   compositeScore: number;          // [0, 1]
@@ -12,6 +12,11 @@ interface CompositeCrewPanelProps {
   crewVerdict: "qualified" | "disqualified";
   disqualifiedMemberIds: string[];
   onMethodChange: (m: CrewCompositeMethod) => void;
+  /** CC-4: simulation state */
+  simState: "idle" | "running" | "done" | "error";
+  simError?: string;
+  outcome?: IMMOutcome;
+  onRunSim: () => void;
 }
 
 const METHOD_LABELS: Record<CrewCompositeMethod, string> = {
@@ -19,6 +24,41 @@ const METHOD_LABELS: Record<CrewCompositeMethod, string> = {
   "worst-link": "Worst-link (min)",
   "geometric-mean": "Geometric mean",
 };
+
+/** Single IMM outcome metric display row. */
+function ResultMetric({
+  label,
+  summary,
+  unit = "%",
+  goodIsHigh = false,
+}: {
+  label: string;
+  summary: PosteriorSummary;
+  unit?: string;
+  goodIsHigh?: boolean;
+}) {
+  const mean = summary.mean;
+  const [lo, hi] = summary.ci95;
+  // Colour logic: if goodIsHigh (e.g. missionSuccess), green = high; else green = low.
+  const color =
+    goodIsHigh
+      ? mean >= 70 ? "var(--go)" : mean >= 45 ? "var(--signal)" : "var(--warn)"
+      : mean <= 5 ? "var(--go)" : mean <= 20 ? "var(--signal)" : "var(--warn)";
+
+  return (
+    <div className="flex items-center justify-between gap-2">
+      <span className="mono text-[10px] text-ink-2 uppercase tracking-cap">{label}</span>
+      <div className="flex items-baseline gap-1.5">
+        <span className="mono text-[14px] tabular-nums font-medium" style={{ color }}>
+          {mean.toFixed(1)}{unit}
+        </span>
+        <span className="mono text-[9px] text-ink-3">
+          [{lo.toFixed(1)}, {hi.toFixed(1)}]
+        </span>
+      </div>
+    </div>
+  );
+}
 
 function ScoreBar({ value }: { value: number }) {
   const pct = Math.round(value * 100);
@@ -44,6 +84,10 @@ export function CompositeCrewPanel({
   crewVerdict,
   disqualifiedMemberIds,
   onMethodChange,
+  simState,
+  simError,
+  outcome,
+  onRunSim,
 }: CompositeCrewPanelProps) {
   const pct = Math.round(compositeScore * 100);
   const qualified = crewVerdict === "qualified";
@@ -127,14 +171,83 @@ export function CompositeCrewPanel({
         </div>
       )}
 
-      {/* Run simulation placeholder — wired in Commit 4 */}
+      {/* Run Simulation button */}
       <button
-        disabled
-        className="mono mt-2 w-full rounded border border-line px-4 py-2 text-[12px]
-                   uppercase tracking-cap text-ink-3 cursor-not-allowed opacity-50"
+        type="button"
+        disabled={simState === "running"}
+        className="mono mt-2 w-full rounded border px-4 py-2 text-[12px]
+                   uppercase tracking-cap transition-colors"
+        style={{
+          borderColor: simState === "running" ? "var(--line)" : "var(--signal)",
+          color: simState === "running" ? "var(--ink-3)" : "var(--signal)",
+          background: simState === "running" ? "transparent" : "rgba(245,181,65,0.06)",
+          cursor: simState === "running" ? "not-allowed" : "pointer",
+        }}
+        onClick={onRunSim}
+        aria-label="run IMM Monte Carlo simulation"
       >
-        ▶ run simulation — coming in commit 4
+        {simState === "running" ? "⟳ simulating…" : "▶ run simulation"}
       </button>
+
+      {/* Simulation error */}
+      {simState === "error" && simError && (
+        <div
+          className="mono text-[10px] rounded border px-3 py-2 mt-1"
+          style={{ borderColor: "var(--warn)", color: "var(--warn)", background: "rgba(255,107,94,0.06)" }}
+        >
+          sim error: {simError}
+        </div>
+      )}
+
+      {/* IMMOutcome results panel */}
+      {simState === "done" && outcome && (
+        <div className="border-t border-line pt-4 mt-1 flex flex-col gap-3">
+          <h4 className="label text-[10px] text-ink-2 uppercase tracking-cap">
+            IMM Results · CI₉₅
+          </h4>
+
+          <div className="flex flex-col gap-2">
+            <ResultMetric
+              label="Mission Success (MSP)"
+              summary={outcome.missionSuccess}
+              unit="%"
+              goodIsHigh
+            />
+            <ResultMetric
+              label="CHI (crew health index)"
+              summary={outcome.chi}
+              unit="%"
+              goodIsHigh
+            />
+            <ResultMetric
+              label="P(evacuation)"
+              summary={outcome.pEvac}
+              unit="%"
+              goodIsHigh={false}
+            />
+            <ResultMetric
+              label="P(loss of crew life)"
+              summary={outcome.pLocl}
+              unit="%"
+              goodIsHigh={false}
+            />
+            <div className="border-t border-line pt-2">
+              <ResultMetric
+                label="Total Medical Events"
+                summary={outcome.tme}
+                unit=" TME"
+                goodIsHigh={false}
+              />
+            </div>
+          </div>
+
+          {/* Convergence info */}
+          <div className="mono text-[9px] text-ink-3 mt-1">
+            σ CHI {(outcome.convergence.sigmaChi.at(-1) ?? 0).toFixed(3)} ·{" "}
+            σ P(evac) {(outcome.convergence.sigmaPevac.at(-1) ?? 0).toFixed(3)}
+          </div>
+        </div>
+      )}
     </div>
   );
 }
