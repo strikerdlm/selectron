@@ -166,3 +166,83 @@ The 2014 [W14] poster lists a slightly different eighth factor ("People Qualific
 **Net:** 4 / 8 fully satisfied today (scope-expansion-3 promoted Verification PARTIAL→SAT via the Poisson-Gamma conjugate test); 1 / 8 partial (Input Data Pedigree — Diego T37 pending); 3 / 8 pending downstream work (Validation, Robustness, Use History). The unsatisfied factors all share a single dependency: Diego's T37 curation unblocks T40 → T59 LOOCV → T61 sensitivity. The Iter-4 paper is a downstream deliverable.
 
 **Re-read this dossier on every Iter-3 acceptance step** (T59, T61, T43 sign-off) and update statuses + outstanding-work cells.
+
+---
+
+## 6. Gate-then-modulate architecture (added 2026-05-21)
+
+### 6.1 Defect that triggered this revision
+
+Diego reported (2026-05-21): "a bad candidate by the worst values of the tests" placed in Antarctic winter-over or Mars500 was producing LxC GREEN — logically inconsistent with the scientific intent of Selectron.
+
+The reproducer `scripts/reproducer_bad_candidate.ts` (commit `c4de4a9`) confirmed and quantified the defect: at T=20 000 trials with seed `0xc0ffee`, WORST and BEST candidates produced identical LxC GREEN verdicts on every mission, with a worst-vs-best CHI delta of only 0.12 percentage points on `antarctic-winter-over` (365 d × 12 crew).
+
+### 6.2 Root cause
+
+Three architectural defects worked together to mute the candidate signal:
+
+1. **`vulnerability_beta = 0` for non-psychiatric condition families.** In `src/data/synthetic-iter3.ts`, only conditions of family `"psychiatric"` received non-zero β (-0.05); every other family had β = 0.0. Six of eight conditions that nominally couple to Selectron criteria via `vulnerabilityCriteria` were therefore insensitive to candidate quality.
+
+2. **Stage A scores were passed raw to the vulnerability product** (`vulnerabilityVector` in `src/risk/simulate.ts`), without z-score normalisation against criterion scale. With β as small as 0.05 and raw scores in [0,1] or [0,100] units, the β·z product was dimensionally inconsistent and the resulting multiplier `exp(β·z)` was effectively pinned near 1.0 regardless of candidate quality.
+
+3. **No select-out gates anywhere.** The criterion `psych.psychopathology_clearance` was specified in the Phase-0 taxonomy (`research/02_criterion_taxonomy.md`) as a binary 0/1 MMPI-2-RF exclusion gate. The runtime implementation in `src/data/placeholder-criteria.ts` instead built `psych.mmpi2rf_eid` as a continuous T-score 30–120 contributing to the MCDA composite. A candidate who failed psychiatric screening was not excluded; their composite score was merely slightly lower. NASA's actual selection process uses binary clearance for psychiatric, medical, and cognitive minima — Selectron did not.
+
+Advisor (consulted 2026-05-21 with the reproducer numbers in hand) confirmed the diagnosis: the math for a *qualified* candidate is roughly correct (Palinkas 2004 reports ~6% Antarctic psychiatric incidence per winter; 12-crew × 365-day × moderate functional impairment yields CHI ≈ 99.6%, matching engine output of 99.47%). The bug is what is allowed to reach Stage B at all.
+
+### 6.3 Fix applied — tasks G1–G9 of the gate-then-modulate plan
+
+| Task | Commit | What it does |
+|---|---|---|
+| G1 | `8c17a5b` | New types: `GateVerdict`, `GateResult`, `Criterion.gateThreshold` |
+| G2 | `051fb54` | `src/engine/gates.ts::evaluateGates(candidate, criteria)` |
+| G3 | `0473761` | `gateThreshold` wired on `psych.mmpi2rf_eid` (fail-if-above 65; MMPI-2-RF clinical elevation, Ben-Porath & Tellegen 2008/2011) and `cognitive.nasa_cognition_battery` (fail-if-below −2.0; 2 SDs below astronaut cohort, Basner 2015 DOI 10.3357/amhp.4343.2015) |
+| G4 | `5a07078` | `assessLxC(posterior, gate?)` returns L5×C5=25 RED with `disqualified: true` when gate verdict is disqualified |
+| G5 | `df31104` | `zScoreAgainstScale(raw, scale)` helper + `vulnerabilityVector` z-scores against criterion scale with sign flip for `higherIsBetter: false` criteria |
+| G6 | `470a27b` | Family-specific `vulnerability_beta` magnitudes (psychiatric -0.4 → renal -0.15; default -0.2). With G5 z-score normalisation, worst-vs-best candidates produce a 2-4× incidence multiplier spread |
+| G7 | `4719951` | UI wiring: `CHIExplainer.tsx` and `MissionComparison.tsx` evaluate the gate and pass it to `assessLxC`; red-bordered DISQUALIFIED banner lists the failed gate ids |
+| G8 | `0fdb184` | Reproducer extended with DISQUALIFIED candidate; gate verdict printed alongside Monte Carlo output; STATUS.md captures the acceptance evidence |
+| G9 | (this commit) | V&V dossier §6 (this section) |
+
+### 6.4 Post-fix validation
+
+The reproducer (`scripts/reproducer_bad_candidate.ts`, T=20 000 trials, seed `0xc0ffee`) reports:
+
+```
+=== antarctic-winter-over (365d, n=12, EVAs=0) ===
+  WORST | CHI 99.24% | ELCD 33.3 | LxC L5×C5=25 red | DISQ:cognitive.nasa_cognition_battery,psych.mmpi2rf_eid
+  MID   | CHI 99.47% | ELCD 23.2 | LxC L5×C5=25 red | DISQ:psych.mmpi2rf_eid
+  BEST  | CHI 99.59% | ELCD 17.9 | LxC L1×C1=1 green | qualified
+  DISQ  | CHI 99.47% | ELCD 23.2 | LxC L5×C5=25 red | DISQ:psych.mmpi2rf_eid
+
+=== hi-seas-45d (45d, n=6, EVAs=12) ===
+  WORST | CHI 41.02% | pET 100.00% | ELCD 159.3 | LxC L5×C5=25 red | DISQ:cognitive.nasa_cognition_battery,psych.mmpi2rf_eid
+  MID   | CHI 86.88% | pET 0.00%   | ELCD 35.4  | LxC L5×C5=25 red | DISQ:psych.mmpi2rf_eid
+  BEST  | CHI 94.23% | pET 0.00%   | ELCD 15.6  | LxC L1×C3=5 green | qualified
+  DISQ  | CHI 86.88% | pET 0.00%   | ELCD 35.4  | LxC L5×C5=25 red | DISQ:psych.mmpi2rf_eid
+```
+
+(Full output in STATUS.md under "Gate-then-modulate validation".)
+
+The coupling amplitude test (`tests/risk/coupling_amplitude.test.ts`) asserts worst-vs-best CHI delta ≥ 5 pp on `hi-seas-45d`; the measured delta is **53 pp** (94.23 % − 41.02 %), well above threshold.
+
+Acceptance criteria from the plan, all met:
+- DISQ candidate red on every mission via gate override (no Monte Carlo trust)
+- BEST candidate green/yellow on every mission
+- WORST candidate red on every mission (fails both gate criteria; pre-fix would have been green)
+- Coupling amplitude delta ≥ 5 pp on hi-seas-45d (actual: 53 pp)
+- Full vitest suite green (147/147 at G8 commit, plus 4 new disqualified-banner tests)
+- No new typecheck errors (pre-existing TestFigureHost.tsx TS6133 acceptable)
+
+### 6.5 Known semantic tensions (deferred)
+
+Two issues surfaced that are honest behaviour, not bugs, but worth surfacing to future maintainers:
+
+1. **Minimum-tier candidates missing elite-tier scores.** `psych.mmpi2rf_eid` (minimumTier: "elite") and `cognitive.nasa_cognition_battery` (minimumTier: "medium") may be `undefined` for minimum-tier users who do not have those measurements. The gate engine treats missing scores as `disqualified` (NASA's safe default — "we cannot clear what we cannot measure"). UI may want to surface this distinction more explicitly: "clearance unevaluated" vs "clearance failed". Deferred.
+2. **Long-duration EVA=0 missions** (Antarctic winter-over, Mars500) show small CHI deltas across qualified-candidate quality bands because the EVA-coupled conditions (musculoskeletal-injury, early-termination-request) don't fire. The ELCD (expected lost crew days) does show 1.86× worse outcomes for worst candidates, so the coupling is operating. Adding more isolation-stress-coupled conditions (Mars-500 / Antarctic literature) would improve CHI discrimination on these missions. Tracked as a Phase-0 evidence-expansion follow-up.
+
+### 6.6 NASA-STD-7009A factor mapping update
+
+This fix improves the following V&V factors:
+- **Factor 2 (Validation)**: the LxC verdict now meaningfully discriminates candidate fitness — the central scientific claim of Selectron.
+- **Factor 3 (Input Data Pedigree)**: the gate thresholds are anchored to NASA-published norms (MMPI-2-RF clinical elevation; Basner 2015 NASA Cognition Battery astronaut-cohort z-score baseline).
+- **Factor 7 (Results Robustness)**: the coupling amplitude test (`tests/risk/coupling_amplitude.test.ts`) provides a regression guard against future amplitude regressions.
