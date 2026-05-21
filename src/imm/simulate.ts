@@ -326,13 +326,22 @@ export function simulateIMM(opts: {
   seed: number;
   /** T31: optional Tier-C global multiplier (default 1.0). */
   tierCMultiplier?: number;
+  /**
+   * Crew Health Index threshold for Mission Success Probability (MSP).
+   * A trial is a "success" when: evac===0 AND locl===0 AND CHI >= chiStar×100.
+   * Defaults to 0.7 (70%) per spec §3.5 / Palinkas 2004 Antarctic anchor.
+   */
+  chiStar?: number;
 }): IMMOutcome {
   const { crew, mission, kit, trials, seed } = opts;
+  const chiStar = opts.chiStar ?? 0.7;
+  const chiStarPct = chiStar * 100;
   const rng = makeRng(seed);
   const L_hours = mission.durationDays * 24;
   const denom = L_hours * crew.length;
 
   const tmes: number[] = [], chis: number[] = [], evacs: number[] = [], locls: number[] = [];
+  const missionSuccessFlags: number[] = [];
   const sigmaCheckpoints: number[] = [];
   const sigmaChi: number[] = [];
   const sigmaPevac: number[] = [];
@@ -344,9 +353,16 @@ export function simulateIMM(opts: {
     const r = runIMMTrial(rng, crew, mission, kit, { tierCMultiplier: opts.tierCMultiplier });
     tmes.push(r.tme);
     // CHI clamped at [0, 100] — QTL can exceed denom under pathological priors (v1 analogue of risk/simulate.ts §3.5 guard).
-    chis.push(Math.max(0, Math.min(100, 100 * (1 - r.qtl / denom))));
+    const chiForTrial = Math.max(0, Math.min(100, 100 * (1 - r.qtl / denom)));
+    chis.push(chiForTrial);
     evacs.push(r.evac);
     locls.push(r.locl);
+    // MSP: trial is a "success" when EVAC=0 AND LOCL=0 AND CHI >= chiStar×100.
+    // Flag is stored ×100 (percent scale) to match pEvac/pLocl convention.
+    // NOTE: with current uncalibrated priors pEVAC ≈ 10–99%, so missionSuccess.mean
+    // will be very low until priors are re-calibrated (see STATUS.md flagged backlog).
+    const successFlag: 0 | 1 = (r.evac === 0 && r.locl === 0 && chiForTrial >= chiStarPct) ? 1 : 0;
+    missionSuccessFlags.push(successFlag);
     for (const [k, v] of Object.entries(r.perConditionCounts)) perConditionCountsSum[k] = (perConditionCountsSum[k] ?? 0) + v;
     for (const [k, v] of Object.entries(r.perConditionEvac))   perConditionEvacSum[k]   = (perConditionEvacSum[k]   ?? 0) + v;
     for (const [k, v] of Object.entries(r.perConditionLocl))   perConditionLoclSum[k]   = (perConditionLoclSum[k]   ?? 0) + v;
@@ -370,16 +386,14 @@ export function simulateIMM(opts: {
     tmeContrib:   (perConditionCountsSum[c.id] ?? 0) / trials,
   }));
 
-  // Commit 4 will replace this stub with per-trial MSP tracking.
-  // For now, provide a zero-filled sentinel so the type is satisfied.
-  const MISSION_SUCCESS_STUB: import("./types").PosteriorSummary = { mean: 0, ci90: [0, 0], ci95: [0, 0], sd: 0 };
-
   return {
     tme:   posteriorSummary(tmes),
     chi:   posteriorSummary(chis),
     pEvac: posteriorSummary(evacs.map(x => x * 100)),
     pLocl: posteriorSummary(locls.map(x => x * 100)),
-    missionSuccess: MISSION_SUCCESS_STUB,
+    // missionSuccess is stored ×100 (percent) — same convention as pEvac/pLocl.
+    // Mean will be near 0 until priors are re-calibrated (pEVAC currently 10–99%).
+    missionSuccess: posteriorSummary(missionSuccessFlags.map(x => x * 100)),
     perConditionDrivers: drivers,
     convergence: { trialCheckpoints: sigmaCheckpoints, sigmaChi, sigmaPevac },
   };
