@@ -43,14 +43,14 @@
           "max": 0.01
         },
         "p_evac": {
-          "min": 0.0005,
-          "mode": 0.003,
-          "max": 0.02
+          "min": 2.5e-06,
+          "mode": 2.5e-05,
+          "max": 0.000125
         },
         "p_locl": {
           "min": 0.0,
-          "mode": 5e-05,
-          "max": 0.0005
+          "mode": 5e-06,
+          "max": 2.5e-05
         }
       },
       "untreated": {
@@ -80,14 +80,14 @@
           "max": 0.1
         },
         "p_evac": {
-          "min": 0.01,
-          "mode": 0.1,
-          "max": 0.3
+          "min": 0.00042,
+          "mode": 0.0014,
+          "max": 0.0035
         },
         "p_locl": {
-          "min": 0.0001,
-          "mode": 0.003,
-          "max": 0.02
+          "min": 3.6e-06,
+          "mode": 1.2e-05,
+          "max": 3.6e-05
         }
       },
       "risk_factor_multipliers": {},
@@ -137,14 +137,14 @@
           "max": 0.01
         },
         "p_evac": {
-          "min": 0.0005,
-          "mode": 0.003,
-          "max": 0.02
+          "min": 2.5e-06,
+          "mode": 2.5e-05,
+          "max": 0.000125
         },
         "p_locl": {
           "min": 0.0,
-          "mode": 5e-05,
-          "max": 0.0005
+          "mode": 5e-06,
+          "max": 2.5e-05
         }
       },
       "untreated": {
@@ -174,14 +174,14 @@
           "max": 0.1
         },
         "p_evac": {
-          "min": 0.01,
-          "mode": 0.1,
-          "max": 0.3
+          "min": 0.00042,
+          "mode": 0.0014,
+          "max": 0.0035
         },
         "p_locl": {
-          "min": 0.0001,
-          "mode": 0.003,
-          "max": 0.02
+          "min": 3.6e-06,
+          "mode": 1.2e-05,
+          "max": 3.6e-05
         }
       },
       "risk_factor_multipliers": {},
@@ -231,14 +231,14 @@
           "max": 0.01
         },
         "p_evac": {
-          "min": 0.0005,
-          "mode": 0.003,
-          "max": 0.02
+          "min": 2.5e-06,
+          "mode": 2.5e-05,
+          "max": 0.000125
         },
         "p_locl": {
           "min": 0.0,
-          "mode": 5e-05,
-          "max": 0.0005
+          "mode": 5e-06,
+          "max": 2.5e-05
         }
       },
       "untreated": {
@@ -268,20 +268,20 @@
           "max": 0.1
         },
         "p_evac": {
-          "min": 0.01,
-          "mode": 0.1,
-          "max": 0.3
+          "min": 0.00042,
+          "mode": 0.0014,
+          "max": 0.0035
         },
         "p_locl": {
-          "min": 0.0001,
-          "mode": 0.003,
-          "max": 0.02
+          "min": 3.6e-06,
+          "mode": 1.2e-05,
+          "max": 3.6e-05
         }
       },
       "risk_factor_multipliers": {},
       "required_resources": {
-        "bandage-small": 5,
-        "topical-antibiotic": 2
+        "wound-closure-strips": 5,
+        "antiseptic": 2
       }
     },
     "skin-abrasion": {
@@ -325,14 +325,14 @@
           "max": 0.0
         },
         "p_evac": {
-          "min": 0.0,
-          "mode": 0.0001,
-          "max": 0.001
+          "min": 2.5e-08,
+          "mode": 2.5e-07,
+          "max": 1.25e-06
         },
         "p_locl": {
           "min": 0.0,
           "mode": 0.0,
-          "max": 1e-05
+          "max": 1e-07
         }
       },
       "untreated": {
@@ -362,20 +362,20 @@
           "max": 0.02
         },
         "p_evac": {
-          "min": 0.001,
-          "mode": 0.01,
-          "max": 0.05
+          "min": 6e-05,
+          "mode": 0.0002,
+          "max": 0.0005
         },
         "p_locl": {
           "min": 0.0,
-          "mode": 1e-05,
-          "max": 0.0001
+          "mode": 0.0,
+          "max": 1e-07
         }
       },
       "risk_factor_multipliers": {},
       "required_resources": {
-        "topical-antibiotic": 2,
-        "bandage-small": 3
+        "antiseptic": 2,
+        "bandage": 3
       }
     },
     "headache-co2-induced": {
@@ -419,14 +419,14 @@
           "max": 0.0
         },
         "p_evac": {
-          "min": 0.0,
-          "mode": 0.0001,
-          "max": 0.001
+          "min": 2.5e-08,
+          "mode": 2.5e-07,
+          "max": 1.25e-06
         },
         "p_locl": {
           "min": 0.0,
           "mode": 0.0,
-          "max": 1e-05
+          "max": 1e-07
         }
       },
       "untreated": {
@@ -456,14 +456,14 @@
           "max": 0.02
         },
         "p_evac": {
-          "min": 0.001,
-          "mode": 0.01,
-          "max": 0.05
+          "min": 6e-05,
+          "mode": 0.0002,
+          "max": 0.0005
         },
         "p_locl": {
           "min": 0.0,
-          "mode": 1e-05,
-          "max": 0.0001
+          "mode": 0.0,
+          "max": 1e-07
         }
       },
       "risk_factor_multipliers": {},
@@ -513,14 +513,14 @@
           "max": 0.01
         },
         "p_evac": {
-          "min": 0.0005,
-          "mode": 0.003,
-          "max": 0.02
+          "min": 2.5e-06,
+          "mode": 2.5e-05,
+          "max": 0.000125
         },
         "p_locl": {
           "min": 0.0,
-          "mode": 5e-05,
-          "max": 0.0005
+          "mode": 5e-06,
+          "max": 2.5e-05
         }
       },
       "untreated": {
@@ -550,19 +550,19 @@
           "max": 0.1
         },
         "p_evac": {
-          "min": 0.01,
-          "mode": 0.1,
-          "max": 0.3
+          "min": 0.00042,
+          "mode": 0.0014,
+          "max": 0.0035
         },
         "p_locl": {
-          "min": 0.0001,
-          "mode": 0.003,
-          "max": 0.02
+          "min": 3.6e-06,
+          "mode": 1.2e-05,
+          "max": 3.6e-05
         }
       },
       "risk_factor_multipliers": {},
       "required_resources": {
-        "bandage-large": 2,
+        "ace-bandage": 2,
         "analgesic-mild": 7
       }
     },
@@ -607,14 +607,14 @@
           "max": 0.0
         },
         "p_evac": {
-          "min": 0.0,
-          "mode": 0.0001,
-          "max": 0.001
+          "min": 2.5e-08,
+          "mode": 2.5e-07,
+          "max": 1.25e-06
         },
         "p_locl": {
           "min": 0.0,
           "mode": 0.0,
-          "max": 1e-05
+          "max": 1e-07
         }
       },
       "untreated": {
@@ -644,20 +644,20 @@
           "max": 0.02
         },
         "p_evac": {
-          "min": 0.001,
-          "mode": 0.01,
-          "max": 0.05
+          "min": 6e-05,
+          "mode": 0.0002,
+          "max": 0.0005
         },
         "p_locl": {
           "min": 0.0,
-          "mode": 1e-05,
-          "max": 0.0001
+          "mode": 0.0,
+          "max": 1e-07
         }
       },
       "risk_factor_multipliers": {},
       "required_resources": {
         "antidiarrheal": 5,
-        "oral-rehydration": 7
+        "oral-rehydration-salts": 7
       }
     },
     "eye-abrasion-foreign-body": {
@@ -701,14 +701,14 @@
           "max": 0.01
         },
         "p_evac": {
-          "min": 0.0005,
-          "mode": 0.003,
-          "max": 0.02
+          "min": 2.5e-06,
+          "mode": 2.5e-05,
+          "max": 0.000125
         },
         "p_locl": {
           "min": 0.0,
-          "mode": 5e-05,
-          "max": 0.0005
+          "mode": 5e-06,
+          "max": 2.5e-05
         }
       },
       "untreated": {
@@ -738,20 +738,20 @@
           "max": 0.1
         },
         "p_evac": {
-          "min": 0.01,
-          "mode": 0.1,
-          "max": 0.3
+          "min": 0.00042,
+          "mode": 0.0014,
+          "max": 0.0035
         },
         "p_locl": {
-          "min": 0.0001,
-          "mode": 0.003,
-          "max": 0.02
+          "min": 3.6e-06,
+          "mode": 1.2e-05,
+          "max": 3.6e-05
         }
       },
       "risk_factor_multipliers": {},
       "required_resources": {
         "eye-irrigation-kit": 1,
-        "antibiotic-eye": 5
+        "ophthalmic-antibiotic": 5
       }
     },
     "acute-cholecystitis-biliary-colic": {
@@ -795,14 +795,14 @@
           "max": 0.05
         },
         "p_evac": {
-          "min": 0.005,
-          "mode": 0.02,
-          "max": 0.1
+          "min": 5e-05,
+          "mode": 0.0005,
+          "max": 0.0025
         },
         "p_locl": {
           "min": 0.0,
-          "mode": 0.0005,
-          "max": 0.003
+          "mode": 0.0001,
+          "max": 0.0005
         }
       },
       "untreated": {
@@ -832,14 +832,14 @@
           "max": 0.3
         },
         "p_evac": {
-          "min": 0.1,
-          "mode": 0.4,
-          "max": 0.8
+          "min": 0.009,
+          "mode": 0.03,
+          "max": 0.075
         },
         "p_locl": {
-          "min": 0.005,
-          "mode": 0.03,
-          "max": 0.15
+          "min": 0.00012,
+          "mode": 0.0004,
+          "max": 0.0012
         }
       },
       "risk_factor_multipliers": {
@@ -892,14 +892,14 @@
           "max": 0.05
         },
         "p_evac": {
-          "min": 0.005,
-          "mode": 0.02,
-          "max": 0.1
+          "min": 5e-05,
+          "mode": 0.0005,
+          "max": 0.0025
         },
         "p_locl": {
           "min": 0.0,
-          "mode": 0.0005,
-          "max": 0.003
+          "mode": 0.0001,
+          "max": 0.0005
         }
       },
       "untreated": {
@@ -929,14 +929,14 @@
           "max": 0.3
         },
         "p_evac": {
-          "min": 0.1,
-          "mode": 0.4,
-          "max": 0.8
+          "min": 0.009,
+          "mode": 0.03,
+          "max": 0.075
         },
         "p_locl": {
-          "min": 0.005,
-          "mode": 0.03,
-          "max": 0.15
+          "min": 0.00012,
+          "mode": 0.0004,
+          "max": 0.0012
         }
       },
       "risk_factor_multipliers": {
@@ -989,14 +989,14 @@
           "max": 0.05
         },
         "p_evac": {
-          "min": 0.005,
-          "mode": 0.02,
-          "max": 0.1
+          "min": 5e-05,
+          "mode": 0.0005,
+          "max": 0.0025
         },
         "p_locl": {
           "min": 0.0,
-          "mode": 0.0005,
-          "max": 0.003
+          "mode": 0.0001,
+          "max": 0.0005
         }
       },
       "untreated": {
@@ -1026,14 +1026,14 @@
           "max": 0.3
         },
         "p_evac": {
-          "min": 0.1,
-          "mode": 0.4,
-          "max": 0.8
+          "min": 0.009,
+          "mode": 0.03,
+          "max": 0.075
         },
         "p_locl": {
-          "min": 0.005,
-          "mode": 0.03,
-          "max": 0.15
+          "min": 0.00012,
+          "mode": 0.0004,
+          "max": 0.0012
         }
       },
       "risk_factor_multipliers": {
@@ -1086,14 +1086,14 @@
           "max": 0.01
         },
         "p_evac": {
-          "min": 0.0005,
-          "mode": 0.003,
-          "max": 0.02
+          "min": 2.5e-06,
+          "mode": 2.5e-05,
+          "max": 0.000125
         },
         "p_locl": {
           "min": 0.0,
-          "mode": 5e-05,
-          "max": 0.0005
+          "mode": 5e-06,
+          "max": 2.5e-05
         }
       },
       "untreated": {
@@ -1123,14 +1123,14 @@
           "max": 0.1
         },
         "p_evac": {
-          "min": 0.01,
-          "mode": 0.1,
-          "max": 0.3
+          "min": 0.00042,
+          "mode": 0.0014,
+          "max": 0.0035
         },
         "p_locl": {
-          "min": 0.0001,
-          "mode": 0.003,
-          "max": 0.02
+          "min": 3.6e-06,
+          "mode": 1.2e-05,
+          "max": 3.6e-05
         }
       },
       "risk_factor_multipliers": {
@@ -1183,14 +1183,14 @@
           "max": 0.05
         },
         "p_evac": {
-          "min": 0.005,
-          "mode": 0.02,
-          "max": 0.1
+          "min": 5e-05,
+          "mode": 0.0005,
+          "max": 0.0025
         },
         "p_locl": {
           "min": 0.0,
-          "mode": 0.0005,
-          "max": 0.003
+          "mode": 0.0001,
+          "max": 0.0005
         }
       },
       "untreated": {
@@ -1220,14 +1220,14 @@
           "max": 0.3
         },
         "p_evac": {
-          "min": 0.1,
-          "mode": 0.4,
-          "max": 0.8
+          "min": 0.009,
+          "mode": 0.03,
+          "max": 0.075
         },
         "p_locl": {
-          "min": 0.005,
-          "mode": 0.03,
-          "max": 0.15
+          "min": 0.00012,
+          "mode": 0.0004,
+          "max": 0.0012
         }
       },
       "risk_factor_multipliers": {},
@@ -1277,14 +1277,14 @@
           "max": 0.01
         },
         "p_evac": {
-          "min": 0.0005,
-          "mode": 0.003,
-          "max": 0.02
+          "min": 2.5e-06,
+          "mode": 2.5e-05,
+          "max": 0.000125
         },
         "p_locl": {
           "min": 0.0,
-          "mode": 5e-05,
-          "max": 0.0005
+          "mode": 5e-06,
+          "max": 2.5e-05
         }
       },
       "untreated": {
@@ -1314,14 +1314,14 @@
           "max": 0.1
         },
         "p_evac": {
-          "min": 0.01,
-          "mode": 0.1,
-          "max": 0.3
+          "min": 0.00042,
+          "mode": 0.0014,
+          "max": 0.0035
         },
         "p_locl": {
-          "min": 0.0001,
-          "mode": 0.003,
-          "max": 0.02
+          "min": 3.6e-06,
+          "mode": 1.2e-05,
+          "max": 3.6e-05
         }
       },
       "risk_factor_multipliers": {},
@@ -1370,14 +1370,14 @@
           "max": 0.01
         },
         "p_evac": {
-          "min": 0.0005,
-          "mode": 0.003,
-          "max": 0.02
+          "min": 2.5e-06,
+          "mode": 2.5e-05,
+          "max": 0.000125
         },
         "p_locl": {
           "min": 0.0,
-          "mode": 5e-05,
-          "max": 0.0005
+          "mode": 5e-06,
+          "max": 2.5e-05
         }
       },
       "untreated": {
@@ -1407,20 +1407,20 @@
           "max": 0.1
         },
         "p_evac": {
-          "min": 0.01,
-          "mode": 0.1,
-          "max": 0.3
+          "min": 0.00042,
+          "mode": 0.0014,
+          "max": 0.0035
         },
         "p_locl": {
-          "min": 0.0001,
-          "mode": 0.003,
-          "max": 0.02
+          "min": 3.6e-06,
+          "mode": 1.2e-05,
+          "max": 3.6e-05
         }
       },
       "risk_factor_multipliers": {},
       "required_resources": {
-        "antibiotic-broad-spectrum": 10,
-        "analgesic-mild": 5
+        "antibiotic": 10,
+        "analgesic": 5
       }
     },
     "urinary-tract-infection": {
@@ -1464,14 +1464,14 @@
           "max": 0.01
         },
         "p_evac": {
-          "min": 0.0005,
-          "mode": 0.003,
-          "max": 0.02
+          "min": 2.5e-06,
+          "mode": 2.5e-05,
+          "max": 0.000125
         },
         "p_locl": {
           "min": 0.0,
-          "mode": 5e-05,
-          "max": 0.0005
+          "mode": 5e-06,
+          "max": 2.5e-05
         }
       },
       "untreated": {
@@ -1501,19 +1501,19 @@
           "max": 0.1
         },
         "p_evac": {
-          "min": 0.01,
-          "mode": 0.1,
-          "max": 0.3
+          "min": 0.00042,
+          "mode": 0.0014,
+          "max": 0.0035
         },
         "p_locl": {
-          "min": 0.0001,
-          "mode": 0.003,
-          "max": 0.02
+          "min": 3.6e-06,
+          "mode": 1.2e-05,
+          "max": 3.6e-05
         }
       },
       "risk_factor_multipliers": {},
       "required_resources": {
-        "antibiotic-broad-spectrum": 7
+        "antibiotic": 7
       }
     },
     "sepsis": {
@@ -1557,14 +1557,14 @@
           "max": 0.1
         },
         "p_evac": {
-          "min": 0.01,
+          "min": 0.005,
           "mode": 0.05,
-          "max": 0.2
+          "max": 0.25
         },
         "p_locl": {
           "min": 0.0,
-          "mode": 0.002,
-          "max": 0.01
+          "mode": 0.004,
+          "max": 0.02
         }
       },
       "untreated": {
@@ -1594,19 +1594,19 @@
           "max": 0.8
         },
         "p_evac": {
-          "min": 0.2,
+          "min": 0.18,
           "mode": 0.6,
-          "max": 0.95
+          "max": 0.99
         },
         "p_locl": {
-          "min": 0.05,
-          "mode": 0.2,
-          "max": 0.7
+          "min": 0.012,
+          "mode": 0.04,
+          "max": 0.12
         }
       },
       "risk_factor_multipliers": {},
       "required_resources": {
-        "antibiotic-broad-spectrum": 14,
+        "antibiotic": 14,
         "iv-fluid": 3
       }
     },
@@ -1651,14 +1651,14 @@
           "max": 0.01
         },
         "p_evac": {
-          "min": 0.0005,
-          "mode": 0.003,
-          "max": 0.02
+          "min": 2.5e-06,
+          "mode": 2.5e-05,
+          "max": 0.000125
         },
         "p_locl": {
           "min": 0.0,
-          "mode": 5e-05,
-          "max": 0.0005
+          "mode": 5e-06,
+          "max": 2.5e-05
         }
       },
       "untreated": {
@@ -1688,22 +1688,22 @@
           "max": 0.1
         },
         "p_evac": {
-          "min": 0.01,
-          "mode": 0.1,
-          "max": 0.3
+          "min": 0.00042,
+          "mode": 0.0014,
+          "max": 0.0035
         },
         "p_locl": {
-          "min": 0.0001,
-          "mode": 0.003,
-          "max": 0.02
+          "min": 3.6e-06,
+          "mode": 1.2e-05,
+          "max": 3.6e-05
         }
       },
       "risk_factor_multipliers": {
         "EVA": 5.0
       },
       "required_resources": {
-        "eye-irrigation-kit": 2,
-        "analgesic-mild": 3
+        "ophthalmic-irrigation": 2,
+        "analgesic": 3
       }
     },
     "stroke-cerebrovascular-accident": {
@@ -1747,14 +1747,14 @@
           "max": 0.1
         },
         "p_evac": {
-          "min": 0.01,
+          "min": 0.005,
           "mode": 0.05,
-          "max": 0.2
+          "max": 0.25
         },
         "p_locl": {
           "min": 0.0,
-          "mode": 0.002,
-          "max": 0.01
+          "mode": 0.004,
+          "max": 0.02
         }
       },
       "untreated": {
@@ -1784,19 +1784,19 @@
           "max": 0.8
         },
         "p_evac": {
-          "min": 0.2,
+          "min": 0.18,
           "mode": 0.6,
-          "max": 0.95
+          "max": 0.99
         },
         "p_locl": {
-          "min": 0.05,
-          "mode": 0.2,
-          "max": 0.7
+          "min": 0.012,
+          "mode": 0.04,
+          "max": 0.12
         }
       },
       "risk_factor_multipliers": {},
       "required_resources": {
-        "anticoagulant": 1,
+        "antithrombotic": 1,
         "iv-fluid": 2
       }
     },
@@ -1841,14 +1841,14 @@
           "max": 0.05
         },
         "p_evac": {
-          "min": 0.005,
-          "mode": 0.02,
-          "max": 0.1
+          "min": 5e-05,
+          "mode": 0.0005,
+          "max": 0.0025
         },
         "p_locl": {
           "min": 0.0,
-          "mode": 0.0005,
-          "max": 0.003
+          "mode": 0.0001,
+          "max": 0.0005
         }
       },
       "untreated": {
@@ -1878,20 +1878,20 @@
           "max": 0.3
         },
         "p_evac": {
-          "min": 0.1,
-          "mode": 0.4,
-          "max": 0.8
+          "min": 0.009,
+          "mode": 0.03,
+          "max": 0.075
         },
         "p_locl": {
-          "min": 0.005,
-          "mode": 0.03,
-          "max": 0.15
+          "min": 0.00012,
+          "mode": 0.0004,
+          "max": 0.0012
         }
       },
       "risk_factor_multipliers": {},
       "required_resources": {
         "iv-fluid": 3,
-        "analgesic-mild": 5
+        "analgesic": 5
       }
     },
     "wrist-fracture": {
@@ -1935,14 +1935,14 @@
           "max": 0.05
         },
         "p_evac": {
-          "min": 0.005,
-          "mode": 0.02,
-          "max": 0.1
+          "min": 5e-05,
+          "mode": 0.0005,
+          "max": 0.0025
         },
         "p_locl": {
           "min": 0.0,
-          "mode": 0.0005,
-          "max": 0.003
+          "mode": 0.0001,
+          "max": 0.0005
         }
       },
       "untreated": {
@@ -1972,20 +1972,20 @@
           "max": 0.3
         },
         "p_evac": {
-          "min": 0.1,
-          "mode": 0.4,
-          "max": 0.8
+          "min": 0.009,
+          "mode": 0.03,
+          "max": 0.075
         },
         "p_locl": {
-          "min": 0.005,
-          "mode": 0.03,
-          "max": 0.15
+          "min": 0.00012,
+          "mode": 0.0004,
+          "max": 0.0012
         }
       },
       "risk_factor_multipliers": {},
       "required_resources": {
         "splint": 1,
-        "analgesic-mild": 5
+        "analgesic": 5
       }
     },
     "angina-myocardial-infarction": {
@@ -2029,14 +2029,14 @@
           "max": 0.05
         },
         "p_evac": {
-          "min": 0.005,
-          "mode": 0.02,
-          "max": 0.1
+          "min": 5e-05,
+          "mode": 0.0005,
+          "max": 0.0025
         },
         "p_locl": {
           "min": 0.0,
-          "mode": 0.0005,
-          "max": 0.003
+          "mode": 0.0001,
+          "max": 0.0005
         }
       },
       "untreated": {
@@ -2066,21 +2066,21 @@
           "max": 0.3
         },
         "p_evac": {
-          "min": 0.1,
-          "mode": 0.4,
-          "max": 0.8
+          "min": 0.009,
+          "mode": 0.03,
+          "max": 0.075
         },
         "p_locl": {
-          "min": 0.005,
-          "mode": 0.03,
-          "max": 0.15
+          "min": 0.00012,
+          "mode": 0.0004,
+          "max": 0.0012
         }
       },
       "risk_factor_multipliers": {},
       "required_resources": {
         "cardiac-monitor": 1,
-        "anticoagulant": 1,
-        "analgesic-mild": 5
+        "antithrombotic": 1,
+        "analgesic": 5
       }
     },
     "decompression-sickness-secondary-to-extravehicular-activity": {
@@ -2124,14 +2124,14 @@
           "max": 0.05
         },
         "p_evac": {
-          "min": 0.005,
-          "mode": 0.02,
-          "max": 0.1
+          "min": 5e-05,
+          "mode": 0.0005,
+          "max": 0.0025
         },
         "p_locl": {
           "min": 0.0,
-          "mode": 0.0005,
-          "max": 0.003
+          "mode": 0.0001,
+          "max": 0.0005
         }
       },
       "untreated": {
@@ -2161,20 +2161,22 @@
           "max": 0.3
         },
         "p_evac": {
-          "min": 0.1,
-          "mode": 0.4,
-          "max": 0.8
+          "min": 0.009,
+          "mode": 0.03,
+          "max": 0.075
         },
         "p_locl": {
-          "min": 0.005,
-          "mode": 0.03,
-          "max": 0.15
+          "min": 0.00012,
+          "mode": 0.0004,
+          "max": 0.0012
         }
       },
       "risk_factor_multipliers": {
         "EVA": 5.0
       },
-      "required_resources": {}
+      "required_resources": {
+        "hyperbaric-oxygen": 1
+      }
     },
     "acute-diverticulitis": {
       "conditionId": "acute-diverticulitis",
@@ -2217,14 +2219,14 @@
           "max": 0.05
         },
         "p_evac": {
-          "min": 0.005,
-          "mode": 0.02,
-          "max": 0.1
+          "min": 5e-05,
+          "mode": 0.0005,
+          "max": 0.0025
         },
         "p_locl": {
           "min": 0.0,
-          "mode": 0.0005,
-          "max": 0.003
+          "mode": 0.0001,
+          "max": 0.0005
         }
       },
       "untreated": {
@@ -2254,19 +2256,19 @@
           "max": 0.3
         },
         "p_evac": {
-          "min": 0.1,
-          "mode": 0.4,
-          "max": 0.8
+          "min": 0.009,
+          "mode": 0.03,
+          "max": 0.075
         },
         "p_locl": {
-          "min": 0.005,
-          "mode": 0.03,
-          "max": 0.15
+          "min": 0.00012,
+          "mode": 0.0004,
+          "max": 0.0012
         }
       },
       "risk_factor_multipliers": {},
       "required_resources": {
-        "antibiotic-broad-spectrum": 14,
+        "antibiotic": 14,
         "iv-fluid": 2
       }
     },
@@ -2311,14 +2313,14 @@
           "max": 0.05
         },
         "p_evac": {
-          "min": 0.005,
-          "mode": 0.02,
-          "max": 0.1
+          "min": 5e-05,
+          "mode": 0.0005,
+          "max": 0.0025
         },
         "p_locl": {
           "min": 0.0,
-          "mode": 0.0005,
-          "max": 0.003
+          "mode": 0.0001,
+          "max": 0.0005
         }
       },
       "untreated": {
@@ -2348,19 +2350,19 @@
           "max": 0.3
         },
         "p_evac": {
-          "min": 0.1,
-          "mode": 0.4,
-          "max": 0.8
+          "min": 0.009,
+          "mode": 0.03,
+          "max": 0.075
         },
         "p_locl": {
-          "min": 0.005,
-          "mode": 0.03,
-          "max": 0.15
+          "min": 0.00012,
+          "mode": 0.0004,
+          "max": 0.0012
         }
       },
       "risk_factor_multipliers": {},
       "required_resources": {
-        "analgesic-mild": 5,
+        "analgesic": 5,
         "cervical-collar": 1
       }
     },
@@ -2405,14 +2407,14 @@
           "max": 0.1
         },
         "p_evac": {
-          "min": 0.01,
+          "min": 0.005,
           "mode": 0.05,
-          "max": 0.2
+          "max": 0.25
         },
         "p_locl": {
           "min": 0.0,
-          "mode": 0.002,
-          "max": 0.01
+          "mode": 0.004,
+          "max": 0.02
         }
       },
       "untreated": {
@@ -2442,21 +2444,22 @@
           "max": 0.8
         },
         "p_evac": {
-          "min": 0.2,
+          "min": 0.18,
           "mode": 0.6,
-          "max": 0.95
+          "max": 0.99
         },
         "p_locl": {
-          "min": 0.05,
-          "mode": 0.2,
-          "max": 0.7
+          "min": 0.012,
+          "mode": 0.04,
+          "max": 0.12
         }
       },
       "risk_factor_multipliers": {
         "EVA": 5.0
       },
       "required_resources": {
-        "iv-fluid": 5
+        "iv-fluid": 5,
+        "blood-products": 2
       }
     },
     "medication-overdose-adverse-reaction": {
@@ -2500,14 +2503,14 @@
           "max": 0.01
         },
         "p_evac": {
-          "min": 0.0005,
-          "mode": 0.003,
-          "max": 0.02
+          "min": 2.5e-06,
+          "mode": 2.5e-05,
+          "max": 0.000125
         },
         "p_locl": {
           "min": 0.0,
-          "mode": 5e-05,
-          "max": 0.0005
+          "mode": 5e-06,
+          "max": 2.5e-05
         }
       },
       "untreated": {
@@ -2537,18 +2540,19 @@
           "max": 0.1
         },
         "p_evac": {
-          "min": 0.01,
-          "mode": 0.1,
-          "max": 0.3
+          "min": 0.00042,
+          "mode": 0.0014,
+          "max": 0.0035
         },
         "p_locl": {
-          "min": 0.0001,
-          "mode": 0.003,
-          "max": 0.02
+          "min": 3.6e-06,
+          "mode": 1.2e-05,
+          "max": 3.6e-05
         }
       },
       "risk_factor_multipliers": {},
       "required_resources": {
+        "antidote": 1,
         "iv-fluid": 2
       }
     },
@@ -2593,14 +2597,14 @@
           "max": 0.1
         },
         "p_evac": {
-          "min": 0.01,
+          "min": 0.005,
           "mode": 0.05,
-          "max": 0.2
+          "max": 0.25
         },
         "p_locl": {
           "min": 0.0,
-          "mode": 0.002,
-          "max": 0.01
+          "mode": 0.004,
+          "max": 0.02
         }
       },
       "untreated": {
@@ -2630,14 +2634,14 @@
           "max": 0.8
         },
         "p_evac": {
-          "min": 0.2,
+          "min": 0.18,
           "mode": 0.6,
-          "max": 0.95
+          "max": 0.99
         },
         "p_locl": {
-          "min": 0.05,
-          "mode": 0.2,
-          "max": 0.7
+          "min": 0.012,
+          "mode": 0.04,
+          "max": 0.12
         }
       },
       "risk_factor_multipliers": {},
@@ -2687,14 +2691,14 @@
           "max": 0.1
         },
         "p_evac": {
-          "min": 0.01,
+          "min": 0.005,
           "mode": 0.05,
-          "max": 0.2
+          "max": 0.25
         },
         "p_locl": {
           "min": 0.0,
-          "mode": 0.002,
-          "max": 0.01
+          "mode": 0.004,
+          "max": 0.02
         }
       },
       "untreated": {
@@ -2724,21 +2728,21 @@
           "max": 0.8
         },
         "p_evac": {
-          "min": 0.2,
+          "min": 0.18,
           "mode": 0.6,
-          "max": 0.95
+          "max": 0.99
         },
         "p_locl": {
-          "min": 0.05,
-          "mode": 0.2,
-          "max": 0.7
+          "min": 0.012,
+          "mode": 0.04,
+          "max": 0.12
         }
       },
       "risk_factor_multipliers": {},
       "required_resources": {
         "burn-dressing": 10,
         "iv-fluid": 3,
-        "analgesic-mild": 10
+        "analgesic": 10
       }
     },
     "toxic-exposure-ammonia": {
@@ -2782,14 +2786,14 @@
           "max": 0.1
         },
         "p_evac": {
-          "min": 0.01,
+          "min": 0.005,
           "mode": 0.05,
-          "max": 0.2
+          "max": 0.25
         },
         "p_locl": {
           "min": 0.0,
-          "mode": 0.002,
-          "max": 0.01
+          "mode": 0.004,
+          "max": 0.02
         }
       },
       "untreated": {
@@ -2819,14 +2823,14 @@
           "max": 0.8
         },
         "p_evac": {
-          "min": 0.2,
+          "min": 0.18,
           "mode": 0.6,
-          "max": 0.95
+          "max": 0.99
         },
         "p_locl": {
-          "min": 0.05,
-          "mode": 0.2,
-          "max": 0.7
+          "min": 0.012,
+          "mode": 0.04,
+          "max": 0.12
         }
       },
       "risk_factor_multipliers": {},
@@ -2876,14 +2880,14 @@
           "max": 0.05
         },
         "p_evac": {
-          "min": 0.005,
-          "mode": 0.02,
-          "max": 0.1
+          "min": 5e-05,
+          "mode": 0.0005,
+          "max": 0.0025
         },
         "p_locl": {
           "min": 0.0,
-          "mode": 0.0005,
-          "max": 0.003
+          "mode": 0.0001,
+          "max": 0.0005
         }
       },
       "untreated": {
@@ -2913,21 +2917,22 @@
           "max": 0.3
         },
         "p_evac": {
-          "min": 0.1,
-          "mode": 0.4,
-          "max": 0.8
+          "min": 0.009,
+          "mode": 0.03,
+          "max": 0.075
         },
         "p_locl": {
-          "min": 0.005,
-          "mode": 0.03,
-          "max": 0.15
+          "min": 0.00012,
+          "mode": 0.0004,
+          "max": 0.0012
         }
       },
       "risk_factor_multipliers": {
         "EVA": 5.0
       },
       "required_resources": {
-        "analgesic-mild": 5
+        "analgesic": 5,
+        "imaging": 1
       }
     },
     "chest-injury": {
@@ -2971,14 +2976,14 @@
           "max": 0.05
         },
         "p_evac": {
-          "min": 0.005,
-          "mode": 0.02,
-          "max": 0.1
+          "min": 5e-05,
+          "mode": 0.0005,
+          "max": 0.0025
         },
         "p_locl": {
           "min": 0.0,
-          "mode": 0.0005,
-          "max": 0.003
+          "mode": 0.0001,
+          "max": 0.0005
         }
       },
       "untreated": {
@@ -3008,21 +3013,21 @@
           "max": 0.3
         },
         "p_evac": {
-          "min": 0.1,
-          "mode": 0.4,
-          "max": 0.8
+          "min": 0.009,
+          "mode": 0.03,
+          "max": 0.075
         },
         "p_locl": {
-          "min": 0.005,
-          "mode": 0.03,
-          "max": 0.15
+          "min": 0.00012,
+          "mode": 0.0004,
+          "max": 0.0012
         }
       },
       "risk_factor_multipliers": {
         "EVA": 5.0
       },
       "required_resources": {
-        "analgesic-mild": 5,
+        "analgesic": 5,
         "chest-tube": 1
       }
     },
@@ -3067,14 +3072,14 @@
           "max": 0.05
         },
         "p_evac": {
-          "min": 0.005,
-          "mode": 0.02,
-          "max": 0.1
+          "min": 5e-05,
+          "mode": 0.0005,
+          "max": 0.0025
         },
         "p_locl": {
           "min": 0.0,
-          "mode": 0.0005,
-          "max": 0.003
+          "mode": 0.0001,
+          "max": 0.0005
         }
       },
       "untreated": {
@@ -3104,19 +3109,19 @@
           "max": 0.3
         },
         "p_evac": {
-          "min": 0.1,
-          "mode": 0.4,
-          "max": 0.8
+          "min": 0.009,
+          "mode": 0.03,
+          "max": 0.075
         },
         "p_locl": {
-          "min": 0.005,
-          "mode": 0.03,
-          "max": 0.15
+          "min": 0.00012,
+          "mode": 0.0004,
+          "max": 0.0012
         }
       },
       "risk_factor_multipliers": {},
       "required_resources": {
-        "analgesic-mild": 5,
+        "analgesic": 5,
         "muscle-relaxant": 5
       }
     },
@@ -3161,14 +3166,14 @@
           "max": 0.01
         },
         "p_evac": {
-          "min": 0.0005,
-          "mode": 0.003,
-          "max": 0.02
+          "min": 2.5e-06,
+          "mode": 2.5e-05,
+          "max": 0.000125
         },
         "p_locl": {
           "min": 0.0,
-          "mode": 5e-05,
-          "max": 0.0005
+          "mode": 5e-06,
+          "max": 2.5e-05
         }
       },
       "untreated": {
@@ -3198,20 +3203,20 @@
           "max": 0.1
         },
         "p_evac": {
-          "min": 0.01,
-          "mode": 0.1,
-          "max": 0.3
+          "min": 0.00042,
+          "mode": 0.0014,
+          "max": 0.0035
         },
         "p_locl": {
-          "min": 0.0001,
-          "mode": 0.003,
-          "max": 0.02
+          "min": 3.6e-06,
+          "mode": 1.2e-05,
+          "max": 3.6e-05
         }
       },
       "risk_factor_multipliers": {},
       "required_resources": {
-        "antibiotic-broad-spectrum": 7,
-        "topical-antibiotic": 5
+        "antibiotic": 7,
+        "wound-care": 5
       }
     },
     "behavioral-emergency": {
@@ -3255,14 +3260,14 @@
           "max": 0.05
         },
         "p_evac": {
-          "min": 0.005,
-          "mode": 0.02,
-          "max": 0.1
+          "min": 5e-05,
+          "mode": 0.0005,
+          "max": 0.0025
         },
         "p_locl": {
           "min": 0.0,
-          "mode": 0.0005,
-          "max": 0.003
+          "mode": 0.0001,
+          "max": 0.0005
         }
       },
       "untreated": {
@@ -3292,19 +3297,19 @@
           "max": 0.3
         },
         "p_evac": {
-          "min": 0.1,
-          "mode": 0.4,
-          "max": 0.8
+          "min": 0.009,
+          "mode": 0.03,
+          "max": 0.075
         },
         "p_locl": {
-          "min": 0.005,
-          "mode": 0.03,
-          "max": 0.15
+          "min": 0.00012,
+          "mode": 0.0004,
+          "max": 0.0012
         }
       },
       "risk_factor_multipliers": {},
       "required_resources": {
-        "antipsychotic": 14,
+        "psychotropic": 14,
         "sedative": 5
       }
     },
@@ -3349,14 +3354,14 @@
           "max": 0.01
         },
         "p_evac": {
-          "min": 0.0005,
-          "mode": 0.003,
-          "max": 0.02
+          "min": 2.5e-06,
+          "mode": 2.5e-05,
+          "max": 0.000125
         },
         "p_locl": {
           "min": 0.0,
-          "mode": 5e-05,
-          "max": 0.0005
+          "mode": 5e-06,
+          "max": 2.5e-05
         }
       },
       "untreated": {
@@ -3386,19 +3391,19 @@
           "max": 0.1
         },
         "p_evac": {
-          "min": 0.01,
-          "mode": 0.1,
-          "max": 0.3
+          "min": 0.00042,
+          "mode": 0.0014,
+          "max": 0.0035
         },
         "p_locl": {
-          "min": 0.0001,
-          "mode": 0.003,
-          "max": 0.02
+          "min": 3.6e-06,
+          "mode": 1.2e-05,
+          "max": 3.6e-05
         }
       },
       "risk_factor_multipliers": {},
       "required_resources": {
-        "anti-anxiety": 14
+        "anxiolytic": 14
       }
     },
     "indigestion": {
@@ -3442,14 +3447,14 @@
           "max": 0.0
         },
         "p_evac": {
-          "min": 0.0,
-          "mode": 0.0001,
-          "max": 0.001
+          "min": 2.5e-08,
+          "mode": 2.5e-07,
+          "max": 1.25e-06
         },
         "p_locl": {
           "min": 0.0,
           "mode": 0.0,
-          "max": 1e-05
+          "max": 1e-07
         }
       },
       "untreated": {
@@ -3479,14 +3484,14 @@
           "max": 0.02
         },
         "p_evac": {
-          "min": 0.001,
-          "mode": 0.01,
-          "max": 0.05
+          "min": 6e-05,
+          "mode": 0.0002,
+          "max": 0.0005
         },
         "p_locl": {
           "min": 0.0,
-          "mode": 1e-05,
-          "max": 0.0001
+          "mode": 0.0,
+          "max": 1e-07
         }
       },
       "risk_factor_multipliers": {},
@@ -3535,14 +3540,14 @@
           "max": 0.01
         },
         "p_evac": {
-          "min": 0.0005,
-          "mode": 0.003,
-          "max": 0.02
+          "min": 2.5e-06,
+          "mode": 2.5e-05,
+          "max": 0.000125
         },
         "p_locl": {
           "min": 0.0,
-          "mode": 5e-05,
-          "max": 0.0005
+          "mode": 5e-06,
+          "max": 2.5e-05
         }
       },
       "untreated": {
@@ -3572,14 +3577,14 @@
           "max": 0.1
         },
         "p_evac": {
-          "min": 0.01,
-          "mode": 0.1,
-          "max": 0.3
+          "min": 0.00042,
+          "mode": 0.0014,
+          "max": 0.0035
         },
         "p_locl": {
-          "min": 0.0001,
-          "mode": 0.003,
-          "max": 0.02
+          "min": 3.6e-06,
+          "mode": 1.2e-05,
+          "max": 3.6e-05
         }
       },
       "risk_factor_multipliers": {},
@@ -3629,14 +3634,14 @@
           "max": 0.01
         },
         "p_evac": {
-          "min": 0.0005,
-          "mode": 0.003,
-          "max": 0.02
+          "min": 2.5e-06,
+          "mode": 2.5e-05,
+          "max": 0.000125
         },
         "p_locl": {
           "min": 0.0,
-          "mode": 5e-05,
-          "max": 0.0005
+          "mode": 5e-06,
+          "max": 2.5e-05
         }
       },
       "untreated": {
@@ -3666,14 +3671,14 @@
           "max": 0.1
         },
         "p_evac": {
-          "min": 0.01,
-          "mode": 0.1,
-          "max": 0.3
+          "min": 0.00042,
+          "mode": 0.0014,
+          "max": 0.0035
         },
         "p_locl": {
-          "min": 0.0001,
-          "mode": 0.003,
-          "max": 0.02
+          "min": 3.6e-06,
+          "mode": 1.2e-05,
+          "max": 3.6e-05
         }
       },
       "risk_factor_multipliers": {},
@@ -3722,14 +3727,14 @@
           "max": 0.01
         },
         "p_evac": {
-          "min": 0.0005,
-          "mode": 0.003,
-          "max": 0.02
+          "min": 2.5e-06,
+          "mode": 2.5e-05,
+          "max": 0.000125
         },
         "p_locl": {
           "min": 0.0,
-          "mode": 5e-05,
-          "max": 0.0005
+          "mode": 5e-06,
+          "max": 2.5e-05
         }
       },
       "untreated": {
@@ -3759,19 +3764,20 @@
           "max": 0.1
         },
         "p_evac": {
-          "min": 0.01,
-          "mode": 0.1,
-          "max": 0.3
+          "min": 0.00042,
+          "mode": 0.0014,
+          "max": 0.0035
         },
         "p_locl": {
-          "min": 0.0001,
-          "mode": 0.003,
-          "max": 0.02
+          "min": 3.6e-06,
+          "mode": 1.2e-05,
+          "max": 3.6e-05
         }
       },
       "risk_factor_multipliers": {},
       "required_resources": {
-        "ophthalmic-exam": 3
+        "ophthalmic-exam": 3,
+        "imaging": 2
       }
     },
     "back-pain-space-adaptation": {
@@ -3815,14 +3821,14 @@
           "max": 0.0
         },
         "p_evac": {
-          "min": 0.0,
-          "mode": 0.0001,
-          "max": 0.001
+          "min": 2.5e-08,
+          "mode": 2.5e-07,
+          "max": 1.25e-06
         },
         "p_locl": {
           "min": 0.0,
           "mode": 0.0,
-          "max": 1e-05
+          "max": 1e-07
         }
       },
       "untreated": {
@@ -3852,14 +3858,14 @@
           "max": 0.02
         },
         "p_evac": {
-          "min": 0.001,
-          "mode": 0.01,
-          "max": 0.05
+          "min": 6e-05,
+          "mode": 0.0002,
+          "max": 0.0005
         },
         "p_locl": {
           "min": 0.0,
-          "mode": 1e-05,
-          "max": 0.0001
+          "mode": 0.0,
+          "max": 1e-07
         }
       },
       "risk_factor_multipliers": {},
@@ -3908,14 +3914,14 @@
           "max": 0.0
         },
         "p_evac": {
-          "min": 0.0,
-          "mode": 0.0001,
-          "max": 0.001
+          "min": 2.5e-08,
+          "mode": 2.5e-07,
+          "max": 1.25e-06
         },
         "p_locl": {
           "min": 0.0,
           "mode": 0.0,
-          "max": 1e-05
+          "max": 1e-07
         }
       },
       "untreated": {
@@ -3945,14 +3951,14 @@
           "max": 0.02
         },
         "p_evac": {
-          "min": 0.001,
-          "mode": 0.01,
-          "max": 0.05
+          "min": 6e-05,
+          "mode": 0.0002,
+          "max": 0.0005
         },
         "p_locl": {
           "min": 0.0,
-          "mode": 1e-05,
-          "max": 0.0001
+          "mode": 0.0,
+          "max": 1e-07
         }
       },
       "risk_factor_multipliers": {},
@@ -4001,14 +4007,14 @@
           "max": 0.0
         },
         "p_evac": {
-          "min": 0.0,
-          "mode": 0.0001,
-          "max": 0.001
+          "min": 2.5e-08,
+          "mode": 2.5e-07,
+          "max": 1.25e-06
         },
         "p_locl": {
           "min": 0.0,
           "mode": 0.0,
-          "max": 1e-05
+          "max": 1e-07
         }
       },
       "untreated": {
@@ -4038,14 +4044,14 @@
           "max": 0.02
         },
         "p_evac": {
-          "min": 0.001,
-          "mode": 0.01,
-          "max": 0.05
+          "min": 6e-05,
+          "mode": 0.0002,
+          "max": 0.0005
         },
         "p_locl": {
           "min": 0.0,
-          "mode": 1e-05,
-          "max": 0.0001
+          "mode": 0.0,
+          "max": 1e-07
         }
       },
       "risk_factor_multipliers": {},
@@ -4094,14 +4100,14 @@
           "max": 0.0
         },
         "p_evac": {
-          "min": 0.0,
-          "mode": 0.0001,
-          "max": 0.001
+          "min": 2.5e-08,
+          "mode": 2.5e-07,
+          "max": 1.25e-06
         },
         "p_locl": {
           "min": 0.0,
           "mode": 0.0,
-          "max": 1e-05
+          "max": 1e-07
         }
       },
       "untreated": {
@@ -4131,21 +4137,21 @@
           "max": 0.02
         },
         "p_evac": {
-          "min": 0.001,
-          "mode": 0.01,
-          "max": 0.05
+          "min": 6e-05,
+          "mode": 0.0002,
+          "max": 0.0005
         },
         "p_locl": {
           "min": 0.0,
-          "mode": 1e-05,
-          "max": 0.0001
+          "mode": 0.0,
+          "max": 1e-07
         }
       },
       "risk_factor_multipliers": {
         "sex-female": 1.3
       },
       "required_resources": {
-        "sleep-aid": 14
+        "sleep-medication": 14
       }
     },
     "nasal-congestion-space-adaptation": {
@@ -4189,14 +4195,14 @@
           "max": 0.0
         },
         "p_evac": {
-          "min": 0.0,
-          "mode": 0.0001,
-          "max": 0.001
+          "min": 2.5e-08,
+          "mode": 2.5e-07,
+          "max": 1.25e-06
         },
         "p_locl": {
           "min": 0.0,
           "mode": 0.0,
-          "max": 1e-05
+          "max": 1e-07
         }
       },
       "untreated": {
@@ -4226,14 +4232,14 @@
           "max": 0.02
         },
         "p_evac": {
-          "min": 0.001,
-          "mode": 0.01,
-          "max": 0.05
+          "min": 6e-05,
+          "mode": 0.0002,
+          "max": 0.0005
         },
         "p_locl": {
           "min": 0.0,
-          "mode": 1e-05,
-          "max": 0.0001
+          "mode": 0.0,
+          "max": 1e-07
         }
       },
       "risk_factor_multipliers": {},
@@ -4282,14 +4288,14 @@
           "max": 0.0
         },
         "p_evac": {
-          "min": 0.0,
-          "mode": 0.0001,
-          "max": 0.001
+          "min": 2.5e-08,
+          "mode": 2.5e-07,
+          "max": 1.25e-06
         },
         "p_locl": {
           "min": 0.0,
           "mode": 0.0,
-          "max": 1e-05
+          "max": 1e-07
         }
       },
       "untreated": {
@@ -4319,14 +4325,14 @@
           "max": 0.02
         },
         "p_evac": {
-          "min": 0.001,
-          "mode": 0.01,
-          "max": 0.05
+          "min": 6e-05,
+          "mode": 0.0002,
+          "max": 0.0005
         },
         "p_locl": {
           "min": 0.0,
-          "mode": 1e-05,
-          "max": 0.0001
+          "mode": 0.0,
+          "max": 1e-07
         }
       },
       "risk_factor_multipliers": {},
@@ -4375,14 +4381,14 @@
           "max": 0.0
         },
         "p_evac": {
-          "min": 0.0,
-          "mode": 0.0001,
-          "max": 0.001
+          "min": 2.5e-08,
+          "mode": 2.5e-07,
+          "max": 1.25e-06
         },
         "p_locl": {
           "min": 0.0,
           "mode": 0.0,
-          "max": 1e-05
+          "max": 1e-07
         }
       },
       "untreated": {
@@ -4412,19 +4418,19 @@
           "max": 0.02
         },
         "p_evac": {
-          "min": 0.001,
-          "mode": 0.01,
-          "max": 0.05
+          "min": 6e-05,
+          "mode": 0.0002,
+          "max": 0.0005
         },
         "p_locl": {
           "min": 0.0,
-          "mode": 1e-05,
-          "max": 0.0001
+          "mode": 0.0,
+          "max": 1e-07
         }
       },
       "risk_factor_multipliers": {},
       "required_resources": {
-        "antiemetic": 3,
+        "promethazine": 3,
         "scopolamine": 3
       }
     },
@@ -4469,14 +4475,14 @@
           "max": 0.0
         },
         "p_evac": {
-          "min": 0.0,
-          "mode": 0.0001,
-          "max": 0.001
+          "min": 2.5e-08,
+          "mode": 2.5e-07,
+          "max": 1.25e-06
         },
         "p_locl": {
           "min": 0.0,
           "mode": 0.0,
-          "max": 1e-05
+          "max": 1e-07
         }
       },
       "untreated": {
@@ -4506,20 +4512,22 @@
           "max": 0.02
         },
         "p_evac": {
-          "min": 0.001,
-          "mode": 0.01,
-          "max": 0.05
+          "min": 6e-05,
+          "mode": 0.0002,
+          "max": 0.0005
         },
         "p_locl": {
           "min": 0.0,
-          "mode": 1e-05,
-          "max": 0.0001
+          "mode": 0.0,
+          "max": 1e-07
         }
       },
       "risk_factor_multipliers": {
         "sex-female": 1.5
       },
-      "required_resources": {}
+      "required_resources": {
+        "pelvic-floor-trainer": 1
+      }
     },
     "urinary-retention-space-adaptation": {
       "conditionId": "urinary-retention-space-adaptation",
@@ -4562,14 +4570,14 @@
           "max": 0.0
         },
         "p_evac": {
-          "min": 0.0,
-          "mode": 0.0001,
-          "max": 0.001
+          "min": 2.5e-08,
+          "mode": 2.5e-07,
+          "max": 1.25e-06
         },
         "p_locl": {
           "min": 0.0,
           "mode": 0.0,
-          "max": 1e-05
+          "max": 1e-07
         }
       },
       "untreated": {
@@ -4599,14 +4607,14 @@
           "max": 0.02
         },
         "p_evac": {
-          "min": 0.001,
-          "mode": 0.01,
-          "max": 0.05
+          "min": 6e-05,
+          "mode": 0.0002,
+          "max": 0.0005
         },
         "p_locl": {
           "min": 0.0,
-          "mode": 1e-05,
-          "max": 0.0001
+          "mode": 0.0,
+          "max": 1e-07
         }
       },
       "risk_factor_multipliers": {
@@ -4657,14 +4665,14 @@
           "max": 0.01
         },
         "p_evac": {
-          "min": 0.0005,
-          "mode": 0.003,
-          "max": 0.02
+          "min": 2.5e-06,
+          "mode": 2.5e-05,
+          "max": 0.000125
         },
         "p_locl": {
           "min": 0.0,
-          "mode": 5e-05,
-          "max": 0.0005
+          "mode": 5e-06,
+          "max": 2.5e-05
         }
       },
       "untreated": {
@@ -4694,14 +4702,14 @@
           "max": 0.1
         },
         "p_evac": {
-          "min": 0.01,
-          "mode": 0.1,
-          "max": 0.3
+          "min": 0.00042,
+          "mode": 0.0014,
+          "max": 0.0035
         },
         "p_locl": {
-          "min": 0.0001,
-          "mode": 0.003,
-          "max": 0.02
+          "min": 3.6e-06,
+          "mode": 1.2e-05,
+          "max": 3.6e-05
         }
       },
       "risk_factor_multipliers": {
@@ -4709,7 +4717,7 @@
       },
       "required_resources": {
         "antidepressant": 30,
-        "anti-anxiety": 14
+        "anxiolytic": 14
       }
     },
     "gastroenteritis": {
@@ -4753,14 +4761,14 @@
           "max": 0.01
         },
         "p_evac": {
-          "min": 0.0005,
-          "mode": 0.003,
-          "max": 0.02
+          "min": 2.5e-06,
+          "mode": 2.5e-05,
+          "max": 0.000125
         },
         "p_locl": {
           "min": 0.0,
-          "mode": 5e-05,
-          "max": 0.0005
+          "mode": 5e-06,
+          "max": 2.5e-05
         }
       },
       "untreated": {
@@ -4790,19 +4798,19 @@
           "max": 0.1
         },
         "p_evac": {
-          "min": 0.01,
-          "mode": 0.1,
-          "max": 0.3
+          "min": 0.00042,
+          "mode": 0.0014,
+          "max": 0.0035
         },
         "p_locl": {
-          "min": 0.0001,
-          "mode": 0.003,
-          "max": 0.02
+          "min": 3.6e-06,
+          "mode": 1.2e-05,
+          "max": 3.6e-05
         }
       },
       "risk_factor_multipliers": {},
       "required_resources": {
-        "oral-rehydration": 5,
+        "oral-rehydration-salts": 5,
         "antidiarrheal": 5
       }
     },
@@ -4847,14 +4855,14 @@
           "max": 0.01
         },
         "p_evac": {
-          "min": 0.0005,
-          "mode": 0.003,
-          "max": 0.02
+          "min": 2.5e-06,
+          "mode": 2.5e-05,
+          "max": 0.000125
         },
         "p_locl": {
           "min": 0.0,
-          "mode": 5e-05,
-          "max": 0.0005
+          "mode": 5e-06,
+          "max": 2.5e-05
         }
       },
       "untreated": {
@@ -4884,14 +4892,14 @@
           "max": 0.1
         },
         "p_evac": {
-          "min": 0.01,
-          "mode": 0.1,
-          "max": 0.3
+          "min": 0.00042,
+          "mode": 0.0014,
+          "max": 0.0035
         },
         "p_locl": {
-          "min": 0.0001,
-          "mode": 0.003,
-          "max": 0.02
+          "min": 3.6e-06,
+          "mode": 1.2e-05,
+          "max": 3.6e-05
         }
       },
       "risk_factor_multipliers": {},
@@ -4941,14 +4949,14 @@
           "max": 0.01
         },
         "p_evac": {
-          "min": 0.0005,
-          "mode": 0.003,
-          "max": 0.02
+          "min": 2.5e-06,
+          "mode": 2.5e-05,
+          "max": 0.000125
         },
         "p_locl": {
           "min": 0.0,
-          "mode": 5e-05,
-          "max": 0.0005
+          "mode": 5e-06,
+          "max": 2.5e-05
         }
       },
       "untreated": {
@@ -4978,14 +4986,14 @@
           "max": 0.1
         },
         "p_evac": {
-          "min": 0.01,
-          "mode": 0.1,
-          "max": 0.3
+          "min": 0.00042,
+          "mode": 0.0014,
+          "max": 0.0035
         },
         "p_locl": {
-          "min": 0.0001,
-          "mode": 0.003,
-          "max": 0.02
+          "min": 3.6e-06,
+          "mode": 1.2e-05,
+          "max": 3.6e-05
         }
       },
       "risk_factor_multipliers": {},
@@ -5035,14 +5043,14 @@
           "max": 0.01
         },
         "p_evac": {
-          "min": 0.0005,
-          "mode": 0.003,
-          "max": 0.02
+          "min": 2.5e-06,
+          "mode": 2.5e-05,
+          "max": 0.000125
         },
         "p_locl": {
           "min": 0.0,
-          "mode": 5e-05,
-          "max": 0.0005
+          "mode": 5e-06,
+          "max": 2.5e-05
         }
       },
       "untreated": {
@@ -5072,14 +5080,14 @@
           "max": 0.1
         },
         "p_evac": {
-          "min": 0.01,
-          "mode": 0.1,
-          "max": 0.3
+          "min": 0.00042,
+          "mode": 0.0014,
+          "max": 0.0035
         },
         "p_locl": {
-          "min": 0.0001,
-          "mode": 0.003,
-          "max": 0.02
+          "min": 3.6e-06,
+          "mode": 1.2e-05,
+          "max": 3.6e-05
         }
       },
       "risk_factor_multipliers": {},
@@ -5128,14 +5136,14 @@
           "max": 0.01
         },
         "p_evac": {
-          "min": 0.0005,
-          "mode": 0.003,
-          "max": 0.02
+          "min": 2.5e-06,
+          "mode": 2.5e-05,
+          "max": 0.000125
         },
         "p_locl": {
           "min": 0.0,
-          "mode": 5e-05,
-          "max": 0.0005
+          "mode": 5e-06,
+          "max": 2.5e-05
         }
       },
       "untreated": {
@@ -5165,14 +5173,14 @@
           "max": 0.1
         },
         "p_evac": {
-          "min": 0.01,
-          "mode": 0.1,
-          "max": 0.3
+          "min": 0.00042,
+          "mode": 0.0014,
+          "max": 0.0035
         },
         "p_locl": {
-          "min": 0.0001,
-          "mode": 0.003,
-          "max": 0.02
+          "min": 3.6e-06,
+          "mode": 1.2e-05,
+          "max": 3.6e-05
         }
       },
       "risk_factor_multipliers": {},
@@ -5222,14 +5230,14 @@
           "max": 0.0
         },
         "p_evac": {
-          "min": 0.0,
-          "mode": 0.0001,
-          "max": 0.001
+          "min": 2.5e-08,
+          "mode": 2.5e-07,
+          "max": 1.25e-06
         },
         "p_locl": {
           "min": 0.0,
           "mode": 0.0,
-          "max": 1e-05
+          "max": 1e-07
         }
       },
       "untreated": {
@@ -5259,20 +5267,20 @@
           "max": 0.02
         },
         "p_evac": {
-          "min": 0.001,
-          "mode": 0.01,
-          "max": 0.05
+          "min": 6e-05,
+          "mode": 0.0002,
+          "max": 0.0005
         },
         "p_locl": {
           "min": 0.0,
-          "mode": 1e-05,
-          "max": 0.0001
+          "mode": 0.0,
+          "max": 1e-07
         }
       },
       "risk_factor_multipliers": {},
       "required_resources": {
         "antihistamine": 14,
-        "topical-steroid": 14
+        "topical-corticosteroid": 14
       }
     },
     "eye-infection": {
@@ -5316,14 +5324,14 @@
           "max": 0.01
         },
         "p_evac": {
-          "min": 0.0005,
-          "mode": 0.003,
-          "max": 0.02
+          "min": 2.5e-06,
+          "mode": 2.5e-05,
+          "max": 0.000125
         },
         "p_locl": {
           "min": 0.0,
-          "mode": 5e-05,
-          "max": 0.0005
+          "mode": 5e-06,
+          "max": 2.5e-05
         }
       },
       "untreated": {
@@ -5353,19 +5361,19 @@
           "max": 0.1
         },
         "p_evac": {
-          "min": 0.01,
-          "mode": 0.1,
-          "max": 0.3
+          "min": 0.00042,
+          "mode": 0.0014,
+          "max": 0.0035
         },
         "p_locl": {
-          "min": 0.0001,
-          "mode": 0.003,
-          "max": 0.02
+          "min": 3.6e-06,
+          "mode": 1.2e-05,
+          "max": 3.6e-05
         }
       },
       "risk_factor_multipliers": {},
       "required_resources": {
-        "antibiotic-eye": 10
+        "ophthalmic-antibiotic": 10
       }
     },
     "mouth-ulcer": {
@@ -5409,14 +5417,14 @@
           "max": 0.01
         },
         "p_evac": {
-          "min": 0.0005,
-          "mode": 0.003,
-          "max": 0.02
+          "min": 2.5e-06,
+          "mode": 2.5e-05,
+          "max": 0.000125
         },
         "p_locl": {
           "min": 0.0,
-          "mode": 5e-05,
-          "max": 0.0005
+          "mode": 5e-06,
+          "max": 2.5e-05
         }
       },
       "untreated": {
@@ -5446,19 +5454,19 @@
           "max": 0.1
         },
         "p_evac": {
-          "min": 0.01,
-          "mode": 0.1,
-          "max": 0.3
+          "min": 0.00042,
+          "mode": 0.0014,
+          "max": 0.0035
         },
         "p_locl": {
-          "min": 0.0001,
-          "mode": 0.003,
-          "max": 0.02
+          "min": 3.6e-06,
+          "mode": 1.2e-05,
+          "max": 3.6e-05
         }
       },
       "risk_factor_multipliers": {},
       "required_resources": {
-        "topical-antibiotic": 7
+        "antiseptic-oral": 7
       }
     },
     "hemorrhoids": {
@@ -5502,14 +5510,14 @@
           "max": 0.0
         },
         "p_evac": {
-          "min": 0.0,
-          "mode": 0.0001,
-          "max": 0.001
+          "min": 2.5e-08,
+          "mode": 2.5e-07,
+          "max": 1.25e-06
         },
         "p_locl": {
           "min": 0.0,
           "mode": 0.0,
-          "max": 1e-05
+          "max": 1e-07
         }
       },
       "untreated": {
@@ -5539,19 +5547,19 @@
           "max": 0.02
         },
         "p_evac": {
-          "min": 0.001,
-          "mode": 0.01,
-          "max": 0.05
+          "min": 6e-05,
+          "mode": 0.0002,
+          "max": 0.0005
         },
         "p_locl": {
           "min": 0.0,
-          "mode": 1e-05,
-          "max": 0.0001
+          "mode": 0.0,
+          "max": 1e-07
         }
       },
       "risk_factor_multipliers": {},
       "required_resources": {
-        "topical-steroid": 7
+        "topical-hemorrhoid-cream": 7
       }
     },
     "barotrauma-ear-sinus-block": {
@@ -5595,14 +5603,14 @@
           "max": 0.01
         },
         "p_evac": {
-          "min": 0.0005,
-          "mode": 0.003,
-          "max": 0.02
+          "min": 2.5e-06,
+          "mode": 2.5e-05,
+          "max": 0.000125
         },
         "p_locl": {
           "min": 0.0,
-          "mode": 5e-05,
-          "max": 0.0005
+          "mode": 5e-06,
+          "max": 2.5e-05
         }
       },
       "untreated": {
@@ -5632,14 +5640,14 @@
           "max": 0.1
         },
         "p_evac": {
-          "min": 0.01,
-          "mode": 0.1,
-          "max": 0.3
+          "min": 0.00042,
+          "mode": 0.0014,
+          "max": 0.0035
         },
         "p_locl": {
-          "min": 0.0001,
-          "mode": 0.003,
-          "max": 0.02
+          "min": 3.6e-06,
+          "mode": 1.2e-05,
+          "max": 3.6e-05
         }
       },
       "risk_factor_multipliers": {},
@@ -5688,14 +5696,14 @@
           "max": 0.0
         },
         "p_evac": {
-          "min": 0.0,
-          "mode": 0.0001,
-          "max": 0.001
+          "min": 2.5e-08,
+          "mode": 2.5e-07,
+          "max": 1.25e-06
         },
         "p_locl": {
           "min": 0.0,
           "mode": 0.0,
-          "max": 1e-05
+          "max": 1e-07
         }
       },
       "untreated": {
@@ -5725,14 +5733,14 @@
           "max": 0.02
         },
         "p_evac": {
-          "min": 0.001,
-          "mode": 0.01,
-          "max": 0.05
+          "min": 6e-05,
+          "mode": 0.0002,
+          "max": 0.0005
         },
         "p_locl": {
           "min": 0.0,
-          "mode": 1e-05,
-          "max": 0.0001
+          "mode": 0.0,
+          "max": 1e-07
         }
       },
       "risk_factor_multipliers": {},
@@ -5781,14 +5789,14 @@
           "max": 0.01
         },
         "p_evac": {
-          "min": 0.0005,
-          "mode": 0.003,
-          "max": 0.02
+          "min": 2.5e-06,
+          "mode": 2.5e-05,
+          "max": 0.000125
         },
         "p_locl": {
           "min": 0.0,
-          "mode": 5e-05,
-          "max": 0.0005
+          "mode": 5e-06,
+          "max": 2.5e-05
         }
       },
       "untreated": {
@@ -5818,18 +5826,20 @@
           "max": 0.1
         },
         "p_evac": {
-          "min": 0.01,
-          "mode": 0.1,
-          "max": 0.3
+          "min": 0.00042,
+          "mode": 0.0014,
+          "max": 0.0035
         },
         "p_locl": {
-          "min": 0.0001,
-          "mode": 0.003,
-          "max": 0.02
+          "min": 3.6e-06,
+          "mode": 1.2e-05,
+          "max": 3.6e-05
         }
       },
       "risk_factor_multipliers": {},
-      "required_resources": {}
+      "required_resources": {
+        "audiometry": 2
+      }
     },
     "paresthesias": {
       "conditionId": "paresthesias",
@@ -5872,14 +5882,14 @@
           "max": 0.01
         },
         "p_evac": {
-          "min": 0.0005,
-          "mode": 0.003,
-          "max": 0.02
+          "min": 2.5e-06,
+          "mode": 2.5e-05,
+          "max": 0.000125
         },
         "p_locl": {
           "min": 0.0,
-          "mode": 5e-05,
-          "max": 0.0005
+          "mode": 5e-06,
+          "max": 2.5e-05
         }
       },
       "untreated": {
@@ -5909,14 +5919,14 @@
           "max": 0.1
         },
         "p_evac": {
-          "min": 0.01,
-          "mode": 0.1,
-          "max": 0.3
+          "min": 0.00042,
+          "mode": 0.0014,
+          "max": 0.0035
         },
         "p_locl": {
-          "min": 0.0001,
-          "mode": 0.003,
-          "max": 0.02
+          "min": 3.6e-06,
+          "mode": 1.2e-05,
+          "max": 3.6e-05
         }
       },
       "risk_factor_multipliers": {},
@@ -5965,14 +5975,14 @@
           "max": 0.0
         },
         "p_evac": {
-          "min": 0.0,
-          "mode": 0.0001,
-          "max": 0.001
+          "min": 2.5e-08,
+          "mode": 2.5e-07,
+          "max": 1.25e-06
         },
         "p_locl": {
           "min": 0.0,
           "mode": 0.0,
-          "max": 1e-05
+          "max": 1e-07
         }
       },
       "untreated": {
@@ -6002,19 +6012,19 @@
           "max": 0.02
         },
         "p_evac": {
-          "min": 0.001,
-          "mode": 0.01,
-          "max": 0.05
+          "min": 6e-05,
+          "mode": 0.0002,
+          "max": 0.0005
         },
         "p_locl": {
           "min": 0.0,
-          "mode": 1e-05,
-          "max": 0.0001
+          "mode": 0.0,
+          "max": 1e-07
         }
       },
       "risk_factor_multipliers": {},
       "required_resources": {
-        "bandage-small": 3
+        "wound-dressing": 3
       }
     },
     "vaginal-yeast-infection": {
@@ -6058,14 +6068,14 @@
           "max": 0.01
         },
         "p_evac": {
-          "min": 0.0005,
-          "mode": 0.003,
-          "max": 0.02
+          "min": 2.5e-06,
+          "mode": 2.5e-05,
+          "max": 0.000125
         },
         "p_locl": {
           "min": 0.0,
-          "mode": 5e-05,
-          "max": 0.0005
+          "mode": 5e-06,
+          "max": 2.5e-05
         }
       },
       "untreated": {
@@ -6095,14 +6105,14 @@
           "max": 0.1
         },
         "p_evac": {
-          "min": 0.01,
-          "mode": 0.1,
-          "max": 0.3
+          "min": 0.00042,
+          "mode": 0.0014,
+          "max": 0.0035
         },
         "p_locl": {
-          "min": 0.0001,
-          "mode": 0.003,
-          "max": 0.02
+          "min": 3.6e-06,
+          "mode": 1.2e-05,
+          "max": 3.6e-05
         }
       },
       "risk_factor_multipliers": {
@@ -6154,14 +6164,14 @@
           "max": 0.01
         },
         "p_evac": {
-          "min": 0.0005,
-          "mode": 0.003,
-          "max": 0.02
+          "min": 2.5e-06,
+          "mode": 2.5e-05,
+          "max": 0.000125
         },
         "p_locl": {
           "min": 0.0,
-          "mode": 5e-05,
-          "max": 0.0005
+          "mode": 5e-06,
+          "max": 2.5e-05
         }
       },
       "untreated": {
@@ -6191,14 +6201,14 @@
           "max": 0.1
         },
         "p_evac": {
-          "min": 0.01,
-          "mode": 0.1,
-          "max": 0.3
+          "min": 0.00042,
+          "mode": 0.0014,
+          "max": 0.0035
         },
         "p_locl": {
-          "min": 0.0001,
-          "mode": 0.003,
-          "max": 0.02
+          "min": 3.6e-06,
+          "mode": 1.2e-05,
+          "max": 3.6e-05
         }
       },
       "risk_factor_multipliers": {},
@@ -6247,14 +6257,14 @@
           "max": 0.1
         },
         "p_evac": {
-          "min": 0.01,
+          "min": 0.005,
           "mode": 0.05,
-          "max": 0.2
+          "max": 0.25
         },
         "p_locl": {
           "min": 0.0,
-          "mode": 0.002,
-          "max": 0.01
+          "mode": 0.004,
+          "max": 0.02
         }
       },
       "untreated": {
@@ -6284,14 +6294,14 @@
           "max": 0.8
         },
         "p_evac": {
-          "min": 0.2,
+          "min": 0.18,
           "mode": 0.6,
-          "max": 0.95
+          "max": 0.99
         },
         "p_locl": {
-          "min": 0.05,
-          "mode": 0.2,
-          "max": 0.7
+          "min": 0.012,
+          "mode": 0.04,
+          "max": 0.12
         }
       },
       "risk_factor_multipliers": {
@@ -6300,8 +6310,8 @@
       },
       "required_resources": {
         "defibrillator": 1,
-        "epinephrine": 3,
-        "opioid": 5
+        "vasopressor": 3,
+        "analgesic-opioid": 5
       }
     },
     "wrist-sprain-strain": {
@@ -6345,14 +6355,14 @@
           "max": 0.01
         },
         "p_evac": {
-          "min": 0.0005,
-          "mode": 0.003,
-          "max": 0.02
+          "min": 2.5e-06,
+          "mode": 2.5e-05,
+          "max": 0.000125
         },
         "p_locl": {
           "min": 0.0,
-          "mode": 5e-05,
-          "max": 0.0005
+          "mode": 5e-06,
+          "max": 2.5e-05
         }
       },
       "untreated": {
@@ -6382,20 +6392,20 @@
           "max": 0.1
         },
         "p_evac": {
-          "min": 0.01,
-          "mode": 0.1,
-          "max": 0.3
+          "min": 0.00042,
+          "mode": 0.0014,
+          "max": 0.0035
         },
         "p_locl": {
-          "min": 0.0001,
-          "mode": 0.003,
-          "max": 0.02
+          "min": 3.6e-06,
+          "mode": 1.2e-05,
+          "max": 3.6e-05
         }
       },
       "risk_factor_multipliers": {},
       "required_resources": {
         "analgesic-mild": 7,
-        "splint": 1
+        "orthopedic-splint": 1
       }
     },
     "shoulder-sprain-strain": {
@@ -6439,14 +6449,14 @@
           "max": 0.01
         },
         "p_evac": {
-          "min": 0.0005,
-          "mode": 0.003,
-          "max": 0.02
+          "min": 2.5e-06,
+          "mode": 2.5e-05,
+          "max": 0.000125
         },
         "p_locl": {
           "min": 0.0,
-          "mode": 5e-05,
-          "max": 0.0005
+          "mode": 5e-06,
+          "max": 2.5e-05
         }
       },
       "untreated": {
@@ -6476,20 +6486,20 @@
           "max": 0.1
         },
         "p_evac": {
-          "min": 0.01,
-          "mode": 0.1,
-          "max": 0.3
+          "min": 0.00042,
+          "mode": 0.0014,
+          "max": 0.0035
         },
         "p_locl": {
-          "min": 0.0001,
-          "mode": 0.003,
-          "max": 0.02
+          "min": 3.6e-06,
+          "mode": 1.2e-05,
+          "max": 3.6e-05
         }
       },
       "risk_factor_multipliers": {},
       "required_resources": {
         "analgesic-mild": 7,
-        "splint": 1
+        "orthopedic-splint": 1
       }
     },
     "hip-sprain-strain": {
@@ -6533,14 +6543,14 @@
           "max": 0.01
         },
         "p_evac": {
-          "min": 0.0005,
-          "mode": 0.003,
-          "max": 0.02
+          "min": 2.5e-06,
+          "mode": 2.5e-05,
+          "max": 0.000125
         },
         "p_locl": {
           "min": 0.0,
-          "mode": 5e-05,
-          "max": 0.0005
+          "mode": 5e-06,
+          "max": 2.5e-05
         }
       },
       "untreated": {
@@ -6570,14 +6580,14 @@
           "max": 0.1
         },
         "p_evac": {
-          "min": 0.01,
-          "mode": 0.1,
-          "max": 0.3
+          "min": 0.00042,
+          "mode": 0.0014,
+          "max": 0.0035
         },
         "p_locl": {
-          "min": 0.0001,
-          "mode": 0.003,
-          "max": 0.02
+          "min": 3.6e-06,
+          "mode": 1.2e-05,
+          "max": 3.6e-05
         }
       },
       "risk_factor_multipliers": {},
@@ -6626,14 +6636,14 @@
           "max": 0.01
         },
         "p_evac": {
-          "min": 0.0005,
-          "mode": 0.003,
-          "max": 0.02
+          "min": 2.5e-06,
+          "mode": 2.5e-05,
+          "max": 0.000125
         },
         "p_locl": {
           "min": 0.0,
-          "mode": 5e-05,
-          "max": 0.0005
+          "mode": 5e-06,
+          "max": 2.5e-05
         }
       },
       "untreated": {
@@ -6663,14 +6673,14 @@
           "max": 0.1
         },
         "p_evac": {
-          "min": 0.01,
-          "mode": 0.1,
-          "max": 0.3
+          "min": 0.00042,
+          "mode": 0.0014,
+          "max": 0.0035
         },
         "p_locl": {
-          "min": 0.0001,
-          "mode": 0.003,
-          "max": 0.02
+          "min": 3.6e-06,
+          "mode": 1.2e-05,
+          "max": 3.6e-05
         }
       },
       "risk_factor_multipliers": {},
@@ -6719,14 +6729,14 @@
           "max": 0.01
         },
         "p_evac": {
-          "min": 0.0005,
-          "mode": 0.003,
-          "max": 0.02
+          "min": 2.5e-06,
+          "mode": 2.5e-05,
+          "max": 0.000125
         },
         "p_locl": {
           "min": 0.0,
-          "mode": 5e-05,
-          "max": 0.0005
+          "mode": 5e-06,
+          "max": 2.5e-05
         }
       },
       "untreated": {
@@ -6756,14 +6766,14 @@
           "max": 0.1
         },
         "p_evac": {
-          "min": 0.01,
-          "mode": 0.1,
-          "max": 0.3
+          "min": 0.00042,
+          "mode": 0.0014,
+          "max": 0.0035
         },
         "p_locl": {
-          "min": 0.0001,
-          "mode": 0.003,
-          "max": 0.02
+          "min": 3.6e-06,
+          "mode": 1.2e-05,
+          "max": 3.6e-05
         }
       },
       "risk_factor_multipliers": {},
@@ -6812,14 +6822,14 @@
           "max": 0.0
         },
         "p_evac": {
-          "min": 0.0,
-          "mode": 0.0001,
-          "max": 0.001
+          "min": 2.5e-08,
+          "mode": 2.5e-07,
+          "max": 1.25e-06
         },
         "p_locl": {
           "min": 0.0,
           "mode": 0.0,
-          "max": 1e-05
+          "max": 1e-07
         }
       },
       "untreated": {
@@ -6849,14 +6859,14 @@
           "max": 0.02
         },
         "p_evac": {
-          "min": 0.001,
-          "mode": 0.01,
-          "max": 0.05
+          "min": 6e-05,
+          "mode": 0.0002,
+          "max": 0.0005
         },
         "p_locl": {
           "min": 0.0,
-          "mode": 1e-05,
-          "max": 0.0001
+          "mode": 0.0,
+          "max": 1e-07
         }
       },
       "risk_factor_multipliers": {},
@@ -6906,14 +6916,14 @@
           "max": 0.01
         },
         "p_evac": {
-          "min": 0.0005,
-          "mode": 0.003,
-          "max": 0.02
+          "min": 2.5e-06,
+          "mode": 2.5e-05,
+          "max": 0.000125
         },
         "p_locl": {
           "min": 0.0,
-          "mode": 5e-05,
-          "max": 0.0005
+          "mode": 5e-06,
+          "max": 2.5e-05
         }
       },
       "untreated": {
@@ -6943,20 +6953,20 @@
           "max": 0.1
         },
         "p_evac": {
-          "min": 0.01,
-          "mode": 0.1,
-          "max": 0.3
+          "min": 0.00042,
+          "mode": 0.0014,
+          "max": 0.0035
         },
         "p_locl": {
-          "min": 0.0001,
-          "mode": 0.003,
-          "max": 0.02
+          "min": 3.6e-06,
+          "mode": 1.2e-05,
+          "max": 3.6e-05
         }
       },
       "risk_factor_multipliers": {},
       "required_resources": {
         "dental-filling-material": 2,
-        "opioid": 5,
+        "analgesic-opioid": 5,
         "analgesic-mild": 7
       }
     },
@@ -7001,14 +7011,14 @@
           "max": 0.01
         },
         "p_evac": {
-          "min": 0.0005,
-          "mode": 0.003,
-          "max": 0.02
+          "min": 2.5e-06,
+          "mode": 2.5e-05,
+          "max": 0.000125
         },
         "p_locl": {
           "min": 0.0,
-          "mode": 5e-05,
-          "max": 0.0005
+          "mode": 5e-06,
+          "max": 2.5e-05
         }
       },
       "untreated": {
@@ -7038,14 +7048,14 @@
           "max": 0.1
         },
         "p_evac": {
-          "min": 0.01,
-          "mode": 0.1,
-          "max": 0.3
+          "min": 0.00042,
+          "mode": 0.0014,
+          "max": 0.0035
         },
         "p_locl": {
-          "min": 0.0001,
-          "mode": 0.003,
-          "max": 0.02
+          "min": 3.6e-06,
+          "mode": 1.2e-05,
+          "max": 3.6e-05
         }
       },
       "risk_factor_multipliers": {},
@@ -7095,14 +7105,14 @@
           "max": 0.0
         },
         "p_evac": {
-          "min": 0.0,
-          "mode": 0.0001,
-          "max": 0.001
+          "min": 2.5e-08,
+          "mode": 2.5e-07,
+          "max": 1.25e-06
         },
         "p_locl": {
           "min": 0.0,
           "mode": 0.0,
-          "max": 1e-05
+          "max": 1e-07
         }
       },
       "untreated": {
@@ -7132,14 +7142,14 @@
           "max": 0.02
         },
         "p_evac": {
-          "min": 0.001,
-          "mode": 0.01,
-          "max": 0.05
+          "min": 6e-05,
+          "mode": 0.0002,
+          "max": 0.0005
         },
         "p_locl": {
           "min": 0.0,
-          "mode": 1e-05,
-          "max": 0.0001
+          "mode": 0.0,
+          "max": 1e-07
         }
       },
       "risk_factor_multipliers": {
@@ -7191,14 +7201,14 @@
           "max": 0.0
         },
         "p_evac": {
-          "min": 0.0,
-          "mode": 0.0001,
-          "max": 0.001
+          "min": 2.5e-08,
+          "mode": 2.5e-07,
+          "max": 1.25e-06
         },
         "p_locl": {
           "min": 0.0,
           "mode": 0.0,
-          "max": 1e-05
+          "max": 1e-07
         }
       },
       "untreated": {
@@ -7228,14 +7238,14 @@
           "max": 0.02
         },
         "p_evac": {
-          "min": 0.001,
-          "mode": 0.01,
-          "max": 0.05
+          "min": 6e-05,
+          "mode": 0.0002,
+          "max": 0.0005
         },
         "p_locl": {
           "min": 0.0,
-          "mode": 1e-05,
-          "max": 0.0001
+          "mode": 0.0,
+          "max": 1e-07
         }
       },
       "risk_factor_multipliers": {},
@@ -7284,14 +7294,14 @@
           "max": 0.01
         },
         "p_evac": {
-          "min": 0.0005,
-          "mode": 0.003,
-          "max": 0.02
+          "min": 2.5e-06,
+          "mode": 2.5e-05,
+          "max": 0.000125
         },
         "p_locl": {
           "min": 0.0,
-          "mode": 5e-05,
-          "max": 0.0005
+          "mode": 5e-06,
+          "max": 2.5e-05
         }
       },
       "untreated": {
@@ -7321,14 +7331,14 @@
           "max": 0.1
         },
         "p_evac": {
-          "min": 0.01,
-          "mode": 0.1,
-          "max": 0.3
+          "min": 0.00042,
+          "mode": 0.0014,
+          "max": 0.0035
         },
         "p_locl": {
-          "min": 0.0001,
-          "mode": 0.003,
-          "max": 0.02
+          "min": 3.6e-06,
+          "mode": 1.2e-05,
+          "max": 3.6e-05
         }
       },
       "risk_factor_multipliers": {
@@ -7381,14 +7391,14 @@
           "max": 0.01
         },
         "p_evac": {
-          "min": 0.0005,
-          "mode": 0.003,
-          "max": 0.02
+          "min": 2.5e-06,
+          "mode": 2.5e-05,
+          "max": 0.000125
         },
         "p_locl": {
           "min": 0.0,
-          "mode": 5e-05,
-          "max": 0.0005
+          "mode": 5e-06,
+          "max": 2.5e-05
         }
       },
       "untreated": {
@@ -7418,21 +7428,21 @@
           "max": 0.1
         },
         "p_evac": {
-          "min": 0.01,
-          "mode": 0.1,
-          "max": 0.3
+          "min": 0.00042,
+          "mode": 0.0014,
+          "max": 0.0035
         },
         "p_locl": {
-          "min": 0.0001,
-          "mode": 0.003,
-          "max": 0.02
+          "min": 3.6e-06,
+          "mode": 1.2e-05,
+          "max": 3.6e-05
         }
       },
       "risk_factor_multipliers": {
         "contacts": 3.0
       },
       "required_resources": {
-        "antibiotic-eye": 14,
+        "ophthalmic-antibiotic": 14,
         "ophthalmic-exam": 2
       }
     },
@@ -7477,14 +7487,14 @@
           "max": 0.05
         },
         "p_evac": {
-          "min": 0.005,
-          "mode": 0.02,
-          "max": 0.1
+          "min": 5e-05,
+          "mode": 0.0005,
+          "max": 0.0025
         },
         "p_locl": {
           "min": 0.0,
-          "mode": 0.0005,
-          "max": 0.003
+          "mode": 0.0001,
+          "max": 0.0005
         }
       },
       "untreated": {
@@ -7514,14 +7524,14 @@
           "max": 0.3
         },
         "p_evac": {
-          "min": 0.1,
-          "mode": 0.4,
-          "max": 0.8
+          "min": 0.009,
+          "mode": 0.03,
+          "max": 0.075
         },
         "p_locl": {
-          "min": 0.005,
-          "mode": 0.03,
-          "max": 0.15
+          "min": 0.00012,
+          "mode": 0.0004,
+          "max": 0.0012
         }
       },
       "risk_factor_multipliers": {
@@ -7529,8 +7539,8 @@
       },
       "required_resources": {
         "ophthalmic-exam": 2,
-        "antibiotic-eye": 7,
-        "eye-irrigation-kit": 2
+        "ophthalmic-antibiotic": 7,
+        "ophthalmic-irrigation": 2
       }
     },
     "retinal-detachment": {
@@ -7574,14 +7584,14 @@
           "max": 0.05
         },
         "p_evac": {
-          "min": 0.005,
-          "mode": 0.02,
-          "max": 0.1
+          "min": 5e-05,
+          "mode": 0.0005,
+          "max": 0.0025
         },
         "p_locl": {
           "min": 0.0,
-          "mode": 0.0005,
-          "max": 0.003
+          "mode": 0.0001,
+          "max": 0.0005
         }
       },
       "untreated": {
@@ -7611,14 +7621,14 @@
           "max": 0.3
         },
         "p_evac": {
-          "min": 0.1,
-          "mode": 0.4,
-          "max": 0.8
+          "min": 0.009,
+          "mode": 0.03,
+          "max": 0.075
         },
         "p_locl": {
-          "min": 0.005,
-          "mode": 0.03,
-          "max": 0.15
+          "min": 0.00012,
+          "mode": 0.0004,
+          "max": 0.0012
         }
       },
       "risk_factor_multipliers": {
@@ -7669,14 +7679,14 @@
           "max": 0.05
         },
         "p_evac": {
-          "min": 0.005,
-          "mode": 0.02,
-          "max": 0.1
+          "min": 5e-05,
+          "mode": 0.0005,
+          "max": 0.0025
         },
         "p_locl": {
           "min": 0.0,
-          "mode": 0.0005,
-          "max": 0.003
+          "mode": 0.0001,
+          "max": 0.0005
         }
       },
       "untreated": {
@@ -7706,14 +7716,14 @@
           "max": 0.3
         },
         "p_evac": {
-          "min": 0.1,
-          "mode": 0.4,
-          "max": 0.8
+          "min": 0.009,
+          "mode": 0.03,
+          "max": 0.075
         },
         "p_locl": {
-          "min": 0.005,
-          "mode": 0.03,
-          "max": 0.15
+          "min": 0.00012,
+          "mode": 0.0004,
+          "max": 0.0012
         }
       },
       "risk_factor_multipliers": {
@@ -7766,14 +7776,14 @@
           "max": 0.05
         },
         "p_evac": {
-          "min": 0.005,
-          "mode": 0.02,
-          "max": 0.1
+          "min": 5e-05,
+          "mode": 0.0005,
+          "max": 0.0025
         },
         "p_locl": {
           "min": 0.0,
-          "mode": 0.0005,
-          "max": 0.003
+          "mode": 0.0001,
+          "max": 0.0005
         }
       },
       "untreated": {
@@ -7803,14 +7813,14 @@
           "max": 0.3
         },
         "p_evac": {
-          "min": 0.1,
-          "mode": 0.4,
-          "max": 0.8
+          "min": 0.009,
+          "mode": 0.03,
+          "max": 0.075
         },
         "p_locl": {
-          "min": 0.005,
-          "mode": 0.03,
-          "max": 0.15
+          "min": 0.00012,
+          "mode": 0.0004,
+          "max": 0.0012
         }
       },
       "risk_factor_multipliers": {},
@@ -7857,14 +7867,14 @@
           "max": 0.01
         },
         "p_evac": {
-          "min": 0.0005,
-          "mode": 0.003,
-          "max": 0.02
+          "min": 2.5e-06,
+          "mode": 2.5e-05,
+          "max": 0.000125
         },
         "p_locl": {
           "min": 0.0,
-          "mode": 5e-05,
-          "max": 0.0005
+          "mode": 5e-06,
+          "max": 2.5e-05
         }
       },
       "untreated": {
@@ -7894,14 +7904,14 @@
           "max": 0.1
         },
         "p_evac": {
-          "min": 0.01,
-          "mode": 0.1,
-          "max": 0.3
+          "min": 0.00042,
+          "mode": 0.0014,
+          "max": 0.0035
         },
         "p_locl": {
-          "min": 0.0001,
-          "mode": 0.003,
-          "max": 0.02
+          "min": 3.6e-06,
+          "mode": 1.2e-05,
+          "max": 3.6e-05
         }
       },
       "risk_factor_multipliers": {},
@@ -7948,14 +7958,14 @@
           "max": 0.01
         },
         "p_evac": {
-          "min": 0.0005,
-          "mode": 0.003,
-          "max": 0.02
+          "min": 2.5e-06,
+          "mode": 2.5e-05,
+          "max": 0.000125
         },
         "p_locl": {
           "min": 0.0,
-          "mode": 5e-05,
-          "max": 0.0005
+          "mode": 5e-06,
+          "max": 2.5e-05
         }
       },
       "untreated": {
@@ -7985,14 +7995,14 @@
           "max": 0.1
         },
         "p_evac": {
-          "min": 0.01,
-          "mode": 0.1,
-          "max": 0.3
+          "min": 0.00042,
+          "mode": 0.0014,
+          "max": 0.0035
         },
         "p_locl": {
-          "min": 0.0001,
-          "mode": 0.003,
-          "max": 0.02
+          "min": 3.6e-06,
+          "mode": 1.2e-05,
+          "max": 3.6e-05
         }
       },
       "risk_factor_multipliers": {},
@@ -8039,14 +8049,14 @@
           "max": 0.05
         },
         "p_evac": {
-          "min": 0.005,
-          "mode": 0.02,
-          "max": 0.1
+          "min": 5e-05,
+          "mode": 0.0005,
+          "max": 0.0025
         },
         "p_locl": {
           "min": 0.0,
-          "mode": 0.0005,
-          "max": 0.003
+          "mode": 0.0001,
+          "max": 0.0005
         }
       },
       "untreated": {
@@ -8076,14 +8086,14 @@
           "max": 0.3
         },
         "p_evac": {
-          "min": 0.1,
-          "mode": 0.4,
-          "max": 0.8
+          "min": 0.009,
+          "mode": 0.03,
+          "max": 0.075
         },
         "p_locl": {
-          "min": 0.005,
-          "mode": 0.03,
-          "max": 0.15
+          "min": 0.00012,
+          "mode": 0.0004,
+          "max": 0.0012
         }
       },
       "risk_factor_multipliers": {},
@@ -8130,14 +8140,14 @@
           "max": 0.05
         },
         "p_evac": {
-          "min": 0.005,
-          "mode": 0.02,
-          "max": 0.1
+          "min": 5e-05,
+          "mode": 0.0005,
+          "max": 0.0025
         },
         "p_locl": {
           "min": 0.0,
-          "mode": 0.0005,
-          "max": 0.003
+          "mode": 0.0001,
+          "max": 0.0005
         }
       },
       "untreated": {
@@ -8167,14 +8177,14 @@
           "max": 0.3
         },
         "p_evac": {
-          "min": 0.1,
-          "mode": 0.4,
-          "max": 0.8
+          "min": 0.009,
+          "mode": 0.03,
+          "max": 0.075
         },
         "p_locl": {
-          "min": 0.005,
-          "mode": 0.03,
-          "max": 0.15
+          "min": 0.00012,
+          "mode": 0.0004,
+          "max": 0.0012
         }
       },
       "risk_factor_multipliers": {},
@@ -8221,14 +8231,14 @@
           "max": 0.01
         },
         "p_evac": {
-          "min": 0.0005,
-          "mode": 0.003,
-          "max": 0.02
+          "min": 2.5e-06,
+          "mode": 2.5e-05,
+          "max": 0.000125
         },
         "p_locl": {
           "min": 0.0,
-          "mode": 5e-05,
-          "max": 0.0005
+          "mode": 5e-06,
+          "max": 2.5e-05
         }
       },
       "untreated": {
@@ -8258,14 +8268,14 @@
           "max": 0.1
         },
         "p_evac": {
-          "min": 0.01,
-          "mode": 0.1,
-          "max": 0.3
+          "min": 0.00042,
+          "mode": 0.0014,
+          "max": 0.0035
         },
         "p_locl": {
-          "min": 0.0001,
-          "mode": 0.003,
-          "max": 0.02
+          "min": 3.6e-06,
+          "mode": 1.2e-05,
+          "max": 3.6e-05
         }
       },
       "risk_factor_multipliers": {},
@@ -8312,14 +8322,14 @@
           "max": 0.1
         },
         "p_evac": {
-          "min": 0.01,
+          "min": 0.005,
           "mode": 0.05,
-          "max": 0.2
+          "max": 0.25
         },
         "p_locl": {
           "min": 0.0,
-          "mode": 0.002,
-          "max": 0.01
+          "mode": 0.004,
+          "max": 0.02
         }
       },
       "untreated": {
@@ -8349,14 +8359,14 @@
           "max": 0.8
         },
         "p_evac": {
-          "min": 0.2,
+          "min": 0.18,
           "mode": 0.6,
-          "max": 0.95
+          "max": 0.99
         },
         "p_locl": {
-          "min": 0.05,
-          "mode": 0.2,
-          "max": 0.7
+          "min": 0.012,
+          "mode": 0.04,
+          "max": 0.12
         }
       },
       "risk_factor_multipliers": {},
@@ -8403,14 +8413,14 @@
           "max": 0.01
         },
         "p_evac": {
-          "min": 0.0005,
-          "mode": 0.003,
-          "max": 0.02
+          "min": 2.5e-06,
+          "mode": 2.5e-05,
+          "max": 0.000125
         },
         "p_locl": {
           "min": 0.0,
-          "mode": 5e-05,
-          "max": 0.0005
+          "mode": 5e-06,
+          "max": 2.5e-05
         }
       },
       "untreated": {
@@ -8440,14 +8450,14 @@
           "max": 0.1
         },
         "p_evac": {
-          "min": 0.01,
-          "mode": 0.1,
-          "max": 0.3
+          "min": 0.00042,
+          "mode": 0.0014,
+          "max": 0.0035
         },
         "p_locl": {
-          "min": 0.0001,
-          "mode": 0.003,
-          "max": 0.02
+          "min": 3.6e-06,
+          "mode": 1.2e-05,
+          "max": 3.6e-05
         }
       },
       "risk_factor_multipliers": {},
@@ -8494,14 +8504,14 @@
           "max": 0.1
         },
         "p_evac": {
-          "min": 0.01,
+          "min": 0.005,
           "mode": 0.05,
-          "max": 0.2
+          "max": 0.25
         },
         "p_locl": {
           "min": 0.0,
-          "mode": 0.002,
-          "max": 0.01
+          "mode": 0.004,
+          "max": 0.02
         }
       },
       "untreated": {
@@ -8531,14 +8541,14 @@
           "max": 0.8
         },
         "p_evac": {
-          "min": 0.2,
+          "min": 0.18,
           "mode": 0.6,
-          "max": 0.95
+          "max": 0.99
         },
         "p_locl": {
-          "min": 0.05,
-          "mode": 0.2,
-          "max": 0.7
+          "min": 0.012,
+          "mode": 0.04,
+          "max": 0.12
         }
       },
       "risk_factor_multipliers": {},
@@ -8585,14 +8595,14 @@
           "max": 0.1
         },
         "p_evac": {
-          "min": 0.01,
+          "min": 0.005,
           "mode": 0.05,
-          "max": 0.2
+          "max": 0.25
         },
         "p_locl": {
           "min": 0.0,
-          "mode": 0.002,
-          "max": 0.01
+          "mode": 0.004,
+          "max": 0.02
         }
       },
       "untreated": {
@@ -8622,14 +8632,14 @@
           "max": 0.8
         },
         "p_evac": {
-          "min": 0.2,
+          "min": 0.18,
           "mode": 0.6,
-          "max": 0.95
+          "max": 0.99
         },
         "p_locl": {
-          "min": 0.05,
-          "mode": 0.2,
-          "max": 0.7
+          "min": 0.012,
+          "mode": 0.04,
+          "max": 0.12
         }
       },
       "risk_factor_multipliers": {},
@@ -8676,14 +8686,14 @@
           "max": 0.05
         },
         "p_evac": {
-          "min": 0.005,
-          "mode": 0.02,
-          "max": 0.1
+          "min": 5e-05,
+          "mode": 0.0005,
+          "max": 0.0025
         },
         "p_locl": {
           "min": 0.0,
-          "mode": 0.0005,
-          "max": 0.003
+          "mode": 0.0001,
+          "max": 0.0005
         }
       },
       "untreated": {
@@ -8713,14 +8723,14 @@
           "max": 0.3
         },
         "p_evac": {
-          "min": 0.1,
-          "mode": 0.4,
-          "max": 0.8
+          "min": 0.009,
+          "mode": 0.03,
+          "max": 0.075
         },
         "p_locl": {
-          "min": 0.005,
-          "mode": 0.03,
-          "max": 0.15
+          "min": 0.00012,
+          "mode": 0.0004,
+          "max": 0.0012
         }
       },
       "risk_factor_multipliers": {},
@@ -8767,14 +8777,14 @@
           "max": 0.01
         },
         "p_evac": {
-          "min": 0.0005,
-          "mode": 0.003,
-          "max": 0.02
+          "min": 2.5e-06,
+          "mode": 2.5e-05,
+          "max": 0.000125
         },
         "p_locl": {
           "min": 0.0,
-          "mode": 5e-05,
-          "max": 0.0005
+          "mode": 5e-06,
+          "max": 2.5e-05
         }
       },
       "untreated": {
@@ -8804,14 +8814,14 @@
           "max": 0.1
         },
         "p_evac": {
-          "min": 0.01,
-          "mode": 0.1,
-          "max": 0.3
+          "min": 0.00042,
+          "mode": 0.0014,
+          "max": 0.0035
         },
         "p_locl": {
-          "min": 0.0001,
-          "mode": 0.003,
-          "max": 0.02
+          "min": 3.6e-06,
+          "mode": 1.2e-05,
+          "max": 3.6e-05
         }
       },
       "risk_factor_multipliers": {},
@@ -8858,14 +8868,14 @@
           "max": 0.05
         },
         "p_evac": {
-          "min": 0.005,
-          "mode": 0.02,
-          "max": 0.1
+          "min": 5e-05,
+          "mode": 0.0005,
+          "max": 0.0025
         },
         "p_locl": {
           "min": 0.0,
-          "mode": 0.0005,
-          "max": 0.003
+          "mode": 0.0001,
+          "max": 0.0005
         }
       },
       "untreated": {
@@ -8895,14 +8905,14 @@
           "max": 0.3
         },
         "p_evac": {
-          "min": 0.1,
-          "mode": 0.4,
-          "max": 0.8
+          "min": 0.009,
+          "mode": 0.03,
+          "max": 0.075
         },
         "p_locl": {
-          "min": 0.005,
-          "mode": 0.03,
-          "max": 0.15
+          "min": 0.00012,
+          "mode": 0.0004,
+          "max": 0.0012
         }
       },
       "risk_factor_multipliers": {},
@@ -8949,14 +8959,14 @@
           "max": 0.01
         },
         "p_evac": {
-          "min": 0.0005,
-          "mode": 0.003,
-          "max": 0.02
+          "min": 2.5e-06,
+          "mode": 2.5e-05,
+          "max": 0.000125
         },
         "p_locl": {
           "min": 0.0,
-          "mode": 5e-05,
-          "max": 0.0005
+          "mode": 5e-06,
+          "max": 2.5e-05
         }
       },
       "untreated": {
@@ -8986,14 +8996,14 @@
           "max": 0.1
         },
         "p_evac": {
-          "min": 0.01,
-          "mode": 0.1,
-          "max": 0.3
+          "min": 0.00042,
+          "mode": 0.0014,
+          "max": 0.0035
         },
         "p_locl": {
-          "min": 0.0001,
-          "mode": 0.003,
-          "max": 0.02
+          "min": 3.6e-06,
+          "mode": 1.2e-05,
+          "max": 3.6e-05
         }
       },
       "risk_factor_multipliers": {},
@@ -9040,14 +9050,14 @@
           "max": 0.05
         },
         "p_evac": {
-          "min": 0.005,
-          "mode": 0.02,
-          "max": 0.1
+          "min": 5e-05,
+          "mode": 0.0005,
+          "max": 0.0025
         },
         "p_locl": {
           "min": 0.0,
-          "mode": 0.0005,
-          "max": 0.003
+          "mode": 0.0001,
+          "max": 0.0005
         }
       },
       "untreated": {
@@ -9077,14 +9087,14 @@
           "max": 0.3
         },
         "p_evac": {
-          "min": 0.1,
-          "mode": 0.4,
-          "max": 0.8
+          "min": 0.009,
+          "mode": 0.03,
+          "max": 0.075
         },
         "p_locl": {
-          "min": 0.005,
-          "mode": 0.03,
-          "max": 0.15
+          "min": 0.00012,
+          "mode": 0.0004,
+          "max": 0.0012
         }
       },
       "risk_factor_multipliers": {},
@@ -9131,14 +9141,14 @@
           "max": 0.1
         },
         "p_evac": {
-          "min": 0.01,
+          "min": 0.005,
           "mode": 0.05,
-          "max": 0.2
+          "max": 0.25
         },
         "p_locl": {
           "min": 0.0,
-          "mode": 0.002,
-          "max": 0.01
+          "mode": 0.004,
+          "max": 0.02
         }
       },
       "untreated": {
@@ -9168,14 +9178,14 @@
           "max": 0.8
         },
         "p_evac": {
-          "min": 0.2,
+          "min": 0.18,
           "mode": 0.6,
-          "max": 0.95
+          "max": 0.99
         },
         "p_locl": {
-          "min": 0.05,
-          "mode": 0.2,
-          "max": 0.7
+          "min": 0.012,
+          "mode": 0.04,
+          "max": 0.12
         }
       },
       "risk_factor_multipliers": {},
@@ -9222,14 +9232,14 @@
           "max": 0.05
         },
         "p_evac": {
-          "min": 0.005,
-          "mode": 0.02,
-          "max": 0.1
+          "min": 5e-05,
+          "mode": 0.0005,
+          "max": 0.0025
         },
         "p_locl": {
           "min": 0.0,
-          "mode": 0.0005,
-          "max": 0.003
+          "mode": 0.0001,
+          "max": 0.0005
         }
       },
       "untreated": {
@@ -9259,14 +9269,14 @@
           "max": 0.3
         },
         "p_evac": {
-          "min": 0.1,
-          "mode": 0.4,
-          "max": 0.8
+          "min": 0.009,
+          "mode": 0.03,
+          "max": 0.075
         },
         "p_locl": {
-          "min": 0.005,
-          "mode": 0.03,
-          "max": 0.15
+          "min": 0.00012,
+          "mode": 0.0004,
+          "max": 0.0012
         }
       },
       "risk_factor_multipliers": {},
@@ -9313,14 +9323,14 @@
           "max": 0.1
         },
         "p_evac": {
-          "min": 0.01,
+          "min": 0.005,
           "mode": 0.05,
-          "max": 0.2
+          "max": 0.25
         },
         "p_locl": {
           "min": 0.0,
-          "mode": 0.002,
-          "max": 0.01
+          "mode": 0.004,
+          "max": 0.02
         }
       },
       "untreated": {
@@ -9350,14 +9360,14 @@
           "max": 0.8
         },
         "p_evac": {
-          "min": 0.2,
+          "min": 0.18,
           "mode": 0.6,
-          "max": 0.95
+          "max": 0.99
         },
         "p_locl": {
-          "min": 0.05,
-          "mode": 0.2,
-          "max": 0.7
+          "min": 0.012,
+          "mode": 0.04,
+          "max": 0.12
         }
       },
       "risk_factor_multipliers": {},
