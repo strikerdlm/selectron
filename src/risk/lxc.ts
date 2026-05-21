@@ -11,6 +11,7 @@
 //   Color = JSC-66705 §3.2.4 rule (red ≥ 20, yellow 11–19, green ≤ 10).
 
 import type { RiskPosterior } from "@/types/risk";
+import type { GateResult } from "@/types";
 import {
   CONSEQUENCE_BANDS_MISSION_OBJ,
   LIKELIHOOD_BANDS_IN_MISSION,
@@ -33,6 +34,10 @@ export type LxCAssessment = {
   // Inputs that drove the assessment — surfaced for the UI explanation.
   pEarlyTermination: number; // P(χ < χ*) used as likelihood
   fractionLost: number;      // 1 − χ_mean used as consequence
+  /** Set to true when the candidate was disqualified by a binary gate. */
+  disqualified?: boolean;
+  /** Human-readable reason string when disqualified is true. */
+  reason?: string;
 };
 
 // IEEE-754 tolerance — `1 - 0.70 = 0.30000000000000004` would otherwise push a
@@ -60,7 +65,28 @@ function bucketConsequence(fractionLost: number): ConsequenceLevel {
   return 5;
 }
 
-export function assessLxC(posterior: RiskPosterior): LxCAssessment {
+export function assessLxC(posterior: RiskPosterior, gate?: GateResult): LxCAssessment {
+  // If the candidate failed a binary clearance gate, return the maximum risk
+  // verdict (L5×C5=25, RED) immediately — Stage B Monte Carlo result is irrelevant.
+  if (gate?.verdict === "disqualified") {
+    const Lband = LIKELIHOOD_BANDS_IN_MISSION[4]; // L5
+    const Cband = CONSEQUENCE_BANDS_MISSION_OBJ[4]; // C5
+    return {
+      likelihood: 5,
+      likelihoodLabel: Lband.label,
+      likelihoodDefinition: Lband.definition,
+      consequence: 5,
+      consequenceLabel: Cband.label,
+      consequenceDefinition: Cband.definition,
+      score: 25,
+      color: "red",
+      pEarlyTermination: 1.0,
+      fractionLost: 1.0,
+      disqualified: true,
+      reason: `disqualified: ${gate.failedGates.join(", ")}`,
+    };
+  }
+
   const pET = posterior.pEarlyTermination.mean;
   const fractionLost = Math.max(0, 1 - posterior.chi.mean);
 
