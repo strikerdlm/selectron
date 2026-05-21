@@ -1,6 +1,6 @@
 # Selectron — STATUS
 
-**Last updated:** 2026-05-21 ~ 18:30 UTC (CC-4 DONE: Web Worker simulation wiring + IMMOutcome results panel in CompositeCrewPanel)
+**Last updated:** 2026-05-21 ~ 18:55 UTC (CC-5 DONE: ARIA polish + landmarks + Playwright crew smoke tests; all 5 CC commits DONE)
 **Current branch:** `iter1-phase0`
 **Active plan (Iter 1):** [`docs/superpowers/plans/2026-05-18-selectron-iter1-phase0.md`](docs/superpowers/plans/2026-05-18-selectron-iter1-phase0.md)
 **Active plan (Iter 3):** [`docs/superpowers/plans/2026-05-18-selectron-iter3-risk.md`](docs/superpowers/plans/2026-05-18-selectron-iter3-risk.md)
@@ -28,9 +28,7 @@ Update rules:
 
 ## Current state
 
-**Next action:** **CC-1 DONE** (pending commit). CrewComposition skeleton view built: `src/ui/views/CrewComposition.tsx` (3-zone layout, 6 archetypal crew members with safe default scores, live composite + gate aggregation), `src/ui/components/CrewMemberCard.tsx` (collapsible card, collapsed status badge + composite score), `src/ui/components/CompositeCrewPanel.tsx` (aggregator dropdown, composite score bar, DQ member list). App.tsx extended with `{kind: "crew-composition"}` View union member + "Crew" nav button. Pre-existing TS6133 in TestFigureHost.tsx fixed (stale ConditionContribution import). typecheck exit 0; build green (1047 kB); composite.test.ts 6/6 + crew-gates.test.ts 4/4 pass.
-
-**Next CC tasks:** CC-2 (per-criterion sliders + CitationChip), CC-3 (ECharts mini-figures), CC-4 (Web Worker simulation), CC-5 (polish + ARIA).
+**Next action:** **All 5 CC commits DONE** (CC-1 `aecb80e` through CC-5 pending commit). CrewComposition UI complete: 3-zone layout, 6 archetypal crew members, live composite+gate via useMemo, per-criterion sliders with CitationChip (DOI/scite/quote), ECharts bell-curve mini-figures (lazy, 80px tall, gate threshold + score marker), IMM Monte Carlo via Web Worker, IMMOutcome results panel (MSP/CHI/pEvac/pLocl/TME + CI₉₅ + convergence σ). ARIA landmarks + polite live region. 20 RTL tests pass; typecheck exit 0; build green. Playwright e2e smoke tests added (3 crew-specific tests in phase3f.smoke.spec.ts).
 
 **Previously: ICN-2 DONE (`faa7553`).** citations.ts 30-entry citation database. **Previously: G8 DONE.** Gate-then-modulate validation complete; DISQ candidate shows red on all 5 missions. **Previously: G7 DONE.** DISQUALIFIED banner + LxC RED wired in Mission risk view. **Previously: Task 94 DONE.** WizardContext.accessTier + ScenarioSelector + EvidenceForm tier instruments. 135/135 vitest; typecheck exit 0. **Previously: Phase 3F.7 COMPLETE. T87 DONE (`61557c2`).** Playwright smoke + 5 figure visual diffs. All 7 pass. **T88 (Diego manual sign-off / Phase 3F acceptance) remains — AWAITING-DIEGO.** Task 58 (Diego manual UI sanity of Mission-risk tab) AWAITING-DIEGO. **Iter-1/2 backlog:** Diego ratifies `research/02_criterion_taxonomy.md` → `docs/criteria.md` (Iter-2 start); Diego signs off Task 17 manual UI sanity (Iter-1 release).
 
@@ -135,8 +133,8 @@ Update rules:
 | CC-1 | CrewComposition skeleton view + App.tsx nav + CrewMemberCard + CompositeCrewPanel | **DONE** | `aecb80e` | 3-zone layout; 6 archetypal crew members with safe defaults (mmpi2rf_eid=35, nasa_cognition≥-1.5); live composite+gate aggregation; "Crew" nav tab in header; pre-existing TS6133 TestFigureHost fix bundled. typecheck exit 0; build green. |
 | CC-2 | Per-criterion sliders + CitationChip | **DONE** | `62873c7` | PerScoreCard.tsx (slider + citation chip with DOI/scite verified badge/relevance quote). CitationChip.tsx. CrewMemberCard updated to render PerScoreCards in expanded body. RTL tests: 10/10 pass (engine unit + gate + PerScoreCard smoke). typecheck exit 0. |
 | CC-3 | ECharts bell-curve mini-figures in PerScoreCard | **DONE** | `029ca62` | CriterionMiniFigure.tsx: 80px-tall ECharts line+area chart (Gaussian PDF over criterion scale). Amber markLine at rawScore; dashed red markLine at gateThreshold.value. useMemo keyed on (criterionId, min, max, gateValue, clampedScore). Lazy: figures map only built when member card is expanded. typecheck exit 0. |
-| CC-4 | Web Worker simulation + IMMOutcome results panel | **IN_PROGRESS** | — | Web Worker via new Worker(new URL(...imm-simulate.worker.ts...)). Run Simulation button: idle→running→done/error states. SimState hook + workerRef + onmessage/onerror cleanup. CompositeCrewPanel extended with simState/simError/outcome/onRunSim props. Results panel: MSP/CHI/pEvac/pLocl/TME with CI₉₅ chips + convergence σ row. typecheck exit 0. |
-| CC-5 | Polish — ARIA labels, keyboard nav, error states, responsive | PENDING | — | Full a11y pass + empty-crew error state + Playwright snapshot test. |
+| CC-4 | Web Worker simulation + IMMOutcome results panel | **DONE** | `7553c24` | Web Worker via new Worker(new URL(...imm-simulate.worker.ts...)). Run Simulation button: idle→running→done/error states. SimState hook + workerRef + onmessage/onerror cleanup. CompositeCrewPanel extended with simState/simError/outcome/onRunSim props. Results panel: MSP/CHI/pEvac/pLocl/TME with CI₉₅ chips + convergence σ row. typecheck exit 0. |
+| CC-5 | Polish — ARIA labels, landmarks, Playwright smoke tests | **IN_PROGRESS** | — | aria-live polite region for composite score updates (role=status). role=region + aria-label on all three zones. aria-labelledby on page heading. 3 Playwright crew smoke tests: tab renders/6 members/composite panel; card expands to sliders; aggregator switch; typecheck exit 0; 20/20 RTL tests pass. |
 
 ---
 

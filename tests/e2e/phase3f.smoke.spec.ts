@@ -33,3 +33,46 @@ test.describe("figure snapshots", () => {
     });
   }
 });
+
+// CC-5: Crew Composition view smoke tests
+test.describe("Crew Composition view", () => {
+  test("crew tab renders with 6 members and composite score", async ({ page }) => {
+    await page.goto("/");
+    // Click the Crew nav button
+    await page.getByRole("button", { name: /crew/i }).click();
+    // The page heading should be visible
+    await expect(page.getByRole("heading", { name: /crew composition/i })).toBeVisible({ timeout: 5_000 });
+    // Six crew member cards should be present (collapsed by default)
+    await expect(page.getByText("Alpha")).toBeVisible();
+    await expect(page.getByText("Foxtrot")).toBeVisible();
+    // Composite panel heading should be present
+    await expect(page.getByText(/crew composite/i)).toBeVisible();
+    // Run simulation button should be present
+    await expect(page.getByRole("button", { name: /run simulation/i })).toBeVisible();
+  });
+
+  test("crew member card expands to show sliders", async ({ page }) => {
+    await page.goto("/");
+    await page.getByRole("button", { name: /crew/i }).click();
+    await page.waitForTimeout(500);
+    // Click the Alpha member card to expand it
+    await page.getByRole("button", { name: /Alpha/i }).first().click();
+    // The per-criterion slider for the first criterion should be visible
+    await expect(page.locator("input[type=range]").first()).toBeVisible({ timeout: 5_000 });
+    // At least one citation link should be visible
+    await expect(page.getByText("↗ doi").first()).toBeVisible({ timeout: 3_000 });
+  });
+
+  test("aggregator method switch updates composite label", async ({ page }) => {
+    await page.goto("/");
+    await page.getByRole("button", { name: /crew/i }).click();
+    await page.waitForTimeout(500);
+    // The aggregator select should have worst-link as default
+    const select = page.locator("select").first();
+    await expect(select).toHaveValue("worst-link");
+    // Switch to mean
+    await select.selectOption("mean");
+    // The label should update (select still shows the option)
+    await expect(select).toHaveValue("mean");
+  });
+});

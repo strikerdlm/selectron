@@ -209,7 +209,7 @@ export function CrewComposition() {
 
       {/* ── page header ─────────────────────────────────────────────────── */}
       <div className="flex flex-wrap items-baseline gap-x-4 gap-y-1">
-        <h2 className="display text-2xl text-ink-0 tracking-tight">
+        <h2 className="display text-2xl text-ink-0 tracking-tight" id="crew-composition-heading">
           Crew Composition
         </h2>
         <span className="label text-signal">IMM · Stage A</span>
@@ -217,12 +217,25 @@ export function CrewComposition() {
           {state.mission.label} · {state.members.length} members
         </span>
       </div>
+      {/* Screen-reader live region for composite updates */}
+      <div
+        role="status"
+        aria-live="polite"
+        aria-atomic="true"
+        className="sr-only"
+      >
+        Crew composite: {Math.round(composite.compositeScore * 100)}%,{" "}
+        {gateResult.crewVerdict}.
+        {gateResult.disqualifiedMemberIds.length > 0
+          ? ` Disqualified: ${gateResult.disqualifiedMemberIds.join(", ")}.`
+          : ""}
+      </div>
 
       {/* ── three-zone layout ───────────────────────────────────────────── */}
-      <div className="grid grid-cols-1 gap-6 lg:grid-cols-12">
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-12" role="main" aria-labelledby="crew-composition-heading">
 
         {/* Zone 1 — Mission + Kit config (3 cols) */}
-        <div className="lg:col-span-3 flex flex-col gap-4">
+        <div className="lg:col-span-3 flex flex-col gap-4" role="region" aria-label="Mission and kit configuration">
           <div className="panel flex flex-col gap-4">
             <h3 className="label text-ink-1 uppercase tracking-cap">Mission</h3>
 
@@ -311,7 +324,7 @@ export function CrewComposition() {
         </div>
 
         {/* Zone 2 — Crew Members (6 cols) */}
-        <div className="lg:col-span-6 flex flex-col gap-3">
+        <div className="lg:col-span-6 flex flex-col gap-3" role="region" aria-label="Crew members">
           <div className="flex items-center justify-between">
             <h3 className="label text-ink-1 uppercase tracking-cap">
               Crew Members
@@ -377,7 +390,7 @@ export function CrewComposition() {
         </div>
 
         {/* Zone 3 — Composite + Results (3 cols) */}
-        <div className="lg:col-span-3 flex flex-col gap-4">
+        <div className="lg:col-span-3 flex flex-col gap-4" role="region" aria-label="Crew composite and simulation results">
           <CompositeCrewPanel
             compositeScore={composite.compositeScore}
             perMemberScores={composite.perMemberScores}
