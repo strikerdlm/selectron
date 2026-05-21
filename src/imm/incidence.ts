@@ -70,7 +70,7 @@ export function sampleGammaPoisson(rng: Rng, alpha: number, beta: number): numbe
   return samplePoisson(rng, lambda);
 }
 
-function sampleBeta(rng: Rng, alpha: number, beta: number): number {
+export function sampleBeta(rng: Rng, alpha: number, beta: number): number {
   const x = sampleGamma(alpha, rng);
   const y = sampleGamma(beta, rng);
   return x / (x + y);
