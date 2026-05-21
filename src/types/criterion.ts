@@ -49,4 +49,10 @@ export type Criterion = {
    * pre-scope-expansion-3-followup behavior where every criterion ran at every tier.
    */
   minimumTier?: AccessTier;
+  /**
+   * Hard binary gate threshold. When set, a candidate score that violates the
+   * operator condition results in immediate disqualification regardless of the
+   * weighted MCDA score. Criteria without this field are modulating criteria only.
+   */
+  gateThreshold?: { operator: "fail-if-below" | "fail-if-above"; value: number };
 };
