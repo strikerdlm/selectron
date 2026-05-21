@@ -1,6 +1,6 @@
 # Selectron — STATUS
 
-**Last updated:** 2026-05-21 ~ 17:35 UTC (CC-1 DONE: CrewComposition skeleton view + App.tsx nav + CrewMemberCard + CompositeCrewPanel; typecheck exit 0; build green)
+**Last updated:** 2026-05-21 ~ 18:05 UTC (CC-2 DONE: PerScoreCard sliders + CitationChip + crew-composition RTL tests 10/10)
 **Current branch:** `iter1-phase0`
 **Active plan (Iter 1):** [`docs/superpowers/plans/2026-05-18-selectron-iter1-phase0.md`](docs/superpowers/plans/2026-05-18-selectron-iter1-phase0.md)
 **Active plan (Iter 3):** [`docs/superpowers/plans/2026-05-18-selectron-iter3-risk.md`](docs/superpowers/plans/2026-05-18-selectron-iter3-risk.md)
@@ -132,8 +132,8 @@ Update rules:
 | IC-4 | simulateIMM MSP tracking (replace stub) | **DONE** | `7d1c003` | Per-trial missionSuccess flag → posteriorSummary; chiStar param; 5 tests. |
 | IC-5 | simulateIMM per-member stageAScores vulnerability multiplier | **DONE** | `9d5abc7` | applyStageAVulnerabilityMultiplier; FAMILY_BETA map; 6 tests; production path dormant (empty vulnerabilityCriteria). |
 | IC-6 | scripts/reproducer_imm_composite.ts + acceptance output | **DONE** | pending | Comparison table: iss-6mo vs mars500; exports/2026-05-21_imm_composite_reproducer.txt written. |
-| CC-1 | CrewComposition skeleton view + App.tsx nav + CrewMemberCard + CompositeCrewPanel | **IN_PROGRESS** | — | 3-zone layout; 6 archetypal crew members with safe defaults (mmpi2rf_eid=35, nasa_cognition≥-1.5); live composite+gate aggregation; "Crew" nav tab in header; pre-existing TS6133 TestFigureHost fix bundled. typecheck exit 0; build green. |
-| CC-2 | Per-criterion sliders + CitationChip | PENDING | — | PerScoreCard.tsx (slider + citation text, no ECharts). RTL test for live composite update. |
+| CC-1 | CrewComposition skeleton view + App.tsx nav + CrewMemberCard + CompositeCrewPanel | **DONE** | `aecb80e` | 3-zone layout; 6 archetypal crew members with safe defaults (mmpi2rf_eid=35, nasa_cognition≥-1.5); live composite+gate aggregation; "Crew" nav tab in header; pre-existing TS6133 TestFigureHost fix bundled. typecheck exit 0; build green. |
+| CC-2 | Per-criterion sliders + CitationChip | **IN_PROGRESS** | — | PerScoreCard.tsx (slider + citation chip with DOI/scite verified badge/relevance quote). CitationChip.tsx. CrewMemberCard updated to render PerScoreCards in expanded body. RTL tests: 10/10 pass (engine unit + gate + PerScoreCard smoke). typecheck exit 0. |
 | CC-3 | ECharts bell-curve mini-figures in PerScoreCard | PENDING | — | 200×80px per-criterion bell curve with gate threshold dashed line. Lazy render on expand. |
 | CC-4 | Web Worker simulation + IMMOutcome results panel | PENDING | — | Wire Run Simulation button to imm-simulate.worker.ts; show TME/CHI/pEVAC/pLOCL/MSP with CI95. |
 | CC-5 | Polish — ARIA labels, keyboard nav, error states, responsive | PENDING | — | Full a11y pass + empty-crew error state + Playwright snapshot test. |

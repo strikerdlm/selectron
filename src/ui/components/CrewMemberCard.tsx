@@ -1,9 +1,12 @@
 // src/ui/components/CrewMemberCard.tsx
 // Collapsible card for a single IMM crew member.
-// Commit 1: shows collapsed state with status badge + composite score.
-// Sliders and per-criterion ECharts figures are added in Commits 2 & 3.
+// Commit 1: collapsed state + status badge + composite score.
+// Commit 2: per-criterion sliders + CitationChip (rendered via PerScoreCard in expanded body).
+// Commit 3: ECharts mini-figures passed as `figure` prop to PerScoreCard.
 
 import type { IMMCrewMember } from "../../imm/types";
+import type { Criterion } from "../../types";
+import { PerScoreCard } from "./PerScoreCard";
 
 interface CrewMemberCardProps {
   member: IMMCrewMember;
@@ -12,8 +15,10 @@ interface CrewMemberCardProps {
   failedGates: string[];
   expanded: boolean;
   onToggle: () => void;
-  /** Slot for per-criterion sliders — rendered when expanded (Commit 2+). */
-  children?: React.ReactNode;
+  criteria: readonly Criterion[];
+  onScoreChange: (memberId: string, criterionId: string, value: number) => void;
+  /** Optional per-criterion mini-figure nodes (Commit 3+). Keyed by criterion.id. */
+  figures?: Record<string, React.ReactNode>;
 }
 
 export function CrewMemberCard({
@@ -23,7 +28,9 @@ export function CrewMemberCard({
   failedGates,
   expanded,
   onToggle,
-  children,
+  criteria,
+  onScoreChange,
+  figures = {},
 }: CrewMemberCardProps) {
   const pct = Math.round(compositeScore * 100);
   const qualified = gateVerdict === "qualified";
@@ -116,12 +123,18 @@ export function CrewMemberCard({
             </div>
           )}
 
-          {/* Per-criterion slider slot (Commit 2+) */}
-          {children ?? (
-            <p className="mono text-[11px] text-ink-3 italic">
-              per-criterion sliders — added in commit 2
-            </p>
-          )}
+          {/* Per-criterion sliders (Commit 2+) */}
+          <div className="flex flex-col gap-3">
+            {criteria.map((c) => (
+              <PerScoreCard
+                key={c.id}
+                criterion={c}
+                rawScore={member.stageAScores?.[c.id] ?? c.scale.min + 0.5 * (c.scale.max - c.scale.min)}
+                onScoreChange={(criterionId, value) => onScoreChange(member.id, criterionId, value)}
+                figure={figures[c.id]}
+              />
+            ))}
+          </div>
         </div>
       )}
     </div>
