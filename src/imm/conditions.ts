@@ -13,7 +13,9 @@ export const IMM_CONDITIONS: IMMCondition[] = [
     "incidenceDist": "Gamma",
     "processType": "general-Poisson",
     "riskFactors": [],
-    "vulnerabilityCriteria": []
+    "vulnerabilityCriteria": [
+      "physical.vo2max"
+    ]
   },
   {
     "id": "abdominal-wall-hernia",
@@ -49,7 +51,9 @@ export const IMM_CONDITIONS: IMMCondition[] = [
       "sex-male",
       "sex-female"
     ],
-    "vulnerabilityCriteria": []
+    "vulnerabilityCriteria": [
+      "physical.vo2max"
+    ]
   },
   {
     "id": "acute-cholecystitis-biliary-colic",
@@ -75,7 +79,9 @@ export const IMM_CONDITIONS: IMMCondition[] = [
       "sex-male",
       "sex-female"
     ],
-    "vulnerabilityCriteria": []
+    "vulnerabilityCriteria": [
+      "physical.vo2max"
+    ]
   },
   {
     "id": "acute-diverticulitis",
@@ -153,7 +159,9 @@ export const IMM_CONDITIONS: IMMCondition[] = [
     "incidenceDist": "Gamma",
     "processType": "general-Poisson",
     "riskFactors": [],
-    "vulnerabilityCriteria": []
+    "vulnerabilityCriteria": [
+      "physical.vo2max"
+    ]
   },
   {
     "id": "altitude-sickness",
@@ -163,7 +171,10 @@ export const IMM_CONDITIONS: IMMCondition[] = [
     "incidenceDist": "Lognormal",
     "processType": "general-Poisson",
     "riskFactors": [],
-    "vulnerabilityCriteria": []
+    "vulnerabilityCriteria": [
+      "cognitive.nasa_cognition_battery",
+      "psych.emotional_stability"
+    ]
   },
   {
     "id": "anaphylaxis",
@@ -173,7 +184,9 @@ export const IMM_CONDITIONS: IMMCondition[] = [
     "incidenceDist": "Fixed",
     "processType": "general-Poisson",
     "riskFactors": [],
-    "vulnerabilityCriteria": []
+    "vulnerabilityCriteria": [
+      "physical.vo2max"
+    ]
   },
   {
     "id": "angina-myocardial-infarction",
@@ -186,7 +199,9 @@ export const IMM_CONDITIONS: IMMCondition[] = [
       "sex-male",
       "sex-female"
     ],
-    "vulnerabilityCriteria": []
+    "vulnerabilityCriteria": [
+      "physical.vo2max"
+    ]
   },
   {
     "id": "ankle-sprain-strain",
@@ -196,7 +211,9 @@ export const IMM_CONDITIONS: IMMCondition[] = [
     "incidenceDist": "Gamma",
     "processType": "general-Poisson",
     "riskFactors": [],
-    "vulnerabilityCriteria": []
+    "vulnerabilityCriteria": [
+      "physical.vo2max"
+    ]
   },
   {
     "id": "anxiety",
@@ -209,7 +226,11 @@ export const IMM_CONDITIONS: IMMCondition[] = [
       "sex-male",
       "sex-female"
     ],
-    "vulnerabilityCriteria": []
+    "vulnerabilityCriteria": [
+      "psych.mmpi2rf_eid",
+      "psych.emotional_stability",
+      "psych.bdi2_baseline"
+    ]
   },
   {
     "id": "appendicitis",
@@ -232,7 +253,9 @@ export const IMM_CONDITIONS: IMMCondition[] = [
       "sex-male",
       "sex-female"
     ],
-    "vulnerabilityCriteria": []
+    "vulnerabilityCriteria": [
+      "physical.vo2max"
+    ]
   },
   {
     "id": "back-injury",
@@ -242,7 +265,9 @@ export const IMM_CONDITIONS: IMMCondition[] = [
     "incidenceDist": "Gamma",
     "processType": "general-Poisson",
     "riskFactors": [],
-    "vulnerabilityCriteria": []
+    "vulnerabilityCriteria": [
+      "physical.vo2max"
+    ]
   },
   {
     "id": "back-pain-space-adaptation",
@@ -252,7 +277,10 @@ export const IMM_CONDITIONS: IMMCondition[] = [
     "incidenceDist": "Beta",
     "processType": "space-adaptation-once",
     "riskFactors": [],
-    "vulnerabilityCriteria": []
+    "vulnerabilityCriteria": [
+      "physical.vo2max",
+      "psych.emotional_stability"
+    ]
   },
   {
     "id": "barotrauma-ear-sinus-block",
@@ -272,7 +300,10 @@ export const IMM_CONDITIONS: IMMCondition[] = [
     "incidenceDist": "Fixed",
     "processType": "general-Poisson",
     "riskFactors": [],
-    "vulnerabilityCriteria": []
+    "vulnerabilityCriteria": [
+      "behavioral.teamwork",
+      "psych.conscientiousness"
+    ]
   },
   {
     "id": "burns-secondary-to-fire",
@@ -295,7 +326,9 @@ export const IMM_CONDITIONS: IMMCondition[] = [
       "sex-male",
       "sex-female"
     ],
-    "vulnerabilityCriteria": []
+    "vulnerabilityCriteria": [
+      "physical.vo2max"
+    ]
   },
   {
     "id": "chest-injury",
@@ -305,7 +338,9 @@ export const IMM_CONDITIONS: IMMCondition[] = [
     "incidenceDist": "Gamma",
     "processType": "general-Poisson",
     "riskFactors": [],
-    "vulnerabilityCriteria": []
+    "vulnerabilityCriteria": [
+      "physical.vo2max"
+    ]
   },
   {
     "id": "choking-obstructed-airway",
@@ -315,7 +350,9 @@ export const IMM_CONDITIONS: IMMCondition[] = [
     "incidenceDist": "Gamma",
     "processType": "general-Poisson",
     "riskFactors": [],
-    "vulnerabilityCriteria": []
+    "vulnerabilityCriteria": [
+      "physical.vo2max"
+    ]
   },
   {
     "id": "constipation-space-adaptation",
@@ -325,7 +362,10 @@ export const IMM_CONDITIONS: IMMCondition[] = [
     "incidenceDist": "Beta",
     "processType": "space-adaptation-once",
     "riskFactors": [],
-    "vulnerabilityCriteria": []
+    "vulnerabilityCriteria": [
+      "physical.vo2max",
+      "psych.emotional_stability"
+    ]
   },
   {
     "id": "decompression-sickness-secondary-to-extravehicular-activity",
@@ -337,7 +377,9 @@ export const IMM_CONDITIONS: IMMCondition[] = [
     "riskFactors": [
       "EVA"
     ],
-    "vulnerabilityCriteria": []
+    "vulnerabilityCriteria": [
+      "physical.vo2max"
+    ]
   },
   {
     "id": "dental-exposed-pulp",
@@ -412,7 +454,11 @@ export const IMM_CONDITIONS: IMMCondition[] = [
       "sex-male",
       "sex-female"
     ],
-    "vulnerabilityCriteria": []
+    "vulnerabilityCriteria": [
+      "psych.mmpi2rf_eid",
+      "psych.emotional_stability",
+      "psych.bdi2_baseline"
+    ]
   },
   {
     "id": "diarrhea",
@@ -432,7 +478,9 @@ export const IMM_CONDITIONS: IMMCondition[] = [
     "incidenceDist": "Fixed",
     "processType": "general-Poisson",
     "riskFactors": [],
-    "vulnerabilityCriteria": []
+    "vulnerabilityCriteria": [
+      "physical.vo2max"
+    ]
   },
   {
     "id": "elbow-sprain-strain",
@@ -442,7 +490,9 @@ export const IMM_CONDITIONS: IMMCondition[] = [
     "incidenceDist": "Gamma",
     "processType": "general-Poisson",
     "riskFactors": [],
-    "vulnerabilityCriteria": []
+    "vulnerabilityCriteria": [
+      "physical.vo2max"
+    ]
   },
   {
     "id": "eye-abrasion-foreign-body",
@@ -504,7 +554,9 @@ export const IMM_CONDITIONS: IMMCondition[] = [
     "incidenceDist": "Gamma",
     "processType": "general-Poisson",
     "riskFactors": [],
-    "vulnerabilityCriteria": []
+    "vulnerabilityCriteria": [
+      "physical.vo2max"
+    ]
   },
   {
     "id": "fingernail-delamination",
@@ -516,7 +568,9 @@ export const IMM_CONDITIONS: IMMCondition[] = [
     "riskFactors": [
       "EVA"
     ],
-    "vulnerabilityCriteria": []
+    "vulnerabilityCriteria": [
+      "physical.vo2max"
+    ]
   },
   {
     "id": "gastroenteritis",
@@ -536,7 +590,9 @@ export const IMM_CONDITIONS: IMMCondition[] = [
     "incidenceDist": "Gamma",
     "processType": "general-Poisson",
     "riskFactors": [],
-    "vulnerabilityCriteria": []
+    "vulnerabilityCriteria": [
+      "physical.vo2max"
+    ]
   },
   {
     "id": "headache-co2-induced",
@@ -546,7 +602,10 @@ export const IMM_CONDITIONS: IMMCondition[] = [
     "incidenceDist": "Gamma",
     "processType": "general-Poisson",
     "riskFactors": [],
-    "vulnerabilityCriteria": []
+    "vulnerabilityCriteria": [
+      "cognitive.nasa_cognition_battery",
+      "psych.emotional_stability"
+    ]
   },
   {
     "id": "headache-late",
@@ -556,7 +615,10 @@ export const IMM_CONDITIONS: IMMCondition[] = [
     "incidenceDist": "Gamma",
     "processType": "general-Poisson",
     "riskFactors": [],
-    "vulnerabilityCriteria": []
+    "vulnerabilityCriteria": [
+      "cognitive.nasa_cognition_battery",
+      "psych.emotional_stability"
+    ]
   },
   {
     "id": "headache-space-adaptation",
@@ -566,7 +628,10 @@ export const IMM_CONDITIONS: IMMCondition[] = [
     "incidenceDist": "Beta",
     "processType": "space-adaptation-once",
     "riskFactors": [],
-    "vulnerabilityCriteria": []
+    "vulnerabilityCriteria": [
+      "physical.vo2max",
+      "psych.emotional_stability"
+    ]
   },
   {
     "id": "hearing-loss",
@@ -596,7 +661,9 @@ export const IMM_CONDITIONS: IMMCondition[] = [
     "incidenceDist": "Gamma",
     "processType": "general-Poisson",
     "riskFactors": [],
-    "vulnerabilityCriteria": []
+    "vulnerabilityCriteria": [
+      "physical.vo2max"
+    ]
   },
   {
     "id": "hip-sprain-strain",
@@ -606,7 +673,9 @@ export const IMM_CONDITIONS: IMMCondition[] = [
     "incidenceDist": "Gamma",
     "processType": "general-Poisson",
     "riskFactors": [],
-    "vulnerabilityCriteria": []
+    "vulnerabilityCriteria": [
+      "physical.vo2max"
+    ]
   },
   {
     "id": "hip-proximal-femur-fracture",
@@ -619,7 +688,9 @@ export const IMM_CONDITIONS: IMMCondition[] = [
       "sex-male",
       "sex-female"
     ],
-    "vulnerabilityCriteria": []
+    "vulnerabilityCriteria": [
+      "physical.vo2max"
+    ]
   },
   {
     "id": "hypertension",
@@ -629,7 +700,9 @@ export const IMM_CONDITIONS: IMMCondition[] = [
     "incidenceDist": "Fixed",
     "processType": "general-Poisson",
     "riskFactors": [],
-    "vulnerabilityCriteria": []
+    "vulnerabilityCriteria": [
+      "physical.vo2max"
+    ]
   },
   {
     "id": "indigestion",
@@ -649,7 +722,9 @@ export const IMM_CONDITIONS: IMMCondition[] = [
     "incidenceDist": "Gamma",
     "processType": "general-Poisson",
     "riskFactors": [],
-    "vulnerabilityCriteria": []
+    "vulnerabilityCriteria": [
+      "physical.vo2max"
+    ]
   },
   {
     "id": "insomnia-space-adaptation",
@@ -659,7 +734,10 @@ export const IMM_CONDITIONS: IMMCondition[] = [
     "incidenceDist": "Beta",
     "processType": "space-adaptation-once",
     "riskFactors": [],
-    "vulnerabilityCriteria": []
+    "vulnerabilityCriteria": [
+      "physical.vo2max",
+      "psych.emotional_stability"
+    ]
   },
   {
     "id": "knee-sprain-strain",
@@ -669,7 +747,9 @@ export const IMM_CONDITIONS: IMMCondition[] = [
     "incidenceDist": "Gamma",
     "processType": "general-Poisson",
     "riskFactors": [],
-    "vulnerabilityCriteria": []
+    "vulnerabilityCriteria": [
+      "physical.vo2max"
+    ]
   },
   {
     "id": "late-insomnia",
@@ -679,7 +759,11 @@ export const IMM_CONDITIONS: IMMCondition[] = [
     "incidenceDist": "Gamma",
     "processType": "general-Poisson",
     "riskFactors": [],
-    "vulnerabilityCriteria": []
+    "vulnerabilityCriteria": [
+      "psych.mmpi2rf_eid",
+      "psych.emotional_stability",
+      "psych.bdi2_baseline"
+    ]
   },
   {
     "id": "lower-extremity-le-stress-fracture",
@@ -692,7 +776,9 @@ export const IMM_CONDITIONS: IMMCondition[] = [
       "sex-male",
       "sex-female"
     ],
-    "vulnerabilityCriteria": []
+    "vulnerabilityCriteria": [
+      "physical.vo2max"
+    ]
   },
   {
     "id": "lumbar-spine-fracture",
@@ -705,7 +791,9 @@ export const IMM_CONDITIONS: IMMCondition[] = [
       "sex-male",
       "sex-female"
     ],
-    "vulnerabilityCriteria": []
+    "vulnerabilityCriteria": [
+      "physical.vo2max"
+    ]
   },
   {
     "id": "medication-overdose-adverse-reaction",
@@ -735,7 +823,10 @@ export const IMM_CONDITIONS: IMMCondition[] = [
     "incidenceDist": "Beta",
     "processType": "space-adaptation-once",
     "riskFactors": [],
-    "vulnerabilityCriteria": []
+    "vulnerabilityCriteria": [
+      "physical.vo2max",
+      "psych.emotional_stability"
+    ]
   },
   {
     "id": "neck-injury",
@@ -745,7 +836,9 @@ export const IMM_CONDITIONS: IMMCondition[] = [
     "incidenceDist": "Gamma",
     "processType": "general-Poisson",
     "riskFactors": [],
-    "vulnerabilityCriteria": []
+    "vulnerabilityCriteria": [
+      "physical.vo2max"
+    ]
   },
   {
     "id": "nephrolithiasis",
@@ -765,7 +858,10 @@ export const IMM_CONDITIONS: IMMCondition[] = [
     "incidenceDist": "Fixed",
     "processType": "general-Poisson",
     "riskFactors": [],
-    "vulnerabilityCriteria": []
+    "vulnerabilityCriteria": [
+      "cognitive.nasa_cognition_battery",
+      "psych.emotional_stability"
+    ]
   },
   {
     "id": "nose-bleed-space-adaptation",
@@ -775,7 +871,10 @@ export const IMM_CONDITIONS: IMMCondition[] = [
     "incidenceDist": "Beta",
     "processType": "space-adaptation-once",
     "riskFactors": [],
-    "vulnerabilityCriteria": []
+    "vulnerabilityCriteria": [
+      "physical.vo2max",
+      "psych.emotional_stability"
+    ]
   },
   {
     "id": "otitis-externa",
@@ -807,7 +906,10 @@ export const IMM_CONDITIONS: IMMCondition[] = [
     "riskFactors": [
       "EVA"
     ],
-    "vulnerabilityCriteria": []
+    "vulnerabilityCriteria": [
+      "cognitive.nasa_cognition_battery",
+      "psych.emotional_stability"
+    ]
   },
   {
     "id": "pharyngitis",
@@ -827,7 +929,9 @@ export const IMM_CONDITIONS: IMMCondition[] = [
     "incidenceDist": "Gamma",
     "processType": "general-Poisson",
     "riskFactors": [],
-    "vulnerabilityCriteria": []
+    "vulnerabilityCriteria": [
+      "physical.vo2max"
+    ]
   },
   {
     "id": "retinal-detachment",
@@ -850,7 +954,10 @@ export const IMM_CONDITIONS: IMMCondition[] = [
     "incidenceDist": "Lognormal",
     "processType": "general-Poisson",
     "riskFactors": [],
-    "vulnerabilityCriteria": []
+    "vulnerabilityCriteria": [
+      "cognitive.nasa_cognition_battery",
+      "psych.emotional_stability"
+    ]
   },
   {
     "id": "sepsis",
@@ -860,7 +967,9 @@ export const IMM_CONDITIONS: IMMCondition[] = [
     "incidenceDist": "Fixed",
     "processType": "general-Poisson",
     "riskFactors": [],
-    "vulnerabilityCriteria": []
+    "vulnerabilityCriteria": [
+      "physical.vo2max"
+    ]
   },
   {
     "id": "shoulder-dislocation",
@@ -870,7 +979,9 @@ export const IMM_CONDITIONS: IMMCondition[] = [
     "incidenceDist": "Fixed",
     "processType": "general-Poisson",
     "riskFactors": [],
-    "vulnerabilityCriteria": []
+    "vulnerabilityCriteria": [
+      "physical.vo2max"
+    ]
   },
   {
     "id": "shoulder-sprain-strain",
@@ -880,7 +991,9 @@ export const IMM_CONDITIONS: IMMCondition[] = [
     "incidenceDist": "Gamma",
     "processType": "general-Poisson",
     "riskFactors": [],
-    "vulnerabilityCriteria": []
+    "vulnerabilityCriteria": [
+      "physical.vo2max"
+    ]
   },
   {
     "id": "skin-abrasion",
@@ -900,7 +1013,9 @@ export const IMM_CONDITIONS: IMMCondition[] = [
     "incidenceDist": "Gamma",
     "processType": "general-Poisson",
     "riskFactors": [],
-    "vulnerabilityCriteria": []
+    "vulnerabilityCriteria": [
+      "physical.vo2max"
+    ]
   },
   {
     "id": "skin-laceration",
@@ -942,7 +1057,9 @@ export const IMM_CONDITIONS: IMMCondition[] = [
     "incidenceDist": "Fixed",
     "processType": "general-Poisson",
     "riskFactors": [],
-    "vulnerabilityCriteria": []
+    "vulnerabilityCriteria": [
+      "physical.vo2max"
+    ]
   },
   {
     "id": "space-motion-sickness-space-adaptation",
@@ -952,7 +1069,10 @@ export const IMM_CONDITIONS: IMMCondition[] = [
     "incidenceDist": "Beta",
     "processType": "space-adaptation-once",
     "riskFactors": [],
-    "vulnerabilityCriteria": []
+    "vulnerabilityCriteria": [
+      "physical.vo2max",
+      "psych.emotional_stability"
+    ]
   },
   {
     "id": "stroke-cerebrovascular-accident",
@@ -965,7 +1085,10 @@ export const IMM_CONDITIONS: IMMCondition[] = [
       "sex-male",
       "sex-female"
     ],
-    "vulnerabilityCriteria": []
+    "vulnerabilityCriteria": [
+      "cognitive.nasa_cognition_battery",
+      "psych.emotional_stability"
+    ]
   },
   {
     "id": "sudden-cardiac-arrest",
@@ -977,7 +1100,9 @@ export const IMM_CONDITIONS: IMMCondition[] = [
     "riskFactors": [
       "CAC-positive"
     ],
-    "vulnerabilityCriteria": []
+    "vulnerabilityCriteria": [
+      "physical.vo2max"
+    ]
   },
   {
     "id": "toxic-exposure-ammonia",
@@ -997,7 +1122,9 @@ export const IMM_CONDITIONS: IMMCondition[] = [
     "incidenceDist": "Fixed",
     "processType": "general-Poisson",
     "riskFactors": [],
-    "vulnerabilityCriteria": []
+    "vulnerabilityCriteria": [
+      "physical.vo2max"
+    ]
   },
   {
     "id": "urinary-incontinence-space-adaptation",
@@ -1010,7 +1137,10 @@ export const IMM_CONDITIONS: IMMCondition[] = [
       "sex-male",
       "sex-female"
     ],
-    "vulnerabilityCriteria": []
+    "vulnerabilityCriteria": [
+      "physical.vo2max",
+      "psych.emotional_stability"
+    ]
   },
   {
     "id": "urinary-retention-space-adaptation",
@@ -1023,7 +1153,10 @@ export const IMM_CONDITIONS: IMMCondition[] = [
       "sex-male",
       "sex-female"
     ],
-    "vulnerabilityCriteria": []
+    "vulnerabilityCriteria": [
+      "physical.vo2max",
+      "psych.emotional_stability"
+    ]
   },
   {
     "id": "urinary-tract-infection",
@@ -1059,7 +1192,10 @@ export const IMM_CONDITIONS: IMMCondition[] = [
     "incidenceDist": "Beta",
     "processType": "SA-VIIP-late",
     "riskFactors": [],
-    "vulnerabilityCriteria": []
+    "vulnerabilityCriteria": [
+      "physical.vo2max",
+      "psych.emotional_stability"
+    ]
   },
   {
     "id": "wrist-fracture",
@@ -1069,7 +1205,9 @@ export const IMM_CONDITIONS: IMMCondition[] = [
     "incidenceDist": "Lognormal",
     "processType": "general-Poisson",
     "riskFactors": [],
-    "vulnerabilityCriteria": []
+    "vulnerabilityCriteria": [
+      "physical.vo2max"
+    ]
   },
   {
     "id": "wrist-sprain-strain",
@@ -1079,6 +1217,8 @@ export const IMM_CONDITIONS: IMMCondition[] = [
     "incidenceDist": "Gamma",
     "processType": "general-Poisson",
     "riskFactors": [],
-    "vulnerabilityCriteria": []
+    "vulnerabilityCriteria": [
+      "physical.vo2max"
+    ]
   }
 ];

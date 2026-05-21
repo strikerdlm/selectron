@@ -218,6 +218,35 @@ const slug = (s: string) =>
     .replace(/[^a-z0-9]+/g, "-")
     .replace(/^-+|-+$/g, "");
 
+// ── VulnerabilityCriteria inference ───────────────────────────────────────────
+// Maps each IMM condition family to the Selectron criteria whose Stage A scores
+// should modulate that condition's vulnerability multiplier.
+// Criterion IDs must match exactly the `id` fields in src/data/placeholder-criteria.ts.
+function inferVulnerabilityCriteria(family: string): string[] {
+  const map: Record<string, string[]> = {
+    "psychiatric":       ["psych.mmpi2rf_eid", "psych.emotional_stability", "psych.bdi2_baseline"],
+    "behavioral":        ["behavioral.teamwork", "psych.conscientiousness"],
+    "neurologic":        ["cognitive.nasa_cognition_battery", "psych.emotional_stability"],
+    "infectious":        ["physical.vo2max"],
+    "musculoskeletal":   ["physical.vo2max"],
+    "cardiovascular":    ["physical.vo2max"],
+    "respiratory":       ["physical.vo2max"],
+    "space-adaptation":  ["physical.vo2max", "psych.emotional_stability"],
+    "GI":                [],
+    "GU":                [],
+    "renal":             [],
+    "endocrine":         [],
+    "hematologic":       [],
+    "dental":            [],
+    "ENT":               [],
+    "ophthalmologic":    [],
+    "dermatologic":      [],
+    "toxicologic":       [],
+    "traumatic":         ["physical.vo2max"],
+  };
+  return map[family] ?? [];
+}
+
 // ── Build conditions ───────────────────────────────────────────────────────────
 const conditions = dataRows.map((line) => {
   const cells = line.split("|").slice(1, -1).map((c) => c.trim());
@@ -226,10 +255,11 @@ const conditions = dataRows.map((line) => {
   const dist = cells[2];
   const riskFactorsRaw = cells[3] || "";
   const riskFactors = inferRiskFactors(riskFactorsRaw);
+  const family = inferFamily(label);
   return {
     id: slug(label),
     label,
-    family: inferFamily(label),
+    family,
     incidenceSource:
       source.includes("In-flight")
         ? "in-flight"
@@ -241,7 +271,7 @@ const conditions = dataRows.map((line) => {
     incidenceDist: dist as "Gamma" | "Lognormal" | "Beta" | "Fixed",
     processType: inferProcess(label, riskFactors),
     riskFactors,
-    vulnerabilityCriteria: [] as string[],
+    vulnerabilityCriteria: inferVulnerabilityCriteria(family),
   };
 });
 
