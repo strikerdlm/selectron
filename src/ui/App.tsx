@@ -4,6 +4,7 @@ import { createCandidate } from "@/db/repository";
 import { Dashboard } from "./views/Dashboard";
 import { Wizard } from "./views/Wizard";
 import { Sim } from "./views/Sim";
+import { CrewComposition } from "./views/CrewComposition";
 import { ToastHost } from "./components/Toast";
 import { ErrorBoundary } from "./components/ErrorBoundary";
 import { TestFigureHost } from "./testing/TestFigureHost";
@@ -13,7 +14,8 @@ const SEED_SAMPLER = 0xc0ffee;
 type View =
   | { kind: "dashboard" }
   | { kind: "wizard"; candidateId: string; step: 0 | 1 | 2 | 3 }
-  | { kind: "sim"; candidateId: string };
+  | { kind: "sim"; candidateId: string }
+  | { kind: "crew-composition" };
 
 function useUtcClock() {
   const [now, setNow] = useState(() => new Date());
@@ -59,8 +61,30 @@ export function App() {
               </span>
               <span className="label text-signal">iter 03 · phase 3f</span>
             </div>
-            <div className="mono flex items-center gap-6 text-[11px] text-ink-2">
-              <div className="flex items-center gap-2">
+            <div className="mono flex items-center gap-4 text-[11px] text-ink-2">
+              {/* Nav links */}
+              <button
+                className={`uppercase tracking-cap transition-colors ${
+                  view.kind === "dashboard"
+                    ? "text-signal border-b border-signal pb-0.5"
+                    : "text-ink-2 hover:text-ink-0"
+                }`}
+                onClick={() => setView({ kind: "dashboard" })}
+              >
+                Candidates
+              </button>
+              <button
+                className={`uppercase tracking-cap transition-colors ${
+                  view.kind === "crew-composition"
+                    ? "text-signal border-b border-signal pb-0.5"
+                    : "text-ink-2 hover:text-ink-0"
+                }`}
+                onClick={() => setView({ kind: "crew-composition" })}
+              >
+                Crew
+              </button>
+              {/* UTC clock + meta */}
+              <div className="flex items-center gap-2 hidden sm:flex">
                 <span className="signal-dot" />
                 <span className="uppercase tracking-cap text-ink-1">live</span>
               </div>
@@ -114,6 +138,14 @@ export function App() {
                 candidateId={view.candidateId}
                 onBackToReview={() => setView({ kind: "wizard", candidateId: view.candidateId, step: 2 })}
               />
+            </ErrorBoundary>
+          )}
+          {view.kind === "crew-composition" && (
+            <ErrorBoundary
+              fallbackLabel="The Crew Composition view crashed during render"
+              onReset={() => setView({ kind: "dashboard" })}
+            >
+              <CrewComposition />
             </ErrorBoundary>
           )}
         </main>

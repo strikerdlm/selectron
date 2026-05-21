@@ -6,7 +6,6 @@ import { RiskHistogram } from "@/ui/figures/RiskHistogram";
 import { DashboardSummary } from "@/ui/figures/DashboardSummary";
 import { EvidenceReference } from "@/ui/figures/EvidenceReference";
 import { ScoreBreakdownRadar } from "@/ui/figures/ScoreBreakdownRadar";
-import { ConditionContribution } from "@/ui/figures/ConditionContribution";
 import { MCDACalculationTrace } from "@/ui/figures/CalculationTrace";
 import { LxCMatrix } from "@/ui/figures/LxCMatrix";
 import { MissionComparison } from "@/ui/figures/MissionComparison";
