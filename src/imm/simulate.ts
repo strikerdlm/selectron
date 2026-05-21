@@ -52,6 +52,13 @@ export type IMMTrialResult = {
 export type IMMTrialOpts = {
   /** Development-only trace flag — returns per-event RAF history in the result. */
   traceRAF?: boolean;
+  /**
+   * T31: Tier-C global incidence multiplier.
+   * When supplied (default 1.0), all conditions with provenance === "tierC-synth"
+   * have their sampled count scaled by this factor.
+   * Used by calibrateTierCMultipliers() for coordinate-descent back-fitting to K15 Table 1.
+   */
+  tierCMultiplier?: number;
 };
 
 /** Exported for testability — internal helper. */
@@ -84,6 +91,8 @@ export function runIMMTrial(
   opts: IMMTrialOpts = {},
 ): IMMTrialResult {
   const priors = loadIMMPriors();
+  // T31: Tier-C global multiplier (default 1.0 → no change, preserves existing behaviour).
+  const tierCMult = opts.tierCMultiplier ?? 1.0;
   const availableResources: Record<string, number> = { ...kit.resources };
   const occurrences: Occurrence[] = [];
   const earlyTerminated = new Set<number>();
@@ -166,6 +175,13 @@ export function runIMMTrial(
         count = 0; // SPE occurrences created directly above; skip the generic loop
       } else if (cond.processType === "SA-VIIP-late") {
         if (sampleIncidence(rng, prior) > 0) count = 1;
+      }
+
+      // T31: Apply Tier-C global multiplier — scale count for tierC-synth conditions.
+      // Multiplier > 1 increases expected events; < 1 decreases them.
+      // Applied to all non-SPE process types (SPE events are created directly above).
+      if (tierCMult !== 1.0 && prior.provenance === "tierC-synth" && cond.processType !== "SPE-coupled") {
+        count = Math.round(count * tierCMult);
       }
 
       // T24: Compute time-of-occurrence based on condition process type.
@@ -272,6 +288,8 @@ export function simulateIMM(opts: {
   kit: IMMKitScenario;
   trials: number;
   seed: number;
+  /** T31: optional Tier-C global multiplier (default 1.0). */
+  tierCMultiplier?: number;
 }): IMMOutcome {
   const { crew, mission, kit, trials, seed } = opts;
   const rng = makeRng(seed);
@@ -287,7 +305,7 @@ export function simulateIMM(opts: {
   const perConditionLoclSum: Record<string, number> = {};
 
   for (let t = 1; t <= trials; t++) {
-    const r = runIMMTrial(rng, crew, mission, kit);
+    const r = runIMMTrial(rng, crew, mission, kit, { tierCMultiplier: opts.tierCMultiplier });
     tmes.push(r.tme);
     // CHI clamped at [0, 100] — QTL can exceed denom under pathological priors (v1 analogue of risk/simulate.ts §3.5 guard).
     chis.push(Math.max(0, Math.min(100, 100 * (1 - r.qtl / denom))));
