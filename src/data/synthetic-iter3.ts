@@ -55,7 +55,25 @@ function buildSyntheticPriors(): PriorsJson {
           ? Object.fromEntries(
               c.vulnerabilityCriteria.map((cid) => [
                 cid,
-                c.family === "psychiatric" ? -0.05 : 0.0,
+                // Family-specific β against z-scored higher-is-better criteria.
+                // Negative β: HIGH-quality candidate (z>0) → β·z<0 → exp<1 → λ↓.
+                // Magnitudes calibrated so worst-vs-best (4 SD spread, ±2 z units)
+                // produces a meaningful 2-4× incidence multiplier spread.
+                // Condition families present in ANALOG_CONDITIONS v1:
+                //   psychiatric, team, physiologic, musculoskeletal, performance.
+                // Future families (Iter-2+ ConditionFamily expansion) are cast via
+                // string comparison to avoid TS2367 narrowing errors while keeping
+                // forward-compatibility branches explicit.
+                (c.family as string) === "psychiatric"      ? -0.4 :
+                (c.family as string) === "behavioral"       ? -0.3 :
+                (c.family as string) === "infectious"       ? -0.25 :
+                (c.family as string) === "musculoskeletal"  ? -0.2 :
+                (c.family as string) === "neurologic"       ? -0.3 :
+                (c.family as string) === "GI"               ? -0.15 :
+                (c.family as string) === "cardiovascular"   ? -0.25 :
+                (c.family as string) === "respiratory"      ? -0.2 :
+                (c.family as string) === "renal"            ? -0.15 :
+                                                               -0.2,    // default (team, physiologic, performance)
               ]),
             )
           : {},
