@@ -381,7 +381,7 @@
     "headache-co2-induced": {
       "conditionId": "headache-co2-induced",
       "provenance": "tierA-nasa",
-      "source_ref": "research/imm_sources/methods/M18_myers_2018_imm_validation.md#headache-co2-induced",
+      "source_ref": "research/imm_sources/methods/M18_myers_2018_imm_validation.md#headache-co2-induced; Whitmire 2015 WOTR15 (65% crewmembers / 6mo mission with CO2-related headache complaint, supports current tier-A rate)",
       "incidence": {
         "distribution": "Gamma-Poisson",
         "alpha": 2,
@@ -1332,7 +1332,7 @@
     "dental-abscess": {
       "conditionId": "dental-abscess",
       "provenance": "tierA-nasa",
-      "source_ref": "research/imm_sources/zotero_imm/antonsen-2021-comparison-of-health-and-performance.md#table-4",
+      "source_ref": "research/imm_sources/zotero_imm/antonsen-2021-comparison-of-health-and-performance.md#table-4; research/imm_sources/methods/G12_gilkey_2012_bayesian_imm.md#table-22 (Bayesian-updated dental abscess submarine + LSAH posterior; tier-A confirmation)",
       "incidence": {
         "distribution": "Gamma-Poisson",
         "alpha": 2,
@@ -3596,11 +3596,11 @@
     "late-insomnia": {
       "conditionId": "late-insomnia",
       "provenance": "tierA-nasa",
-      "source_ref": "research/imm_sources/validation/S20_walton_kerstman_2020_iss_quantification.md#late-insomnia",
+      "source_ref": "research/imm_sources/validation/S20_walton_kerstman_2020_iss_quantification.md#late-insomnia; research/imm_sources/methods/M18_myers_2018_imm_validation.md#late-insomnia; enriched 2026-05-22 with Basner 2014 Mars-500 (1/6 crew chronic insomnia over 520d = 0.117 events/py), Fedyay 2023 SIRIUS-21 sleep-disturbance prevalence, Whitmire 2015 WOTR15 ISS sleep-aid use 45-50% of crewmembers; see research/_priors_rev3c_synthesis.md#2.2",
       "incidence": {
         "distribution": "Gamma-Poisson",
-        "alpha": 2,
-        "beta": 1000,
+        "alpha": 2.0,
+        "beta": 3636.0,
         "lambda_unit": "events-per-person-day"
       },
       "severity": {
@@ -3783,7 +3783,7 @@
     "back-pain-space-adaptation": {
       "conditionId": "back-pain-space-adaptation",
       "provenance": "tierB-lit",
-      "source_ref": "research/evidence/pagel-chouker-2016-effects-isolation-confinement.md",
+      "source_ref": "research/evidence/pagel-chouker-2016-effects-isolation-confinement.md; rev3-c note: KERS12 (n=772 flights, 52% SABP / 6mo) is the CHRONIC SABP rate, mechanistically distinct from the acute first-10-days space-adaptation window this prior models. The two are NOT the same condition; do not conflate.",
       "incidence": {
         "distribution": "Beta-Bernoulli",
         "alpha": 7,
@@ -4627,11 +4627,11 @@
     "depression": {
       "conditionId": "depression",
       "provenance": "tierB-lit",
-      "source_ref": "research/evidence/palinkas-2004-antarctic-psychiatric-disorders.md",
+      "source_ref": "research/evidence/palinkas-2004-antarctic-psychiatric-disorders.md; research/evidence/palinkas-2004-antarctic-psychiatric-disorders.md (5.2%/winter weighted = 1.93e-4/day); Hong 2022 (8.0%/winter, Korean Antarctic); Bhatia 2012 (3 psychiatric / 26 py Maitri = 3.16e-4/day); see research/_priors_rev3c_synthesis.md#2.3",
       "incidence": {
         "distribution": "Gamma-Poisson",
-        "alpha": 2,
-        "beta": 4545,
+        "alpha": 2.0,
+        "beta": 10000.0,
         "lambda_unit": "events-per-person-day"
       },
       "severity": {
@@ -4817,11 +4817,11 @@
     "respiratory-infection": {
       "conditionId": "respiratory-infection",
       "provenance": "tierB-lit",
-      "source_ref": "research/evidence/ponomarev-2021-immunological-aspects-isolation-confinement.md",
+      "source_ref": "research/evidence/ponomarev-2021-immunological-aspects-isolation-confinement.md; Bhatia 2012 Maitri Antarctic (9.7% URTI \u00d7 3.58 events/py / 365 = 9.5e-4/day, small-crew analog); Pattarini 2016 McMurdo (large-crew 'polar T-zone' upper bound 1.7e-3/day); 1.43e-3/day = small-crew anchor midpoint; see research/_priors_rev3c_synthesis.md#2.4",
       "incidence": {
         "distribution": "Gamma-Poisson",
-        "alpha": 2,
-        "beta": 278,
+        "alpha": 2.0,
+        "beta": 1400.0,
         "lambda_unit": "events-per-person-day"
       },
       "severity": {
@@ -5192,11 +5192,11 @@
     "skin-rash": {
       "conditionId": "skin-rash",
       "provenance": "tierB-lit",
-      "source_ref": "research/evidence/ponomarev-2021-immunological-aspects-isolation-confinement.md",
+      "source_ref": "research/evidence/ponomarev-2021-immunological-aspects-isolation-confinement.md; Pattarini 2016 McMurdo (dermatologic 14% \u00d7 3.58/py / 365 = 1.37e-3/day); Whitmire 2015 WOTR15 ISS (25% crew required rash medication / 6mo \u2248 1.37e-3/day) \u2014 independent anchors converge; see research/_priors_rev3c_synthesis.md#2.5",
       "incidence": {
         "distribution": "Gamma-Poisson",
-        "alpha": 2,
-        "beta": 500,
+        "alpha": 2.0,
+        "beta": 1460.0,
         "lambda_unit": "events-per-person-day"
       },
       "severity": {
@@ -6783,12 +6783,12 @@
     },
     "dental-caries": {
       "conditionId": "dental-caries",
-      "provenance": "tierB-lit",
-      "source_ref": "research/evidence_tables/medical.md",
+      "provenance": "tierA-nasa",
+      "source_ref": "research/evidence_tables/medical.md; research/imm_sources/methods/G12_gilkey_2012_bayesian_imm.md#table-26 (Bayesian update: 240 USN SSBN patrols / 5946.9 py + LSAH posterior; rate 9.41e-3/py = 2.58e-5/day); see research/_priors_rev3c_synthesis.md#2.1",
       "incidence": {
         "distribution": "Gamma-Poisson",
-        "alpha": 2,
-        "beta": 1460,
+        "alpha": 2.0,
+        "beta": 77519.0,
         "lambda_unit": "events-per-person-day"
       },
       "severity": {

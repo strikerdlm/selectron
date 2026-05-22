@@ -1,9 +1,9 @@
 # IMM Priors Rev3 — Re-elicitation Strategy
 
 **Created:** 2026-05-22
-**Last updated:** 2026-05-22 ~ 05:25 UTC — rev3-a + rev3-b DONE; rev3-c/d deferred
+**Last updated:** 2026-05-22 ~ 07:00 UTC — rev3-a + rev3-b + rev3-c DONE; rev3-d (TM21 Mars validation) is OUT OF SCOPE per analog-scope-down decision
 **Owner:** Diego
-**Reference targets:** K15 Table 1 (ISS 6mo / 6 crew / T=100k)
+**Reference targets:** K15 Table 1 (ISS 6mo / 6 crew / T=100k) — analog-relevant only post-scope-down
 
 ---
 
@@ -83,8 +83,8 @@ Rev2 deliberately did NOT increase untreated.p_evac (it only halved treated.p_ev
 |-------|-------|-----------|--------|
 | **rev3-a** | Resource-name normalisation | issHMS pEVAC ↓ 16.4 → 12.8 %; unlimited CHI 83.9 → 93.0 | **DONE** `cdef5e5` |
 | **rev3-b** | Tier-B incidence multiplier (single-knob; not multi-knob — diagnostic showed tier-B dominates) | TME ✓ across all 3 K15 scenarios; CHI(none) ✓; CHI(unlimited) ✓ | **DONE** (this commit) |
-| **rev3-c** | Closed-form per-event `untreated.p_evac` / `untreated.p_locl` rescale | pEVAC(none) → 66.9 %; pLOCL(none) → 2.89 % | DEFERRED |
-| **rev3-d** | TM21 AMM/SMM validation gate (IMM-87) | Verify generalisation to Mars-class missions | DEFERRED |
+| **rev3-c** | Per-condition source-cited priors for top tier-B contributors (HIGH-confidence only) | 5 conditions updated (dental-caries, late-insomnia, depression, respiratory-infection, skin-rash); 3 source_ref enrichments; tier-B multiplier re-tune | **DONE** (this commit) |
+| **rev3-d** | TM21 AMM/SMM validation gate (IMM-87) | Verify generalisation to Mars-class missions | **OUT OF SCOPE** per analog-scope-down 2026-05-22 — see [`future_features.md`](future_features.md) |
 
 ## 7 · rev3-b results (T=100 000, post-tierB=0.55)
 
@@ -129,6 +129,28 @@ affects results.
 **TM21 informational** (no formal gate yet — IMM-87 deferred):
 - AMM 426d: TME 151.7, CHI 74.12, pEVAC 14.15 %, pLOCL 0.41 % (vs spec band pEVAC 25–40 %, pLOCL 5–12 % — both under, consistent with rev3-c gap)
 - SMM 923d: TME 305.2, CHI 72.33, pEVAC 30.05 %, pLOCL 0.95 % (vs pEVAC 40–65 %, pLOCL 15–30 % — pEVAC almost into band; pLOCL well under)
+
+---
+
+## 8 · rev3-c results (per-condition calibration with cited primary sources)
+
+Per [`research/_priors_rev3c_synthesis.md`](../research/_priors_rev3c_synthesis.md). Three parallel research agents produced 27 distinct primary sources across Antarctic / confined-analog / submarine-ISS literature. HIGH-confidence subset applied:
+
+| Condition | Before λ̄/day | After λ̄/day | × | Source |
+|-----------|---------------|--------------|---|--------|
+| `dental-caries` | 1.37 × 10⁻³ | 2.58 × 10⁻⁵ | 0.019× | G12 Table 26 (NASA TM 217227; submarine + LSAH Bayesian) |
+| `late-insomnia` | 2.00 × 10⁻³ | 5.50 × 10⁻⁴ | 0.275× | Mars-500 Basner 2014 + SIRIUS-21 Fedyay 2023 + WOTR15 |
+| `depression` | 4.40 × 10⁻⁴ | 2.00 × 10⁻⁴ | 0.455× | Palinkas 2004 + Hong 2022 + Bhatia 2012 |
+| `respiratory-infection` | 7.19 × 10⁻³ | 1.43 × 10⁻³ | 0.199× | Bhatia 2012 (Maitri small-crew) + Pattarini 2016 (McMurdo) |
+| `skin-rash` | 4.00 × 10⁻³ | 1.37 × 10⁻³ | 0.343× | Pattarini 2016 + WOTR15 (independent convergence) |
+
+Plus source_ref enrichment (no rate change) on `dental-abscess` (G12 Table 22), `headache-co2-induced` (WOTR15 confirmation), and `back-pain-space-adaptation` (KERS12 acute-vs-chronic distinction note).
+
+Tier promotion: `dental-caries` tierB-lit → tierA-nasa (G12 is NASA-published).
+
+**Coverage after rev3-c:** 5 of 42 tier-B conditions now have source-cited per-py rates. The remaining 37 tier-B remain literature-elicited without per-condition validation — the rev3-b blanket `tierB_multiplier` is their fallback. GU/GYN and SMS categories have zero Earth-analog data (see `research/_priors_rev3c_synthesis.md` §1 coverage matrix).
+
+**tier-B multiplier re-tune:** rev3-c lowers 4 tier-B priors (`depression`, `respiratory-infection`, `skin-rash`, plus `late-insomnia` which is tier-A so multiplier doesn't affect it; `dental-caries` was promoted to tier-A and dropped substantially). Expected TME drop with `tierB_multiplier` still at 0.55 is ~9 events. Post-rev3-c `validate_imm` output in `exports/2026-05-22_validate_imm_rev3c_tierB055.txt` decides whether to keep 0.55 or relax toward 1.0.
 
 Each phase commits its priors-rev3 increment + a delta entry to this strategy doc and STATUS.md. Convergence is measured by the K15 reproduction test (`IMM-86`) which gates IMM Phase 2 acceptance (`IMM-51`).
 
