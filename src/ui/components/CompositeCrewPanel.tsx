@@ -125,10 +125,12 @@ export function CompositeCrewPanel({
 
       {/* Aggregation method selector */}
       <div className="flex flex-col gap-1.5">
-        <label className="label text-ink-2 text-[10px] uppercase tracking-cap">
+        <label htmlFor="crew-composite-aggregator" className="label text-ink-2 text-[10px] uppercase tracking-cap">
           Aggregation method
         </label>
         <select
+          id="crew-composite-aggregator"
+          aria-label="Aggregation method"
           className="mono text-[12px] bg-transparent border border-line rounded px-3 py-1.5
                      text-ink-1 cursor-pointer focus:border-signal focus:outline-none"
           value={method}

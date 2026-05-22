@@ -42,13 +42,18 @@ test.describe("Crew Composition view", () => {
     await page.getByRole("button", { name: /crew/i }).click();
     // The page heading should be visible
     await expect(page.getByRole("heading", { name: /crew composition/i })).toBeVisible({ timeout: 5_000 });
-    // Six crew member cards should be present (collapsed by default)
-    await expect(page.getByText("Alpha")).toBeVisible();
-    await expect(page.getByText("Foxtrot")).toBeVisible();
-    // Composite panel heading should be present
-    await expect(page.getByText(/crew composite/i)).toBeVisible();
-    // Run simulation button should be present
-    await expect(page.getByRole("button", { name: /run simulation/i })).toBeVisible();
+    // Six crew member cards should be present (collapsed by default).
+    // Use .first() because some member ids (e.g. Foxtrot as the weakest-link)
+    // also appear in the composite-panel "weakest · X" label.
+    await expect(page.getByText("Alpha").first()).toBeVisible();
+    await expect(page.getByText("Foxtrot").first()).toBeVisible();
+    // Composite panel heading should be present (use getByRole to avoid the
+    // screen-reader "Crew composite: NN%, qualified." sr-only live region also
+    // matching the regex).
+    await expect(page.getByRole("heading", { name: /crew composite/i })).toBeVisible();
+    // Run simulation button should be present (the button's accessible name
+    // comes from its aria-label "run IMM Monte Carlo simulation").
+    await expect(page.getByRole("button", { name: /run IMM Monte Carlo simulation/i })).toBeVisible();
   });
 
   test("crew member card expands to show sliders", async ({ page }) => {
@@ -67,12 +72,13 @@ test.describe("Crew Composition view", () => {
     await page.goto("/");
     await page.getByRole("button", { name: /crew/i }).click();
     await page.waitForTimeout(500);
-    // The aggregator select should have worst-link as default
-    const select = page.locator("select").first();
+    // Anchor on the aggregator select specifically — the page now has 3 selects
+    // (mission picker, IMM-49 preset crew dropdown, this aggregator). Use the
+    // existing "Aggregation method" label to disambiguate.
+    const select = page.getByLabel(/aggregation method/i);
     await expect(select).toHaveValue("worst-link");
     // Switch to mean
     await select.selectOption("mean");
-    // The label should update (select still shows the option)
     await expect(select).toHaveValue("mean");
   });
 });
