@@ -531,6 +531,40 @@ describe("priors-rev3-b tier multipliers", () => {
     expect(autoloaded).toBeLessThan(explicitOnes);
     expect(explicitOnes - autoloaded).toBeGreaterThan(15);
   });
+
+  it("rev3-b-followup: TME variance scales correctly with tier multiplier (λ-site, not post-count)", () => {
+    // For Poisson with rate λ, both mean and variance equal λ. If we scale λ by α,
+    // both mean and variance scale by α; sd scales by √α.
+    //
+    // The OLD post-count stochastic rounding would have given sd-ratio ≈ α (since
+    // Var[α·X] = α²·Var[X] for fixed α, ignoring the small frac-rounding correction).
+    // The NEW λ-site multiplier gives sd-ratio ≈ √α (correct Poisson scaling).
+    //
+    // For α = 0.5: old sd-ratio ≈ 0.50 ; new sd-ratio ≈ √0.5 ≈ 0.707.
+    // This test asserts the NEW behaviour — observable difference is unambiguous.
+    const baseline = simulateIMM({
+      crew: k15Crew, mission: issMission, kit: IMM_KITS.issHMS,
+      trials: TR, seed: 0xc0ffee, ...ONES,
+    });
+    const halved = simulateIMM({
+      crew: k15Crew, mission: issMission, kit: IMM_KITS.issHMS,
+      trials: TR, seed: 0xc0ffee,
+      tierAMultiplier: 0.5, tierBMultiplier: 0.5, tierCMultiplier: 0.5,
+    });
+
+    const meanRatio = halved.tme.mean / baseline.tme.mean;
+    const sdRatio   = halved.tme.sd   / baseline.tme.sd;
+
+    // Mean preservation works under both old and new (sanity check).
+    expect(meanRatio).toBeCloseTo(0.5, 1);
+
+    // CRITICAL: sd-ratio must be strictly greater than 0.5 (old behaviour ceiling).
+    // Under the new λ-site fix, Poisson contributions push sd-ratio toward √0.5 ≈ 0.707;
+    // mixed-distribution TME (some Bernoulli, some Poisson) lands between 0.5 and 0.71.
+    // Tolerance: > 0.55 distinguishes from the old behaviour at T=5k Monte-Carlo noise.
+    expect(sdRatio).toBeGreaterThan(0.55);
+    expect(sdRatio).toBeLessThan(0.85);
+  });
 });
 
 // ── Task 30: σ<5% convergence (M18/A22 rule) ─────────────────────────────────

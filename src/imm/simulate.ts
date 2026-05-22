@@ -183,19 +183,23 @@ function sampleGeneralPoissonCount(
   family: IMMConditionFamily,
   vulnerabilityCriteria: string[],
   criteriaIndex: ReadonlyMap<string, Criterion>,
+  tierMult: number = 1.0,
 ): number {
   const inc = prior.incidence;
   if (inc.distribution === "Lognormal-Poisson") {
     const lambdaPerDay = sampleLognormal(rng, inc.mu_log_lambda!, inc.sigma_log_lambda!);
     const rfmLambda = applyRiskFactorMultiplier(lambdaPerDay, member, prior);
     const modLambda = applyStageAVulnerabilityMultiplier(rfmLambda, member, family, vulnerabilityCriteria, criteriaIndex);
-    return samplePoisson(rng, modLambda * durationDays);
+    // rev3-b-followup: tierMult applied at the λ-sampling site → Poisson(λ · tierMult)
+    // preserves both mean *and* variance (Var = λ · tierMult, not mult² · λ which
+    // is what post-count stochastic rounding produced).
+    return samplePoisson(rng, modLambda * durationDays * tierMult);
   }
   if (inc.distribution === "Gamma-Poisson") {
     const lambdaPerDay = sampleGamma(inc.alpha!, rng) / inc.beta!;
     const rfmLambda = applyRiskFactorMultiplier(lambdaPerDay, member, prior);
     const modLambda = applyStageAVulnerabilityMultiplier(rfmLambda, member, family, vulnerabilityCriteria, criteriaIndex);
-    return samplePoisson(rng, modLambda * durationDays);
+    return samplePoisson(rng, modLambda * durationDays * tierMult);
   }
   // Fixed: already handled inline in the caller (lambda_fixed is a rate-per-day too)
   throw new Error(`E_BAD_PRIOR: sampleGeneralPoissonCount called with unsupported distribution ${inc.distribution}`);
@@ -245,34 +249,49 @@ export function runIMMTrial(
       const prior = priors.conditions[cond.id];
       if (!prior) continue;
 
+      // rev3-b-followup: compute the per-prior tier multiplier ONCE up front so
+      // every sampling-site call below can multiply at the correct mathematical
+      // location (λ for Poisson; p for Bernoulli). Replaces the earlier
+      // post-count stochastic-rounding block which preserved mean but distorted
+      // variance for Poisson paths.
+      let tierMult = 1.0;
+      if (prior.provenance === "tierC-synth")     tierMult = tierCMult;
+      else if (prior.provenance === "tierA-nasa") tierMult = tierAMult;
+      else if (prior.provenance === "tierB-lit")  tierMult = tierBMult;
+
       let count = 0;
       if (cond.processType === "general-Poisson") {
         if (prior.incidence.distribution === "Fixed") {
           // Fixed: lambda_fixed is a per-person-day rate; scale by duration, then apply RFM.
           // IC-5: apply Stage A vulnerability multiplier on top of RFM.
+          // rev3-b-followup: tierMult applied to λ directly (variance-preserving).
           const baseLambdaPerDay = prior.incidence.lambda_fixed!;
           const rfmLambdaPerDay = applyRiskFactorMultiplier(baseLambdaPerDay, member, prior);
           const modLambdaPerDay = applyStageAVulnerabilityMultiplier(rfmLambdaPerDay, member, cond.family, cond.vulnerabilityCriteria, criteriaIndex);
-          count = samplePoisson(rng, modLambdaPerDay * mission.durationDays);
+          count = samplePoisson(rng, modLambdaPerDay * mission.durationDays * tierMult);
         } else {
           // Gamma-Poisson / Lognormal-Poisson: draw λ/day from hierarchical prior, apply RFM,
           // IC-5 Stage A multiplier, then scale by mission duration before Poisson sampling.
-          count = sampleGeneralPoissonCount(rng, prior, member, mission.durationDays, cond.family, cond.vulnerabilityCriteria, criteriaIndex);
+          count = sampleGeneralPoissonCount(rng, prior, member, mission.durationDays, cond.family, cond.vulnerabilityCriteria, criteriaIndex, tierMult);
         }
       } else if (cond.processType === "space-adaptation-once") {
         // T24: once-per-mission cap — skip if this crew member already had this condition.
+        // rev3-b-followup: tierMult applied per-Bernoulli (count is 0 or 1; product of
+        // Bernoulli(p)·Bernoulli(mult) = Bernoulli(p·mult), variance-correct).
         if (processedSAOnce[cIdx].has(cond.id)) {
           count = 0;
         } else {
           const occ = sampleIncidence(rng, prior);
-          if (occ > 0) {
+          if (occ > 0 && (tierMult === 1.0 || rng() < tierMult)) {
             processedSAOnce[cIdx].add(cond.id);
             count = 1;
           }
         }
       } else if (cond.processType === "EVA-coupled") {
+        // rev3-b-followup: tierMult applied per-Bernoulli inside the per-EVA loop.
+        // Sum of independent Bernoulli(p·mult) is Binomial(n, p·mult) — variance-correct.
         for (let e = 0; e < member.EVA_count; e++) {
-          if (sampleIncidence(rng, prior) > 0) count++;
+          if (sampleIncidence(rng, prior) > 0 && (tierMult === 1.0 || rng() < tierMult)) count++;
         }
       } else if (cond.processType === "SPE-coupled") {
         // T23: Per-SPE-event Bernoulli via ARS prior (Beta-Bernoulli per event).
@@ -308,33 +327,24 @@ export function runIMMTrial(
         }
         count = 0; // SPE occurrences created directly above; skip the generic loop
       } else if (cond.processType === "SA-VIIP-late") {
-        if (sampleIncidence(rng, prior) > 0) count = 1;
+        // rev3-b-followup: tierMult applied per-Bernoulli (single Bernoulli; variance-correct).
+        if (sampleIncidence(rng, prior) > 0 && (tierMult === 1.0 || rng() < tierMult)) count = 1;
       }
 
-      // T31 + priors-rev3-b: Apply per-tier global incidence multiplier.
-      // Multiplier > 1 increases expected events; < 1 decreases them.
-      // Applied to all non-SPE process types (SPE events are created directly above).
-      // CRITICAL: uses *stochastic rounding* to preserve the expected value exactly.
-      // (Math.round biases small counts: e.g. count=1 × 0.5 → Math.round(0.5)=1 retains the
-      // event entirely, so simple rounding turns a "half the events" multiplier into a
-      // "preserve most events" no-op for the count=1 regime that dominates tier-B priors.)
-      //
-      // TODO(rev3-b-followup): the principled fix is to thread the multiplier into the
-      // λ *sampling site* (sample directly from Poisson(λ · mult) in `src/imm/incidence.ts`)
-      // rather than post-multiplying the count. Stochastic rounding is mean-preserving
-      // but distorts variance — Var(floor + Bernoulli(frac)) ≠ Var(Poisson(λ · mult)).
-      // For CI₉₅ reporting this matters. Tracked in
-      // `docs/iter5_scientific_limitations.md` §3.3 and in `docs/iter5_priors_rev3_strategy.md`.
-      let tierMult = 1.0;
-      if (prior.provenance === "tierC-synth") tierMult = tierCMult;
-      else if (prior.provenance === "tierA-nasa") tierMult = tierAMult;
-      else if (prior.provenance === "tierB-lit") tierMult = tierBMult;
-      if (tierMult !== 1.0 && cond.processType !== "SPE-coupled" && count > 0) {
-        const scaled = count * tierMult;
-        const floor = Math.floor(scaled);
-        const frac = scaled - floor;
-        count = floor + (rng() < frac ? 1 : 0);
-      }
+      // rev3-b-followup (2026-05-22): the post-count stochastic-rounding block that
+      // used to live here has been removed. tierMult is now threaded into every
+      // distribution-specific sampling site above:
+      //   - Lognormal/Gamma/Fixed Poisson → multiply λ before samplePoisson (variance-correct)
+      //   - SA-once / EVA-coupled / SA-VIIP-late Bernoulli → multiply p per-Bernoulli
+      //     (variance-correct because Bernoulli(p)·Bernoulli(mult) = Bernoulli(p·mult))
+      //   - SPE-coupled → SPE schedule is external (sampled once per trial via
+      //     samplePoissonProcess); tierMult does not apply to the SPE timeline itself,
+      //     only to per-ARS-event Bernoulli inside the SPE branch — already handled
+      //     inline above by the existing Beta-Bernoulli ARS draw, which is unaffected
+      //     by tier multipliers (SPE is treated as physical infrastructure not as a
+      //     condition prior we calibrate).
+      // See docs/iter5_priors_rev3_strategy.md §8 and docs/iter5_scientific_limitations.md §3.3
+      // for the rationale.
 
       // T24: Compute time-of-occurrence based on condition process type.
       // space-adaptation-once: peak day 2.5, range 0–5 (early adaptation window).

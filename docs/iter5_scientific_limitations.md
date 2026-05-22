@@ -58,13 +58,20 @@ rev3-b set `global_calibration.tierB_multiplier = 0.55` — a single scalar that
 
 **Residual: 37 of 42 tier-B conditions still rely on the blanket multiplier as fallback.** They lack per-condition Earth-analog evidence (most are minor everyday medical events whose per-py rate is in NASA's proprietary iMED database, not published literature). Further per-condition calibration is iterative — each requires its own source verification — and is tracked as a future rev3-d-and-beyond effort.
 
-### 3.3 Stochastic rounding preserves mean only
+### 3.3 ~~Stochastic rounding preserves mean only~~ — RESOLVED 2026-05-22 (rev3-b-followup)
 
-The rev3-b engine extension applies tier multipliers via stochastic rounding (`floor(count × mult) + Bernoulli(frac)`). This preserves the expected value exactly but **distorts higher moments** — variance is no longer `Var(Poisson(λ · mult))`. For CI₉₅ reporting (which is the whole point of the Monte Carlo), this is a known issue.
+The rev3-b engine extension originally applied tier multipliers via stochastic rounding (`floor(count × mult) + Bernoulli(frac)`) which preserved mean but distorted variance: `Var[floor + Bernoulli(frac)] ≠ Var[Poisson(λ · mult)]`. For `tierB=0.55` this under-reported Poisson variance by ~45 % (Var becomes `mult² · λ + ε` instead of the correct `mult · λ`). CI₉₅ widths were correspondingly under-reported.
 
-The principled fix is to thread the multiplier into the **sampling site**: sample directly from `Poisson(λ · mult)` (or `Lognormal-Poisson(μ + log(mult), σ)`, etc.) rather than post-multiplying the count. This is a one-line change in `src/imm/incidence.ts` and tracked as a follow-up TODO in `src/imm/simulate.ts`.
+**Resolved in commit `<rev3-b-followup>`:** the tier multiplier is now threaded into each distribution-specific sampling site in `src/imm/simulate.ts::runIMMTrial`:
 
-Until that follow-up lands, **CI₉₅ widths on metrics that depend on multiplied tiers are slightly under-reported**.
+- **Lognormal-Poisson / Gamma-Poisson / Fixed-Poisson:** multiply `λ` before `samplePoisson(rng, λ · tierMult)` — preserves both mean and variance exactly (Poisson is closed under rate scaling).
+- **space-adaptation-once / SA-VIIP-late (single Bernoulli):** apply `&& (tierMult === 1.0 || rng() < tierMult)` after the Bernoulli draw — variance-correct because `Bernoulli(p) × Bernoulli(mult) = Bernoulli(p · mult)`.
+- **EVA-coupled (Binomial via per-EVA Bernoullis):** apply `&& (tierMult === 1.0 || rng() < tierMult)` inside the per-EVA loop — the sum of independent `Bernoulli(p · mult)` is `Binomial(n, p · mult)`, variance-correct.
+- **SPE-coupled:** SPE schedule is external (sampled once per trial via `samplePoissonProcess` at `LAMBDA_SPE_PER_DAY`) and per-ARS-event Bernoulli is treated as physical infrastructure; tier multipliers do not apply to SPE timing.
+
+The post-count stochastic-rounding block was removed entirely. New variance-correctness test in `tests/imm/simulate.test.ts::priors-rev3-b` asserts that the SD ratio between `mult=0.5` and `mult=1.0` runs lands in `(0.55, 0.85)` — distinguishing the new λ-site fix from the old post-count behaviour (which would have given SD ratio ≈ 0.5).
+
+**Implication:** CI₉₅ widths reported by `simulateIMM` (and downstream by `assessIMMLxC` → NASA HSRB matrix verdict) are now variance-correct. K15 reproduction means are unchanged (mean preservation held both before and after the fix); CI₉₅ widths may be modestly wider after the fix because variance is no longer under-reported.
 
 ### 3.4 The auto-load behaviour shifts RNG streams
 
