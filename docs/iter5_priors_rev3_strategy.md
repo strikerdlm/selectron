@@ -1,7 +1,7 @@
 # IMM Priors Rev3 — Re-elicitation Strategy
 
 **Created:** 2026-05-22
-**Status:** rev3-a in progress (this session); rev3-b/c deferred to follow-up
+**Last updated:** 2026-05-22 ~ 05:25 UTC — rev3-a + rev3-b DONE; rev3-c/d deferred
 **Owner:** Diego
 **Reference targets:** K15 Table 1 (ISS 6mo / 6 crew / T=100k)
 
@@ -79,12 +79,56 @@ Rev2 deliberately did NOT increase untreated.p_evac (it only halved treated.p_ev
 
 ## 4 · Phasing
 
-| Phase | Scope | Expected Δ | Status |
+| Phase | Scope | Observed Δ | Status |
 |-------|-------|-----------|--------|
-| **rev3-a** | Resource-name normalisation (this session) | issHMS pEVAC ↓; CHI(issHMS) ↑; TME unchanged | IN PROGRESS |
-| **rev3-b** | Multi-knob incidence calibration | TME → ref across all 3 scenarios; CHI(none) → ref; secondary effect on pEVAC | DEFERRED |
-| **rev3-c** | Closed-form per-event p_evac/p_locl rescale | pEVAC(none) → 66.9 %; pLOCL(none) → 2.89 % | DEFERRED |
-| **rev3-d** | TM21 AMM/SMM validation gate | Verify generalisation to Mars-class missions | DEFERRED |
+| **rev3-a** | Resource-name normalisation | issHMS pEVAC ↓ 16.4 → 12.8 %; unlimited CHI 83.9 → 93.0 | **DONE** `cdef5e5` |
+| **rev3-b** | Tier-B incidence multiplier (single-knob; not multi-knob — diagnostic showed tier-B dominates) | TME ✓ across all 3 K15 scenarios; CHI(none) ✓; CHI(unlimited) ✓ | **DONE** (this commit) |
+| **rev3-c** | Closed-form per-event `untreated.p_evac` / `untreated.p_locl` rescale | pEVAC(none) → 66.9 %; pLOCL(none) → 2.89 % | DEFERRED |
+| **rev3-d** | TM21 AMM/SMM validation gate (IMM-87) | Verify generalisation to Mars-class missions | DEFERRED |
+
+## 7 · rev3-b results (T=100 000, post-tierB=0.55)
+
+`exports/2026-05-22_validate_imm_rev3b_tierB055.txt`. The single-knob change:
+all conditions with `provenance: "tierB-lit"` (42 conditions, ~65 % of baseline
+TME) are now scaled by 0.55 via the new `global_calibration.tierB_multiplier`
+field in `imm-priors.json`, auto-loaded by `simulateIMM` when caller's opts
+don't override.
+
+| Scenario  | Metric | Before rev3-b | After rev3-b | K15 ref | CI₉₅ | Status |
+|-----------|--------|---------------|--------------|---------|------|--------|
+| **none**      | TME   | 149.40 | **106.48** |  98.30 | [73, 122] | ✓ |
+|               | CHI   |  48.87 |  **64.88** |  59.20 | [43.36, 71.25] | ✓ |
+|               | pEVAC |  19.36 % |  13.69 % |  66.90 % | [66.57, 67.14] | ✗ (rev3-c) |
+|               | pLOCL |   0.67 % |   0.45 % |   2.89 % | [2.78, 2.99] | ✗ (rev3-c) |
+| **issHMS**    | TME   | 150.86 | **107.17** | 106.00 | [87, 126] | ✓ |
+|               | CHI   |  60.79 |  75.64 |  94.93 | [84.30, 98.50] | ✗ (severity/coverage; rev3-c?) |
+|               | pEVAC |  12.82 % |   8.66 % |   5.57 % | [5.43, 5.72] | ✗ |
+|               | pLOCL |   0.31 % |   0.27 % |   0.44 % | [0.40, 0.49] | ✗ |
+| **unlimited** | TME   | 152.17 | **107.79** | 106.00 | [87, 126] | ✓ |
+|               | CHI   |  92.98 |  **94.88** |  94.98 | [84.40, 98.50] | ✓ (Δ −0.10 — nearly perfect) |
+|               | pEVAC |   2.49 % |   2.18 % |   4.93 % | [4.80, 5.07] | ✗ (rev3-c upward) |
+|               | pLOCL |   0.26 % |   0.19 % |   0.45 % | [0.41, 0.49] | ✗ (rev3-c upward) |
+
+**5 of 12 K15 metrics now within CI₉₅** (was 1 of 12 post-rev3-a). All 3 TME
+metrics ✓; 'none' and 'unlimited' CHI both ✓. The remaining 7 are pEVAC and
+pLOCL (all 3 scenarios × 2 metrics, plus issHMS CHI). pEVAC/pLOCL residuals
+are systematic (under-elicited untreated path) and address-able by rev3-c
+closed-form rescale. issHMS CHI is a third axis: not fixable by incidence
+scaling alone — likely needs per-condition severity tuning or further kit
+coverage work.
+
+**Stochastic-rounding bug found and fixed:** the original Tier-C multiplier
+(T31, commit `cedb2bc`) used `Math.round(count × mult)`. For count=1 (the
+dominant per-trial count for most conditions), `Math.round(0.5) = 1` retains
+the event entirely, so simple rounding turned a "halve the events" multiplier
+into a near-no-op for the count=1 regime. Replaced with stochastic rounding
+(`floor + Bernoulli(frac)`) which preserves the expected value exactly. This
+was a latent bug in T31 calibration; rev3-b is the first place it materially
+affects results.
+
+**TM21 informational** (no formal gate yet — IMM-87 deferred):
+- AMM 426d: TME 151.7, CHI 74.12, pEVAC 14.15 %, pLOCL 0.41 % (vs spec band pEVAC 25–40 %, pLOCL 5–12 % — both under, consistent with rev3-c gap)
+- SMM 923d: TME 305.2, CHI 72.33, pEVAC 30.05 %, pLOCL 0.95 % (vs pEVAC 40–65 %, pLOCL 15–30 % — pEVAC almost into band; pLOCL well under)
 
 Each phase commits its priors-rev3 increment + a delta entry to this strategy doc and STATUS.md. Convergence is measured by the K15 reproduction test (`IMM-86`) which gates IMM Phase 2 acceptance (`IMM-51`).
 

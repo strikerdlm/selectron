@@ -86,6 +86,14 @@ export type IMMTrialOpts = {
    */
   tierCMultiplier?: number;
   /**
+   * priors-rev3-b: Tier-A and Tier-B global incidence multipliers.
+   * Mirror tierCMultiplier semantics for the other two provenance tiers.
+   * Default 1.0 (no effect). Threaded by simulateIMM from calibration values
+   * stored in imm-priors.json's global_calibration block.
+   */
+  tierAMultiplier?: number;
+  tierBMultiplier?: number;
+  /**
    * IC-5: Optional criteria index for Stage A z-scored vulnerability multiplier.
    * When provided, per-member stageAScores are z-scored and applied as an
    * additional lambda multiplier for conditions with non-empty vulnerabilityCriteria.
@@ -212,6 +220,9 @@ export function runIMMTrial(
   const priors = loadIMMPriors();
   // T31: Tier-C global multiplier (default 1.0 → no change, preserves existing behaviour).
   const tierCMult = opts.tierCMultiplier ?? 1.0;
+  // priors-rev3-b: Tier-A and Tier-B global multipliers (default 1.0).
+  const tierAMult = opts.tierAMultiplier ?? 1.0;
+  const tierBMult = opts.tierBMultiplier ?? 1.0;
   // IC-5: criteria index for Stage A z-scored vulnerability multiplier.
   const criteriaIndex: ReadonlyMap<string, Criterion> = opts.criteriaIndex ?? new Map();
   const availableResources: Record<string, number> = { ...kit.resources };
@@ -300,11 +311,22 @@ export function runIMMTrial(
         if (sampleIncidence(rng, prior) > 0) count = 1;
       }
 
-      // T31: Apply Tier-C global multiplier — scale count for tierC-synth conditions.
+      // T31 + priors-rev3-b: Apply per-tier global incidence multiplier.
       // Multiplier > 1 increases expected events; < 1 decreases them.
       // Applied to all non-SPE process types (SPE events are created directly above).
-      if (tierCMult !== 1.0 && prior.provenance === "tierC-synth" && cond.processType !== "SPE-coupled") {
-        count = Math.round(count * tierCMult);
+      // CRITICAL: uses *stochastic rounding* to preserve the expected value exactly.
+      // (Math.round biases small counts: e.g. count=1 × 0.5 → Math.round(0.5)=1 retains the
+      // event entirely, so simple rounding turns a "half the events" multiplier into a
+      // "preserve most events" no-op for the count=1 regime that dominates tier-B priors.)
+      let tierMult = 1.0;
+      if (prior.provenance === "tierC-synth") tierMult = tierCMult;
+      else if (prior.provenance === "tierA-nasa") tierMult = tierAMult;
+      else if (prior.provenance === "tierB-lit") tierMult = tierBMult;
+      if (tierMult !== 1.0 && cond.processType !== "SPE-coupled" && count > 0) {
+        const scaled = count * tierMult;
+        const floor = Math.floor(scaled);
+        const frac = scaled - floor;
+        count = floor + (rng() < frac ? 1 : 0);
       }
 
       // T24: Compute time-of-occurrence based on condition process type.
@@ -413,6 +435,9 @@ export function simulateIMM(opts: {
   seed: number;
   /** T31: optional Tier-C global multiplier (default 1.0). */
   tierCMultiplier?: number;
+  /** priors-rev3-b: optional Tier-A and Tier-B global multipliers (default 1.0). */
+  tierAMultiplier?: number;
+  tierBMultiplier?: number;
   /**
    * Crew Health Index threshold for Mission Success Probability (MSP).
    * A trial is a "success" when: evac===0 AND locl===0 AND CHI >= chiStar×100.
@@ -429,6 +454,8 @@ export function simulateIMM(opts: {
 }): IMMOutcome {
   const { crew, mission, kit, trials, seed } = opts;
   const chiStar = opts.chiStar ?? 0.7;
+  // priors-rev3-b: read global_calibration defaults for tier multipliers.
+  const globalCal = loadIMMPriors().global_calibration;
   // IC-5: build criteria index once, pass to each trial.
   const criteriaIndex: ReadonlyMap<string, Criterion> = opts.criteria
     ? new Map(opts.criteria.map(c => [c.id, c]))
@@ -448,7 +475,15 @@ export function simulateIMM(opts: {
   const perConditionLoclSum: Record<string, number> = {};
 
   for (let t = 1; t <= trials; t++) {
-    const r = runIMMTrial(rng, crew, mission, kit, { tierCMultiplier: opts.tierCMultiplier, criteriaIndex });
+    const r = runIMMTrial(rng, crew, mission, kit, {
+      // priors-rev3-b: explicit opts override priors.json defaults; if opts not
+      // provided, fall back to global_calibration values (so the calibrated
+      // multipliers auto-apply without every caller knowing to pass them).
+      tierAMultiplier: opts.tierAMultiplier ?? globalCal.tierA_multiplier ?? 1.0,
+      tierBMultiplier: opts.tierBMultiplier ?? globalCal.tierB_multiplier ?? 1.0,
+      tierCMultiplier: opts.tierCMultiplier ?? globalCal.tierC_multiplier ?? 1.0,
+      criteriaIndex,
+    });
     tmes.push(r.tme);
     // CHI clamped at [0, 100] — QTL can exceed denom under pathological priors (v1 analogue of risk/simulate.ts §3.5 guard).
     const chiForTrial = Math.max(0, Math.min(100, 100 * (1 - r.qtl / denom)));
