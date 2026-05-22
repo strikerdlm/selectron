@@ -48,13 +48,15 @@ The actual observed data (M18 Table 2: zero observed EVAC and zero observed LOCL
 
 This means: our K15 "reproduction" demonstrates that we can reproduce another model's outputs, not that we have validated against reality.
 
-### 3.2 The tier-B blanket multiplier is atheoretical
+### 3.2 The tier-B blanket multiplier is atheoretical (partially addressed in rev3-c)
 
 rev3-b set `global_calibration.tierB_multiplier = 0.55` — a single scalar that scales every tier-B condition's sampled incidence by 0.55. This was the simplest knob that brought aggregate TME within K15 CI₉₅ across all three scenarios.
 
 **It is not a scientific claim that every tier-B prior was elicited 1.8× too high.** Individual tier-B conditions are almost certainly over-elicited (a 1.8× scalar is too much) or under-elicited (it is not enough); the blanket multiplier moves the AGGREGATE to match while obscuring per-condition errors.
 
-A scientifically defensible alternative would be a **per-condition audit**: spot-check each tier-B condition against the primary source(s), correct individual incidence values, and let the aggregate fall where it falls. We do not have the analyst-hours nor the per-condition source data to do this for all 42 tier-B conditions in this iteration.
+**rev3-c partial fix (2026-05-22):** 5 tier-B conditions were replaced with source-cited per-py rates derived from Earth-analog primary literature (Antarctic, Mars-500, SIRIUS-21, submarine, ISS WOTR15 — 27 primary citations total across 3 research-agent deliverables). The conditions calibrated: `dental-caries` (promoted to tier-A via G12 Bayesian chain), `late-insomnia`, `depression`, `respiratory-infection`, `skin-rash`. Plus source_ref enrichment on `dental-abscess`, `headache-co2-induced`, `back-pain-space-adaptation`. See [`research/_priors_rev3c_synthesis.md`](../research/_priors_rev3c_synthesis.md) for the consolidated table.
+
+**Residual: 37 of 42 tier-B conditions still rely on the blanket multiplier as fallback.** They lack per-condition Earth-analog evidence (most are minor everyday medical events whose per-py rate is in NASA's proprietary iMED database, not published literature). Further per-condition calibration is iterative — each requires its own source verification — and is tracked as a future rev3-d-and-beyond effort.
 
 ### 3.3 Stochastic rounding preserves mean only
 
@@ -80,9 +82,14 @@ This section now lists residuals **within the active analog + LEO-ISS scope only
 
 ### 4.1 'none' pEVAC under-elicited (LEO-ISS scenario)
 
-The 'none' (no medical kit, K15 reference crew on ISS 6mo) scenario gives pEVAC = 13.7 % vs K15 ref 66.9 %. The K15 baseline expects that 2-of-3 crews on a 6-month mission without any medical resources would face an EVAC decision. Our priors give 1-of-7.
+The 'none' (no medical kit, K15 reference crew on ISS 6mo) scenario gives pEVAC = 13.0 % (post-rev3-c) vs K15 ref 66.9 %. The K15 baseline expects that 2-of-3 crews on a 6-month mission without any medical resources would face an EVAC decision. Our priors give 1-of-7.
 
-This is a per-event `untreated.p_evac` under-elicitation (rev3-c scope, deferred). It is in-scope and addressable by a closed-form rescale once we choose to do that work.
+This is a per-event `untreated.p_evac` under-elicitation. Closed-form rescale is technically possible (given calibrated event count N, target per-event p ≈ 1 − (1 − P_K15)^(1/N)) but **NOT applied in rev3-c** because:
+1. The 'none' scenario is operationally implausible — every analog and LEO mission has at minimum some medical kit
+2. The K15 'none' value is a model-construct baseline (no actual mission has zero kit), so reproducing it via blanket p_evac inflation would over-correct the operationally-relevant issHMS/unlimited scenarios
+3. Per-condition `untreated.p_evac` rates would need per-source elicitation (Pattarini 2016 MEDEVAC rate 0.036/py is the operational anchor, not the K15 'none' construct)
+
+Status: open question whether to close this gap or document it as a K15-model-construct artifact. Decision deferred.
 
 ### 4.2 issHMS CHI residual (Δ −19.3)
 
