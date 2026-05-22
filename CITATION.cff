@@ -1,14 +1,18 @@
 cff-version: 1.2.0
-title: "Selectron: A Bayesian Multi-Criteria Decision Engine with NASA HSRB Likelihood × Consequence Mapping for Analog-Astronaut Selection"
-message: "If you use this software, please cite the accompanying manuscript and this software repository together."
+title: "Selectron: A Bayesian Multi-Criteria Decision Engine with NASA HSRB Likelihood × Consequence Mapping and IMM Calculator for Analog-Astronaut Selection"
+message: "If you use Selectron in academic work, please cite this software as below, plus the underlying NASA Integrated Medical Model papers listed in `references`."
+type: software
 authors:
   - family-names: "Malpica"
     given-names: "Diego L."
-    affiliation: "Direction of Aerospace Medicine, Colombian Aerospace Force (FAC)"
+    affiliation: "Dirección de Medicina Aeroespacial, Fuerza Aeroespacial Colombiana (FAC)"
     email: "dlmalpica@yahoo.com"
-type: software
+    orcid: "https://orcid.org/0000-0002-7082-1846"
 license: MIT
 repository-code: "https://github.com/strikerdlm/selectron"
+url: "https://github.com/strikerdlm/selectron"
+version: "0.5.0-iter5-priors-rev3a"
+date-released: "2026-05-22"
 preferred-citation:
   type: article
   title: "Bayesian Multi-Criteria Decision Analysis with NASA Human-System-Risk-Board Likelihood × Consequence Mapping for Analog-Astronaut Selection"
@@ -22,7 +26,69 @@ keywords:
   - "analog astronaut selection"
   - "Bayesian MCDA"
   - "NASA HSRB"
+  - "NASA IMM"
+  - "Integrated Medical Model"
+  - "probabilistic risk assessment"
   - "Likelihood × Consequence"
   - "JSC-66705"
   - "Monte Carlo"
   - "Crew Health Index"
+  - "aerospace medicine"
+references:
+  - type: article
+    authors:
+      - family-names: "Keenan"
+        given-names: "A. M."
+    title: "Integrated Medical Model: A probabilistic simulation model for predicting in-flight medical conditions"
+    year: 2015
+    conference:
+      name: "ICES-2015-123, 45th International Conference on Environmental Systems"
+      city: "Bellevue"
+      country: "US"
+    notes: "K15 — Selectron's foundational IMM architecture and Table 1 validation target"
+  - type: article
+    authors:
+      - family-names: "Myers"
+        given-names: "J. G."
+    title: "Validation of the Integrated Medical Model"
+    year: 2018
+    conference:
+      name: "PSAM 14, Paper 174"
+      city: "Los Angeles"
+      country: "US"
+    notes: "M18 — σ<5 % convergence rule + canonical T=100 000 trials + NASA-STD-7009A factor list"
+  - type: article
+    authors:
+      - family-names: "Antonsen"
+        given-names: "E. L."
+    title: "Quantifying medical risk in human spaceflight"
+    year: 2022
+    journal: "npj Microgravity"
+    volume: 8
+    issue: 1
+    doi: "10.1038/s41526-022-00193-9"
+    notes: "A22 — 4-step trial verbatim + 100k convergence aggregation"
+  - type: report
+    authors:
+      - family-names: "Gilkey"
+        given-names: "K. M."
+    title: "Bayesian update for the Integrated Medical Model"
+    year: 2012
+    institution:
+      name: "NASA Technical Memorandum 217227"
+    notes: "G12 — Bayesian update of LSAH astronaut data; WinBUGS dual-convergence rule"
+  - type: article
+    authors:
+      - family-names: "Walton"
+        given-names: "M. E."
+      - family-names: "Kerstman"
+        given-names: "E. L."
+    title: "Quantitative risk assessment for the International Space Station Integrated Medical Model"
+    year: 2020
+    journal: "Aerospace Medicine and Human Performance"
+    volume: 91
+    issue: 4
+    start: 332
+    end: 342
+    doi: "10.3357/AMHP.5432.2020"
+    notes: "S20 — empirical ISS validation context"
