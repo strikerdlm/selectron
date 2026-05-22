@@ -267,12 +267,28 @@ See [`docs/superpowers/specs/2026-05-20-selectron-imm-calculator-design.md`](doc
 - **Iter 2 criteria + tiers:** 12 evidence-grounded criteria with verified DOIs, 3-tier accessibility model (Minimum / Medium / Elite), tier-aware scale transforms.
 - **Iter 3 risk + LxC:** NASA IMM Monte Carlo at *T* = 100 000, NASA HSRB LxC verdict per JSC-66705 Rev A, CHIExplainer + LxCMatrix UI, per-mission LxC chips in the comparison panel.
 - **Iter 4 manuscript:** initial IMRaD draft complete; figure pipeline (F1–F7) reproducible from `src/`.
-- **Iter 5 IMM Calculator (active):** Phase 0 (100-condition catalog + 3-tier priors) + Phase 1 (engine math, σ<5 % convergence) DONE; Phase 4 figures partial — I1–I5 shipped and wired into CrewComposition (I6/I7/I8 engine-blocked); priors re-elicitation rev3-a landed, rev3-b/c/d deferred to follow-up sessions.
+- **Iter 5 IMM Calculator (active):** Phase 0 (100-condition catalog + 3-tier priors) + Phase 1 (engine math, σ<5 % convergence) DONE; Phase 2 data layer scaffolding started — Dexie v3 + `imm_sessions` CRUD landed (IMM-37/38); Phase 4 figures partial — I1–I5 shipped and wired into CrewComposition (I6/I7/I8 engine-blocked); priors re-elicitation rev3-a landed, rev3-b/c/d deferred to follow-up sessions.
 - **Phase 0 literature fan-out:** complete; all 6 agent deliverables under `research/`.
 - **Active branch:** `iter1-phase0` (still the working branch name from Iter-1; rebased history carries Iter-2, Iter-3, Iter-4, and Iter-5 work).
-- **Next concrete work:** priors-rev3-b multi-knob incidence calibration (gates IMM Phase 2 acceptance, IMM-51) → IMM-37/38 Dexie v3 schema + CRUD → IMMCalculator standalone view (IMM-39 onwards).
 
-The live resume tracker is [`STATUS.md`](STATUS.md). It is updated as the single source of truth at the end of every task, so any new session (or any new agent) can pick up cleanly from a disconnection.
+The live resume tracker is [`STATUS.md`](STATUS.md). It is updated as the single source of truth at the end of every task, so any new session (or any new agent) can pick up cleanly from a disconnection. Citation metadata is in [`CITATION.cff`](CITATION.cff) (GitHub renders a "Cite this repository" button).
+
+## What's left to do
+
+Ordered by impact, honest about blockers:
+
+1. **IMM priors-rev3-b — multi-knob incidence calibration** (HIGH PRIORITY; gates IMM Phase 2 acceptance and IMM-86 K15 reproduction test). TME is uniformly +44 to +51 above K15 reference across all 3 scenarios; the existing single-Tier-C-scalar `src/imm/calibration.ts` cannot reach it. Extend to per-tier × per-scenario multipliers (tierA / tierB / tierC × none / issHMS / unlimited). Single deep-work session — not parallelisable per the rev3 strategy in [`docs/iter5_priors_rev3_strategy.md`](docs/iter5_priors_rev3_strategy.md); 5–15 `validate_imm` cycles × ~5 min each.
+2. **IMM priors-rev3-c — closed-form per-event `untreated.p_evac` rescale.** Depends on rev3-b. Target: lift `none` pEVAC from 19 % to K15's 67 %. Closed-form, deterministic — once incidence is fit, this is a one-pass calculation.
+3. **IMM Phase 2 UI — `IMMCalculator.tsx` standalone view (IMM-39 → IMM-51).** Now unblocked by IMM-37/38 (data layer in place). 13 tasks: CrewBuilder, KitPicker, Mission inputs, ResultsCard, prior-override drilldown, Run button + Web Worker, K15 validation badge, engine toggle, vulnerability mode toggle, quick-load presets, session save/load/share UI, P2 acceptance gate. Several of these are parallel-dispatchable (each task is one component file + tests).
+4. **Engine extensions to unblock the remaining 3 IMM figures.**
+   - **I6 IMMSensitivityTornado:** add a ±50 % per-condition perturbation runner (re-runs `simulateIMM` with bumped λ per condition; not the GP surrogate of design spec §22 — a deterministic v1 is fine).
+   - **I7 IMMCrewRiskHeat:** surface per-crew × per-condition counts from `runIMMTrial` into `IMMOutcome` (currently only mission-aggregate `perConditionDrivers` is exposed).
+   - **I8 IMMVulnerabilityCalibration:** depends on Phase 3 ML — vulnerability MLP training (IMM-57+ all PENDING).
+5. **Phase 3 ML layer (IMM-52 → IMM-65)** — surrogate (LightGBM) + vulnerability MLP (TFJS). 14 tasks. Deliberately deferred per the IMM Calculator plan; not on this release's critical path.
+6. **Validation gates (IMM-86 / IMM-87)** — K15 Table 1 reproduction test + TM21 AMM/SMM ±20 % gate. Both written as `tests/imm/validation.test.ts`; will fail until rev3-b/c land.
+7. **AWAITING-DIEGO sign-offs** — Iter-1 manual UI sanity (Task 17), Iter-3 Mission-risk tab manual sanity (Task 58), Phase 3F acceptance (Task 88), Iter-2 ratification of `research/02_criterion_taxonomy.md` → `docs/criteria.md` (gates Iter-2 start).
+
+See [`STATUS.md`](STATUS.md) for the full per-task tracker (97 IMM tasks + Iter-1/2/3/4 history) and [`docs/iter5_priors_rev3_strategy.md`](docs/iter5_priors_rev3_strategy.md) for the priors re-elicitation phasing.
 
 ## Inspiration & citation
 
