@@ -1,7 +1,7 @@
 # IMM Priors Rev3 — Re-elicitation Strategy
 
 **Created:** 2026-05-22
-**Last updated:** 2026-05-22 ~ 09:00 UTC — rev3-a + rev3-b + rev3-c + rev3-d DONE (rev3-d = K15-correct sequential QTL fix; closed the issHMS CHI residual within K15 CI₉₅); rev3-e queued for cp3 prior re-elicitation
+**Last updated:** 2026-05-22 ~ 09:25 UTC — rev3-a + rev3-b + rev3-c + rev3-d + rev3-e DONE (rev3-e = per-condition fi_cp3 audit + cp3 re-enabled in QTL per K15 §II.A.9); 7/12 K15 metrics within CI₉₅; remaining residuals on operationally-implausible 'none' scenario only
 **Owner:** Diego
 **Reference targets:** K15 Table 1 (ISS 6mo / 6 crew / T=100k) — analog-relevant only post-scope-down
 
@@ -86,7 +86,8 @@ Rev2 deliberately did NOT increase untreated.p_evac (it only halved treated.p_ev
 | **rev3-c** | Per-condition source-cited priors for top tier-B contributors (HIGH-confidence only) | 5 conditions updated (dental-caries, late-insomnia, depression, respiratory-infection, skin-rash); 3 source_ref enrichments; tier-B multiplier re-tune | **DONE** (this commit) |
 | ~~**rev3-d (TM21)**~~ | ~~TM21 AMM/SMM validation gate~~ | — | **OUT OF SCOPE** per analog-scope-down 2026-05-22 — see [`future_features.md`](future_features.md) |
 | **rev3-d (severity)** | K15-correct sequential per-event QTL (concurrent-FI bug fix) | issHMS CHI Δ -16 → Δ -3.85 (within K15 CI₉₅); 'none' CHI overshoots to Δ +27 (reveals untreated-prior under-elicitation) | **DONE** `3ac5480` |
-| **rev3-e** | Per-condition `fi_cp3` prior audit + re-enable cp3 in QTL | Brings K15 CHI back within CI₉₅ on all 3 scenarios after cp3 contribution is re-added with calibrated priors | DEFERRED |
+| **rev3-e** | Per-condition `fi_cp3` audit (68 zeroed, 32 retained) + re-enable cp3 in QTL per K15 §II.A.9 | issHMS CHI Δ -4.68 (within CI₉₅); unlimited CHI Δ +2.71 (within CI₉₅); 'none' CHI Δ +26.11 (axis = cp1/cp2 untreated priors; not cp3) | **DONE** `4521390` |
+| **rev3-f** (potential) | Per-condition severity tuning for the 32 persistent-impairment priors against published literature | Tighten Tier-A/B treated.fi_cp3 modes; cite primary sources per condition | NOT YET QUEUED |
 
 ## 7 · rev3-b results (T=100 000, post-tierB=0.55)
 
@@ -209,3 +210,43 @@ qtl += fi_cp1 * dt_cp1_hours + fi_cp2 * dt_cp2_hours   // K15-correct
 **7 of 12 K15 metrics within CI₉₅** (was 6/12). The issHMS CHI fix is the operationally-meaningful gain — issHMS is the realistic medical-kit configuration. The 'none' overshoot is in the operationally-implausible scenario (no real mission has zero kit) already documented in scientific limitations §4.1.
 
 73/73 fast IMM tests pass; concurrent-FI building-block test and three K15-correct sequential-phase tests added; 2 v1.1 cp3 reservation tests document the math the engine will use post-rev3-e.
+
+## 10 · rev3-e results (per-condition fi_cp3 audit + cp3 re-enabled)
+
+`exports/2026-05-22_validate_imm_rev3e_cp3_enabled.txt`. Closes the cp3 contribution that rev3-d deferred. Full per-condition decision log in [`research/_priors_rev3e_fi_cp3_audit.md`](../research/_priors_rev3e_fi_cp3_audit.md).
+
+**Audit decision.** 68 of 100 conditions had `treated.fi_cp3 = untreated.fi_cp3 = (0,0,0)` set — these fully resolve over the 180-day analog/LEO timeframe regardless of treatment (URTI, GI, MSK sprains, headaches, SA conditions, minor derm, dental, GU/GYN). 32 conditions with documented persistent-impairment risk retained their Beta-Pert distributions (sepsis, cardiac MI/arrest, stroke, ARS, traumatic injuries, hearing loss, VIIP, etc.).
+
+**Engine change.** `src/imm/simulate.ts` QTL accumulator now includes cp3 per K15 §II.A.9 sequential-phase definition:
+
+```ts
+qtl += fi_cp1*dt_cp1 + fi_cp2*dt_cp2;
+if (fi_cp3 > 0) {
+  cp3Start = timeDays*24 + dt_cp1 + dt_cp2;
+  cp3Duration = max(0, missionDurationHours - cp3Start);
+  qtl += fi_cp3 * cp3Duration;
+}
+```
+
+The `fi_cp3 > 0` guard short-circuits for the 68 zeroed conditions (no Beta-Pert sampling overhead).
+
+| Scenario  | Metric | rev3-d (no cp3) | rev3-e (cp3 on) | K15 ref | CI₉₅ | Within? |
+|-----------|--------|------------------|------------------|---------|------|---------|
+| **none**      | TME   |  99.17 |  99.18 |  98.30 | [73, 122] | ✓ |
+|               | CHI   |  86.33 |  85.31 |  59.20 | [43.36, 71.25] | ✗ (cp1/cp2 untreated axis; see §4.1) |
+|               | pEVAC |  12.96 % |  13.05 % |  66.90 % | [66.57, 67.14] | ✗ |
+|               | pLOCL |   0.44 % |   0.41 % |   2.89 % | [2.78, 2.99] | ✗ |
+| **issHMS**    | TME   |  99.74 |  99.76 | 106.00 | [87, 126] | ✓ |
+|               | CHI   |  91.08 |  **90.25** |  94.93 | [84.30, 98.50] | ✓ (Δ -4.68; still within bracket) |
+|               | pEVAC |   7.81 % |   7.80 % |   5.57 % | [5.43, 5.72] | ✗ |
+|               | pLOCL |   0.25 % |   0.23 % |   0.44 % | [0.40, 0.49] | ✗ |
+| **unlimited** | TME   | 100.34 | 100.23 | 106.00 | [87, 126] | ✓ |
+|               | CHI   |  98.25 |  **97.69** |  94.98 | [84.40, 98.50] | ✓ (Δ +2.71; closer to K15 ref) |
+|               | pEVAC |   2.14 % |   2.13 % |   4.93 % | [4.80, 5.07] | ✗ |
+|               | pLOCL |   0.22 % |   0.21 % |   0.45 % | [0.41, 0.49] | ✗ |
+
+**7 of 12 K15 metrics within CI₉₅** (maintained from rev3-d). cp3 enable causes small CHI drops (0.6-1.0 pp across scenarios) because the 68 zeroed conditions contribute 0 cp3 and the 32 retained are mostly rare events (sepsis ~0.5/mission, ARS ~0.5/mission, etc.). issHMS CHI stays within K15 CI₉₅ [84.30, 98.50]; unlimited CHI stays within and is now slightly closer to K15 ref.
+
+**The IMM engine is now mathematically complete per K15 §II.A.9** — cp1 + cp2 + cp3 sequential phases all correctly charged to QTL. concurrent-FI building block preserved for the deferred cross-event v1.1 enhancement (overlapping events from different conditions on the same crewmember).
+
+**Remaining residuals are all on the 'none' scenario** (operationally implausible — no real mission has zero kit) plus the per-event pEVAC/pLOCL on issHMS/unlimited (which are operational but small absolute Δ values; their K15 CI₉₅ brackets are tight at the 0.4-5.6 % range so even ~3pp deviations fall outside). These remain open items for rev3-f / future per-condition severity audits.

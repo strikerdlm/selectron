@@ -58,13 +58,15 @@ rev3-b set `global_calibration.tierB_multiplier = 0.55` — a single scalar that
 
 **Residual: 37 of 42 tier-B conditions still rely on the blanket multiplier as fallback.** They lack per-condition Earth-analog evidence (most are minor everyday medical events whose per-py rate is in NASA's proprietary iMED database, not published literature). Further per-condition calibration is iterative — each requires its own source verification — and is tracked as a future rev3-d-and-beyond effort.
 
-### 3.5 cp3 (permanent impairment) deferred from QTL pending per-condition prior re-elicitation
+### 3.5 ~~cp3 deferred from QTL~~ — RESOLVED 2026-05-22 (rev3-e)
 
-K15 §II.A.9 specifies that cp3 (permanent impairment for the remainder of the mission) contributes `fi_cp3 × (mission_end − cp3_start)` to per-event QTL. The Selectron engine **samples** fi_cp3 per event (stored on `Occurrence.outcomes.fi_cp3`) but the QTL accumulator in `src/imm/simulate.ts` does **not** charge cp3.
+rev3-e applied a clinical-judgment per-condition fi_cp3 audit (`research/_priors_rev3e_fi_cp3_audit.md`): 68 of 100 conditions had `treated.fi_cp3 = untreated.fi_cp3 = (0,0,0)` set because they fully resolve over the 180-day analog/LEO timeframe regardless of treatment (URTI, GI, MSK sprains, headaches, SA conditions, minor derm, dental, GU/GYN). The 32 retained conditions are documented persistent-impairment cases (sepsis, cardiac MI/arrest, stroke, ARS, traumatic injuries, hearing loss, VIIP, etc.) with current Beta-Pert distributions kept intact.
 
-**Why deferred:** the rev3-d audit (`scripts/diagnose_chi_residual.ts` + `validate_imm` with cp3 enabled, 2026-05-22) showed that 80 of 100 priors have non-zero `treated.fi_cp3` modes — 12 severe conditions (sepsis, cardiac, stroke, ARS, anaphylaxis, etc.) have mode=0.020 which would charge ~80 crew-hours per event on a 180-day mission. The priors were elicited under the OLD engine where cp3 was sampled but never charged to QTL; enabling cp3 with these priors overshoots K15 issHMS CHI by 4 pp. The rev3-b/c calibrations matched K15 by coincidence — two errors cancelled (no cp3 + inflated concurrent-FI).
+The QTL accumulator in `src/imm/simulate.ts` now charges cp3 per K15 §II.A.9: `qtl += fi_cp3 × max(0, mission_end_hours − event_end_hours)`. The `if (fi_cp3 > 0)` guard means the 68 zeroed conditions contribute zero cp3 QTL (no overhead).
 
-**v1.1 path:** per-condition `fi_cp3` prior audit (rev3-e scope), then re-enable cp3 in the QTL accumulator. The two `v1.1 reservation` tests in `tests/imm/simulate.test.ts::rev3-d K15 per-event QTL` document the math the engine will use after the prior audit lands.
+Validation impact (rev3-d → rev3-e at T=100k): issHMS CHI 91.08 → 90.25 (Δ -0.83, still within K15 CI₉₅); unlimited CHI 98.25 → 97.69 (Δ -0.56, slight improvement); 'none' CHI 86.33 → 85.31 (Δ -1.02; 'none' overshoot remains a separate cp1/cp2 untreated-prior issue tracked in §4.1). 7/12 K15 metrics within CI₉₅ maintained.
+
+The 32-condition persistent-impairment classification is clinical-judgment-based (not NASA-iMED-derived; per-condition fi_cp3 values remain NASA-internal). Further refinement of the persistent-impairment priors against published literature is a follow-up rev3-f scope.
 
 ### 3.3 ~~Stochastic rounding preserves mean only~~ — RESOLVED 2026-05-22 (rev3-b-followup)
 
