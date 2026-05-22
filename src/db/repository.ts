@@ -8,6 +8,7 @@ import {
   type SimSession,
   SCHEMA_VERSION,
 } from "./schema";
+import type { IMMSession } from "@/imm/types";
 
 export type CreateCandidateInput = {
   alias: string;
@@ -208,6 +209,93 @@ export async function recentSimsFor(candidateId: string, limit = 10): Promise<Si
   const rows = await db.simSessions.where("candidateId").equals(candidateId).toArray();
   rows.sort((a, b) => b.runAt.localeCompare(a.runAt));
   return rows.slice(0, limit);
+}
+
+// ---------------------------------------------------------------------------
+// IMMSession CRUD (IMM-38, v3 schema)
+// ---------------------------------------------------------------------------
+//
+// The `immSessions` table persists Crew Composition runs from the IMM
+// Calculator (see src/imm/types.ts). The row type IS `IMMSession` verbatim —
+// no DbIMMSession wrapper. Indexed columns (declared in schema.ts v3):
+//   id, candidateId, createdAt, mission.id
+//
+// candidateId is `string | null` — `null` represents an ad-hoc crew that is
+// not tied to a Stage A candidate. Dexie 4 does not index `null`/`undefined`
+// values, so `.where("candidateId").equals(null)` returns nothing reliably;
+// the ad-hoc-crew filter path therefore uses an in-memory `.filter()` over
+// `toArray()` (acceptable: this table is small — one row per crew sim run).
+
+export async function createIMMSession(
+  input: Omit<IMMSession, "id" | "createdAt">,
+): Promise<string> {
+  const row: IMMSession = {
+    ...input,
+    id: uuid(),
+    createdAt: new Date().toISOString(),
+  };
+  await db.immSessions.add(row);
+  return row.id;
+}
+
+export async function getIMMSession(id: string): Promise<IMMSession | null> {
+  const row = await db.immSessions.get(id);
+  return row ?? null;
+}
+
+export async function listIMMSessions(
+  opts?: { candidateId?: string | null; missionId?: string; limit?: number },
+): Promise<IMMSession[]> {
+  let rows: IMMSession[];
+  // Use the indexed paths when possible; fall back to in-memory filter for
+  // the ad-hoc-crew (candidateId === null) case, which Dexie 4 does not index.
+  if (opts?.candidateId === null) {
+    rows = await db.immSessions.toArray();
+    rows = rows.filter((r) => r.candidateId === null);
+  } else if (typeof opts?.candidateId === "string") {
+    rows = await db.immSessions.where("candidateId").equals(opts.candidateId).toArray();
+  } else {
+    rows = await db.immSessions.toArray();
+  }
+  if (opts?.missionId !== undefined) {
+    // Use the nested-key index when no candidateId filter is in play; otherwise
+    // narrow the already-filtered set in memory.
+    if (opts.candidateId === undefined) {
+      rows = await db.immSessions.where("mission.id").equals(opts.missionId).toArray();
+    } else {
+      rows = rows.filter((r) => r.mission.id === opts.missionId);
+    }
+  }
+  rows.sort((a, b) => b.createdAt.localeCompare(a.createdAt));
+  if (typeof opts?.limit === "number") rows = rows.slice(0, opts.limit);
+  return rows;
+}
+
+export async function updateIMMSession(
+  id: string,
+  patch: Partial<Omit<IMMSession, "id" | "createdAt">>,
+): Promise<void> {
+  const existing = await db.immSessions.get(id);
+  if (!existing) throw new Error(`IMMSession ${id} not found`);
+  const next: IMMSession = {
+    ...existing,
+    ...patch,
+    id: existing.id,
+    createdAt: existing.createdAt,
+  };
+  await db.immSessions.put(next);
+}
+
+export async function deleteIMMSession(id: string): Promise<void> {
+  // Silent on not-found, matching the existing saveSimSession/delete convention.
+  await db.immSessions.delete(id);
+}
+
+export async function recentIMMSessionsFor(
+  candidateId: string,
+  limit = 10,
+): Promise<IMMSession[]> {
+  return listIMMSessions({ candidateId, limit });
 }
 
 // ---------------------------------------------------------------------------

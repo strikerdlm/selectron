@@ -3,19 +3,33 @@ import "fake-indexeddb/auto";
 import { db } from "@/db/schema";
 import {
   createCandidate,
+  createIMMSession,
   deleteCandidate,
+  deleteIMMSession,
   exportDb,
   getCandidateWithEvidence,
+  getIMMSession,
   importDb,
   listCandidates,
   listCriterionEntries,
+  listIMMSessions,
+  recentIMMSessionsFor,
   recentSimsFor,
   saveSimSession,
   updateCandidate,
+  updateIMMSession,
   upsertCriterionEntry,
   attachFile,
   detachFile,
 } from "@/db/repository";
+import type {
+  IMMCrewMember,
+  IMMKitScenario,
+  IMMMission,
+  IMMOutcome,
+  IMMSession,
+  PosteriorSummary,
+} from "@/imm/types";
 
 beforeEach(async () => {
   await db.delete();
@@ -247,6 +261,210 @@ describe("simSessions", () => {
     const sims = await recentSimsFor(c.id);
     expect(sims).toHaveLength(1);
     expect(sims[0].missionId).toBe("mdrs-2wk");
+  });
+});
+
+// ───────────────────────────────────────────────────────────────────────────
+// IMMSession CRUD (IMM-38, v3 schema)
+// ───────────────────────────────────────────────────────────────────────────
+
+function fakePosteriorSummary(mean: number): PosteriorSummary {
+  return {
+    mean,
+    ci90: [mean * 0.9, mean * 1.1],
+    ci95: [mean * 0.85, mean * 1.15],
+    sd: mean * 0.05,
+  };
+}
+
+function fakeMission(id = "mars-transit"): IMMMission {
+  return {
+    id,
+    label: "Mars Transit (180d)",
+    durationDays: 180,
+    crewSize: 4,
+    totalEVAs: 0,
+    evaSchedule: [],
+  };
+}
+
+function fakeCrewMember(id = "m1"): IMMCrewMember {
+  return {
+    id,
+    sex: "male",
+    contacts: false,
+    crowns: false,
+    CAC_positive: false,
+    abdominal_surgery_history: false,
+    EVA_eligible: false,
+    EVA_count: 0,
+  };
+}
+
+function fakeKit(): IMMKitScenario {
+  return {
+    scenarioId: "issHMS",
+    label: "ISS HMS-equivalent kit",
+    resources: { "antibiotic-broad-spectrum": 12, "iv-fluids-1L": 6 },
+  };
+}
+
+function fakeOutcome(): IMMOutcome {
+  return {
+    tme: fakePosteriorSummary(3.2),
+    chi: fakePosteriorSummary(0.92),
+    pEvac: fakePosteriorSummary(2.4),
+    pLocl: fakePosteriorSummary(0.31),
+    missionSuccess: fakePosteriorSummary(96.1),
+    perConditionDrivers: [
+      { conditionId: "renal.stone", pEvacContrib: 0.42, pLoclContrib: 0.05, tmeContrib: 0.18 },
+    ],
+    convergence: {
+      trialCheckpoints: [1000, 5000, 10000],
+      sigmaChi: [0.04, 0.018, 0.012],
+      sigmaPevac: [0.06, 0.025, 0.017],
+    },
+  };
+}
+
+function fakeIMMSessionInput(
+  overrides: Partial<Omit<IMMSession, "id" | "createdAt">> = {},
+): Omit<IMMSession, "id" | "createdAt"> {
+  return {
+    candidateId: null,
+    mission: fakeMission(),
+    crew: [fakeCrewMember("m1"), fakeCrewMember("m2")],
+    kit: fakeKit(),
+    trials: 25000,
+    seed: 0xc0ffee,
+    overrides: {},
+    vulnerabilityMode: "selectron-stage-a-ml",
+    engine: "monte-carlo",
+    outcomes: fakeOutcome(),
+    validation: {
+      vsK15Table1: {
+        delta_tme: 0.05,
+        delta_chi: 0.01,
+        delta_pEvac: 0.03,
+        delta_pLocl: 0.02,
+        within_ci95: true,
+      },
+    },
+    laypersonCaptionsExpanded: {},
+    ...overrides,
+  };
+}
+
+describe("IMMSession CRUD", () => {
+  test("createIMMSession + getIMMSession round-trip with full nested shape", async () => {
+    const id = await createIMMSession(fakeIMMSessionInput({ candidateId: "cand-1" }));
+    expect(id).toMatch(/^[0-9a-f-]{36}$/);
+    const back = await getIMMSession(id);
+    expect(back).not.toBeNull();
+    expect(back!.id).toBe(id);
+    expect(back!.candidateId).toBe("cand-1");
+    expect(back!.mission.id).toBe("mars-transit");
+    expect(back!.crew).toHaveLength(2);
+    expect(back!.outcomes.chi.mean).toBeCloseTo(0.92, 5);
+    expect(back!.outcomes.perConditionDrivers[0].conditionId).toBe("renal.stone");
+    expect(new Date(back!.createdAt).getTime()).toBeLessThanOrEqual(Date.now());
+  });
+
+  test("getIMMSession returns null when row is missing", async () => {
+    expect(await getIMMSession("nope")).toBeNull();
+  });
+
+  test("listIMMSessions returns rows sorted by createdAt desc", async () => {
+    const id1 = await createIMMSession(fakeIMMSessionInput({ candidateId: "cand-A" }));
+    await new Promise((r) => setTimeout(r, 5));
+    const id2 = await createIMMSession(fakeIMMSessionInput({ candidateId: "cand-B" }));
+    await new Promise((r) => setTimeout(r, 5));
+    const id3 = await createIMMSession(fakeIMMSessionInput({ candidateId: "cand-C" }));
+    const list = await listIMMSessions();
+    expect(list.map((r) => r.id)).toEqual([id3, id2, id1]);
+  });
+
+  test("listIMMSessions filters by candidateId === null (ad-hoc crew)", async () => {
+    await createIMMSession(fakeIMMSessionInput({ candidateId: "cand-A" }));
+    await createIMMSession(fakeIMMSessionInput({ candidateId: null }));
+    await createIMMSession(fakeIMMSessionInput({ candidateId: null }));
+    const adHoc = await listIMMSessions({ candidateId: null });
+    expect(adHoc).toHaveLength(2);
+    expect(adHoc.every((s) => s.candidateId === null)).toBe(true);
+  });
+
+  test("listIMMSessions filters by missionId via nested-key index", async () => {
+    await createIMMSession(fakeIMMSessionInput({ mission: fakeMission("mars-transit") }));
+    await createIMMSession(fakeIMMSessionInput({ mission: fakeMission("iss-6mo") }));
+    await createIMMSession(fakeIMMSessionInput({ mission: fakeMission("mars-transit") }));
+    const mars = await listIMMSessions({ missionId: "mars-transit" });
+    expect(mars).toHaveLength(2);
+    expect(mars.every((s) => s.mission.id === "mars-transit")).toBe(true);
+  });
+
+  test("listIMMSessions composes candidateId + missionId filters", async () => {
+    await createIMMSession(
+      fakeIMMSessionInput({ candidateId: "cand-A", mission: fakeMission("mars-transit") }),
+    );
+    await createIMMSession(
+      fakeIMMSessionInput({ candidateId: "cand-A", mission: fakeMission("iss-6mo") }),
+    );
+    await createIMMSession(
+      fakeIMMSessionInput({ candidateId: "cand-B", mission: fakeMission("mars-transit") }),
+    );
+    const got = await listIMMSessions({ candidateId: "cand-A", missionId: "mars-transit" });
+    expect(got).toHaveLength(1);
+    expect(got[0].candidateId).toBe("cand-A");
+    expect(got[0].mission.id).toBe("mars-transit");
+  });
+
+  test("listIMMSessions honors limit", async () => {
+    for (let i = 0; i < 5; i++) {
+      await createIMMSession(fakeIMMSessionInput({ candidateId: `cand-${i}` }));
+      await new Promise((r) => setTimeout(r, 2));
+    }
+    const got = await listIMMSessions({ limit: 2 });
+    expect(got).toHaveLength(2);
+  });
+
+  test("updateIMMSession merges patch and preserves id + createdAt", async () => {
+    const id = await createIMMSession(fakeIMMSessionInput({ trials: 25000 }));
+    const before = await getIMMSession(id);
+    await new Promise((r) => setTimeout(r, 5));
+    await updateIMMSession(id, { trials: 50000, seed: 0xdeadbeef });
+    const after = await getIMMSession(id);
+    expect(after!.id).toBe(before!.id);
+    expect(after!.createdAt).toBe(before!.createdAt);
+    expect(after!.trials).toBe(50000);
+    expect(after!.seed).toBe(0xdeadbeef);
+    expect(after!.outcomes.chi.mean).toBeCloseTo(0.92, 5); // untouched
+  });
+
+  test("updateIMMSession throws on missing id", async () => {
+    await expect(updateIMMSession("missing", { trials: 1 })).rejects.toThrow(/not found/);
+  });
+
+  test("deleteIMMSession removes the row and is idempotent on not-found", async () => {
+    const id = await createIMMSession(fakeIMMSessionInput());
+    await deleteIMMSession(id);
+    expect(await getIMMSession(id)).toBeNull();
+    // Second delete must NOT throw (matches saveSimSession-family convention).
+    await expect(deleteIMMSession(id)).resolves.toBeUndefined();
+    await expect(deleteIMMSession("never-existed")).resolves.toBeUndefined();
+  });
+
+  test("recentIMMSessionsFor returns desc-by-createdAt for a candidate, honors limit", async () => {
+    await createIMMSession(fakeIMMSessionInput({ candidateId: "cand-A" }));
+    await new Promise((r) => setTimeout(r, 5));
+    const id2 = await createIMMSession(fakeIMMSessionInput({ candidateId: "cand-A" }));
+    await new Promise((r) => setTimeout(r, 5));
+    const id3 = await createIMMSession(fakeIMMSessionInput({ candidateId: "cand-A" }));
+    await createIMMSession(fakeIMMSessionInput({ candidateId: "cand-B" })); // noise
+
+    const recent = await recentIMMSessionsFor("cand-A", 2);
+    expect(recent).toHaveLength(2);
+    expect(recent.map((r) => r.id)).toEqual([id3, id2]);
+    expect(recent.every((r) => r.candidateId === "cand-A")).toBe(true);
   });
 });
 
