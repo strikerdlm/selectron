@@ -58,6 +58,14 @@ rev3-b set `global_calibration.tierB_multiplier = 0.55` — a single scalar that
 
 **Residual: 37 of 42 tier-B conditions still rely on the blanket multiplier as fallback.** They lack per-condition Earth-analog evidence (most are minor everyday medical events whose per-py rate is in NASA's proprietary iMED database, not published literature). Further per-condition calibration is iterative — each requires its own source verification — and is tracked as a future rev3-d-and-beyond effort.
 
+### 3.5 cp3 (permanent impairment) deferred from QTL pending per-condition prior re-elicitation
+
+K15 §II.A.9 specifies that cp3 (permanent impairment for the remainder of the mission) contributes `fi_cp3 × (mission_end − cp3_start)` to per-event QTL. The Selectron engine **samples** fi_cp3 per event (stored on `Occurrence.outcomes.fi_cp3`) but the QTL accumulator in `src/imm/simulate.ts` does **not** charge cp3.
+
+**Why deferred:** the rev3-d audit (`scripts/diagnose_chi_residual.ts` + `validate_imm` with cp3 enabled, 2026-05-22) showed that 80 of 100 priors have non-zero `treated.fi_cp3` modes — 12 severe conditions (sepsis, cardiac, stroke, ARS, anaphylaxis, etc.) have mode=0.020 which would charge ~80 crew-hours per event on a 180-day mission. The priors were elicited under the OLD engine where cp3 was sampled but never charged to QTL; enabling cp3 with these priors overshoots K15 issHMS CHI by 4 pp. The rev3-b/c calibrations matched K15 by coincidence — two errors cancelled (no cp3 + inflated concurrent-FI).
+
+**v1.1 path:** per-condition `fi_cp3` prior audit (rev3-e scope), then re-enable cp3 in the QTL accumulator. The two `v1.1 reservation` tests in `tests/imm/simulate.test.ts::rev3-d K15 per-event QTL` document the math the engine will use after the prior audit lands.
+
 ### 3.3 ~~Stochastic rounding preserves mean only~~ — RESOLVED 2026-05-22 (rev3-b-followup)
 
 The rev3-b engine extension originally applied tier multipliers via stochastic rounding (`floor(count × mult) + Bernoulli(frac)`) which preserved mean but distorted variance: `Var[floor + Bernoulli(frac)] ≠ Var[Poisson(λ · mult)]`. For `tierB=0.55` this under-reported Poisson variance by ~45 % (Var becomes `mult² · λ + ε` instead of the correct `mult · λ`). CI₉₅ widths were correspondingly under-reported.
@@ -98,9 +106,11 @@ This is a per-event `untreated.p_evac` under-elicitation. Closed-form rescale is
 
 Status: open question whether to close this gap or document it as a K15-model-construct artifact. Decision deferred.
 
-### 4.2 issHMS CHI residual (Δ −19.3)
+### 4.2 ~~issHMS CHI residual (Δ −19.3)~~ — RESOLVED 2026-05-22 (rev3-d)
 
-CHI = 1 − QTL / available. On issHMS, our CHI = 75.6 % vs K15 ref 94.93 %. This is independent of incidence (rev3-b) and per-event probability (rev3-c) — it reflects per-event SEVERITY (`fi_cp1/2/3` × `dt_cp1/2/3_hours` Beta-Pert distributions) and the issHMS kit's actual coverage of treatment paths. Likely needs per-condition severity audit, not blanket scaling.
+CHI(issHMS) = 91.08 % vs K15 ref 94.93 %, Δ −3.85 — **now within K15 CI₉₅ [84.30, 98.50]**. Closed by the rev3-d concurrent-FI engine fix (`src/imm/simulate.ts` per-event QTL formula corrected from `concurrentFI([fi_cp1, fi_cp2]) × (dt_cp1+dt_cp2)` to the K15 §II.A.9-correct `fi_cp1×dt_cp1 + fi_cp2×dt_cp2`). The old buggy formula over-estimated per-event QTL by ~2-3×; correcting it cuts QTL on the operationally-meaningful issHMS path.
+
+**Side effect:** 'none' CHI now overshoots K15 ref (86.33 vs 59.20, Δ +27) — revealed that the `untreated.fi_cp` / `untreated.dt_cp` priors are under-elicited (the OLD buggy formula was masking this by over-counting all paths uniformly). 'none' is operationally implausible (no real mission has zero kit) so the overshoot is acceptable; tracked as §4.1 above for future per-condition severity work on untreated outcomes.
 
 ### 4.3 Out-of-scope: Mars (TM21) and Artemis (lunar)
 

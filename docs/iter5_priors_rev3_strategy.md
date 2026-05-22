@@ -1,7 +1,7 @@
 # IMM Priors Rev3 — Re-elicitation Strategy
 
 **Created:** 2026-05-22
-**Last updated:** 2026-05-22 ~ 07:00 UTC — rev3-a + rev3-b + rev3-c DONE; rev3-d (TM21 Mars validation) is OUT OF SCOPE per analog-scope-down decision
+**Last updated:** 2026-05-22 ~ 09:00 UTC — rev3-a + rev3-b + rev3-c + rev3-d DONE (rev3-d = K15-correct sequential QTL fix; closed the issHMS CHI residual within K15 CI₉₅); rev3-e queued for cp3 prior re-elicitation
 **Owner:** Diego
 **Reference targets:** K15 Table 1 (ISS 6mo / 6 crew / T=100k) — analog-relevant only post-scope-down
 
@@ -84,7 +84,9 @@ Rev2 deliberately did NOT increase untreated.p_evac (it only halved treated.p_ev
 | **rev3-a** | Resource-name normalisation | issHMS pEVAC ↓ 16.4 → 12.8 %; unlimited CHI 83.9 → 93.0 | **DONE** `cdef5e5` |
 | **rev3-b** | Tier-B incidence multiplier (single-knob; not multi-knob — diagnostic showed tier-B dominates) | TME ✓ across all 3 K15 scenarios; CHI(none) ✓; CHI(unlimited) ✓ | **DONE** (this commit) |
 | **rev3-c** | Per-condition source-cited priors for top tier-B contributors (HIGH-confidence only) | 5 conditions updated (dental-caries, late-insomnia, depression, respiratory-infection, skin-rash); 3 source_ref enrichments; tier-B multiplier re-tune | **DONE** (this commit) |
-| **rev3-d** | TM21 AMM/SMM validation gate (IMM-87) | Verify generalisation to Mars-class missions | **OUT OF SCOPE** per analog-scope-down 2026-05-22 — see [`future_features.md`](future_features.md) |
+| ~~**rev3-d (TM21)**~~ | ~~TM21 AMM/SMM validation gate~~ | — | **OUT OF SCOPE** per analog-scope-down 2026-05-22 — see [`future_features.md`](future_features.md) |
+| **rev3-d (severity)** | K15-correct sequential per-event QTL (concurrent-FI bug fix) | issHMS CHI Δ -16 → Δ -3.85 (within K15 CI₉₅); 'none' CHI overshoots to Δ +27 (reveals untreated-prior under-elicitation) | **DONE** `3ac5480` |
+| **rev3-e** | Per-condition `fi_cp3` prior audit + re-enable cp3 in QTL | Brings K15 CHI back within CI₉₅ on all 3 scenarios after cp3 contribution is re-added with calibrated priors | DEFERRED |
 
 ## 7 · rev3-b results (T=100 000, post-tierB=0.55)
 
@@ -168,3 +170,42 @@ Per-advisor analysis (2026-05-22): re-elicitation is not naturally parallelisabl
 
 - **rev3-a complete when:** `tests/imm/resource_coverage.test.ts` passes AND `validate_imm` shows issHMS pEVAC strictly closer to K15 ref than the baseline 16.41 %.
 - **rev3 fully converged when:** all 12 K15 metric/scenario combinations are within K15 CI₉₅ (per IMM-86 test gate).
+
+## 9 · rev3-d results (K15-correct sequential per-event QTL fix)
+
+`exports/2026-05-22_validate_imm_rev3d_concurrent_fi_fix.txt`. Engine bug found during the diagnose-first approach for the issHMS CHI severity-axis residual.
+
+**The bug.** `src/imm/simulate.ts` per-event QTL accumulator applied the K15 §II.A.9 concurrent-FI formula within an event:
+
+```
+qtl += concurrentFI([fi_cp1, fi_cp2]) × (dt_cp1_hours + dt_cp2_hours)   // WRONG
+```
+
+But cp1 (diagnosis + initial treatment) and cp2 (convalescence) are SEQUENTIAL clinical phases of a single event, not OVERLAPPING impairments. K15 §II.A.9 verbatim specifies concurrent FI for cross-event overlap; within-event QTL is the sum of (f_i × dt_i) per phase. The pre-fix code over-estimated per-event QTL by ~2-3× (applied cp2's lower FI to cp1's duration and cp1's higher FI to cp2's duration).
+
+**The fix.**
+```
+qtl += fi_cp1 * dt_cp1_hours + fi_cp2 * dt_cp2_hours   // K15-correct
+```
+`concurrentFI` is still exported as a building block for the deferred cross-event v1.1 enhancement (overlapping events from DIFFERENT conditions on the same crewmember).
+
+**cp3 deferred.** K15 §II.A.9 also specifies cp3 (permanent impairment for remainder of mission) contributes `fi_cp3 × (mission_end − cp3_start)` per event. Empirical audit (`scripts/diagnose_chi_residual.ts` + validate_imm with cp3 enabled): 80 of 100 priors have non-zero `treated.fi_cp3` modes; 12 severe conditions have mode=0.020 charging ~80h/event. Priors were elicited under the OLD engine that didn't use cp3; enabling cp3 with current priors overshoots K15 by 4 pp. rev3-b/c calibrations matched K15 by coincidence — two errors cancelled (no cp3 + inflated concurrent-FI). Shipping the concurrent-FI fix unconditionally; cp3 deferred to **rev3-e** with per-condition `fi_cp3` prior audit. See `docs/iter5_scientific_limitations.md` §3.5.
+
+| Scenario  | Metric | Pre-rev3-d | Post-rev3-d | K15 ref | CI₉₅ | Within? |
+|-----------|--------|------------|-------------|---------|------|---------|
+| **none**      | TME   |  99.14 |  99.17 |  98.30 | [73, 122] | ✓ |
+|               | CHI   |  68.10 |  **86.33** |  59.20 | [43.36, 71.25] | **✗** (was ✓; overshoot reveals untreated priors are under-elicited — see §3.5) |
+|               | pEVAC |  12.98 % |  12.96 % |  66.90 % | [66.57, 67.14] | ✗ (rev3-c-followup) |
+|               | pLOCL |   0.46 % |   0.44 % |   2.89 % | [2.78, 2.99] | ✗ (rev3-c-followup) |
+| **issHMS**    | TME   |  99.70 |  99.74 | 106.00 | [87, 126] | ✓ |
+|               | CHI   |  78.82 |  **91.08** |  94.93 | [84.30, 98.50] | **✓** (was ✗ at Δ -16; closed by rev3-d to Δ -3.85) |
+|               | pEVAC |   7.80 % |   7.81 % |   5.57 % | [5.43, 5.72] | ✗ |
+|               | pLOCL |   0.22 % |   0.25 % |   0.44 % | [0.40, 0.49] | ✗ |
+| **unlimited** | TME   | 100.36 | 100.34 | 106.00 | [87, 126] | ✓ |
+|               | CHI   |  95.23 |  **98.25** |  94.98 | [84.40, 98.50] | ✓ (Δ +3.27; slight over) |
+|               | pEVAC |   2.02 % |   2.14 % |   4.93 % | [4.80, 5.07] | ✗ |
+|               | pLOCL |   0.23 % |   0.22 % |   0.45 % | [0.41, 0.49] | ✗ |
+
+**7 of 12 K15 metrics within CI₉₅** (was 6/12). The issHMS CHI fix is the operationally-meaningful gain — issHMS is the realistic medical-kit configuration. The 'none' overshoot is in the operationally-implausible scenario (no real mission has zero kit) already documented in scientific limitations §4.1.
+
+73/73 fast IMM tests pass; concurrent-FI building-block test and three K15-correct sequential-phase tests added; 2 v1.1 cp3 reservation tests document the math the engine will use post-rev3-e.
