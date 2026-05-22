@@ -8,7 +8,7 @@
 // Commit 4: Web Worker simulation wiring.
 // Commit 5: polish + a11y.
 
-import { useCallback, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { IMMCrewMember, CrewCompositeMethod, IMMOutcome } from "../../imm/types";
 import { PLACEHOLDER_CRITERIA } from "../../data/placeholder-criteria";
 import { IMM_MISSIONS } from "../../data/imm-missions";
@@ -18,6 +18,9 @@ import { evaluateCrewGates } from "../../imm/crew-gates";
 import { CrewMemberCard } from "../components/CrewMemberCard";
 import { CompositeCrewPanel } from "../components/CompositeCrewPanel";
 import { CriterionMiniFigure } from "../figures/CriterionMiniFigure";
+import { IMMPosteriorHist } from "../figures/IMMPosteriorHist";
+import { IMMConvergencePlot } from "../figures/IMMConvergencePlot";
+import { IMMValidationCompare } from "../figures/IMMValidationCompare";
 
 type SimState = "idle" | "running" | "done" | "error";
 
@@ -203,6 +206,16 @@ export function CrewComposition() {
       criteria: PLACEHOLDER_CRITERIA,
     });
   }, [simState, state.members, state.mission, state.kit, state.trials, state.seed, state.chiStar]);
+
+  // ── worker cleanup on unmount ───────────────────────────────────────────
+  useEffect(() => {
+    return () => {
+      if (workerRef.current) {
+        workerRef.current.terminate();
+        workerRef.current = null;
+      }
+    };
+  }, []);
 
   return (
     <div className="flex flex-col gap-8">
@@ -407,6 +420,41 @@ export function CrewComposition() {
         </div>
 
       </div>
+
+      {/* ── IMM figure panel — mounted below the 3-zone grid when a sim result is available ── */}
+      {outcome && (
+        <div className="flex flex-col gap-6 mt-4" role="region" aria-label="IMM simulation figures">
+          <div className="panel">
+            <h3 className="label text-ink-1 uppercase tracking-cap mb-4">
+              I2 · Posterior Distributions
+            </h3>
+            <IMMPosteriorHist
+              outcome={outcome}
+              trials={state.trials}
+              seed={state.seed}
+              mission={{ id: state.mission.id, label: state.mission.label }}
+            />
+          </div>
+
+          <div className="panel">
+            <h3 className="label text-ink-1 uppercase tracking-cap mb-4">
+              I4 · Convergence Diagnostics
+            </h3>
+            <IMMConvergencePlot
+              outcome={outcome}
+              trials={state.trials}
+              chiStar={state.chiStar}
+            />
+          </div>
+
+          <div className="panel">
+            <h3 className="label text-ink-1 uppercase tracking-cap mb-4">
+              I5 · K15 Validation Comparison
+            </h3>
+            <IMMValidationCompare outcome={outcome} />
+          </div>
+        </div>
+      )}
     </div>
   );
 }
