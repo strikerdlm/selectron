@@ -181,21 +181,45 @@ The 2014 [W14] poster lists a slightly different eighth factor ("People Qualific
 
 ### 5.2 K15 Table 1 reproduction
 
-Run `npm run validate:imm` to regenerate. Snapshot from last calibration (post engine fixes, post priors v2):
+Run `npm run validate:imm` to regenerate. Snapshot from the **rev3-a post-normalization** run (T=100 000 trials, seed `0xc0ffee`, K15 reference crew 4M 2F per `K15_REFERENCE_CREW` in `src/imm/calibration.ts`). Source export: `exports/2026-05-22_validate_imm_rev3a_post_normalization.txt`. K15 reference means and CI₉₅ brackets are taken verbatim from Keenan 2015 Table 1 (see `research/imm_sources/architecture/K15_keenan_2015_imm_probabilistic_simulation.md` math_anchor "Validation table").
 
-| Scenario | Metric | Engine | K15 ref | Δ | Within CI₉₅? |
+| Scenario | Metric | K15 reference mean [CI₉₅] | Selectron rev3-a (mean) | Δ | Within CI₉₅? | Status |
+| --- | --- | --- | --- | --- | --- | --- |
+| none | TME | 98.3 [73, 122] | 149.4 | +51.1 | ✗ | incidence-OOS (rev3-b) |
+| none | CHI | 59.20 [43.36, 71.25] | 48.87 | −10.33 | ✓ | — |
+| none | pEVAC | 66.90% [66.57, 67.14] | 19.36% | −47.54 | ✗ | untreated.p_evac under-elicited (rev3-c) |
+| none | pLOCL | 2.89% [2.78, 2.99] | 0.67% | −2.22 | ✗ | untreated.p_evac under-elicited (rev3-c) |
+| issHMS | TME | 106 [87, 126] | 150.86 | +44.86 | ✗ | incidence-OOS (rev3-b) |
+| issHMS | CHI | 94.93 [84.30, 98.50] | 60.79 | −34.14 | ✗ | incidence-OOS (rev3-b) |
+| issHMS | pEVAC | 5.57% [5.43, 5.72] | 12.82% | +7.25 | ✗ | incidence-OOS (rev3-b) |
+| issHMS | pLOCL | 0.44% [0.40, 0.49] | 0.31% | −0.13 | ✗ | overshot slightly below (rev3-c may correct) |
+| unlimited | TME | 106 [87, 126] | 152.17 | +46.17 | ✗ | incidence-OOS (rev3-b) |
+| unlimited | CHI | 94.98 [84.40, 98.50] | 92.98 | −2.00 | ✓ | — |
+| unlimited | pEVAC | 4.93% [4.80, 5.07] | 2.49% | −2.44 | ✗ | overshot slightly below (rev3-c may correct) |
+| unlimited | pLOCL | 0.45% [0.41, 0.49] | 0.26% | −0.20 | ✗ | overshot slightly below (rev3-c may correct) |
+
+*Caption.* As of rev3-a, K15 reproduction is **partial**: only two of twelve metrics land inside CI₉₅ — `unlimited` CHI (Δ −2.00, well inside the [84.40, 98.50] bracket) and `none` CHI (Δ −10.33, inside the wide [43.36, 71.25] bracket). TME is uniformly **+44 to +51 high across all three scenarios**, indicating an incidence-level over-prediction that propagates into every downstream metric (deferred to **rev3-b** — incidence calibration; see STATUS.md audit log). `none`-scenario pEVAC is severely under-elicited (19.4 % vs 66.9 % reference; Δ −47.5), pointing at untreated.p_evac priors that are too low — deferred to **rev3-c** (untreated-outcome elicitation). The remaining ✗ rows for issHMS / unlimited pEVAC and pLOCL are smaller-magnitude misses that may resolve as a side-effect of rev3-c.
+
+### 5.3 TM21 AMM/SMM cross-walk
+
+TM21 (Antonsen / Myers 2021 *NASA TM-20210015527* DRMs) provides aggregate AMM (asteroid redirect mission, 426 d, 4-crew, 60 EVAs) and SMM (Mars short-stay, 923 d, 4-crew, 401 EVAs) outcomes that Selectron's engine should reproduce in spirit if not to a published CI. Snapshot from the same rev3-a export (`exports/2026-05-22_validate_imm_rev3a_post_normalization.txt`):
+
+| DRM | TME | CHI | pEVAC | pLOCL | Reference band (script comment) |
 | --- | --- | --- | --- | --- | --- |
-| (insert latest values when next Track A run completes; see STATUS.md audit log for the most recent commit) | | | | | |
+| amm-426d (426 d, 4-crew, 60 EVAs) | 206.3 | 59.80 | 20.56% | 0.53% | ~25-40 % pEVAC, ~5-12 % pLOCL |
+| smm-923d (923 d, 4-crew, 401 EVAs) | 403.1 | 59.14 | 41.55% | 1.27% | ~40-65 % pEVAC, ~15-30 % pLOCL |
 
-### 5.3 ML layer status
+*Note.* TM21 has no formal validation gate yet (IMM-87 deferred); the bands above are spec-level expectations encoded as comments in `scripts/validate_imm.ts` (lines 35-36), **not** published K15-style CI₉₅s. AMM pEVAC (20.56 %) sits below the lower bound of the spec band (25 %), and SMM pEVAC (41.55 %) lands just inside its band (40-65 %). pLOCL is materially under-elicited in both DRMs (0.53 % vs 5-12 %; 1.27 % vs 15-30 %) — the same under-elicitation pattern as `none` pLOCL in §5.2, supporting the rev3-c untreated-outcome hypothesis.
+
+### 5.4 ML layer status
 
 - Surrogate (LightGBM): NOT YET TRAINED — deferred to Phase A1 of the IMM Calculator plan (post-MVP).
 - Vulnerability MLP: NOT YET TRAINED — deferred to Phase A2 (publication novelty hook). The deterministic per-member Stage A z-score injection (commit `9d5abc7`) is the v1 substitute.
 
-### 5.4 NASA-STD-7009A factor mapping
+### 5.5 NASA-STD-7009A factor mapping
 
 - **Factor 1 (Verification):** 8 closed-form moment tests across incidence, severity, outcomes, treatment, simulate. `coupling_amplitude.test.ts` regresses against worst-vs-best ≥ 5 pp.
-- **Factor 2 (Validation):** `validate_imm.ts` reports per-metric per-scenario K15 deltas. Run after every priors or engine change.
+- **Factor 2 (Validation):** `validate_imm.ts` reports per-metric per-scenario K15 deltas. Run after every priors or engine change. **As of 2026-05-22 rev3-a, K15 reproduction is partial — see §5.2. Full reproduction blocked on rev3-b incidence calibration.**
 - **Factor 3 (Input Pedigree):** Tier-A / Tier-B / Tier-C provenance tags on every condition; 30-entry `src/data/citations.ts` with Scite-verified DOIs (20/28 confirmed, 3 wrong DOIs replaced via Scite).
 - **Factors 4-8:** out of scope (per the IMM Calculator design spec §10).
 
