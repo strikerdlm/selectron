@@ -23,6 +23,16 @@
 
 ---
 
+> ### ⚠ NOT-FOR-FLIGHT — research tool + methodology demonstrator
+>
+> Selectron is a **research instrument** for analog-mission planning, selection-criteria sensitivity analysis, and methodology demonstration. It is **NOT** a flight-medical-kit sizing tool, a Mars-mission risk-certification instrument, or a substitute for individual crew-member fitness-to-fly assessment.
+>
+> Calibration is partial: as of priors-rev3-b (2026-05-22), **5 of 12 K15 Table 1 metrics reproduce within CI₉₅**, and the **TM21 Mars-class generalization fails by 12–30× on pLOCL** because the engine does not yet model treatment-decision degradation under Mars comms delay, cumulative-dose pathways, or Mars-EVA-specific risk profiles. See [`docs/iter5_scientific_limitations.md`](docs/iter5_scientific_limitations.md) for the full honest catalog of what the priors do and do not represent.
+>
+> For real-mission medical-risk decisions, use NASA's actual iMED + IMM workflow.
+
+---
+
 ## What Selectron is
 
 A working TypeScript application and a methodology paper, in one repository.
@@ -275,11 +285,14 @@ The live resume tracker is [`STATUS.md`](STATUS.md). It is updated as the single
 
 ## What's left to do
 
-Ordered by impact, honest about blockers:
+Ordered by *what would most improve scientific defensibility*, honest about which items are structural-engine work vs prior tuning:
 
-1. **IMM priors-rev3-c — closed-form per-event `untreated.p_evac` / `untreated.p_locl` rescale** (HIGH PRIORITY; the largest remaining K15 residuals). Target: lift `none` pEVAC from 13.7 % to K15's 66.9 % (Δ -53) and `none` pLOCL from 0.45 % to 2.89 % (Δ -2.4). Closed-form: given calibrated event count N (now correct per rev3-b), target per-event `p_target ≈ 1 − (1 − P_K15)^(1/N)`. Apply uniformly to `untreated.p_evac.mode` and `untreated.p_locl.mode` preserving Beta-Pert shape. Single-pass deterministic calculation — no iteration. Will also lift issHMS/unlimited pEVAC + pLOCL into K15 CI₉₅.
-2. **IMM issHMS CHI residual (Δ −19.29)** — third axis: not fixable by incidence scaling (rev3-b) or per-event probability rescale (rev3-c). Likely needs per-condition severity tuning (`fi_cp*` × `dt_cp*_hours`) or further issHMS kit-coverage expansion. May fold naturally out of rev3-c if the issue is kit-fallthrough conditions hitting under-elicited untreated severities — measure first after rev3-c.
-3. **IMM Phase 2 UI — `IMMCalculator.tsx` standalone view (IMM-39 → IMM-51).** Now unblocked by IMM-37/38 (data layer in place). 13 tasks: CrewBuilder, KitPicker, Mission inputs, ResultsCard, prior-override drilldown, Run button + Web Worker, K15 validation badge, engine toggle, vulnerability mode toggle, quick-load presets, session save/load/share UI, P2 acceptance gate. Several of these are parallel-dispatchable (each task is one component file + tests).
+1. **TM21 generalization gap — understand before fixing** (HIGH PRIORITY; gates IMM-87 acceptance and any claim that the model generalizes beyond ISS). `scripts/diagnose_tm21_gap.ts` (2026-05-22) showed ARS dominates Mars pLOCL contribution (34 %) and cardiogenic shock is #2 (19 % on SMM), but absolute numbers remain 12–30× below TM21 spec bands. This **cannot be closed by blanket priors rescaling**. The advisor's analysis points to structural model extensions: (a) treatment-decision degradation under 22-min Mars comms delay, (b) cumulative-dose conditions over 400+ days, (c) Mars-EVA-specific risk profile (SMM has 401 EVAs). Each is a multi-task engine extension, not a prior change. Decision pending: do we extend the engine, scope-down the Mars claim, or both? See [`docs/iter5_scientific_limitations.md`](docs/iter5_scientific_limitations.md) §4.1.
+2. **IMM priors-rev3-c — closed-form per-event `untreated.p_evac` / `untreated.p_locl` rescale** (now SOFTENED — useful for K15 'none' scenario fit but will NOT close the TM21 gap and may worsen issHMS overshoot via kit-fallthrough). Target: lift `none` pEVAC from 13.7 % to K15's 66.9 %. Closed-form: given calibrated event count N (now correct per rev3-b), target per-event `p_target ≈ 1 − (1 − P_K15)^(1/N)`. Apply uniformly to `untreated.p_evac.mode` and `untreated.p_locl.mode` preserving Beta-Pert shape. **Run #1 first** — if the Mars gap is structural we may not want to over-tune the priors to K15.
+3. **Per-condition source audit of top-20 tier-B contributors** — spot-check each of the highest-contribution tier-B priors against the primary literature source. Replaces the blanket tier-B 0.55 multiplier with per-condition corrections where the source actually warrants it. Higher-rigor alternative to rev3-c. See [`docs/iter5_scientific_limitations.md`](docs/iter5_scientific_limitations.md) §3.2.
+4. **Move tier multipliers to λ-sampling site** (engine principled-ness; tracked as TODO in `src/imm/simulate.ts`). Current `floor + Bernoulli(frac)` preserves mean but distorts higher moments — for CI₉₅ reporting this matters. One-line change in `src/imm/incidence.ts` to scale λ before `samplePoisson` / `sampleLognormalPoisson` / `sampleGammaPoisson`.
+5. **IMM issHMS CHI residual (Δ −19.29)** — third calibration axis: not fixable by incidence scaling (rev3-b) or per-event probability rescale (rev3-c). Likely needs per-condition severity tuning (`fi_cp*` × `dt_cp*_hours`) or further issHMS kit-coverage expansion. May fold naturally out of rev3-c if the issue is kit-fallthrough conditions hitting under-elicited untreated severities — measure first.
+6. **IMM Phase 2 UI — `IMMCalculator.tsx` standalone view (IMM-39 → IMM-51).** Unblocked by IMM-37/38 (data layer in place). 13 tasks: CrewBuilder, KitPicker, Mission inputs, ResultsCard, prior-override drilldown, Run button + Web Worker, K15 validation badge, engine toggle, vulnerability mode toggle, quick-load presets, session save/load/share UI, P2 acceptance gate. Several are parallel-dispatchable.
 4. **Engine extensions to unblock the remaining 3 IMM figures.**
    - **I6 IMMSensitivityTornado:** add a ±50 % per-condition perturbation runner (re-runs `simulateIMM` with bumped λ per condition; not the GP surrogate of design spec §22 — a deterministic v1 is fine).
    - **I7 IMMCrewRiskHeat:** surface per-crew × per-condition counts from `runIMMTrial` into `IMMOutcome` (currently only mission-aggregate `perConditionDrivers` is exposed).

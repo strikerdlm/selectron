@@ -318,6 +318,13 @@ export function runIMMTrial(
       // (Math.round biases small counts: e.g. count=1 × 0.5 → Math.round(0.5)=1 retains the
       // event entirely, so simple rounding turns a "half the events" multiplier into a
       // "preserve most events" no-op for the count=1 regime that dominates tier-B priors.)
+      //
+      // TODO(rev3-b-followup): the principled fix is to thread the multiplier into the
+      // λ *sampling site* (sample directly from Poisson(λ · mult) in `src/imm/incidence.ts`)
+      // rather than post-multiplying the count. Stochastic rounding is mean-preserving
+      // but distorts variance — Var(floor + Bernoulli(frac)) ≠ Var(Poisson(λ · mult)).
+      // For CI₉₅ reporting this matters. Tracked in
+      // `docs/iter5_scientific_limitations.md` §3.3 and in `docs/iter5_priors_rev3_strategy.md`.
       let tierMult = 1.0;
       if (prior.provenance === "tierC-synth") tierMult = tierCMult;
       else if (prior.provenance === "tierA-nasa") tierMult = tierAMult;
