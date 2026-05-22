@@ -25,6 +25,10 @@ import { IMMConditionDrivers } from "../figures/IMMConditionDrivers";
 import { IMMConvergencePlot } from "../figures/IMMConvergencePlot";
 import { IMMValidationCompare } from "../figures/IMMValidationCompare";
 import { assessIMMLxC } from "../../imm/lxc";
+import { PRESET_CREWS, PRESET_KEYS } from "../../data/imm-preset-crews";
+import { notify } from "../components/Toast";
+import { createIMMSession, recentIMMSessionsFor } from "../../db/repository";
+import type { IMMSession } from "../../imm/types";
 
 type SimState = "idle" | "running" | "done" | "error";
 
@@ -128,6 +132,20 @@ export function CrewComposition() {
   const [simError, setSimError] = useState<string | undefined>();
   const [outcome, setOutcome] = useState<IMMOutcome | undefined>();
   const workerRef = useRef<Worker | null>(null);
+
+  // ── IMM-50: recent saved sessions for the load dropdown ─────────────────
+  const [recentSessions, setRecentSessions] = useState<IMMSession[]>([]);
+  const reloadRecentSessions = useCallback(async () => {
+    try {
+      const rows = await recentIMMSessionsFor(null as unknown as string, 10);
+      // recentIMMSessionsFor with null candidateId returns ad-hoc-crew sessions
+      // via listIMMSessions's in-memory filter (see src/db/repository.ts).
+      setRecentSessions(rows);
+    } catch {
+      setRecentSessions([]);
+    }
+  }, []);
+  useEffect(() => { reloadRecentSessions(); }, [reloadRecentSessions]);
 
   // ── live crew composite ─────────────────────────────────────────────────
   const composite = useMemo(
@@ -254,6 +272,36 @@ export function CrewComposition() {
         {gateResult.disqualifiedMemberIds.length > 0
           ? ` Disqualified: ${gateResult.disqualifiedMemberIds.join(", ")}.`
           : ""}
+      </div>
+
+      {/* IMM-49: quick-load preset crew dropdown */}
+      <div className="flex flex-wrap items-baseline gap-2">
+        <label htmlFor="preset-crew-select" className="label uppercase tracking-cap text-ink-2">
+          Load preset crew configuration:
+        </label>
+        <select
+          id="preset-crew-select"
+          aria-label="Load preset crew configuration"
+          className="mono text-xs border border-line/40 bg-transparent text-ink-1 px-2 py-1"
+          value=""
+          onChange={(e) => {
+            const key = e.target.value;
+            if (!key) return;
+            const preset = PRESET_CREWS[key];
+            if (!preset) return;
+            setState((s) => ({ ...s, members: preset.members }));
+            setOutcome(undefined);
+            notify(`loaded preset: ${preset.label}`, "info");
+            e.target.value = ""; // reset to sentinel so re-selecting same preset still fires
+          }}
+        >
+          <option value="">— load preset crew —</option>
+          {PRESET_KEYS.map((k) => (
+            <option key={k} value={k}>
+              {PRESET_CREWS[k].label}
+            </option>
+          ))}
+        </select>
       </div>
 
       {/* ── three-zone layout ───────────────────────────────────────────── */}
@@ -437,6 +485,16 @@ export function CrewComposition() {
       {outcome && (
         <div className="flex flex-col gap-6 mt-4" role="region" aria-label="IMM simulation figures">
 
+          {/* IMM-46 · K15 Table 1 reproduction badge — compact comparison of run
+              vs K15 Table 1 (Keenan et al. 2015 ICES-2015-123). Rendered only
+              when the mission is iss-6mo AND the kit is one of the three K15
+              scenarios. Hidden for analog missions and custom kits. */}
+          <K15ValidationBadge
+            outcome={outcome}
+            missionId={state.mission.id}
+            kitScenarioId={state.kit.scenarioId}
+          />
+
           {/* HSRB LxC verdict — NASA JSC-66705 Rev A standard, headline above all figures. */}
           {lxc && (
             <div
@@ -546,6 +604,272 @@ export function CrewComposition() {
           </div>
         </div>
       )}
+
+      {/* IMM-50: save / load / export toolbar.
+       *   - Load dropdown is ALWAYS visible (loading a saved session brings in
+       *     an outcome from Dexie; gating it on outcome would be chicken-and-egg).
+       *   - Save and Export buttons mount only when an outcome exists.
+       */}
+      <div
+        className="panel flex flex-wrap items-baseline gap-3 mt-4"
+        role="region"
+        aria-label="save load export"
+      >
+        <h3 className="label uppercase tracking-cap text-ink-1 mr-2">
+          Session
+        </h3>
+
+        {outcome && (
+          <button
+            type="button"
+            aria-label="Save current IMM session"
+            className="mono text-xs border border-line/40 px-2 py-1 hover:bg-line/10"
+            onClick={async () => {
+              try {
+                const id = await createIMMSession({
+                  candidateId: null,
+                  mission: { ...state.mission },
+                  crew: state.members.map((m) => ({ ...m })),
+                  kit: state.kit,
+                  trials: state.trials,
+                  seed: state.seed,
+                  overrides: {},
+                  vulnerabilityMode: "boolean-flags",
+                  engine: "monte-carlo",
+                  outcomes: outcome,
+                  validation: {
+                    vsK15Table1: {
+                      delta_tme: 0, delta_chi: 0, delta_pEvac: 0, delta_pLocl: 0,
+                      within_ci95: false,
+                    },
+                  },
+                  laypersonCaptionsExpanded: {},
+                });
+                notify(`session saved (id: ${id.slice(0, 8)}…)`, "info");
+                reloadRecentSessions();
+              } catch (err) {
+                notify(`save failed: ${(err as Error).message}`, "error");
+              }
+            }}
+          >
+            💾 Save
+          </button>
+        )}
+
+        <label htmlFor="recent-session-select" className="sr-only">
+          Load recent IMM session
+        </label>
+        <select
+          id="recent-session-select"
+          aria-label="Load recent IMM session"
+          className="mono text-xs border border-line/40 bg-transparent text-ink-1 px-2 py-1"
+          value=""
+          onChange={(e) => {
+            const sid = e.target.value;
+            if (!sid) return;
+            const s = recentSessions.find((r) => r.id === sid);
+            if (!s) return;
+            setState((cur) => ({
+              ...cur,
+              mission: s.mission,
+              kit: s.kit as typeof IMM_KITS["issHMS"],
+              trials: s.trials,
+              seed: s.seed,
+              members: s.crew,
+            }));
+            setOutcome(s.outcomes);
+            notify(`session loaded`, "info");
+            e.target.value = "";
+          }}
+        >
+          <option value="">— select session —</option>
+          {recentSessions.map((s) => (
+            <option key={s.id} value={s.id}>
+              {s.createdAt.slice(0, 19)} · {s.mission.label} · CHI {s.outcomes.chi.mean.toFixed(1)}%
+            </option>
+          ))}
+        </select>
+
+        {outcome && (
+          <button
+            type="button"
+            aria-label="Export current IMM session as JSON"
+            className="mono text-xs border border-line/40 px-2 py-1 hover:bg-line/10"
+            onClick={() => {
+              const payload = {
+                mission: state.mission,
+                kit: state.kit.scenarioId,
+                trials: state.trials,
+                seed: state.seed,
+                members: state.members,
+                outcome: outcome ?? null,
+              };
+              const blob = new Blob([JSON.stringify(payload, null, 2)], {
+                type: "application/json",
+              });
+              const url = URL.createObjectURL(blob);
+              const a = document.createElement("a");
+              a.href = url;
+              const date = new Date().toISOString().slice(0, 10);
+              const seedHex = state.seed.toString(16);
+              a.download = `selectron-imm-session-${date}-${seedHex}.json`;
+              document.body.appendChild(a);
+              a.click();
+              document.body.removeChild(a);
+              URL.revokeObjectURL(url);
+            }}
+          >
+            ⬇ Export JSON
+          </button>
+        )}
+      </div>
+    </div>
+  );
+}
+
+// ─── IMM-46 · K15 Table 1 reproduction badge ────────────────────────────────
+// Compact in-UI badge that compares the current sim's IMMOutcome to K15 Table 1
+// (Keenan et al. 2015 ICES-2015-123) for the corresponding kit scenario. Shows
+// ✓/✗ per metric (TME, CHI, pEVAC, pLOCL) based on whether the run's posterior
+// mean falls inside K15's 95% confidence interval.
+//
+// K15 Table 1 means + CI₉₅ brackets are INLINED here because importing
+// `calibration.ts` pulls in `node:fs`, which breaks the browser bundle. This
+// follows the same inline-vs-import pattern used in `IMMValidationCompare.tsx`
+// (see file header for rationale). CI₉₅ brackets are sourced verbatim from
+// `research/imm_sources/architecture/K15_keenan_2015_imm_probabilistic_simulation.md`.
+
+type K15ScenarioKey = "none" | "issHMS" | "unlimited";
+
+type K15MetricRef = {
+  ref: number;
+  ci95: [number, number];
+};
+
+type K15ScenarioRef = {
+  tme:   K15MetricRef;
+  chi:   K15MetricRef;
+  pEvac: K15MetricRef;
+  pLocl: K15MetricRef;
+};
+
+// K15 Table 1: ISS 6-month / 6-crew DRM (100k trials), three resource scenarios.
+// Means match src/imm/calibration.ts K15_TABLE1_REF; CI₉₅ brackets sourced
+// verbatim from K15 §III (Keenan et al. 2015 ICES-2015-123).
+const K15_TABLE1: Record<K15ScenarioKey, K15ScenarioRef> = {
+  none: {
+    tme:   { ref: 98.3,  ci95: [73,    122   ] },
+    chi:   { ref: 59.2,  ci95: [43.36, 71.25 ] },
+    pEvac: { ref: 66.9,  ci95: [66.57, 67.14 ] },
+    pLocl: { ref: 2.89,  ci95: [ 2.78,  2.99 ] },
+  },
+  issHMS: {
+    tme:   { ref: 106,   ci95: [87,    126   ] },
+    chi:   { ref: 94.93, ci95: [84.30, 98.50 ] },
+    pEvac: { ref: 5.57,  ci95: [ 5.43,  5.72 ] },
+    pLocl: { ref: 0.44,  ci95: [ 0.40,  0.49 ] },
+  },
+  unlimited: {
+    tme:   { ref: 106,   ci95: [87,    126   ] },
+    chi:   { ref: 94.98, ci95: [84.40, 98.50 ] },
+    pEvac: { ref: 4.93,  ci95: [ 4.80,  5.07 ] },
+    pLocl: { ref: 0.45,  ci95: [ 0.41,  0.49 ] },
+  },
+};
+
+/** True when `value` is within `[lo, hi]` (inclusive). */
+function withinK15CI95(value: number, ci95: [number, number]): boolean {
+  return value >= ci95[0] && value <= ci95[1];
+}
+
+export type K15ValidationBadgeProps = {
+  outcome: IMMOutcome | undefined;
+  missionId: string;
+  kitScenarioId: "none" | "issHMS" | "unlimited" | "custom";
+};
+
+/**
+ * Renders nothing unless:
+ *   - `outcome` is defined,
+ *   - `missionId === "iss-6mo"` (the K15 reference DRM), and
+ *   - `kitScenarioId` is one of the three K15 scenarios (not "custom").
+ *
+ * When visible, shows a single row of 4 mini-stats (TME / CHI / pEVAC / pLOCL),
+ * each with the engine value, the K15 reference, the Δ, and a ✓/✗ flag based on
+ * inclusion in K15's CI₉₅.
+ */
+export function K15ValidationBadge({
+  outcome,
+  missionId,
+  kitScenarioId,
+}: K15ValidationBadgeProps) {
+  // Visibility gate — K15 Table 1 only describes the ISS 6mo / 6 crew DRM with
+  // one of the three documented kit scenarios. Anything else (e.g. mdrs-2wk,
+  // custom kit) has no published K15 anchor and the comparison would mislead.
+  if (!outcome) return null;
+  if (missionId !== "iss-6mo") return null;
+  if (kitScenarioId === "custom") return null;
+
+  const scenarioRef: K15ScenarioRef = K15_TABLE1[kitScenarioId];
+
+  const rows: Array<{
+    label: "TME" | "CHI" | "pEVAC" | "pLOCL";
+    unit: string;
+    value: number;
+    ref: number;
+    ci95: [number, number];
+    decimals: number;
+  }> = [
+    { label: "TME",   unit: "",  value: outcome.tme.mean,   ref: scenarioRef.tme.ref,   ci95: scenarioRef.tme.ci95,   decimals: 1 },
+    { label: "CHI",   unit: "%", value: outcome.chi.mean,   ref: scenarioRef.chi.ref,   ci95: scenarioRef.chi.ci95,   decimals: 2 },
+    { label: "pEVAC", unit: "%", value: outcome.pEvac.mean, ref: scenarioRef.pEvac.ref, ci95: scenarioRef.pEvac.ci95, decimals: 2 },
+    { label: "pLOCL", unit: "%", value: outcome.pLocl.mean, ref: scenarioRef.pLocl.ref, ci95: scenarioRef.pLocl.ci95, decimals: 2 },
+  ];
+
+  return (
+    <div
+      className="panel"
+      role="status"
+      aria-label={`K15 Table 1 reproduction badge for ${kitScenarioId} scenario`}
+    >
+      <h3 className="label text-ink-1 uppercase tracking-cap mb-3">
+        K15 Table 1 reproduction · {kitScenarioId} scenario
+      </h3>
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+        {rows.map((r) => {
+          const within = withinK15CI95(r.value, r.ci95);
+          const delta = r.value - r.ref;
+          const deltaSign = delta >= 0 ? "+" : "−";
+          const deltaAbs = Math.abs(delta).toFixed(r.decimals);
+          const flagClass = within ? "text-go" : "text-warn";
+          const flagGlyph = within ? "✓" : "✗";
+          return (
+            <div
+              key={r.label}
+              className="flex flex-col gap-0.5"
+              data-testid={`k15-badge-row-${r.label}`}
+            >
+              <div className="flex items-baseline gap-1.5">
+                <span className="label text-[10px] text-ink-2 uppercase tracking-cap">
+                  {r.label}
+                </span>
+                <span className={"mono text-[12px] " + flagClass} aria-hidden="true">
+                  {flagGlyph}
+                </span>
+                <span className="sr-only">
+                  {within ? "within K15 CI₉₅" : "outside K15 CI₉₅"}
+                </span>
+              </div>
+              <span className="mono text-[11px] text-ink-1 tabular-nums">
+                {r.value.toFixed(r.decimals)}{r.unit}
+              </span>
+              <span className="mono text-[10px] text-ink-3 tabular-nums">
+                ref {r.ref.toFixed(r.decimals)}{r.unit} · Δ {deltaSign}{deltaAbs}{r.unit}
+              </span>
+            </div>
+          );
+        })}
+      </div>
     </div>
   );
 }
