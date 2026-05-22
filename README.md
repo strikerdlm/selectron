@@ -291,17 +291,18 @@ Ordered by *what would most improve scientific defensibility within the active E
 
 1. **issHMS CHI residual (Δ −16, severity axis)** — biggest remaining in-scope K15 gap. Not fixable by incidence scaling (rev3-b) or per-condition incidence rates (rev3-c). Needs a per-condition severity audit: `fi_cp1/2/3` × `dt_cp1/2/3_hours` Beta-Pert distributions, plus issHMS kit-coverage expansion for the conditions that fall through to the untreated path. Likely the next 3-5 hour focus session.
 2. **Per-condition source audit for the remaining 37 tier-B priors** — rev3-c calibrated 5 of 42 tier-B conditions against Earth-analog primary literature. The other 37 still rely on the `tierB_multiplier = 0.55` blanket fallback. Per-py rates for most are in NASA's proprietary iMED database (not public); analog literature gives % crewmembers per mission for some. Iterative work; each condition requires its own source verification.
-3. **Move tier multipliers to λ-sampling site** (engine principled-ness; tracked as TODO in `src/imm/simulate.ts`). Current `floor + Bernoulli(frac)` preserves mean but distorts higher moments — for CI₉₅ reporting this matters. One-line change in `src/imm/incidence.ts` to scale λ before `samplePoisson` / `sampleLognormalPoisson` / `sampleGammaPoisson`.
-4. **'none' pEVAC/pLOCL** — open decision: close it via closed-form per-event rescale, or document it as a K15-model-construct artifact (the 'none' scenario is operationally implausible; no analog or LEO mission has zero kit). See [`docs/iter5_scientific_limitations.md`](docs/iter5_scientific_limitations.md) §4.1.
-5. **IMM Phase 2 UI — `IMMCalculator.tsx` standalone view (IMM-39 → IMM-51).** Unblocked by IMM-37/38 (data layer in place). 13 tasks: CrewBuilder, KitPicker, Mission inputs, ResultsCard, prior-override drilldown, Run button + Web Worker, K15 validation badge, engine toggle, vulnerability mode toggle, quick-load presets, session save/load/share UI, P2 acceptance gate. Several are parallel-dispatchable.
-6. **Future features (not on this release's critical path)** — Artemis (lunar) and Mars (interplanetary) missions, plus the Phase 3 ML layer + I6/I7/I8 figures, are all in [`docs/future_features.md`](docs/future_features.md) with their structural prerequisites.
-4. **Engine extensions to unblock the remaining 3 IMM figures.**
-   - **I6 IMMSensitivityTornado:** add a ±50 % per-condition perturbation runner (re-runs `simulateIMM` with bumped λ per condition; not the GP surrogate of design spec §22 — a deterministic v1 is fine).
-   - **I7 IMMCrewRiskHeat:** surface per-crew × per-condition counts from `runIMMTrial` into `IMMOutcome` (currently only mission-aggregate `perConditionDrivers` is exposed).
-   - **I8 IMMVulnerabilityCalibration:** depends on Phase 3 ML — vulnerability MLP training (IMM-57+ all PENDING).
-5. **Phase 3 ML layer (IMM-52 → IMM-65)** — surrogate (LightGBM) + vulnerability MLP (TFJS). 14 tasks. Deliberately deferred per the IMM Calculator plan; not on this release's critical path.
-6. **Validation gates (IMM-86 / IMM-87)** — K15 Table 1 reproduction test + TM21 AMM/SMM ±20 % gate. Both written as `tests/imm/validation.test.ts`; will fail until rev3-b/c land.
-7. **AWAITING-DIEGO sign-offs** — Iter-1 manual UI sanity (Task 17), Iter-3 Mission-risk tab manual sanity (Task 58), Phase 3F acceptance (Task 88), Iter-2 ratification of `research/02_criterion_taxonomy.md` → `docs/criteria.md` (gates Iter-2 start).
+3. **'none' pEVAC/pLOCL** — open decision: close it via closed-form per-event rescale, or document it as a K15-model-construct artifact (the 'none' scenario is operationally implausible; no analog or LEO mission has zero kit). See [`docs/iter5_scientific_limitations.md`](docs/iter5_scientific_limitations.md) §4.1.
+4. **IMM Phase 2 UI — `IMMCalculator.tsx` standalone view (IMM-39 → IMM-51).** Unblocked by IMM-37/38 (data layer in place). 13 tasks: CrewBuilder, KitPicker, Mission inputs, ResultsCard, prior-override drilldown, Run button + Web Worker, K15 validation badge, engine toggle, vulnerability mode toggle, quick-load presets, session save/load/share UI, P2 acceptance gate. Several are parallel-dispatchable.
+5. **Future features (not on this release's critical path)** — Artemis (lunar) and Mars (interplanetary) missions, plus the Phase 3 ML layer + I6/I7/I8 figures, are all in [`docs/future_features.md`](docs/future_features.md) with their structural prerequisites.
+
+> ✓ **Resolved 2026-05-22 (rev3-b-followup, commit `ce97dda`):** tier multipliers now thread into the λ-sampling site instead of post-multiplying the count. Variance is correctly preserved (`Var = mult · λ`) instead of distorted (`mult² · λ`); CI₉₅ widths in IMMOutcome are now mathematically correct, which directly improves the fidelity of the downstream HSRB LxC matrix verdict. See `docs/iter5_scientific_limitations.md` §3.3.
+
+### AWAITING-DIEGO sign-offs (separate from the engineering backlog above)
+
+- Iter-1 manual UI sanity (Task 17)
+- Iter-3 Mission-risk tab manual sanity (Task 58)
+- Phase 3F acceptance (Task 88)
+- Iter-2 ratification of `research/02_criterion_taxonomy.md` → `docs/criteria.md` (gates Iter-2 start)
 
 See [`STATUS.md`](STATUS.md) for the full per-task tracker (97 IMM tasks + Iter-1/2/3/4 history) and [`docs/iter5_priors_rev3_strategy.md`](docs/iter5_priors_rev3_strategy.md) for the priors re-elicitation phasing.
 
