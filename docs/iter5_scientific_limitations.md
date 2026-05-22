@@ -1,10 +1,11 @@
 # Selectron — Scientific Limitations of the Current IMM Calibration
 
 **Created:** 2026-05-22 (post priors-rev3-b)
+**Last updated:** 2026-05-22 — analog-scope-down: Mars (TM21) and Artemis moved to [`future_features.md`](future_features.md)
 **Status:** Living document — update on every priors revision or engine extension
-**Companion docs:** [`iter5_priors_rev3_strategy.md`](iter5_priors_rev3_strategy.md), [`iter3_vv_dossier.md`](iter3_vv_dossier.md) §5
+**Companion docs:** [`iter5_priors_rev3_strategy.md`](iter5_priors_rev3_strategy.md), [`iter3_vv_dossier.md`](iter3_vv_dossier.md) §5, [`future_features.md`](future_features.md)
 
-> **NOT-FOR-FLIGHT:** Selectron is a research tool + methodology demonstrator. It is not a flight-medical-kit sizing tool, not a Mars-mission risk-certification instrument, and not a substitute for individual crew-member fitness-to-fly assessment. The limitations below are not aspirational TODOs — they are real and material.
+> **NOT-FOR-FLIGHT — analog scope only.** Selectron v1 is a research tool + methodology demonstrator scoped to **Earth-based analog isolation missions** (MDRS, HI-SEAS, Mars-500, Antarctic winter-over) and **LEO / ISS-baseline scenarios** (ISS 6 mo K15 reference, S20 DRMs). It is **NOT** a Mars-mission tool, **NOT** an Artemis-mission tool, **NOT** a flight-medical-kit sizing tool, and **NOT** a substitute for individual crew-member fitness-to-fly assessment. Mars and Artemis are catalogued in [`future_features.md`](future_features.md) with their structural prerequisites; do not enable them in `ACTIVE_MISSIONS` until those prerequisites land. The limitations below apply to the *in-scope* analog + LEO use case and are real and material.
 
 ---
 
@@ -73,33 +74,31 @@ Until that follow-up lands, **CI₉₅ widths on metrics that depend on multipli
 
 ---
 
-## 4 · Where the model is wildly miscalibrated
+## 4 · Where the model is wildly miscalibrated (in-scope only)
 
-### 4.1 TM21 Mars-class missions
+This section now lists residuals **within the active analog + LEO-ISS scope only**. Mars (TM21) and Artemis-class missions are no longer "wildly miscalibrated" — they are **out of scope** and catalogued in [`future_features.md`](future_features.md) with their structural prerequisites. The TM21 12–30× pLOCL gap diagnostic (`exports/2026-05-22_tm21_gap_diagnostic.txt`) drove the scope-down decision, not a calibration push.
 
-`exports/2026-05-22_validate_imm_rev3b_tierB055.txt` shows:
+### 4.1 'none' pEVAC under-elicited (LEO-ISS scenario)
 
-| DRM | Engine pEVAC | TM21 spec band | Engine pLOCL | TM21 spec band |
-|-----|--------------|----------------|--------------|----------------|
-| AMM 426d | 14.15 % | 25–40 % | 0.41 % | 5–12 % |
-| SMM 923d | 30.05 % | 40–65 % | 0.95 % | 15–30 % |
+The 'none' (no medical kit, K15 reference crew on ISS 6mo) scenario gives pEVAC = 13.7 % vs K15 ref 66.9 %. The K15 baseline expects that 2-of-3 crews on a 6-month mission without any medical resources would face an EVAC decision. Our priors give 1-of-7.
 
-**pLOCL is 12–30× too low.** This is not addressable by any blanket multiplier or per-event probability rescale. The TM21 spec bands almost certainly encode effects our engine does not model:
+This is a per-event `untreated.p_evac` under-elicitation (rev3-c scope, deferred). It is in-scope and addressable by a closed-form rescale once we choose to do that work.
 
-- **Treatment-decision degradation under comms delay** (22-minute one-way Mars latency). A myocardial infarction or septic event treated with ground-team guidance is much worse on Mars than on ISS. Our engine has no comms-delay model.
-- **Cumulative-dose conditions** (renal stones, radiation cataract, late-onset cardiac, bone-fracture risk) that compound over 400+ days. Our priors are per-event Poisson with constant λ; no cumulative-dose pathway exists.
-- **Mars-surface EVA risk profile** ≠ ISS-microgravity EVA. SMM has 401 EVAs in our mission profile — each with risks the K15 priors did not characterize for partial-gravity surface ops.
-- **Compound failures**: simultaneous medical + life-support degradation, food/water shortages, planetary launch-window dependencies on crew capability. None of these are modeled.
-
-`scripts/diagnose_tm21_gap.ts` (run 2026-05-22) shows ARS dominates Mars pLOCL contribution (34 % of total) and cardiogenic shock is #2 (19 % on SMM) — but absolute numbers remain 12–30× below TM21 spec bands. **Re-elicitation alone will not close this gap.** A structural engine extension (comms-delay modulation; cumulative-dose accumulator; Mars-EVA risk vector) is required.
-
-### 4.2 'none' pEVAC under-elicited
-
-The 'none' (no medical kit) scenario gives pEVAC = 13.7 % vs K15 ref 66.9 %. The K15 baseline expects that 2-of-3 crews on a 6-month mission without any medical resources would face an EVAC decision. Our priors give 1-of-7. This is a per-event `untreated.p_evac` under-elicitation (rev3-c scope) — but see §4.1: the same fix may not generalize to TM21.
-
-### 4.3 issHMS CHI residual (Δ −19.3)
+### 4.2 issHMS CHI residual (Δ −19.3)
 
 CHI = 1 − QTL / available. On issHMS, our CHI = 75.6 % vs K15 ref 94.93 %. This is independent of incidence (rev3-b) and per-event probability (rev3-c) — it reflects per-event SEVERITY (`fi_cp1/2/3` × `dt_cp1/2/3_hours` Beta-Pert distributions) and the issHMS kit's actual coverage of treatment paths. Likely needs per-condition severity audit, not blanket scaling.
+
+### 4.3 Out-of-scope: Mars (TM21) and Artemis (lunar)
+
+Selectron's IMM engine in v1 does not model:
+- Treatment-decision degradation under comms delay (Artemis ~1.3 s, Mars ~22 min)
+- Cumulative-dose conditions over 400+ days (GCR, SPE accumulation)
+- Mars-surface / lunar-surface EVA risk profile (different from ISS microgravity EVA)
+- Crew-autonomy treatment matrices (no ground-team guidance, no emergency-return)
+- No-resupply resource consumption hard-failure modes
+- Compound-failure modes (medical + life-support degradation, food/water shortage)
+
+These are out-of-scope **by design** as of 2026-05-22. The catalogued AMM/SMM Mars DRMs (and the future Artemis I–IV entries) are tagged `kind: "*-future"` in `src/data/imm-missions.ts` and filtered out of `ACTIVE_MISSIONS` so the UI picker cannot reach them. The engine remains capable of running them, but the priors will produce **plausibly-shaped but quantitatively wrong** outputs without the structural prerequisites in [`future_features.md`](future_features.md). Do not bypass the `ACTIVE_MISSIONS` filter without first implementing those prerequisites and a Mars / Artemis-specific validation gate.
 
 ---
 
@@ -114,17 +113,19 @@ Neither validation gate is written as a vitest test yet. Both are required for I
 
 ---
 
-## 6 · What Selectron IS appropriate for
+## 6 · What Selectron IS appropriate for (v1 scope)
 
-- **Analog-mission planning** — assessing relative crew composition risk for MDRS / HI-SEAS / Mars500 / SIRIUS scenarios where the priors are closer to in-flight observation
+- **Earth-based analog-mission planning** — assessing relative crew composition risk for MDRS / HI-SEAS / Mars-500 / SIRIUS / Antarctic winter-over / AMADEE / D-MARS / CHAPEA scenarios where the priors are closer to in-flight or terrestrial-analog observation
+- **LEO / ISS-baseline scenarios** — ISS 6 mo K15 reference; S20 DRM1/DRM2; analog-mission planners using ISS as the comparator
 - **Selection-criteria sensitivity analysis** — testing how different MCDA weight elicitations change ranking under the same posterior
 - **Methodology paper for the npj Microgravity / Aerospace Medicine venue** — the V&V approach (NASA-STD-7009A factors 1-3 explicit) is the publishable contribution; the priors are illustrative
 - **Educational tool** — teaching the IMM Monte Carlo workflow, Bayesian MCDA, NASA HSRB LxC
 
 ## 7 · What Selectron is NOT appropriate for
 
-- **Flight medical kit sizing** — use NASA's actual iMED + IMM workflow with NASA-internal priors
-- **Mars-mission risk certification** — the TM21 generalization gap (§4.1) precludes this
+- **Mars mission planning, risk certification, or medical kit sizing** — out of scope by design as of 2026-05-22. See [`future_features.md`](future_features.md) §2 for the structural prerequisites required to extend Selectron to interplanetary missions.
+- **Artemis (lunar) mission planning** — out of scope by design as of 2026-05-22. See [`future_features.md`](future_features.md) §1 for the structural prerequisites.
+- **Flight medical kit sizing** (any destination) — use NASA's actual iMED + IMM workflow with NASA-internal priors
 - **Individual crew-member fitness-to-fly decisions** — the gate-then-modulate architecture is illustrative; clinical disposition requires the full NASA Class I/II/III qualification process and individual medical workup
 - **Insurance / actuarial actual-loss prediction** — calibration is not against observed in-flight losses
 

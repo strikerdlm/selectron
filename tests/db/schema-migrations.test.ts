@@ -33,6 +33,7 @@ function buildSession(id: string): IMMSession {
     mission: {
       id: "mission-v3-test",
       label: "v3 round-trip",
+      kind: "analog-isolation",
       durationDays: 30,
       crewSize: 1,
       totalEVAs: 0,

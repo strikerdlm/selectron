@@ -11,11 +11,11 @@ afterEach(() => {
 
 const TRIAL_RNG = makeRng(0xc0ffee);
 const oneDayMission: IMMMission = {
-  id: "test-1d", label: "1-day test",
+  id: "test-1d", label: "1-day test", kind: "analog-isolation",
   durationDays: 1, crewSize: 1, totalEVAs: 0, evaSchedule: [],
 };
 const thirtyDayMission: IMMMission = {
-  id: "test-30d", label: "30-day test",
+  id: "test-30d", label: "30-day test", kind: "analog-isolation",
   durationDays: 30, crewSize: 1, totalEVAs: 0, evaSchedule: [],
 };
 const oneCrew: IMMCrewMember[] = [{
@@ -304,7 +304,7 @@ describe("General-Poisson duration scaling", () => {
     });
 
     const missionD180: IMMMission = {
-      id: "test-180d", label: "180-day test",
+      id: "test-180d", label: "180-day test", kind: "analog-isolation",
       durationDays: 180, crewSize: 1, totalEVAs: 0, evaSchedule: [],
     };
     const N = 10_000;

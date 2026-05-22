@@ -1,9 +1,18 @@
 // scripts/validate_imm.ts
-// T35: K15 Table 1 / S20 DRM / TM21 AMM+SMM delta reporter (V&V dossier).
-// Runs simulateIMM at T=100k — wall time ~5-10 min.
+// T35: K15 Table 1 reproduction reporter (V&V dossier).
+// Runs simulateIMM at T=100k against the 3 ISS / no-Mars K15 scenarios — wall time ~3-5 min.
 // Usage: npm run validate:imm
 // Prints per-scenario delta vs reference values.
 // Do NOT commit any output logs — this script is the audit artifact.
+//
+// SCOPE: ISS-baseline only. The TM21 AMM/SMM (Mars) cross-walk that this
+// script previously ran was REMOVED in the 2026-05-22 analog-scope-down
+// (commit message reference: see STATUS.md audit log for that date). The
+// Mars DRMs remain in src/data/imm-missions.ts tagged
+// kind: "interplanetary-mars-future" — re-enable this script's Mars
+// section after the engine extensions in docs/future_features.md land
+// (comms-delay treatment degradation; cumulative-dose pathways;
+// Mars-EVA risk profile).
 
 import { simulateIMM } from "../src/imm/simulate";
 import { IMM_KITS } from "../src/imm/kits";
@@ -31,19 +40,13 @@ for (const scenarioId of Object.keys(K15_TABLE1_REF) as Array<keyof typeof K15_T
   console.log();
 }
 
-// TM21 AMM and SMM placeholder targets:
-// AMM (426d, 4-crew, 60 EVAs): expected pEVAC ~ 25-40%, pLOCL ~ 5-12%
-// SMM (923d, 4-crew, 401 EVAs): expected pEVAC ~ 40-65%, pLOCL ~ 15-30%
-// Validation gates will be added in T87 (P5).
-console.log("\n=== TM21 AMM/SMM aggregate reproduction (T=100k) ===\n");
-const TM21_CREW = K15_REFERENCE_CREW.slice(0, 4); // 4-person crew for Mars
-for (const missionId of ["amm-426d", "smm-923d"] as const) {
-  const mission = IMM_MISSIONS.find(m => m.id === missionId)!;
-  const t0 = Date.now();
-  const out = simulateIMM({ crew: TM21_CREW, mission, kit: IMM_KITS.issHMS, trials: T, seed: SEED });
-  const t1 = Date.now();
-  console.log(`-- ${missionId} (${mission.durationDays}d, 4-crew, ${mission.totalEVAs} EVAs) --`);
-  console.log(`Wall: ${((t1 - t0) / 1000).toFixed(1)}s`);
-  console.log(`TME ${out.tme.mean.toFixed(1)}  CHI ${out.chi.mean.toFixed(2)}  pEVAC ${out.pEvac.mean.toFixed(2)}%  pLOCL ${out.pLocl.mean.toFixed(2)}%`);
-  console.log();
-}
+console.log("\n=== Mars TM21 AMM/SMM cross-walk: REMOVED (out of scope) ===");
+console.log("The Mars DRMs are catalogued in src/data/imm-missions.ts but tagged");
+console.log("kind: 'interplanetary-mars-future' and EXCLUDED from this validation");
+console.log("script and from the CrewComposition UI picker. The IMM engine does");
+console.log("not yet model the structural risk drivers required for");
+console.log("interplanetary missions (comms-delay treatment degradation,");
+console.log("cumulative-dose pathways, Mars-EVA risk profile). See");
+console.log("docs/future_features.md for the implementation roadmap and");
+console.log("docs/iter5_scientific_limitations.md §4 for the underlying analysis.");
+console.log();

@@ -11,7 +11,8 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { IMMCrewMember, CrewCompositeMethod, IMMOutcome } from "../../imm/types";
 import { PLACEHOLDER_CRITERIA } from "../../data/placeholder-criteria";
-import { IMM_MISSIONS } from "../../data/imm-missions";
+import { ACTIVE_MISSIONS } from "../../data/imm-missions";
+import type { IMMMission } from "../../imm/types";
 import { IMM_KITS } from "../../imm/kits";
 import { aggregateCrewComposite } from "../../imm/composite";
 import { evaluateCrewGates } from "../../imm/crew-gates";
@@ -101,7 +102,7 @@ const INITIAL_CREW: IMMCrewMember[] = [
 
 interface CrewState {
   members: IMMCrewMember[];
-  mission: typeof IMM_MISSIONS[0];
+  mission: IMMMission;
   kit: typeof IMM_KITS["issHMS"];
   trials: number;
   seed: number;
@@ -111,7 +112,7 @@ interface CrewState {
 
 const INITIAL_STATE: CrewState = {
   members: INITIAL_CREW,
-  mission: IMM_MISSIONS[0],    // iss-6mo (K15 reference)
+  mission: ACTIVE_MISSIONS[0], // iss-6mo (K15 reference) — first active mission
   kit: IMM_KITS.issHMS,
   trials: 100_000,
   seed: 0xc0ffee,
@@ -261,11 +262,11 @@ export function CrewComposition() {
                            text-ink-1 focus:border-signal focus:outline-none cursor-pointer"
                 value={state.mission.id}
                 onChange={(e) => {
-                  const m = IMM_MISSIONS.find((x) => x.id === e.target.value);
+                  const m = ACTIVE_MISSIONS.find((x) => x.id === e.target.value);
                   if (m) setState((s) => ({ ...s, mission: m }));
                 }}
               >
-                {IMM_MISSIONS.map((m) => (
+                {ACTIVE_MISSIONS.map((m) => (
                   <option key={m.id} value={m.id}>{m.label}</option>
                 ))}
               </select>

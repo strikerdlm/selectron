@@ -280,7 +280,8 @@ function fakePosteriorSummary(mean: number): PosteriorSummary {
 function fakeMission(id = "mars-transit"): IMMMission {
   return {
     id,
-    label: "Mars Transit (180d)",
+    label: "Analog 180-day fixture",
+    kind: "analog-isolation",
     durationDays: 180,
     crewSize: 4,
     totalEVAs: 0,

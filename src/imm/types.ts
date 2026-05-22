@@ -73,9 +73,29 @@ export type IMMCrewMember = {
   stageAScores?: Record<string, number>;
 };
 
+/**
+ * Mission taxonomy. Selectron v1 supports only "analog-isolation" and
+ * "leo-iss" — these are the operational scope for which the IMM Calculator
+ * is calibrated and validated.
+ *
+ * "lunar-artemis-future" and "interplanetary-mars-future" are catalogued for
+ * forward compatibility but are FILTERED OUT of the active mission picker
+ * because the engine does not yet model the structural risk drivers required
+ * for those destinations (comms-delay treatment degradation, cumulative-dose
+ * pathways, partial-gravity EVA risk profiles). See `docs/future_features.md`
+ * for the implementation roadmap.
+ */
+export type IMMMissionKind =
+  | "analog-isolation"            // MDRS, HI-SEAS, Mars-500, Antarctic winter-over, etc.
+  | "leo-iss"                     // ISS expeditions and reference DRMs
+  | "lunar-artemis-future"        // Artemis I/II/III/IV — planned future feature
+  | "interplanetary-mars-future"; // TM21 AMM/SMM — planned future feature
+
 export type IMMMission = {
   id: string;
   label: string;
+  /** Mission category — controls whether the picker exposes it. */
+  kind: IMMMissionKind;
   durationDays: number;
   crewSize: number;
   totalEVAs: number;
