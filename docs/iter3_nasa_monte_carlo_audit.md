@@ -130,3 +130,27 @@ The simulator's deterministic-seed contract (`tests/risk/simulate.test.ts` "same
 | [M18] | Myers, J. G. et al. (2018). *PSAM 14 Proceedings*, Paper 174. | [iapsam.org/psam14/proceedings/paper/paper_174_1.pdf](https://www.iapsam.org/psam14/proceedings/paper/paper_174_1.pdf) | 100k canonical; convergence rule verbatim |
 | [G12] | Gilkey, K. M. (2012). *NASA Technical Memorandum* 217227. | [NTRS 20120013096](https://ntrs.nasa.gov/citations/20120013096) | 75k MCMC samples; WinBUGS convergence rule |
 | [S20] | Walton, M. E. & Kerstman, E. L. (2020). *Aerosp Med Hum Perform* 91(4):332–342. | [10.3357/AMHP.5432.2020](https://doi.org/10.3357/AMHP.5432.2020) | ISS empirical validation context |
+
+---
+
+## 7. IMM Calculator alignment (Iter-5)
+
+### 7.1 Convergence rule alignment
+
+`src/imm/simulate.ts::simulateIMM` records σ(CHI) and σ(pEvac) at every 1000-trial checkpoint per the M18/A22 rule:
+
+> "the standard deviation of the main outputs ... fractional change between the last two 1 000-trial increments < 5 %."
+
+The convergence series is exposed through `IMMOutcome.convergence.{trialCheckpoints, sigmaChi, sigmaPevac}` and is the data backing the I4 IMMConvergencePlot figure. The convergence test (`tests/imm/simulate.test.ts σ<5% rule`) asserts the fractional change at T=100k satisfies this rule for the K15 reference crew on ISS 6mo / issHMS.
+
+### 7.2 K15 §II.A.9 concurrent FI formula
+
+The IMM engine implements the verbatim Keenan 2015 §II.A.9 formula:
+
+> "f_total = 1 − (1 − f_1) × (1 − f_2) × ... × (1 − f_n)"
+
+`src/imm/outcomes.ts::concurrentFI` is unit-tested against this exact identity across single, two-event, three-event, empty, and saturated (all-1.0) inputs. `runIMMTrial` uses concurrent FI when aggregating overlapping clinical-phase FIs within a single event (T26 of the IMM Calculator plan). The cross-event timeline integration (full K15 §II.A.9 semantics) is deferred to v1.1 and tracked as a known simplification in `src/imm/simulate.ts` comments.
+
+### 7.3 T=100 000 canonical trial count
+
+Default `trials: 100_000` matches the explicit NASA IMM reference figure documented verbatim in M18 ("One hundred thousand trials...") and confirmed by A22. The previous Selectron Stage B default of T=25 000 (Iter-3) was 4× below the NASA canonical figure; the IMM Calculator restores parity.

@@ -169,6 +169,38 @@ The 2014 [W14] poster lists a slightly different eighth factor ("People Qualific
 
 ---
 
+## 5. IMM Calculator validation (Iter-5)
+
+### 5.1 Catalog coverage
+
+- 100 K15 appendix conditions (`src/imm/conditions.ts`), every condition with `provenance` tag.
+- Tier-A NASA-published: 40 (M18 Table 1 8 conditions, G12 Bayesian 5, TM21 Mars drivers ~21, S20 ISS DRM 6, A22 aggregate).
+- Tier-B literature: 42 (Phase-0 I&C corpus 25, NASA evidence-report bridges + Phase-0 tables 17).
+- Tier-C synthetic back-fit: 18.
+- `vulnerabilityCriteria` populated on 58 conditions (psychiatric 3, behavioral 1, neurologic 7, infectious 7, musculoskeletal 19, cardiovascular 5, respiratory 2, space-adaptation 10, traumatic 4).
+
+### 5.2 K15 Table 1 reproduction
+
+Run `npm run validate:imm` to regenerate. Snapshot from last calibration (post engine fixes, post priors v2):
+
+| Scenario | Metric | Engine | K15 ref | Δ | Within CI₉₅? |
+| --- | --- | --- | --- | --- | --- |
+| (insert latest values when next Track A run completes; see STATUS.md audit log for the most recent commit) | | | | | |
+
+### 5.3 ML layer status
+
+- Surrogate (LightGBM): NOT YET TRAINED — deferred to Phase A1 of the IMM Calculator plan (post-MVP).
+- Vulnerability MLP: NOT YET TRAINED — deferred to Phase A2 (publication novelty hook). The deterministic per-member Stage A z-score injection (commit `9d5abc7`) is the v1 substitute.
+
+### 5.4 NASA-STD-7009A factor mapping
+
+- **Factor 1 (Verification):** 8 closed-form moment tests across incidence, severity, outcomes, treatment, simulate. `coupling_amplitude.test.ts` regresses against worst-vs-best ≥ 5 pp.
+- **Factor 2 (Validation):** `validate_imm.ts` reports per-metric per-scenario K15 deltas. Run after every priors or engine change.
+- **Factor 3 (Input Pedigree):** Tier-A / Tier-B / Tier-C provenance tags on every condition; 30-entry `src/data/citations.ts` with Scite-verified DOIs (20/28 confirmed, 3 wrong DOIs replaced via Scite).
+- **Factors 4-8:** out of scope (per the IMM Calculator design spec §10).
+
+---
+
 ## 6. Gate-then-modulate architecture (added 2026-05-21)
 
 ### 6.1 Defect that triggered this revision
