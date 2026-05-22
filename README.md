@@ -248,19 +248,29 @@ Selectron now ships a **NASA-IMM-aligned probabilistic medical-risk calculator**
 
 **Citations:** every gate threshold + criterion + composite method + MSP formulation cites a Scite-verified primary source via `src/data/citations.ts` (30 entries, 20 Scite-verified, 3 DOIs replaced after Scite caught wrong-paper attribution).
 
-**Validation gate**: reproduces K15 Table 1 (ISS 6mo / 6 crew) within CI₉₅ on all 4 metrics across 3 kit scenarios.
+**Result figures** (mounted in CrewComposition's "IMM simulation figures" region when a sim outcome exists):
+- **I1 IMMHeadlineCard** — 4-stat hero composite (TME / CHI / pEVAC / pLOCL) + Mission Success Probability + σ(CHI) convergence sparkline.
+- **I2 IMMPosteriorHist** — parametric Gaussian-approximated posterior panels with CI₉₀ + μ overlay.
+- **I3 IMMConditionDrivers** — per-condition lollipop sorted by contribution; toggle between pEVAC and pLOCL drivers; family-colored dots.
+- **I4 IMMConvergencePlot** — σ(CHI) and σ(pEVAC) vs cumulative trials with M18/A22 5 % reference line; T<1 000 sentinel.
+- **I5 IMMValidationCompare** — dumbbell run vs K15 issHMS reference (TME=106, CHI=94.93, pEVAC=5.57 %, pLOCL=0.44 %); dots blue if K15 ref ∈ run CI₉₅, amber otherwise.
 
-See `docs/superpowers/specs/2026-05-20-selectron-imm-calculator-design.md` for the design spec.
+Three more figures are planned but engine-blocked: **I6 IMMSensitivityTornado** (needs ±50 % per-condition perturbation runner — Phase B2), **I7 IMMCrewRiskHeat** (needs per-crew × per-condition counts surfaced from `runIMMTrial`), **I8 IMMVulnerabilityCalibration** (needs trained vulnerability MLP — Phase 3).
+
+**Validation status (current, 2026-05-22 priors-rev3-a):** K15 Table 1 reproduction is partial. Only `unlimited`-scenario CHI reproduces within ~2 pp of reference (92.98 vs 94.98). `unlimited` pEVAC and pLOCL overshoot slightly *below* the reference (over-correction signal). `issHMS` pEVAC reduced from 16.41 % toward 5.57 % (now at 12.82 %) by closing the kit-fallthrough coupling via 45-key resource-name normalization. Persistent residuals: TME +44 to +51 across all scenarios (incidence-level error, deferred to priors-rev3-b multi-knob calibration); 'none' pEVAC under-elicited at 19 % vs K15 reference 67 % (deferred to priors-rev3-c closed-form rescale). Full delta table + phasing in [`docs/iter5_priors_rev3_strategy.md`](docs/iter5_priors_rev3_strategy.md) and [`docs/iter3_vv_dossier.md`](docs/iter3_vv_dossier.md) §5.
+
+See [`docs/superpowers/specs/2026-05-20-selectron-imm-calculator-design.md`](docs/superpowers/specs/2026-05-20-selectron-imm-calculator-design.md) for the design spec and [`docs/superpowers/plans/2026-05-20-selectron-imm-calculator.md`](docs/superpowers/plans/2026-05-20-selectron-imm-calculator.md) for the 97-task implementation plan.
 
 ## Status
 
 - **Iter 1 vertical slice:** code-complete, math validated, all engine tests green.
 - **Iter 2 criteria + tiers:** 12 evidence-grounded criteria with verified DOIs, 3-tier accessibility model (Minimum / Medium / Elite), tier-aware scale transforms.
-- **Iter 3 risk + LxC (active):** NASA IMM Monte Carlo at *T* = 100 000, NASA HSRB LxC verdict per JSC-66705 Rev A, CHIExplainer + LxCMatrix UI, per-mission LxC chips in the comparison panel.
+- **Iter 3 risk + LxC:** NASA IMM Monte Carlo at *T* = 100 000, NASA HSRB LxC verdict per JSC-66705 Rev A, CHIExplainer + LxCMatrix UI, per-mission LxC chips in the comparison panel.
+- **Iter 4 manuscript:** initial IMRaD draft complete; figure pipeline (F1–F7) reproducible from `src/`.
+- **Iter 5 IMM Calculator (active):** Phase 0 (100-condition catalog + 3-tier priors) + Phase 1 (engine math, σ<5 % convergence) DONE; Phase 4 figures partial — I1–I5 shipped and wired into CrewComposition (I6/I7/I8 engine-blocked); priors re-elicitation rev3-a landed, rev3-b/c/d deferred to follow-up sessions.
 - **Phase 0 literature fan-out:** complete; all 6 agent deliverables under `research/`.
-- **Active branch:** `iter1-phase0` (still the working branch name from Iter-1; rebased history carries Iter-2 and Iter-3 work).
-- **Test suite:** 171 vitest tests across 23 suites + 7 Playwright e2e — all green.
-- **Next:** Diego's manual UI sanity sign-off → Iter-4 manuscript pass.
+- **Active branch:** `iter1-phase0` (still the working branch name from Iter-1; rebased history carries Iter-2, Iter-3, Iter-4, and Iter-5 work).
+- **Next concrete work:** priors-rev3-b multi-knob incidence calibration (gates IMM Phase 2 acceptance, IMM-51) → IMM-37/38 Dexie v3 schema + CRUD → IMMCalculator standalone view (IMM-39 onwards).
 
 The live resume tracker is [`STATUS.md`](STATUS.md). It is updated as the single source of truth at the end of every task, so any new session (or any new agent) can pick up cleanly from a disconnection.
 
