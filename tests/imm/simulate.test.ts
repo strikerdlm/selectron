@@ -141,20 +141,63 @@ describe("T27: risk-factor multipliers", () => {
   });
 });
 
-describe("T26: concurrent-FI QTL accounting", () => {
+describe("K15 §II.A.9 concurrent-FI building block (cross-event v1.1 reservation)", () => {
+  // concurrentFI is still mathematically valid as a building block for the
+  // deferred cross-event v1.1 enhancement (overlapping events from different
+  // conditions on the same crewmember at the same point in time). The within-
+  // event QTL computation does NOT use this formula — it uses sequential phase
+  // summation per K15 §II.A.9 (see "rev3-d K15 per-event QTL" describe block
+  // below).
   it("concurrentFI([0.3, 0.4]) = 1 − 0.7×0.6 = 0.58", () => {
-    // K15 §II.A.9: f_total = 1 − Π(1 − f_i)
-    // fi_cp1=0.3, fi_cp2=0.4 → 1 − (1−0.3)(1−0.4) = 1 − 0.7×0.6 = 0.58
     expect(concurrentFI([0.3, 0.4])).toBeCloseTo(0.58, 10);
   });
+});
 
-  it("QTL for a single event with fi_cp1=0.3, fi_cp2=0.4 uses concurrentFI", () => {
-    // With known FI values, QTL = concurrentFI([fi_cp1, fi_cp2]) × (dt_cp1 + dt_cp2).
-    // We verify that the formula produces the right mathematical relationship.
-    // concurrentFI([0.3, 0.4]) = 0.58; if dt_cp1=10h, dt_cp2=20h → QTL = 0.58 × 30 = 17.4
+describe("rev3-d K15 per-event QTL (sequential phases, not concurrent)", () => {
+  // K15 §II.A.9 verbatim: cp1 (diagnosis + initial treatment) and cp2 (ongoing
+  // treatment + convalescence) are SEQUENTIAL clinical phases of a single event,
+  // not overlapping. Therefore per-event QTL = Σ fi_i × dt_i (sum of products),
+  // NOT concurrentFI × Σ dt_i. cp3 (permanent impairment) is charged from end
+  // of cp2 to end of mission.
+  //
+  // Pre-rev3-d code applied concurrentFI([fi_cp1, fi_cp2]) × (dt_cp1 + dt_cp2)
+  // which over-estimated per-event QTL by ~2-3× and was the dominant driver of
+  // the issHMS CHI residual (Δ -16 vs K15 ref 94.93).
+
+  it("sequential-phase QTL formula: fi_cp1×dt_cp1 + fi_cp2×dt_cp2", () => {
+    // fi_cp1=0.3, dt_cp1=10h, fi_cp2=0.4, dt_cp2=20h
+    // K15-correct: 0.3×10 + 0.4×20 = 3 + 8 = 11
+    // Pre-rev3-d (wrong, banned now): concurrentFI([0.3,0.4]) × 30 = 0.58 × 30 = 17.4
     const fi_cp1 = 0.3, fi_cp2 = 0.4, dt1 = 10, dt2 = 20;
-    const expected = concurrentFI([fi_cp1, fi_cp2]) * (dt1 + dt2);
-    expect(expected).toBeCloseTo(17.4, 5);
+    const correct = fi_cp1 * dt1 + fi_cp2 * dt2;
+    expect(correct).toBe(11);
+    // Sanity: the wrong formula gives a larger number — confirming the over-estimate.
+    const buggyEquivalent = concurrentFI([fi_cp1, fi_cp2]) * (dt1 + dt2);
+    expect(buggyEquivalent).toBeGreaterThan(correct);
+  });
+
+  it("v1.1 reservation: cp3 charges fi_cp3 × (mission_end − cp3_start) hours when enabled", () => {
+    // NOTE: cp3 is currently DEFERRED in the engine pending per-condition fi_cp3
+    // prior re-elicitation (see simulate.ts block comment + docs/iter5_scientific_limitations.md §3.4).
+    // This test documents the math K15 specifies (and the engine will use after the
+    // prior audit lands). For an event at timeDays=10 with dt_cp1=2h, dt_cp2=10h,
+    // fi_cp3=0.05 on a 180-day mission: cp3 starts at 252 hours; remaining = 4068h;
+    // cp3 loss = 0.05 × 4068 = 203.4.
+    const missionDurationHours = 180 * 24;
+    const eventTimeHours = 10 * 24;
+    const dt_cp1 = 2, dt_cp2 = 10, fi_cp3 = 0.05;
+    const cp3Start = eventTimeHours + dt_cp1 + dt_cp2;
+    const cp3Duration = Math.max(0, missionDurationHours - cp3Start);
+    expect(fi_cp3 * cp3Duration).toBeCloseTo(203.4, 5);
+  });
+
+  it("v1.1 reservation: cp3 clamps to 0 when event occurs after mission end", () => {
+    const missionDurationHours = 14 * 24;
+    const eventTimeHours = 13 * 24;
+    const dt_cp1 = 24, dt_cp2 = 48;
+    const cp3Start = eventTimeHours + dt_cp1 + dt_cp2;
+    const cp3Duration = Math.max(0, missionDurationHours - cp3Start);
+    expect(cp3Duration).toBe(0);
   });
 });
 

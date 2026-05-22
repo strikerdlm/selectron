@@ -19,7 +19,10 @@ import { applyVulnerabilityMultiplier } from "../risk/incidence";
 import { zScoreAgainstScale } from "../engine/normalize-cohort";
 import { sampleGamma } from "../engine/gamma";
 import { sampleSeverity } from "./severity";
-import { sampleBetaPert, concurrentFI } from "./outcomes";
+// concurrentFI is exported from ./outcomes but not used in the per-event QTL
+// loop (which uses sequential phase summation per K15 §II.A.9). Kept exported
+// for the deferred cross-event v1.1 enhancement.
+import { sampleBetaPert } from "./outcomes";
 import { interpolateBetaPertByRAF } from "./treatment";
 import { computeRAF } from "./kits";
 import type { Criterion } from "../types";
@@ -390,18 +393,59 @@ export function runIMMTrial(
   // Aggregate trial outputs
   const tme = occurrences.length;
 
-  // T26: QTL with concurrent-FI per K15 §II.A.9: f_total = 1 − Π(1 − f_i).
-  // Within-event concurrent FI: compose fi_cp1 and fi_cp2 multiplicatively.
-  // QTL contribution = concurrentFI([fi_cp1, fi_cp2]) × (dt_cp1 + dt_cp2).
+  // rev3-d (severity-axis fix, 2026-05-22): K15 §II.A.9 per-event QTL — sequential phases.
   //
-  // DEFERRED: full cross-event concurrent FI (i.e., overlapping events from different
-  // conditions on the same crew member composed together) is a v1.1 enhancement.
-  // It requires a per-crew-member timeline integration of impairment intervals, which is
-  // complex and currently not supported (each event's duration phases are treated as sequential).
+  //   K15 verbatim: "Given n overlapping functional impairments ⟨f₁, f₂, f₃, …, fₙ⟩
+  //   at a point in time within a crewmember due to medical events, the overall
+  //   functional impairment f_total can be calculated using f_total = 1 − Π(1 − f_i).
+  //   ... Total quality time lost (QTL) over a mission is calculated as the SUM OF
+  //   PRODUCTS of the functional impairments and durations."
+  //
+  // The concurrentFI formula applies to OVERLAPPING impairments at the same point
+  // in time (cross-event overlap on the same crew member). Within a single event,
+  // cp1 (diagnosis + initial treatment) and cp2 (ongoing treatment + convalescence)
+  // are SEQUENTIAL clinical phases — they do not overlap. Per K15 §II.A.9, QTL is
+  // the SUM of (f_i × dt_i) over the phases.
+  //
+  // Pre-rev3-d code applied concurrentFI([fi_cp1, fi_cp2]) × (dt_cp1 + dt_cp2)
+  // inside this loop, which over-estimated per-event QTL by ~2-3× (the multiplicative
+  // composition mistakenly applied cp2's reduced FI to cp1's duration AND cp1's
+  // higher FI to cp2's duration). Replaced with the sum-of-products below.
+  //
+  // ── cp3 (permanent impairment) treatment ────────────────────────────────────
+  // K15 §II.A says cp3 is "permanent impairment for the remainder of the mission"
+  // and the fi_cp3 Beta-Pert is sampled per event. The MATHEMATICALLY CORRECT QTL
+  // formula would add `fi_cp3 × (mission_end_hours − event_end_hours)` to each
+  // per-event QTL contribution.
+  //
+  // HOWEVER: empirical audit (2026-05-22, scripts/diagnose_chi_residual.ts +
+  // validate_imm with cp3 enabled) showed that the per-condition `treated.fi_cp3`
+  // priors in imm-priors.json were elicited under the OLD engine where cp3 was
+  // sampled but NEVER charged to QTL. 80 of 100 conditions have non-zero
+  // treated.fi_cp3 modes; 12 severe conditions (sepsis, cardiac, stroke, ARS,
+  // anaphylaxis, etc.) have mode=0.020 which charges ~80 crew-hours per event on
+  // a 180-day mission. Enabling cp3 with the existing priors overshoots K15
+  // CHI calibration by 4 pp on issHMS (rev3-c+cp3: 75.17 vs target 94.93;
+  // rev3-c without cp3: 78.82). The rev3-b/c calibrations were done against the
+  // bug-canceling state (no cp3 + inflated concurrent-FI) which by coincidence
+  // matched K15 aggregate. Adding cp3 alone breaks that fortunate cancellation.
+  //
+  // Decision: ship the concurrent-FI fix (unambiguously K15-correct, cuts QTL ~2.5×
+  // per event) and DEFER cp3 to v1.1 with a per-condition fi_cp3 prior re-elicitation
+  // pass. cp3 is sampled and exposed on Occurrence.outcomes for downstream use; the
+  // QTL accumulator omits it pending the prior audit. Tracked in
+  // docs/iter5_scientific_limitations.md §3.4 and as the next rev3-e item in
+  // docs/iter5_priors_rev3_strategy.md.
+  //
+  // Cross-event concurrent FI (overlapping events from DIFFERENT conditions on the
+  // same crewmember composed via concurrentFI) remains the v1.1 enhancement — it
+  // requires a per-crewmember timeline integration of impairment intervals.
+  // Currently events from different conditions are treated as non-overlapping in time.
   let qtl = 0;
   for (const o of occurrences) {
-    const effectiveFI = concurrentFI([o.outcomes.fi_cp1, o.outcomes.fi_cp2]);
-    qtl += effectiveFI * (o.outcomes.dt_cp1_hours + o.outcomes.dt_cp2_hours);
+    qtl += o.outcomes.fi_cp1 * o.outcomes.dt_cp1_hours +
+           o.outcomes.fi_cp2 * o.outcomes.dt_cp2_hours;
+    // cp3 deferred — see block comment above.
   }
 
   // T25: EVAC/LOCL aggregation uses per-event Bernoulli samples (not 0.5 threshold).
