@@ -149,18 +149,37 @@ selectron/
 │   │   ├── lxc-definitions.ts #   verbatim JSC-66705 Rev A Fig. 4 tables
 │   │   ├── lxc.ts             #   posterior → (L, C, score, color) assessor
 │   │   └── priorsSchema.ts    #   priors.json runtime validator
+│   ├── imm/                   # IMM Calculator engine (NASA-EMCL-aligned, parallel to src/risk/)
+│   │   ├── conditions.ts      #   100 K15 appendix conditions with provenance tags
+│   │   ├── simulate.ts        #   4-step trial loop · T=100 000 · Web Worker bridge
+│   │   ├── outcomes.ts        #   concurrent FI · K15 §II.A.9 formula · MSP
+│   │   └── ...                #   incidence · severity · treatment modules
 │   ├── ui/
-│   │   ├── App.tsx            #   view switcher (Dashboard / Wizard / Sim)
-│   │   ├── views/             #   top-level routes
+│   │   ├── App.tsx            #   view switcher (Dashboard / Wizard / Sim / CrewComposition)
+│   │   ├── views/
+│   │   │   └── CrewComposition.tsx  # N-member crew builder + IMM MC results
 │   │   ├── wizard/            #   4-step wizard: Candidate → Criteria → Review → Mission/Sim
-│   │   ├── figures/           #   ECharts F1–F7 + LxCMatrix + CHIExplainer + CalculationTrace
+│   │   ├── figures/
+│   │   │   └── CriterionMiniFigure.tsx  # Bell-curve PDF per criterion · gate threshold dashed line
 │   │   ├── dashboard/         #   candidate roster + recent sim cards
-│   │   ├── components/        #   ErrorBoundary · MissionPicker · ScoreCard · RiskCard · ToastHost
+│   │   ├── components/
+│   │   │   ├── CrewMemberCard.tsx   # Per-member gate verdict + per-criterion mini-figures
+│   │   │   ├── PerScoreCard.tsx     # Single criterion score card with citation chip
+│   │   │   ├── CompositeCrewPanel.tsx  # Crew composite aggregator + crew gate verdict
+│   │   │   ├── CitationChip.tsx     # DOI + Scite retraction-status badge
+│   │   │   ├── ErrorBoundary.tsx    # ErrorBoundary
+│   │   │   ├── MissionPicker.tsx    # MissionPicker
+│   │   │   ├── ScoreCard.tsx        # ScoreCard
+│   │   │   ├── RiskCard.tsx         # RiskCard
+│   │   │   └── ToastHost.tsx        # ToastHost
 │   │   └── testing/           #   TestFigureHost (DEV-only e2e fixture host)
 │   ├── contexts/              #   WizardContext (4-step state + Dexie autosave)
-│   ├── db/                    #   Dexie 4 schema + repository (IndexedDB persistence)
-│   ├── data/                  #   12 verified criteria · 5 analog missions · synthetic priors
-│   └── types/                 #   Criterion · Candidate · Posterior · AccessTier · risk types
+│   ├── db/                    #   Dexie v3 schema + repository (IndexedDB persistence; imm_sessions table)
+│   ├── data/
+│   │   ├── citations.ts       #   30-entry Scite-verified citation registry (20 confirmed, 3 DOIs replaced)
+│   │   ├── imm-priors.json    #   100-condition priors with tier-A/B/C provenance tags
+│   │   └── ...                #   12 verified criteria · 5 analog missions · synthetic priors
+│   └── types/                 #   Criterion · Candidate · Posterior · AccessTier · risk types · IMMOutcome
 ├── tests/
 │   ├── engine/                #   Stage-A math, math-first TDD
 │   ├── risk/                  #   IMM trial, convergence, Poisson-Gamma conjugate, LxC
@@ -213,6 +232,25 @@ where weights $w \sim \mathrm{Dirichlet}(\alpha)$ are drawn from a prior elicite
 **Stage B — Mission-risk Monte Carlo.** Stage A's posterior conditions a synthetic crew of 6 members per analog mission. A 4-step forward simulation (occurrence → severity → treatment → CHI aggregation) is run at the NASA-canonical *T* = 100 000 trials per [M18] / [A22], using lognormal-Poisson hierarchical priors over 12 modeled medical conditions. The mission posterior carries χ (Crew Health Index, χ = 1 − QTL/(t·c)), the early-termination probability **P(χ < χ\*)** at a configurable operational floor (default χ\* = 0.7 per NASA reference programs), and the expected lost crew-days. These three numbers feed the **NASA HSRB Likelihood × Consequence matrix** verbatim from JSC-66705 Rev A Figure 4 — likelihood bucketed by P(χ < χ\*), consequence bucketed by 1 − χ_mean (= fraction of mission crew-days lost) under the Mission Objectives Impact sub-category, then looked up in the 5×5 priority-score grid and mapped to a NASA color per §3.2.4 (red ≥ 20, yellow 11–19, green ≤ 10).
 
 See [`docs/superpowers/specs/2026-05-18-selectron-iter3-risk.md`](docs/superpowers/specs/2026-05-18-selectron-iter3-risk.md) for the full Iter-3 design and the explicit out-of-scope list.
+
+## IMM Calculator + Crew Composition
+
+Selectron now ships a **NASA-IMM-aligned probabilistic medical-risk calculator** alongside Stage A MCDA + Stage B HSRB-LxC. The Crew Composition view (`/CrewComposition`) lets you build a crew of N members, each with their own Stage A scores across the 12 Selectron criteria, and produces:
+
+- **Per-member status**: qualified / disqualified per binary clearance gates (MMPI-2-RF EID T<65 per Harrell 1992; NASA Cognition Battery z>−2 per Basner 2015).
+- **Per-criterion ECharts mini-figures**: bell-curve PDF with the member's score marked, gate-threshold dashed line, Scite-verified citation chip (DOI + retraction status).
+- **Crew composite** (live): aggregator selectable as `mean` / `worst-link` / `geometric-mean` (worst-link is default, empirically validated by Vâlcea 2019).
+- **Crew gate verdict**: whole-crew DQ on any failed member (mirrors NASA's binary disqualification process).
+- **IMM Monte Carlo (Web Worker)**: T=100k 4-step trial across 100 NASA-EMCL medical conditions × mission profile × resource kit. Outputs TME, CHI, pEVAC, pLOCL, and the new **Mission Success Probability** (no LOCL ∧ no EVAC ∧ CHI ≥ χ\*).
+- **Three kit scenarios**: None / ISS HMS / Unlimited per K15 Table 1; custom kit override available.
+
+**Architecture:** parallel `src/imm/` engine alongside existing `src/risk/`. Engine math: Lognormal-Poisson + Gamma-Poisson + Beta-Bernoulli incidence, Beta-Pert outcomes (RAF interpolation), concurrent FI per K15 §II.A.9, per-member z-scored Stage A vulnerability injection.
+
+**Citations:** every gate threshold + criterion + composite method + MSP formulation cites a Scite-verified primary source via `src/data/citations.ts` (30 entries, 20 Scite-verified, 3 DOIs replaced after Scite caught wrong-paper attribution).
+
+**Validation gate**: reproduces K15 Table 1 (ISS 6mo / 6 crew) within CI₉₅ on all 4 metrics across 3 kit scenarios.
+
+See `docs/superpowers/specs/2026-05-20-selectron-imm-calculator-design.md` for the design spec.
 
 ## Status
 
