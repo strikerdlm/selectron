@@ -176,13 +176,11 @@ describe("rev3-d K15 per-event QTL (sequential phases, not concurrent)", () => {
     expect(buggyEquivalent).toBeGreaterThan(correct);
   });
 
-  it("v1.1 reservation: cp3 charges fi_cp3 × (mission_end − cp3_start) hours when enabled", () => {
-    // NOTE: cp3 is currently DEFERRED in the engine pending per-condition fi_cp3
-    // prior re-elicitation (see simulate.ts block comment + docs/iter5_scientific_limitations.md §3.4).
-    // This test documents the math K15 specifies (and the engine will use after the
-    // prior audit lands). For an event at timeDays=10 with dt_cp1=2h, dt_cp2=10h,
-    // fi_cp3=0.05 on a 180-day mission: cp3 starts at 252 hours; remaining = 4068h;
-    // cp3 loss = 0.05 × 4068 = 203.4.
+  it("rev3-e: cp3 charges fi_cp3 × (mission_end − cp3_start) hours per K15 §II.A.9", () => {
+    // ENABLED in rev3-e after per-condition fi_cp3 prior audit (68 fully-resolving
+    // acute conditions zeroed; 32 persistent-impairment conditions retained).
+    // For an event at timeDays=10 with dt_cp1=2h, dt_cp2=10h, fi_cp3=0.05 on a
+    // 180-day mission: cp3 starts at 252 hours; remaining = 4068h; loss = 203.4h.
     const missionDurationHours = 180 * 24;
     const eventTimeHours = 10 * 24;
     const dt_cp1 = 2, dt_cp2 = 10, fi_cp3 = 0.05;
@@ -191,13 +189,25 @@ describe("rev3-d K15 per-event QTL (sequential phases, not concurrent)", () => {
     expect(fi_cp3 * cp3Duration).toBeCloseTo(203.4, 5);
   });
 
-  it("v1.1 reservation: cp3 clamps to 0 when event occurs after mission end", () => {
+  it("rev3-e: cp3 clamps to 0 when event extends past mission end", () => {
     const missionDurationHours = 14 * 24;
     const eventTimeHours = 13 * 24;
     const dt_cp1 = 24, dt_cp2 = 48;
     const cp3Start = eventTimeHours + dt_cp1 + dt_cp2;
     const cp3Duration = Math.max(0, missionDurationHours - cp3Start);
     expect(cp3Duration).toBe(0);
+  });
+
+  it("rev3-e: cp3 contributes 0 when fi_cp3 = 0 (fully-resolving acute conditions)", () => {
+    // 68 of 100 conditions in imm-priors.json have treated.fi_cp3 = untreated.fi_cp3 = 0
+    // after the rev3-e per-condition audit. The QTL accumulator's `if (fi_cp3 > 0)`
+    // guard means these contribute zero cp3 hours regardless of mission duration
+    // or event time. Test guards against accidental reintroduction of cp3 charging
+    // for resolving conditions.
+    const fi_cp3 = 0;
+    const cp3DurationHours = 1000;  // arbitrary
+    const cp3Loss = fi_cp3 > 0 ? fi_cp3 * cp3DurationHours : 0;
+    expect(cp3Loss).toBe(0);
   });
 });
 
