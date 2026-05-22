@@ -1,6 +1,7 @@
 import Dexie, { type EntityTable } from "dexie";
 import type { RiskPosterior } from "@/types/risk";
 import type { AccessTier } from "@/types/scenario";
+import type { IMMSession } from "@/imm/types";
 
 export type CandidateStatus = "draft" | "ready";
 
@@ -69,7 +70,7 @@ export type MetaEntry = {
   schemaVersion: number;
 };
 
-export const SCHEMA_VERSION = 2;
+export const SCHEMA_VERSION = 3;
 
 export class SelectronDb extends Dexie {
   candidates!: EntityTable<DbCandidate, "id">;
@@ -78,6 +79,12 @@ export class SelectronDb extends Dexie {
   simSessions!: EntityTable<SimSession, "id">;
   priorsCache!: EntityTable<PriorsCacheEntry, "id">;
   _meta!: EntityTable<MetaEntry, "id">;
+  /**
+   * v3 (IMM Phase 2, 2026-05-22): persists IMM Calculator runs from the
+   * Crew Composition view. Row type re-uses `IMMSession` from
+   * `src/imm/types.ts` verbatim — no DbIMMSession wrapper.
+   */
+  immSessions!: EntityTable<IMMSession, "id">;
 
   constructor() {
     super("selectron");
@@ -93,6 +100,21 @@ export class SelectronDb extends Dexie {
     // The schema declaration is the same — no new indexed column. Existing rows
     // are valid as-is (accessTier is optional). Upgrade hook is a no-op but
     // exists so Dexie bumps the version cleanly.
+    this.version(2).stores({
+      candidates: "id, alias, createdAt, updatedAt, status",
+      criterionEntries: "id, candidateId, criterionId, [candidateId+criterionId], updatedAt",
+      attachments: "id, sha256, uploadedAt",
+      simSessions: "id, candidateId, missionId, runAt, [candidateId+missionId]",
+      priorsCache: "id",
+      _meta: "id",
+    });
+    // v3 (IMM Phase 2, 2026-05-22): additive — adds the `immSessions` store.
+    // No existing v1/v2 store is altered, so v1/v2 rows remain readable and
+    // no data migration callback is required. Indexes:
+    //   - `id` (primary key, UUID)
+    //   - `candidateId` (Stage A linkage; null when crew is ad-hoc)
+    //   - `createdAt` (ISO timestamp for chronological listing)
+    //   - `mission.id` (nested-key index for per-mission rollups)
     this.version(SCHEMA_VERSION).stores({
       candidates: "id, alias, createdAt, updatedAt, status",
       criterionEntries: "id, candidateId, criterionId, [candidateId+criterionId], updatedAt",
@@ -100,6 +122,7 @@ export class SelectronDb extends Dexie {
       simSessions: "id, candidateId, missionId, runAt, [candidateId+missionId]",
       priorsCache: "id",
       _meta: "id",
+      immSessions: "id, candidateId, createdAt, mission.id",
     });
   }
 }

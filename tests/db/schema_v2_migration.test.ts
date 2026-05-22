@@ -13,8 +13,9 @@ afterEach(async () => {
 });
 
 describe("Dexie schema v2 — DbCandidate.accessTier", () => {
-  test("SCHEMA_VERSION is 2", () => {
-    expect(SCHEMA_VERSION).toBe(2);
+  test("SCHEMA_VERSION is at least 2 (v2 contract still satisfied after later additive migrations)", () => {
+    // v2 added DbCandidate.accessTier; that contract is preserved under v3+.
+    expect(SCHEMA_VERSION).toBeGreaterThanOrEqual(2);
   });
 
   test("can write a candidate with accessTier and read it back", async () => {
