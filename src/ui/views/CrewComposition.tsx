@@ -18,7 +18,9 @@ import { evaluateCrewGates } from "../../imm/crew-gates";
 import { CrewMemberCard } from "../components/CrewMemberCard";
 import { CompositeCrewPanel } from "../components/CompositeCrewPanel";
 import { CriterionMiniFigure } from "../figures/CriterionMiniFigure";
+import { IMMHeadlineCard } from "../figures/IMMHeadlineCard";
 import { IMMPosteriorHist } from "../figures/IMMPosteriorHist";
+import { IMMConditionDrivers } from "../figures/IMMConditionDrivers";
 import { IMMConvergencePlot } from "../figures/IMMConvergencePlot";
 import { IMMValidationCompare } from "../figures/IMMValidationCompare";
 
@@ -426,9 +428,33 @@ export function CrewComposition() {
         <div className="flex flex-col gap-6 mt-4" role="region" aria-label="IMM simulation figures">
           <div className="panel">
             <h3 className="label text-ink-1 uppercase tracking-cap mb-4">
+              I1 · Headline
+            </h3>
+            <IMMHeadlineCard
+              outcome={outcome}
+              trials={state.trials}
+              seed={state.seed}
+              mission={{ id: state.mission.id, label: state.mission.label }}
+            />
+          </div>
+
+          <div className="panel">
+            <h3 className="label text-ink-1 uppercase tracking-cap mb-4">
               I2 · Posterior Distributions
             </h3>
             <IMMPosteriorHist
+              outcome={outcome}
+              trials={state.trials}
+              seed={state.seed}
+              mission={{ id: state.mission.id, label: state.mission.label }}
+            />
+          </div>
+
+          <div className="panel">
+            <h3 className="label text-ink-1 uppercase tracking-cap mb-4">
+              I3 · Condition Drivers
+            </h3>
+            <IMMConditionDrivers
               outcome={outcome}
               trials={state.trials}
               seed={state.seed}
