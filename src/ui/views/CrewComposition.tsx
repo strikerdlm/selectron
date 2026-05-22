@@ -24,6 +24,7 @@ import { IMMPosteriorHist } from "../figures/IMMPosteriorHist";
 import { IMMConditionDrivers } from "../figures/IMMConditionDrivers";
 import { IMMConvergencePlot } from "../figures/IMMConvergencePlot";
 import { IMMValidationCompare } from "../figures/IMMValidationCompare";
+import { assessIMMLxC } from "../../imm/lxc";
 
 type SimState = "idle" | "running" | "done" | "error";
 
@@ -138,6 +139,14 @@ export function CrewComposition() {
   const gateResult = useMemo(
     () => evaluateCrewGates(state.members, PLACEHOLDER_CRITERIA),
     [state.members],
+  );
+
+  // ── derived HSRB LxC verdict (drives the NASA-standard risk colour) ──────
+  // Computed off the IMM outcome + crew gate so it auto-updates whenever
+  // either changes. Returns undefined while no sim has been run.
+  const lxc = useMemo(
+    () => (outcome ? assessIMMLxC(outcome, gateResult) : undefined),
+    [outcome, gateResult],
   );
 
   function toggleMember(id: string) {
@@ -427,6 +436,61 @@ export function CrewComposition() {
       {/* ── IMM figure panel — mounted below the 3-zone grid when a sim result is available ── */}
       {outcome && (
         <div className="flex flex-col gap-6 mt-4" role="region" aria-label="IMM simulation figures">
+
+          {/* HSRB LxC verdict — NASA JSC-66705 Rev A standard, headline above all figures. */}
+          {lxc && (
+            <div
+              className="panel"
+              role="status"
+              aria-label={`HSRB risk verdict ${lxc.color} L${lxc.likelihood} times C${lxc.consequence} score ${lxc.score}`}
+            >
+              <h3 className="label text-ink-1 uppercase tracking-cap mb-4">
+                NASA HSRB · LxC verdict (JSC-66705 Rev A)
+              </h3>
+              <div className="flex items-baseline gap-6 flex-wrap">
+                <span
+                  className={
+                    "display text-4xl tabular-nums " +
+                    (lxc.color === "red"    ? "text-red-500"  :
+                     lxc.color === "yellow" ? "text-amber-400" :
+                                              "text-go")
+                  }
+                >
+                  L{lxc.likelihood} × C{lxc.consequence} = {lxc.score}
+                </span>
+                <span
+                  className={
+                    "mono uppercase tracking-cap text-xs px-2 py-1 rounded " +
+                    (lxc.color === "red"    ? "bg-red-500/15 text-red-300"  :
+                     lxc.color === "yellow" ? "bg-amber-400/15 text-amber-300" :
+                                              "bg-go/15 text-go")
+                  }
+                >
+                  {lxc.color}
+                </span>
+                {lxc.disqualified && (
+                  <span className="mono text-xs text-red-300">
+                    {lxc.reason}
+                  </span>
+                )}
+              </div>
+              <dl className="mono text-xs text-ink-2 mt-4 grid grid-cols-2 gap-x-6 gap-y-1">
+                <dt className="text-ink-3 uppercase tracking-cap">likelihood</dt>
+                <dd>
+                  L{lxc.likelihood} · {lxc.likelihoodLabel} · pFailure = {(100 * lxc.pMissionFailure).toFixed(2)}%
+                </dd>
+                <dt className="text-ink-3 uppercase tracking-cap">consequence</dt>
+                <dd>
+                  C{lxc.consequence} · {lxc.consequenceLabel} · fractionLost = {(100 * lxc.fractionLost).toFixed(2)}%
+                </dd>
+              </dl>
+              <p className="mono text-[10px] text-ink-3 mt-3 border-t border-line/40 pt-2">
+                pFailure = 1 − missionSuccess (failure ⇔ any of EVAC, LOCL, CHI &lt; χ*).
+                fractionLost = 1 − CHI/100 (NASA JSC-66705 §3.2.4).
+              </p>
+            </div>
+          )}
+
           <div className="panel">
             <h3 className="label text-ink-1 uppercase tracking-cap mb-4">
               I1 · Headline
