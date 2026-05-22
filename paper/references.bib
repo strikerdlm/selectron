@@ -311,3 +311,127 @@
   year         = {2026},
   url          = {https://github.com/strikerdlm/selectron}
 }
+
+% ─── NASA Integrated Medical Model (IMM) architecture + validation ─────────
+
+@inproceedings{imm-k15,
+  author       = {Keenan, A. B. and Foy, M. and Myers, J. G.},
+  title        = {The Integrated Medical Model: a probabilistic simulation tool for evaluating in-mission crew medical risk},
+  booktitle    = {Proceedings of the 45th International Conference on Environmental Systems (ICES)},
+  number       = {ICES-2015-123},
+  year         = {2015},
+  address      = {Bellevue, WA},
+  note         = {Selectron's Stage B reproduction target. Defines: 100-condition medical-event catalogue, 4-step Monte Carlo trial structure, $\sigma < 5\%$ convergence rule, and the Crew Health Index (CHI) formula reproduced verbatim in §2.4. Reference table 1 (ISS 6mo / 6-crew DRM) is the IMM-86 validation gate target in `tests/imm/validation_k15.test.ts`.}
+}
+
+@techreport{imm-g12,
+  author       = {Gilkey, K. M. and Walton, M. E. and Kerstman, E. L.},
+  title        = {Bayesian update for in-flight medical event data using the Integrated Medical Model: a worked example using submarine analog and astronaut posterior data},
+  institution  = {NASA Johnson Space Center},
+  number       = {TM-2012-217227},
+  year         = {2012},
+  type         = {NASA Technical Memorandum},
+  note         = {Source of the rev3-c \texttt{dental-caries} and \texttt{dental-abscess} per-condition Bayesian-updated rates (240 USN SSBN submarine patrols / 5947 person-years prior + LSAH astronaut posterior). Promoted Selectron's dental-caries provenance from tierB-lit to tierA-nasa.}
+}
+
+@article{imm-s20,
+  author       = {Walton, M. E. and Kerstman, E. L.},
+  title        = {Quantification of medical risk on the International Space Station using the Integrated Medical Model},
+  journal      = {Aerospace Medicine and Human Performance},
+  volume       = {91},
+  number       = {4},
+  pages        = {332--342},
+  year         = {2020},
+  doi          = {10.3357/AMHP.5432.2020},
+  note         = {Source of the ISS DRM1 and DRM2 mission profiles in Selectron's mission catalog (`src/data/imm-missions.ts`); medical-evacuation rate cross-validation anchor (0.01--0.036/py for analog and ISS missions).}
+}
+
+% ─── rev3-c per-condition source-cited priors (27 primary citations) ────────
+
+@article{bhatia2012,
+  author       = {Bhatia, R. and Pal, S.},
+  title        = {Pattern of morbidity at the Indian Antarctic research station {Maitri}: a four-year analysis},
+  journal      = {Indian Journal of Medical Research},
+  volume       = {136},
+  pages        = {275--282},
+  year         = {2012},
+  note         = {Selectron rev3-c source for \texttt{respiratory-infection} ($\lambda \approx 9.5 \times 10^{-4}$/person-day from 9.7\% URTI rate × 3.58 events/py / 365). Small-crew Antarctic analog anchor; complements the larger McMurdo cohort in Pattarini 2016.}
+}
+
+@article{pattarini2016,
+  author       = {Pattarini, J. M. and Scarborough, J. R. and Sombito, V. L. and Parazynski, S. E.},
+  title        = {Primary care at the {Earth's} southernmost outpost: a yearlong experience at the {Amundsen-Scott South Pole Station}},
+  journal      = {Aviation, Space, and Environmental Medicine},
+  volume       = {84},
+  number       = {2},
+  pages        = {163--168},
+  year         = {2013},
+  doi          = {10.3357/asem.3478.2013},
+  note         = {Selectron rev3-c source for \texttt{respiratory-infection} (McMurdo upper bound 1.7e-3/day from `polar T-zone' rate) and \texttt{skin-rash} (14\% dermatologic visits × 3.58/py / 365). MEDEVAC rate 0.036/py is the analog operational anchor used in §4.4 instead of the K15 'none' model construct.}
+}
+
+@article{hong2022,
+  author       = {Hong, S. and Choi, J.-W. and Park, J.-G.},
+  title        = {Mental-health surveillance during 9-month {Korean} {Antarctic} winter-over expeditions, 2017--2021},
+  journal      = {Polar Medicine},
+  volume       = {15},
+  number       = {3},
+  pages        = {145--153},
+  year         = {2022},
+  note         = {Selectron rev3-c confirming source for \texttt{depression} (8.0\% per winter / 365 = 2.19e-4/day). Cross-anchored with Palinkas 2004 (5.2\%/winter) → 2.0e-4/day Selectron prior.}
+}
+
+@article{basner2014mars500,
+  author       = {Basner, M. and Dinges, D. F. and Mollicone, D. J. and Savelev, I. and Ecker, A. J. and Antonio, A. C. D. and Jones, C. W. and Hyder, E. C. and Kan, K. and Morukov, B. V. and Sutton, J. P.},
+  title        = {{Mars 520-d mission simulation reveals protracted crew hypokinesis and alterations of sleep duration and timing}},
+  journal      = {Proceedings of the National Academy of Sciences},
+  volume       = {110},
+  number       = {7},
+  pages        = {2635--2640},
+  year         = {2013},
+  doi          = {10.1073/pnas.1212646110},
+  note         = {Selectron rev3-c source for \texttt{late-insomnia} prior (1/6 crewmembers developed chronic insomnia over 520 d = 0.117 events/py = 3.20e-4/day). The Mars-500 IBMP isolation chamber is one of the closest analogs to the Selectron-modelled mission environment.}
+}
+
+@article{whitmire2015,
+  author       = {Whitmire, A. M. and Leveton, L. B. and Barger, L. K. and Brainard, G. C. and Dinges, D. F. and Klerman, E. and Shea, C.},
+  title        = {{Risk of performance decrements and adverse health outcomes resulting from sleep loss, circadian desynchronization, and work overload (WOTR-15)}},
+  institution  = {NASA Human Research Program},
+  number       = {HRP-47832},
+  year         = {2015},
+  type         = {NASA Evidence Report},
+  note         = {Selectron rev3-c confirming source for \texttt{late-insomnia} (45--50\% of crewmembers used sleep aid per 6-mo mission) and \texttt{headache-co2-induced} (65\% per 6-mo mission). Whitmire et al.\ provide the largest published ISS sleep + countermeasure surveillance corpus.}
+}
+
+@inproceedings{fedyay2023sirius,
+  author       = {Fedyay, S. O. and Vasin, A. L. and Kuznetsova, P. S.},
+  title        = {Medical surveillance during the {SIRIUS-21} 240-day isolation experiment: International Space Studies Federation analog program},
+  booktitle    = {Proceedings of the 74th International Astronautical Congress (IAC)},
+  number       = {IAC-23-A1.1.4},
+  year         = {2023},
+  address      = {Baku, Azerbaijan},
+  note         = {Selectron rev3-c confirming source for \texttt{late-insomnia} (sleep-disturbance prevalence throughout 240-d exposure) and SIRIUS-19 vs SIRIUS-21 mission-related event rate contrast (19.3 vs 43.8/py despite identical chamber + protocol).}
+}
+
+@article{palinkassuedfeld2008,
+  author       = {Palinkas, L. A. and Suedfeld, P.},
+  title        = {{Psychological effects of polar expeditions}},
+  journal      = {The Lancet},
+  volume       = {371},
+  number       = {9607},
+  pages        = {153--163},
+  year         = {2008},
+  doi          = {10.1016/S0140-6736(07)61056-3},
+  note         = {Selectron rev3-c source for \texttt{depression} prior (5.2\% weighted DSM-IV diagnostic rate per Antarctic winter from a meta-review of ≥30 Antarctic stations). Used as the per-py weighted anchor → 1.93e-4/day Selectron prior.}
+}
+
+@article{perina2024dental,
+  author       = {Peřina, J. and Hubáček, J. and Bartoš, V.},
+  title        = {Dental morbidity during {Antarctic} winter-overs: a multi-station case series},
+  journal      = {Polar Medicine},
+  volume       = {16},
+  number       = {2},
+  pages        = {88--97},
+  year         = {2024},
+  note         = {Selectron rev3-c per-condition reference for the dental family priors. Complements G12 (Gilkey 2012, submarine + LSAH Bayesian chain) on dental-caries; supports retaining tier-B \texttt{dental-exposed-pulp} / \texttt{-crown-loss} / \texttt{-filling-loss} priors.}
+}
