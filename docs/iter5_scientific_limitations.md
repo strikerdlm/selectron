@@ -97,16 +97,28 @@ The post-count stochastic-rounding block was removed entirely. New variance-corr
 
 This section now lists residuals **within the active analog + LEO-ISS scope only**. Mars (TM21) and Artemis-class missions are no longer "wildly miscalibrated" — they are **out of scope** and catalogued in [`future_features.md`](future_features.md) with their structural prerequisites. The TM21 12–30× pLOCL gap diagnostic (`exports/2026-05-22_tm21_gap_diagnostic.txt`) drove the scope-down decision, not a calibration push.
 
-### 4.1 'none' pEVAC under-elicited (LEO-ISS scenario)
+### 4.1 ~~'none' scenario divergence~~ — RESOLVED 2026-05-22 by explicit scope decision
 
-The 'none' (no medical kit, K15 reference crew on ISS 6mo) scenario gives pEVAC = 13.0 % (post-rev3-c) vs K15 ref 66.9 %. The K15 baseline expects that 2-of-3 crews on a 6-month mission without any medical resources would face an EVAC decision. Our priors give 1-of-7.
+The 'none' (no medical kit) scenario produces values that diverge from K15:
 
-This is a per-event `untreated.p_evac` under-elicitation. Closed-form rescale is technically possible (given calibrated event count N, target per-event p ≈ 1 − (1 − P_K15)^(1/N)) but **NOT applied in rev3-c** because:
-1. The 'none' scenario is operationally implausible — every analog and LEO mission has at minimum some medical kit
-2. The K15 'none' value is a model-construct baseline (no actual mission has zero kit), so reproducing it via blanket p_evac inflation would over-correct the operationally-relevant issHMS/unlimited scenarios
-3. Per-condition `untreated.p_evac` rates would need per-source elicitation (Pattarini 2016 MEDEVAC rate 0.036/py is the operational anchor, not the K15 'none' construct)
+| Metric | Selectron (post rev3-e) | K15 'none' ref | Δ |
+|--------|--------------------------|-----------------|----|
+| TME    | 99.18  | 98.30  | +0.88 ✓ |
+| CHI    | 85.31  | 59.20  | +26.11 ✗ |
+| pEVAC  | 13.05 % | 66.90 % | −53.85 ✗ |
+| pLOCL  | 0.41 % | 2.89 % | −2.48 ✗ |
 
-Status: open question whether to close this gap or document it as a K15-model-construct artifact. Decision deferred.
+**Decision (2026-05-22): accept the divergence as a principled limitation. Do NOT chase K15 'none' values via blanket untreated-prior inflation.** Rationale:
+
+1. **Operationally implausible.** No real Earth-analog or LEO mission has ever launched with zero medical resources. Even the most spartan analog missions (NEEMO, MDRS short rotations) carry first-aid kits, basic medications, and crew medical officers. The 'none' scenario is K15's calibration boundary, not an operational use case.
+2. **K15 'none' is model-construct, not observed data.** No mission has been monitored without a medical kit. NASA's iMED produces 'none' values by setting all resources to zero and running its internal untreated-outcome priors. Those internal priors are not publicly published; Selectron's independent elicitation of untreated outcomes is necessarily different.
+3. **Operational scenarios reproduce well.** The issHMS scenario (ISS Health Maintenance System — real ISS kit) and unlimited scenario (full resource availability) both reproduce K15 within CI₉₅ on the CHI metric (the primary K15-aligned quality-of-mission outcome). issHMS is the operationally-relevant configuration; matching K15 there is what matters.
+4. **Closing the 'none' gap would over-correct the operational scenarios.** A blanket inflation of `untreated.fi_cp1/cp2` / `untreated.p_evac` to match K15 'none' would propagate through the RAF-interpolated path on issHMS (where many conditions fall through to untreated when kit doesn't cover them) and break the issHMS CI₉₅ fit. Per-condition surgery would be required, with diminishing returns vs the cost of doing it for 100 conditions without public source data.
+5. **Per-condition `untreated.p_evac` anchored to Pattarini 2016.** The Antarctic MEDEVAC rate (0.036/py per Pattarini McMurdo, 0.01-0.036/py per Walton & Kerstman 2020) is the OPERATIONAL anchor for evacuation likelihood in analog missions. Our operational-scenario pEVAC values track this anchor; the 'none' construct doesn't.
+
+**Implications for users.** Selectron's 'none' scenario should be interpreted as a sensitivity-analysis lower bound (what happens when treatment is unavailable for that condition), not as a calibrated prediction of "no-kit ISS mission". For sensitivity studies (e.g., "what if antibiotics run out mid-mission?") the more appropriate technique is to subset the kit (`customKit({antibiotic: 0})`) rather than the full 'none' kit. The Crew Composition view's kit picker exposes the three K15 scenarios; future versions may add explicit kit-element-subset UI for sensitivity analysis (this is the IMM-44 "custom prior overrides drilldown" item in the IMM Calculator plan).
+
+Documented and accepted. No further calibration action on this scenario.
 
 ### 4.2 ~~issHMS CHI residual (Δ −19.3)~~ — RESOLVED 2026-05-22 (rev3-d)
 
