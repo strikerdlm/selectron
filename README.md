@@ -287,18 +287,35 @@ The live resume tracker is [`STATUS.md`](STATUS.md). It is updated as the single
 
 ## What's left to do
 
-Ordered by *what would most improve scientific defensibility within the active Earth-analog + LEO-ISS scope*. Items beyond that scope are in [`docs/future_features.md`](docs/future_features.md).
+Two distinct backlogs: **(A)** manuscript submission package (~2 hours blocking) and **(B)** engineering / calibration backlog (iterative, post-submission).
 
-1. **'none' CHI overshoot (Δ +26) — untreated.fi_cp1/cp2 priors under-elicited** — the rev3-d/e correct QTL math revealed that `untreated.fi_cp1/2` × `untreated.dt_cp1/2_hours` priors don't reproduce K15's expected 40% lost-time for the no-kit scenario. Per-condition severity audit for the cp1/cp2 untreated path. Lower priority because 'none' is operationally implausible (no real mission has zero kit).
-2. **Per-condition source audit for the remaining 37 tier-B priors** — rev3-c calibrated 5 of 42 tier-B conditions against Earth-analog primary literature. The other 37 still rely on the `tierB_multiplier = 0.55` blanket fallback. Per-py rates for most are in NASA's proprietary iMED database (not public); analog literature gives % crewmembers per mission for some. Iterative work; each condition requires its own source verification.
-3. **'none' pEVAC/pLOCL** — open decision: close it via closed-form per-event rescale, or document it as a K15-model-construct artifact. See [`docs/iter5_scientific_limitations.md`](docs/iter5_scientific_limitations.md) §4.1.
-4. **rev3-f (potential) — per-condition severity tuning for the 32 persistent-impairment priors** — rev3-e applied a clinical-judgment classification (68 zeroed, 32 retained); the 32 retained still use rev3-c/d Beta-Pert values. Further refinement against published persistent-impairment literature would tighten the issHMS CHI fit. NOT YET QUEUED.
-5. **IMM Phase 2 UI — `IMMCalculator.tsx` standalone view (IMM-39 → IMM-51).** Unblocked by IMM-37/38 (data layer in place). 13 tasks: CrewBuilder, KitPicker, Mission inputs, ResultsCard, prior-override drilldown, Run button + Web Worker, K15 validation badge, engine toggle, vulnerability mode toggle, quick-load presets, session save/load/share UI, P2 acceptance gate. Several are parallel-dispatchable.
+### A. Manuscript submission package (≤ 2 hours)
+
+1. **Mint Zenodo DOI** for `v0.5.1` (commit `345445d`) and populate the `__ZENODO_DOI__` placeholder in `paper/manuscript.md` §2.5 + code-availability statement + CHANGELOG.md. (~30 min, Zenodo portal step.)
+2. **Cover letter update** in `paper/cover-letter.md` to reflect the v0.5.1 contributions — particularly the K15 §II.A.9 sequential-phase clarification as a methodological finding for the editor. (~30 min.)
+3. **Optional Scite retraction re-check** after the MCP monthly quota resets (250-call cap was exhausted in the previous peer-review pass; Crossref check at v0.5.x showed no retractions for the 26 DOIs). (~30 min.)
+4. **Submit to npj Microgravity portal.** Manuscript + cover letter + Zenodo DOI + 7 main figures + 2 supplementary figures + signed forms.
+
+### B. Engineering / calibration backlog (post-submission, iterative)
+
+1. **'none' CHI overshoot (Δ +26)** — untreated.fi_cp1/cp2 priors under-elicited; the rev3-d/e correct QTL math revealed that `untreated.fi_cp1/2` × `untreated.dt_cp1/2_hours` priors don't reproduce K15's expected 40 % lost-time for the no-kit scenario. Lower priority because 'none' is operationally implausible (no real mission has zero kit).
+2. **Per-condition source audit for the remaining 36 tier-B priors** — rev3-c calibrated 5 of 41 tier-B conditions against Earth-analog primary literature; the other 36 still rely on the `tierB_multiplier = 0.55` blanket fallback. Per-py rates for most are in NASA's proprietary iMED database (not public); analog literature gives % crewmembers per mission for some. Iterative work.
+3. **rev3-f severity tuning for the 32 persistent-impairment priors** — refinement against published persistent-impairment literature to tighten the issHMS CHI fit further. NOT YET QUEUED.
+4. **Peer-review #2 deferred items** (per `paper/peer-review-tier1-application-log.md` §Deferred): α₀ ∈ {1, 10, 100} robustness panel (Stage A), K-S marginal Dirichlet fit test, non-degenerate worked example (F3'), 46-condition leave-the-calibrated-out sensitivity panel, Gelman-Rubin R̂ across 4 independent T=25k chains. Each is 1-2h focused work.
+5. **IMM Phase 2 UI tail** — IMM-39 standalone IMMCalculator view, IMM-44 custom prior overrides drilldown, IMM-47 engine toggle (MC vs Surrogate stub), IMM-48 vulnerability mode toggle (boolean vs Stage-A-ML). All functionally subsumed by the existing CrewComposition view in v0.5.x.
 6. **Future features (not on this release's critical path)** — Artemis (lunar) and Mars (interplanetary) missions, plus the Phase 3 ML layer + I6/I7/I8 figures, are all in [`docs/future_features.md`](docs/future_features.md) with their structural prerequisites.
 
-> ✓ **Resolved 2026-05-22 (rev3-b-followup, commit `ce97dda`):** tier multipliers now thread into the λ-sampling site instead of post-multiplying the count. Variance is correctly preserved (`Var = mult · λ`) instead of distorted (`mult² · λ`); CI₉₅ widths in IMMOutcome are now mathematically correct, which directly improves the fidelity of the downstream HSRB LxC matrix verdict. See `docs/iter5_scientific_limitations.md` §3.3.
+### Resolved
+
+> ✓ **Bibliography Crossref + Scite walk (commit `f68ffbc`, 2026-05-23):** 40/40 entries verified; 5 entries corrected during the walk (imm-k15 author list + GRC-E-DAA-TN21386 doc number; hong2022 → kang2022; amadee2018 → mcmenamin2020amadee; whitmire2015 → flynnevans2016; fedyay2023sirius IAC → MDPI Aerospace). Bibliography submission-ready. See `paper/crossref-walk-2026-05-23.md`.
 >
-> ✓ **Resolved 2026-05-22 (rev3-d + rev3-e, commits `3ac5480` + `4521390`):** per-event QTL is now K15 §II.A.9-correct end-to-end. rev3-d fixed the within-event concurrent-FI bug (cp1 + cp2 are sequential, not overlapping → use sum-of-products). rev3-e completed cp3 via a 100-condition `fi_cp3` audit (68 fully-resolving acute conditions zeroed; 32 persistent-impairment conditions retained). The IMM engine is now mathematically complete per K15 §II.A.9. See `docs/iter5_scientific_limitations.md` §3.5.
+> ✓ **F6 + F7 figures regenerated from IMM Calculator (commit `345445d`, tag `v0.5.1`):** Manuscript pivoted Stage B prose to src/imm/ in d909ce6; the figure regeneration completes the pivot. New `scripts/extract_imm_worked_example.ts` offline-precomputes IMM outputs; new `src/ui/figures/PaperF6IMM.tsx` + `PaperF7IMM.tsx` render from `src/data/imm-worked-example.json` for fast Playwright snapshots.
+>
+> ✓ **Two peer-review passes (commits `b70e1eb` + `3cf8059`) + 14/23 Tier-1 fixes applied (`0cfef0c`):** Q2 citation-hygiene review (paper/peer-review-report.md) + ML/biomathematical-depth review (paper/peer-review-2-ml-biomath-npjmgrav.md) + Tier-1 application log (paper/peer-review-tier1-application-log.md). 9 items deferred with explicit rationale.
+>
+> ✓ **rev3-b-followup variance-correct multipliers (commit `ce97dda`):** tier multipliers thread into the λ-sampling site instead of post-multiplying the count. Variance is correctly preserved (`Var = mult · λ`) instead of distorted (`mult² · λ`); CI₉₅ widths in IMMOutcome are now mathematically correct. See `docs/iter5_scientific_limitations.md` §3.3.
+>
+> ✓ **rev3-d + rev3-e K15-correct QTL (commits `3ac5480` + `4521390`):** per-event QTL is K15 §II.A.9-correct end-to-end. rev3-d fixed the within-event concurrent-FI bug (cp1 + cp2 are sequential, not overlapping → use sum-of-products). rev3-e completed cp3 via a 100-condition `fi_cp3` audit (68 fully-resolving acute conditions zeroed; 32 persistent-impairment conditions retained). The IMM engine is now mathematically complete per K15 §II.A.9. See `docs/iter5_scientific_limitations.md` §3.5.
 
 ### AWAITING-DIEGO sign-offs (separate from the engineering backlog above)
 
