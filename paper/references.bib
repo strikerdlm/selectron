@@ -177,15 +177,16 @@
   doi     = {10.3389/fphys.2022.898841}
 }
 
-@article{amadee2018,
-  title   = {Team processes and outcomes during the {AMADEE-18} {Mars} analog mission},
+@article{mcmenamin2020amadee,
+  title   = {Team Processes and Outcomes During the {AMADEE-18} {Mars} Analog Mission},
   author  = {McMenamin, Julia and Allen, Natalie J. and Battler, Melissa},
   journal = {Astrobiology},
   volume  = {20},
   number  = {11},
   pages   = {1287--1294},
   year    = {2020},
-  doi     = {10.1089/ast.2019.2035}
+  doi     = {10.1089/ast.2019.2035},
+  note    = {Verified via Crossref REST (peer-review walk, 2026-05-23); previous citekey \texttt{amadee2018} referenced the mission year (2018) not the publication year (2020) — renamed for consistency with the author+year+topic convention used elsewhere in the bibliography. PMID 33179970.}
 }
 
 @inproceedings{apollonio2026,
@@ -315,13 +316,14 @@
 % ─── NASA Integrated Medical Model (IMM) architecture + validation ─────────
 
 @inproceedings{imm-k15,
-  author       = {Keenan, A. B. and Foy, M. and Myers, J. G.},
-  title        = {The Integrated Medical Model: a probabilistic simulation tool for evaluating in-mission crew medical risk},
+  author       = {Keenan, Alexandra and Young, Millennia and Saile, Lynn and Boley, Lynn and Walton, Marlei and Kerstman, Eric and Shah, Ronak and Goodenow, Debra A. and Myers, Jr., Jerry G.},
+  title        = {The Integrated Medical Model: A Probabilistic Simulation Model Predicting In-Flight Medical Risks},
   booktitle    = {Proceedings of the 45th International Conference on Environmental Systems (ICES)},
-  number       = {ICES-2015-123},
+  number       = {GRC-E-DAA-TN21386},
   year         = {2015},
   address      = {Bellevue, WA},
-  note         = {Selectron's Stage B reproduction target. Defines: 100-condition medical-event catalogue, 4-step Monte Carlo trial structure, $\sigma < 5\%$ convergence rule, and the Crew Health Index (CHI) formula reproduced verbatim in §2.4. Reference table 1 (ISS 6mo / 6-crew DRM) is the IMM-86 validation gate target in `tests/imm/validation_k15.test.ts`.}
+  url          = {https://ntrs.nasa.gov/citations/20150018879},
+  note         = {Selectron's Stage B reproduction target. Defines: 100-condition medical-event catalogue, 4-step Monte Carlo trial structure, $\sigma < 5\%$ convergence rule, and the Crew Health Index (CHI) formula reproduced verbatim in §2.4. Reference Table 1 (ISS 6mo / 6-crew DRM) is the IMM-86 validation gate target in `tests/imm/validation_k15.test.ts`. Verified ground-truth metadata via direct NTRS WebFetch (peer-review pass, 2026-05-23): authors and title corrected from earlier elicitation; NASA document number is GRC-E-DAA-TN21386 (not ICES-2015-123 as previously cited).}
 }
 
 @techreport{imm-g12,
@@ -373,15 +375,15 @@
   note         = {Selectron per-condition source for \texttt{respiratory-infection} (McMurdo upper bound from `polar T-zone' rate inferred from primary care clinic encounters at three US Antarctic stations 2013--2014) and \texttt{skin-rash} (dermatologic visit share). Operational analog evacuation rate is the in-mission-pEVAC anchor in §4.4 rather than the K15 'none' model construct. PMID 26948556. Verified ground-truth metadata via Claude MCP PubMed lookup (peer-review pass, 2026-05-22).}
 }
 
-@article{hong2022,
-  author       = {Hong, Soyeon and Kim, Hojin and Lee, Sangki and Hwang, Heeyoung and Choi, Hyukjun and Park, Sungmi and Yoo, Insu and Lee, Sehoon and Hong, Eunkyung and Kim, Yoon-Sung and Han, Kang-Hee},
+@article{kang2022,
+  author       = {Kang, Jae Myeong and Cho, Seong-Jin and Cho, Seo-Eun and Bang, Taemo and Chae, Byung Do and Yi, Eojin and Bae, Seung Min and Na, Kyoung-Sae and Jung, Jaehun and Kang, Seung-Gul},
   title        = {Mood and Sleep Status and Mental Disorders During Prolonged Winter-Over Residence in Two {Korean} {Antarctic} Stations},
   journal      = {Nature and Science of Sleep},
   volume       = {14},
   pages        = {1387--1396},
   year         = {2022},
   doi          = {10.2147/NSS.S370659},
-  note         = {Selectron per-condition confirming source for \texttt{depression} (7/88 = 8.0\% of crewmembers diagnosed with mental disorders incl. insomnia in early winter from 88-participant Korean Antarctic cohort 2017--2020). Cross-anchored with Palinkas \& Suedfeld 2008 Antarctic meta-review. Verified ground-truth metadata via WebSearch + journal-site verification (peer-review pass, 2026-05-22).}
+  note         = {Selectron per-condition confirming source for \texttt{depression} (7/88 = 8.0\% of crewmembers diagnosed with mental disorders incl. insomnia in early winter from 88-participant Korean Antarctic cohort 2017--2020). Cross-anchored with Palinkas \& Suedfeld 2008 Antarctic meta-review. PMID 35982827. Verified ground-truth metadata + 10-author list via Crossref REST + PubMed (peer-review walk, 2026-05-23); previously mis-cited as \texttt{hong2022} — true first author is Kang.}
 }
 
 @article{basner2013mars500,
@@ -396,24 +398,27 @@
   note         = {Selectron per-condition source for \texttt{late-insomnia} (the majority of crewmembers experienced sleep-quality disturbances over 520 d of confinement; per-individual chronic-insomnia subset extracted from the activity-actigraphy + neurobehavioral findings — specific per-event rate inferred for prior elicitation). The Mars-500 IBMP isolation chamber is one of the closest analogs to the Selectron-modelled mission environment. PMID 23297197. Verified ground-truth metadata + full author list via Claude MCP PubMed lookup (peer-review pass, 2026-05-22).}
 }
 
-@article{whitmire2015,
-  author       = {Whitmire, A. M. and Leveton, L. B. and Barger, L. K. and Brainard, G. C. and Dinges, D. F. and Klerman, E. and Shea, C.},
-  title        = {{Risk of performance decrements and adverse health outcomes resulting from sleep loss, circadian desynchronization, and work overload (WOTR-15)}},
+@techreport{flynnevans2016,
+  author       = {Flynn-Evans, Erin E. and Gregory, Kevin and Arsintescu, Lucia and Whitmire, Alexandra M.},
+  title        = {Evidence Report: Risk of Performance Decrements and Adverse Health Outcomes Resulting from Sleep Loss, Circadian Desynchronization, and Work Overload},
   institution  = {NASA Human Research Program},
-  number       = {HRP-47832},
-  year         = {2015},
+  year         = {2016},
   type         = {NASA Evidence Report},
-  note         = {Selectron rev3-c confirming source for \texttt{late-insomnia} (45--50\% of crewmembers used sleep aid per 6-mo mission) and \texttt{headache-co2-induced} (65\% per 6-mo mission). Whitmire et al.\ provide the largest published ISS sleep + countermeasure surveillance corpus.}
+  url          = {https://ntrs.nasa.gov/citations/20160003864},
+  note         = {Selectron per-condition confirming source for \texttt{late-insomnia} (sleep loss prevalent during spaceflight; astronauts consistently average less sleep in-flight than on the ground) and \texttt{headache-co2-induced} (CO2-related symptom reporting in long-duration ISS missions). Largest published ISS sleep + countermeasure surveillance corpus in the NASA HRP evidence base. Verified via direct NTRS search (peer-review walk, 2026-05-23); lead author is Flynn-Evans (not Whitmire as previously cited); year is 2016 (not 2015); cited as \texttt{flynnevans2016} for accuracy.}
 }
 
-@inproceedings{fedyay2023sirius,
-  author       = {Fedyay, S. O. and Vasin, A. L. and Kuznetsova, P. S.},
-  title        = {Medical surveillance during the {SIRIUS-21} 240-day isolation experiment: International Space Studies Federation analog program},
-  booktitle    = {Proceedings of the 74th International Astronautical Congress (IAC)},
-  number       = {IAC-23-A1.1.4},
+@article{fedyay2023sirius,
+  author       = {Fedyay, Stefania and Vasin, Anatoly and Kovalyov, Sergey and Pochuev, Vyacheslav},
+  title        = {Medical Support for Space Missions: The Case of the {SIRIUS} Project},
+  journal      = {Aerospace},
+  publisher    = {MDPI},
+  volume       = {10},
+  number       = {6},
+  pages        = {518},
   year         = {2023},
-  address      = {Baku, Azerbaijan},
-  note         = {Selectron rev3-c confirming source for \texttt{late-insomnia} (sleep-disturbance prevalence throughout 240-d exposure) and SIRIUS-19 vs SIRIUS-21 mission-related event rate contrast (19.3 vs 43.8/py despite identical chamber + protocol).}
+  doi          = {10.3390/aerospace10060518},
+  note         = {Selectron per-condition confirming source for \texttt{late-insomnia} (sleep-disturbance prevalence throughout 240-d SIRIUS-21 exposure) and SIRIUS-19 vs SIRIUS-21 mission-related event rate contrast (headache, skin-inflammatory, and sleep-disturbance prevalence elevated in the longer 8-month confinement vs the 4-month run). Vitamin D deficiency identified in 10 of 12 subjects. Verified via Crossref REST + MDPI Aerospace journal-site (peer-review walk, 2026-05-23); replaces the previously-cited IAC-23-A1.1.4 conference paper with the peer-reviewed MDPI Aerospace version recommended by peer-review \#1 Tier 1 \#10.}
 }
 
 @article{palinkassuedfeld2008,
