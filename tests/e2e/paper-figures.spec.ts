@@ -20,15 +20,23 @@
 import { test } from "@playwright/test";
 import { mkdirSync } from "node:fs";
 
-const FIGS = ["paper-F3", "paper-F4", "paper-F6", "paper-F7"] as const;
+// F3, F4 remain unchanged from Iter-3 (Stage A is unchanged in v0.5.x).
+// F6, F7 are regenerated from the IMM-Calculator-backed fixtures (v0.5.1+).
+//   - F6.png: K15 crew × ISS HMS × iss-6mo at T=100k → assessIMMLxC verdict
+//   - F7.png: 7 missions × ISS HMS at T=25k → multi-mission comparison
+const FIGS = [
+  { id: "paper-F3", out: "F3.png" },
+  { id: "paper-F4", out: "F4.png" },
+  { id: "paper-F6-imm", out: "F6.png" },
+  { id: "paper-F7-imm", out: "F7.png" },
+] as const;
 
 for (const fig of FIGS) {
-  test(`generates ${fig} snapshot`, async ({ page }) => {
-    await page.setViewportSize({ width: 1600, height: 1000 });
-    await page.goto(`http://localhost:5173/?testFigure=${fig}`);
+  test(`generates ${fig.id} → ${fig.out}`, async ({ page }) => {
+    await page.setViewportSize({ width: 1600, height: 1200 });
+    await page.goto(`http://localhost:5173/?testFigure=${fig.id}`);
     await page.waitForSelector("[data-testfigure-ready]", { timeout: 20_000 });
     mkdirSync("paper/figures", { recursive: true });
-    const target = `paper/figures/${fig.replace("paper-", "")}.png`;
-    await page.screenshot({ path: target, fullPage: false });
+    await page.screenshot({ path: `paper/figures/${fig.out}`, fullPage: true });
   });
 }

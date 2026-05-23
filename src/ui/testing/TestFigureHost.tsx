@@ -9,6 +9,8 @@ import { ScoreBreakdownRadar } from "@/ui/figures/ScoreBreakdownRadar";
 import { MCDACalculationTrace } from "@/ui/figures/CalculationTrace";
 import { LxCMatrix } from "@/ui/figures/LxCMatrix";
 import { MissionComparison } from "@/ui/figures/MissionComparison";
+import { PaperF6IMM } from "@/ui/figures/PaperF6IMM";
+import { PaperF7IMM } from "@/ui/figures/PaperF7IMM";
 import { PLACEHOLDER_CRITERIA } from "@/data/placeholder-criteria";
 import { ANALOG_CONDITIONS } from "@/risk/conditions";
 import { ANALOG_MISSIONS } from "@/data/analog-missions";
@@ -294,8 +296,42 @@ export function TestFigureHost({ figureId }: { figureId: string }) {
   if (figureId === "paper-F7") {
     return <PaperF7 />;
   }
+  if (figureId === "paper-F6-imm") {
+    // v0.5.1+ IMM-Calculator-backed F6: K15 crew × ISS HMS × iss-6mo at T=100k.
+    // Synchronous render from src/data/imm-worked-example.json — no in-browser MC.
+    return <PaperF6IMMHost />;
+  }
+  if (figureId === "paper-F7-imm") {
+    // v0.5.1+ IMM-Calculator-backed F7: 7 missions × ISS HMS at T=25k.
+    return <PaperF7IMMHost />;
+  }
 
   return <div>Unknown figure id: {figureId}</div>;
+}
+
+function PaperF6IMMHost() {
+  const ref = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    // Synchronous render of static-JSON-backed fixture — no async sentinels.
+    if (ref.current) ref.current.setAttribute("data-testfigure-ready", "true");
+  }, []);
+  return (
+    <div ref={ref}>
+      <PaperF6IMM />
+    </div>
+  );
+}
+
+function PaperF7IMMHost() {
+  const ref = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    if (ref.current) ref.current.setAttribute("data-testfigure-ready", "true");
+  }, []);
+  return (
+    <div ref={ref}>
+      <PaperF7IMM />
+    </div>
+  );
 }
 
 // ---------------------------------------------------------------------------
