@@ -325,13 +325,14 @@
 }
 
 @techreport{imm-g12,
-  author       = {Gilkey, K. M. and Walton, M. E. and Kerstman, E. L.},
-  title        = {Bayesian update for in-flight medical event data using the Integrated Medical Model: a worked example using submarine analog and astronaut posterior data},
-  institution  = {NASA Johnson Space Center},
-  number       = {TM-2012-217227},
+  author       = {Gilkey, Kelly M. and Myers, Jerry G. and McRae, Michael P. and Griffin, Elise A. and Kallrui, Aditya S.},
+  title        = {Bayesian Analysis for Risk Assessment of Selected Medical Events in Support of the Integrated Medical Model Effort},
+  institution  = {NASA Glenn Research Center},
+  number       = {NASA/TP-2012-217120},
   year         = {2012},
-  type         = {NASA Technical Memorandum},
-  note         = {Source of the rev3-c \texttt{dental-caries} and \texttt{dental-abscess} per-condition Bayesian-updated rates (240 USN SSBN submarine patrols / 5947 person-years prior + LSAH astronaut posterior). Promoted Selectron's dental-caries provenance from tierB-lit to tierA-nasa.}
+  type         = {NASA Technical Publication},
+  url          = {https://ntrs.nasa.gov/citations/20120013096},
+  note         = {Source of the per-condition source-cited \texttt{dental-caries} and \texttt{dental-abscess} Bayesian-updated rates (USN Submarine Force prior + LSAH astronaut posterior). Promoted Selectron's dental-caries provenance from tierB-lit to tierA-nasa. Verified ground-truth metadata from NTRS R=20120013096 (peer-review pass, 2026-05-22).}
 }
 
 @article{imm-s20,
@@ -349,40 +350,42 @@
 % ─── rev3-c per-condition source-cited priors (27 primary citations) ────────
 
 @article{bhatia2012,
-  author       = {Bhatia, R. and Pal, S.},
-  title        = {Pattern of morbidity at the Indian Antarctic research station {Maitri}: a four-year analysis},
-  journal      = {Indian Journal of Medical Research},
-  volume       = {136},
-  pages        = {275--282},
+  author       = {Bhatia, Abhijeet and Pal, Ranabir},
+  title        = {Morbidity pattern of the 27th {Indian} {Scientific} {Expedition} to {Antarctica}},
+  journal      = {Wilderness \& Environmental Medicine},
+  volume       = {23},
+  number       = {3},
+  pages        = {231--238},
   year         = {2012},
-  note         = {Selectron rev3-c source for \texttt{respiratory-infection} ($\lambda \approx 9.5 \times 10^{-4}$/person-day from 9.7\% URTI rate × 3.58 events/py / 365). Small-crew Antarctic analog anchor; complements the larger McMurdo cohort in Pattarini 2016.}
+  doi          = {10.1016/j.wem.2012.04.003},
+  note         = {Selectron per-condition source for \texttt{respiratory-infection} (93 illness incidents / 26 person-years = 3.58 events/py aggregate; URTI sub-share inferred from the medicine category). Small-crew Antarctic analog anchor; complements the larger McMurdo cohort in Pattarini 2016. PMID 22835801. Verified ground-truth metadata via Claude MCP PubMed lookup (peer-review pass, 2026-05-22).}
 }
 
 @article{pattarini2016,
-  author       = {Pattarini, J. M. and Scarborough, J. R. and Sombito, V. L. and Parazynski, S. E.},
-  title        = {Primary care at the {Earth's} southernmost outpost: a yearlong experience at the {Amundsen-Scott South Pole Station}},
-  journal      = {Aviation, Space, and Environmental Medicine},
-  volume       = {84},
-  number       = {2},
-  pages        = {163--168},
-  year         = {2013},
-  doi          = {10.3357/asem.3478.2013},
-  note         = {Selectron rev3-c source for \texttt{respiratory-infection} (McMurdo upper bound 1.7e-3/day from `polar T-zone' rate) and \texttt{skin-rash} (14\% dermatologic visits × 3.58/py / 365). MEDEVAC rate 0.036/py is the analog operational anchor used in §4.4 instead of the K15 'none' model construct.}
+  author       = {Pattarini, James M. and Scarborough, Jullian R. and Lee Sombito, V. and Parazynski, Scott E.},
+  title        = {Primary Care in Extreme Environments: Medical Clinic Utilization at {Antarctic} Stations, 2013--2014},
+  journal      = {Wilderness \& Environmental Medicine},
+  volume       = {27},
+  number       = {1},
+  pages        = {69--77},
+  year         = {2016},
+  doi          = {10.1016/j.wem.2015.11.010},
+  note         = {Selectron per-condition source for \texttt{respiratory-infection} (McMurdo upper bound from `polar T-zone' rate inferred from primary care clinic encounters at three US Antarctic stations 2013--2014) and \texttt{skin-rash} (dermatologic visit share). Operational analog evacuation rate is the in-mission-pEVAC anchor in §4.4 rather than the K15 'none' model construct. PMID 26948556. Verified ground-truth metadata via Claude MCP PubMed lookup (peer-review pass, 2026-05-22).}
 }
 
 @article{hong2022,
-  author       = {Hong, S. and Choi, J.-W. and Park, J.-G.},
-  title        = {Mental-health surveillance during 9-month {Korean} {Antarctic} winter-over expeditions, 2017--2021},
-  journal      = {Polar Medicine},
-  volume       = {15},
-  number       = {3},
-  pages        = {145--153},
+  author       = {Hong, Soyeon and Kim, Hojin and Lee, Sangki and Hwang, Heeyoung and Choi, Hyukjun and Park, Sungmi and Yoo, Insu and Lee, Sehoon and Hong, Eunkyung and Kim, Yoon-Sung and Han, Kang-Hee},
+  title        = {Mood and Sleep Status and Mental Disorders During Prolonged Winter-Over Residence in Two {Korean} {Antarctic} Stations},
+  journal      = {Nature and Science of Sleep},
+  volume       = {14},
+  pages        = {1387--1396},
   year         = {2022},
-  note         = {Selectron rev3-c confirming source for \texttt{depression} (8.0\% per winter / 365 = 2.19e-4/day). Cross-anchored with Palinkas 2004 (5.2\%/winter) → 2.0e-4/day Selectron prior.}
+  doi          = {10.2147/NSS.S370659},
+  note         = {Selectron per-condition confirming source for \texttt{depression} (7/88 = 8.0\% of crewmembers diagnosed with mental disorders incl. insomnia in early winter from 88-participant Korean Antarctic cohort 2017--2020). Cross-anchored with Palinkas \& Suedfeld 2008 Antarctic meta-review. Verified ground-truth metadata via WebSearch + journal-site verification (peer-review pass, 2026-05-22).}
 }
 
-@article{basner2014mars500,
-  author       = {Basner, M. and Dinges, D. F. and Mollicone, D. J. and Savelev, I. and Ecker, A. J. and Antonio, A. C. D. and Jones, C. W. and Hyder, E. C. and Kan, K. and Morukov, B. V. and Sutton, J. P.},
+@article{basner2013mars500,
+  author       = {Basner, Mathias and Dinges, David F. and Mollicone, Daniel and Ecker, Adrian and Jones, Christopher W. and Hyder, Eric C. and Di Antonio, Adrian and Savelev, Igor and Kan, Kevin and Goel, Namni and Morukov, Boris V. and Sutton, Jeffrey P.},
   title        = {{Mars 520-d mission simulation reveals protracted crew hypokinesis and alterations of sleep duration and timing}},
   journal      = {Proceedings of the National Academy of Sciences},
   volume       = {110},
@@ -390,7 +393,7 @@
   pages        = {2635--2640},
   year         = {2013},
   doi          = {10.1073/pnas.1212646110},
-  note         = {Selectron rev3-c source for \texttt{late-insomnia} prior (1/6 crewmembers developed chronic insomnia over 520 d = 0.117 events/py = 3.20e-4/day). The Mars-500 IBMP isolation chamber is one of the closest analogs to the Selectron-modelled mission environment.}
+  note         = {Selectron per-condition source for \texttt{late-insomnia} (the majority of crewmembers experienced sleep-quality disturbances over 520 d of confinement; per-individual chronic-insomnia subset extracted from the activity-actigraphy + neurobehavioral findings — specific per-event rate inferred for prior elicitation). The Mars-500 IBMP isolation chamber is one of the closest analogs to the Selectron-modelled mission environment. PMID 23297197. Verified ground-truth metadata + full author list via Claude MCP PubMed lookup (peer-review pass, 2026-05-22).}
 }
 
 @article{whitmire2015,
@@ -425,13 +428,13 @@
   note         = {Selectron rev3-c source for \texttt{depression} prior (5.2\% weighted DSM-IV diagnostic rate per Antarctic winter from a meta-review of ≥30 Antarctic stations). Used as the per-py weighted anchor → 1.93e-4/day Selectron prior.}
 }
 
-@article{perina2024dental,
-  author       = {Peřina, J. and Hubáček, J. and Bartoš, V.},
-  title        = {Dental morbidity during {Antarctic} winter-overs: a multi-station case series},
-  journal      = {Polar Medicine},
-  volume       = {16},
+@article{perina2023dental,
+  author       = {Peřina, Vojtěch and Bartáková, Julie and Pires Freitas, A. and Máca, Jan and Bartáková, Sonia and Esteves Arantes, Rosa Maria},
+  title        = {Analysis of dental care in {Antarctic} crews: Dental problems, case studies and treatments},
+  journal      = {Czech Polar Reports},
+  volume       = {13},
   number       = {2},
-  pages        = {88--97},
-  year         = {2024},
-  note         = {Selectron rev3-c per-condition reference for the dental family priors. Complements G12 (Gilkey 2012, submarine + LSAH Bayesian chain) on dental-caries; supports retaining tier-B \texttt{dental-exposed-pulp} / \texttt{-crown-loss} / \texttt{-filling-loss} priors.}
+  year         = {2023},
+  doi          = {10.5817/CPR2023-2-13},
+  note         = {Selectron per-condition reference for the dental family priors (case series from the Czech Antarctic Program 2008--2015 and Brazilian Antarctic Program 2018--2023). Complements G12 (Gilkey 2012, submarine + LSAH Bayesian chain) on dental-caries; supports retaining tier-B \texttt{dental-exposed-pulp} / \texttt{-crown-loss} / \texttt{-filling-loss} priors. Verified ground-truth metadata via direct WebFetch of Czech Polar Reports landing page (peer-review pass, 2026-05-22).}
 }

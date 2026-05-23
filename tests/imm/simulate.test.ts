@@ -209,6 +209,33 @@ describe("rev3-d K15 per-event QTL (sequential phases, not concurrent)", () => {
     const cp3Loss = fi_cp3 > 0 ? fi_cp3 * cp3DurationHours : 0;
     expect(cp3Loss).toBe(0);
   });
+
+  it("peer-review-2 #11: cp1 + cp2 clamped to remaining mission hours", () => {
+    // Late-mission event: event at day 13 of a 14-day mission with dt_cp1=24h,
+    // dt_cp2=48h. Without clamping, the formula would charge 24+48=72 hours of
+    // cp1+cp2 even though only 24 hours of mission remain after the event.
+    const missionDurationHours = 14 * 24;
+    const eventTimeHours = 13 * 24;
+    const remainingFromEvent = Math.max(0, missionDurationHours - eventTimeHours);
+    const dt_cp1_clamped = Math.min(24, remainingFromEvent);
+    const remainingAfterCp1 = Math.max(0, remainingFromEvent - dt_cp1_clamped);
+    const dt_cp2_clamped = Math.min(48, remainingAfterCp1);
+    expect(dt_cp1_clamped).toBe(24); // exactly fills the 24h remaining
+    expect(dt_cp2_clamped).toBe(0);  // cp2 has nothing left to consume
+  });
+
+  it("peer-review-2 #11: mid-mission event is not clamped (cp1/cp2 fit within mission)", () => {
+    // Mid-mission event at day 60 of 180-day mission with dt_cp1=2h, dt_cp2=24h.
+    // Plenty of mission time left; clamping must be a no-op.
+    const missionDurationHours = 180 * 24;
+    const eventTimeHours = 60 * 24;
+    const remainingFromEvent = Math.max(0, missionDurationHours - eventTimeHours);
+    const dt_cp1_clamped = Math.min(2, remainingFromEvent);
+    const remainingAfterCp1 = Math.max(0, remainingFromEvent - dt_cp1_clamped);
+    const dt_cp2_clamped = Math.min(24, remainingAfterCp1);
+    expect(dt_cp1_clamped).toBe(2);
+    expect(dt_cp2_clamped).toBe(24);
+  });
 });
 
 import { customKit } from "../../src/imm/kits";

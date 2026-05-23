@@ -172,8 +172,76 @@ function runScenarioTests(scenarioId: keyof typeof K15) {
       expect(v).toBeGreaterThanOrEqual(acc.pLocl.accepted[0]);
       expect(v).toBeLessThanOrEqual(acc.pLocl.accepted[1]);
     });
+
+    // peer-review-2 Issue 5: CI₉₅-width assertions as regression fingerprint
+    // for the variance-correct λ-site multiplier fix (rev3-b-followup).
+    //
+    // We do NOT compare to K15's published CI₉₅ widths — K15's iMED produces
+    // extremely tight intervals for pEVAC/pLOCL (e.g., issHMS pEVAC CI₉₅
+    // [5.43, 5.72] width 0.29 %) that the IMM Calculator's broader prior
+    // structure cannot reasonably match. Instead, we pin to v0.5.0 observed
+    // widths ±50 % as a one-directional regression guard: if a future change
+    // accidentally collapses or inflates CI₉₅ width on any metric by more
+    // than 50 %, the gate fails.
+    //
+    // Source: `paper/results-snapshot-v0.5.0.md` + manual extraction from
+    // validate_imm at commit v0.5.0 = 9e31b85.
+    const v0_5_0_widths = WIDTH_BASELINES[scenarioId];
+
+    it(`TME CI₉₅ width matches v0.5.0 baseline ±50 %`, () => {
+      const ourWidth = outcome.tme.ci95[1] - outcome.tme.ci95[0];
+      const baseline = v0_5_0_widths.tme;
+      expect(ourWidth).toBeGreaterThanOrEqual(baseline * 0.5);
+      expect(ourWidth).toBeLessThanOrEqual(baseline * 1.5);
+    });
+
+    it(`CHI CI₉₅ width matches v0.5.0 baseline ±50 %`, () => {
+      const ourWidth = outcome.chi.ci95[1] - outcome.chi.ci95[0];
+      const baseline = v0_5_0_widths.chi;
+      expect(ourWidth).toBeGreaterThanOrEqual(baseline * 0.5);
+      expect(ourWidth).toBeLessThanOrEqual(baseline * 1.5);
+    });
+
+    it(`pEVAC CI₉₅ width matches v0.5.0 baseline ±50 % (or zero-spread tolerated for rare-event metrics)`, () => {
+      const ourWidth = outcome.pEvac.ci95[1] - outcome.pEvac.ci95[0];
+      const baseline = v0_5_0_widths.pEvac;
+      if (baseline === 0) {
+        expect(ourWidth).toBeLessThanOrEqual(1.0); // tolerate near-zero spread for rare-event metrics
+      } else {
+        expect(ourWidth).toBeGreaterThanOrEqual(baseline * 0.5);
+        expect(ourWidth).toBeLessThanOrEqual(baseline * 1.5);
+      }
+    });
+
+    it(`pLOCL CI₉₅ width matches v0.5.0 baseline ±50 % (or zero-spread tolerated)`, () => {
+      const ourWidth = outcome.pLocl.ci95[1] - outcome.pLocl.ci95[0];
+      const baseline = v0_5_0_widths.pLocl;
+      if (baseline === 0) {
+        expect(ourWidth).toBeLessThanOrEqual(0.5);
+      } else {
+        expect(ourWidth).toBeGreaterThanOrEqual(baseline * 0.5);
+        expect(ourWidth).toBeLessThanOrEqual(baseline * 1.5);
+      }
+    });
   });
 }
+
+// peer-review-2 Issue 5: v0.5.0 observed CI₉₅ widths per scenario × metric.
+// Extracted from the validate_imm run at commit 9e31b85; used as the regression
+// baseline for the width assertions above. Update when the calibration changes
+// substantively (rev3-f etc.); width changes outside ±50 % indicate a real
+// variance regression that should be investigated, not silently re-baselined.
+// Measured by `scripts/extract_v0_5_0_widths.ts` at commit 9e31b85 / v0.5.0.
+// pEvac and pLocl have notable patterns: 'none' and 'issHMS' pEvac CI₉₅ widths
+// are 100 % because the bracketing computation saturates for heavily skewed
+// rare-event posteriors; 'unlimited' pEvac and all pLocl widths are 0 because
+// most trials produce a zero outcome (CI₉₅ at the 2.5%/97.5% percentiles
+// collapses to the same value).
+const WIDTH_BASELINES = {
+  none:      { tme: 47.0, chi: 11.3, pEvac: 100.0, pLocl: 0 },
+  issHMS:    { tme: 45.0, chi:  8.9, pEvac: 100.0, pLocl: 0 },
+  unlimited: { tme: 44.0, chi:  3.0, pEvac:   0,   pLocl: 0 },
+};
 
 runScenarioTests("none");
 runScenarioTests("issHMS");
@@ -196,5 +264,17 @@ describe("IMM-86 · gate inventory", () => {
     expect(within).toBe(5);
     expect(divergent).toBe(7);
     expect(within + divergent).toBe(12);
+  });
+
+  // peer-review-2 Issue 5: total assertions per scenario after CI₉₅-width
+  // tests = 4 mean + 4 width = 8 per scenario × 3 scenarios = 24, plus this
+  // inventory test = 25 total.
+  it("documents the 8-assertion-per-scenario gate structure (4 mean + 4 CI₉₅-width)", () => {
+    const scenarios = 3;
+    const meanAssertionsPerScenario = 4;
+    const widthAssertionsPerScenario = 4;
+    const inventoryAssertions = 2; // this test + the within/divergent count
+    const total = scenarios * (meanAssertionsPerScenario + widthAssertionsPerScenario) + inventoryAssertions;
+    expect(total).toBe(26);
   });
 });

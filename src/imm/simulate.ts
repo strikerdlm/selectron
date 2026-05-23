@@ -433,16 +433,26 @@ export function runIMMTrial(
   // same crewmember composed via concurrentFI) remains the v1.1 enhancement — it
   // requires a per-crewmember timeline integration of impairment intervals.
   // Currently events from different conditions are treated as non-overlapping in time.
+  // peer-review-2 Issue 11: clamp cp1 + cp2 durations to remaining mission hours
+  // so late-mission events don't over-count QTL beyond the mission end. cp3 was
+  // already clamped; this extends the same discipline to cp1 and cp2.
   const missionDurationHours = mission.durationDays * 24;
   let qtl = 0;
   for (const o of occurrences) {
-    qtl += o.outcomes.fi_cp1 * o.outcomes.dt_cp1_hours +
-           o.outcomes.fi_cp2 * o.outcomes.dt_cp2_hours;
+    const eventStartHours = o.timeDays * 24;
+    const remainingFromEvent = Math.max(0, missionDurationHours - eventStartHours);
+    // cp1 cannot extend past mission end.
+    const dt_cp1_clamped = Math.min(o.outcomes.dt_cp1_hours, remainingFromEvent);
+    const remainingAfterCp1 = Math.max(0, remainingFromEvent - dt_cp1_clamped);
+    // cp2 starts after cp1 finishes; clamp to whatever mission time is left.
+    const dt_cp2_clamped = Math.min(o.outcomes.dt_cp2_hours, remainingAfterCp1);
+    qtl += o.outcomes.fi_cp1 * dt_cp1_clamped +
+           o.outcomes.fi_cp2 * dt_cp2_clamped;
     // cp3: permanent impairment from end of cp2 to end of mission. For most
     // conditions fi_cp3 = 0 (rev3-e per-condition audit). Only persistent-
     // impairment conditions (32 of 100) contribute non-zero cp3 QTL.
     if (o.outcomes.fi_cp3 > 0) {
-      const cp3StartHours = o.timeDays * 24 + o.outcomes.dt_cp1_hours + o.outcomes.dt_cp2_hours;
+      const cp3StartHours = eventStartHours + dt_cp1_clamped + dt_cp2_clamped;
       const cp3DurationHours = Math.max(0, missionDurationHours - cp3StartHours);
       qtl += o.outcomes.fi_cp3 * cp3DurationHours;
     }
