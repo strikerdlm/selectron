@@ -103,6 +103,14 @@ export type IMMTrialOpts = {
    * Missing when simulateIMM is called without a criteria catalog.
    */
   criteriaIndex?: ReadonlyMap<string, Criterion>;
+  /**
+   * peer-review-2 §4.5: Leave-calibrated-out sensitivity analysis.
+   * When provided, only conditions for which this callback returns true are
+   * included in the simulation. Applied once before the trial loop for performance.
+   * Use to exclude tier-B blanket-multiplier and tier-C back-fit conditions,
+   * leaving only evidence-based (tier-A + source-cited tier-B) priors active.
+   */
+  conditionFilter?: (c: import("./types").IMMCondition) => boolean;
 };
 
 /**
@@ -232,6 +240,12 @@ export function runIMMTrial(
   const tierBMult = opts.tierBMultiplier ?? 1.0;
   // IC-5: criteria index for Stage A z-scored vulnerability multiplier.
   const criteriaIndex: ReadonlyMap<string, Criterion> = opts.criteriaIndex ?? new Map();
+  // peer-review-2 §4.5: filter active conditions once per trial (not per-crew-member)
+  // so the overhead is O(|conditions|) rather than O(|conditions| × |crew|).
+  const activeConditions = opts.conditionFilter
+    ? IMM_CONDITIONS.filter(opts.conditionFilter)
+    : IMM_CONDITIONS;
+
   const availableResources: Record<string, number> = { ...kit.resources };
   const occurrences: Occurrence[] = [];
   const earlyTerminated = new Set<number>();
@@ -248,7 +262,7 @@ export function runIMMTrial(
     const member = crew[cIdx];
     if (earlyTerminated.has(cIdx)) continue;
 
-    for (const cond of IMM_CONDITIONS) {
+    for (const cond of activeConditions) {
       const prior = priors.conditions[cond.id];
       if (!prior) continue;
 
@@ -528,6 +542,13 @@ export function simulateIMM(opts: {
    * Omit or set false in production to avoid retaining a large array.
    */
   diagnostics?: boolean;
+  /**
+   * peer-review-2 §4.5: Leave-calibrated-out sensitivity analysis.
+   * When provided, only conditions for which this callback returns true are
+   * simulated. Applied once per trial before iterating conditions.
+   * Threaded into runIMMTrial as conditionFilter.
+   */
+  conditionFilter?: (c: import("./types").IMMCondition) => boolean;
 }): IMMOutcome {
   const { crew, mission, kit, trials, seed } = opts;
   const chiStar = opts.chiStar ?? 0.7;
@@ -560,6 +581,7 @@ export function simulateIMM(opts: {
       tierBMultiplier: opts.tierBMultiplier ?? globalCal.tierB_multiplier ?? 1.0,
       tierCMultiplier: opts.tierCMultiplier ?? globalCal.tierC_multiplier ?? 1.0,
       criteriaIndex,
+      conditionFilter: opts.conditionFilter,
     });
     tmes.push(r.tme);
     // CHI clamped at [0, 100] — QTL can exceed denom under pathological priors (v1 analogue of risk/simulate.ts §3.5 guard).
