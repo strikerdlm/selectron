@@ -198,14 +198,15 @@ function miniHistogramOption(
  * From a list of simSessions, pick the most-recent run-id that has exactly 5
  * rows (one per analog mission). Returns the 5 rows or null.
  */
-function pickComparisonSet(rows: SimSession[]): SimSession[] | null {
-  // Filter rows tagged as comparison-run-*
-  const tagged = rows.filter((r) => r.notes?.startsWith("comparison-run-"));
+export function pickComparisonSet(rows: SimSession[]): SimSession[] | null {
+  const tagged = rows.filter((r) => r.notes?.includes("comparison-run-"));
 
-  // Group by run-id suffix
+  // Group by run-id suffix (the ISO timestamp after "comparison-run-")
   const groups = new Map<string, SimSession[]>();
   for (const row of tagged) {
-    const runId = row.notes!.replace("comparison-run-", "");
+    const m = row.notes!.match(/comparison-run-(.+)$/);
+    if (!m) continue;
+    const runId = m[1];
     const g = groups.get(runId) ?? [];
     g.push(row);
     groups.set(runId, g);

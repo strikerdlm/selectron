@@ -13,6 +13,7 @@ import { IMMCalculationTrace } from "@/ui/figures/CalculationTrace";
 import { CHIExplainer } from "@/ui/figures/CHIExplainer";
 import type { AccessTier, GateResult } from "@/types";
 import { ACCESS_TIERS } from "@/types";
+import { isCriterionAvailableAtTier } from "@/types/scenario";
 
 export function Sim({
   candidateId,
@@ -40,13 +41,24 @@ export function Sim({
       if (cancelled) return;
       // Pick the most recent NON-comparison-run sim as the "latest"
       const nonComparison = sims.filter((s) => !(s.notes ?? "").includes("comparison-run-"));
-      setLatest(nonComparison[0] ?? null);
+      const latestSim = nonComparison[0] ?? null;
+      setLatest(latestSim);
+      // Derive tier from session notes so gates are only evaluated for
+      // criteria available at the tier the user actually selected.
+      const tierNote = (latestSim?.notes ?? "").match(/^tier=(\w+)/);
+      const tier: AccessTier =
+        tierNote?.[1] && ACCESS_TIERS.includes(tierNote[1] as AccessTier)
+          ? (tierNote[1] as AccessTier)
+          : "minimum";
+      const tierCriteria = PLACEHOLDER_CRITERIA.filter(
+        (c) => isCriterionAvailableAtTier(c.minimumTier, tier),
+      );
       // Build Candidate shape from DB entries and evaluate gates
       if (bundle) {
         const scores: Record<string, number> = {};
         for (const e of bundle.criterionEntries) scores[e.criterionId] = e.rawValue;
         const candidate = { id: bundle.candidate.id, alias: bundle.candidate.alias, scores };
-        setGate(evaluateGates(candidate, PLACEHOLDER_CRITERIA));
+        setGate(evaluateGates(candidate, tierCriteria));
       } else {
         setGate(null);
       }

@@ -55,3 +55,68 @@ describe("evaluateGates", () => {
     expect(r.verdict).toBe("qualified");
   });
 });
+
+// Regression: minimum-tier candidates must not be disqualified by gates that
+// belong to higher tiers (psych.mmpi2rf_eid is elite-only, nasa_cognition is
+// medium+). The fix is to filter criteria by tier BEFORE calling evaluateGates.
+describe("tier-filtered gate evaluation (regression)", () => {
+  it("minimum-tier candidate qualifies when gated criteria are filtered by tier", async () => {
+    const { PLACEHOLDER_CRITERIA } = await import("../../src/data/placeholder-criteria");
+    const { isCriterionAvailableAtTier } = await import("../../src/types/scenario");
+
+    const minCriteria = PLACEHOLDER_CRITERIA.filter(
+      (c) => isCriterionAvailableAtTier(c.minimumTier, "minimum"),
+    );
+
+    // Build a candidate with mid-range scores on minimum-tier criteria only
+    const scores: Record<string, number> = {};
+    for (const c of minCriteria) {
+      scores[c.id] = (c.scale.min + c.scale.max) / 2;
+    }
+
+    const result = evaluateGates({ id: "min-tier", alias: "min-tier", scores }, minCriteria);
+    expect(result.verdict).toBe("qualified");
+    expect(result.failedGates).toHaveLength(0);
+    // Gated criteria from higher tiers must not appear in evaluated list
+    expect(result.evaluated).not.toContain("psych.mmpi2rf_eid");
+    expect(result.evaluated).not.toContain("cognitive.nasa_cognition_battery");
+  });
+
+  it("elite-tier candidate with MMPI EID > 65 is still disqualified at elite tier", async () => {
+    const { PLACEHOLDER_CRITERIA } = await import("../../src/data/placeholder-criteria");
+    const { isCriterionAvailableAtTier } = await import("../../src/types/scenario");
+
+    const eliteCriteria = PLACEHOLDER_CRITERIA.filter(
+      (c) => isCriterionAvailableAtTier(c.minimumTier, "elite"),
+    );
+    const scores: Record<string, number> = {};
+    for (const c of eliteCriteria) {
+      scores[c.id] = (c.scale.min + c.scale.max) / 2;
+    }
+    // Override MMPI EID to above the gate threshold (65)
+    scores["psych.mmpi2rf_eid"] = 70;
+
+    const result = evaluateGates({ id: "elite-fail", alias: "elite-fail", scores }, eliteCriteria);
+    expect(result.verdict).toBe("disqualified");
+    expect(result.failedGates).toContain("psych.mmpi2rf_eid");
+  });
+
+  it("unfiltered evaluation disqualifies minimum-tier candidate on missing elite-gate scores", async () => {
+    const { PLACEHOLDER_CRITERIA } = await import("../../src/data/placeholder-criteria");
+    const { isCriterionAvailableAtTier } = await import("../../src/types/scenario");
+
+    const minCriteria = PLACEHOLDER_CRITERIA.filter(
+      (c) => isCriterionAvailableAtTier(c.minimumTier, "minimum"),
+    );
+    const scores: Record<string, number> = {};
+    for (const c of minCriteria) {
+      scores[c.id] = (c.scale.min + c.scale.max) / 2;
+    }
+
+    // Without tier filtering: gates on elite/medium criteria fire on missing scores
+    const result = evaluateGates({ id: "min-tier", alias: "min-tier", scores }, PLACEHOLDER_CRITERIA);
+    expect(result.verdict).toBe("disqualified");
+    expect(result.failedGates).toContain("psych.mmpi2rf_eid");
+    expect(result.failedGates).toContain("cognitive.nasa_cognition_battery");
+  });
+});
