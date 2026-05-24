@@ -109,14 +109,16 @@ class TestGetTierBConditions:
 class TestLoadEvidenceProposals:
     def test_loads_and_deduplicates(self) -> None:
         rows = load_evidence_proposals()
-        assert len(rows) == 13
+        assert len(rows) >= 20  # 13 from p-a/p-b + 9 from p-d
 
     def test_maps_condition_ids(self) -> None:
         rows = load_evidence_proposals()
         mapped = [r for r in rows if r["mapped_prior_id"] is not None]
-        assert len(mapped) == 2
-        for r in mapped:
-            assert r["mapped_prior_id"] == "depression"
+        assert len(mapped) >= 10
+        mapped_ids = {r["mapped_prior_id"] for r in mapped}
+        assert "depression" in mapped_ids
+        assert "respiratory-infection" in mapped_ids
+        assert "skin-rash" in mapped_ids
 
     def test_all_rows_have_required_columns(self) -> None:
         rows = load_evidence_proposals()

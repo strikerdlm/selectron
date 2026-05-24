@@ -296,7 +296,8 @@ Two distinct backlogs: **(A)** manuscript submission (~2 hours blocking) and **(
 
 ### B. Engineering / calibration backlog (iterative)
 
-1. **Per-condition source audit for the remaining 37 tier-B priors** — rev3-c calibrated 5 of 42; the rest still rely on the `tierB_multiplier = 0.55` blanket fallback. Per-py rates for most are in NASA's proprietary iMED database (not public). Iterative work.
+0. **Python offline calibration pipeline DONE** (`python/`). PyMC NUTS Gamma-Poisson fitter + K15 validator + atomic priors writer + Sobol/Morris sensitivity. **7 of 30 Gamma-Poisson tier-B conditions now fittable** from analog-environment cohort data (Palinkas 2004, Basner 2014, Bhatia 2012, Wotring 2015, Pattarini 2016). CLI: `cd python && source .venv/bin/activate && python -m selectron --dry-run`. 50 fast tests pass.
+1. **Per-condition source audit for the remaining 23 tier-B priors** — rev3-c calibrated 5 of 42; Python pipeline now covers 7 more; the rest still rely on the `tierB_multiplier = 0.55` blanket fallback. Per-py rates for most are in NASA's proprietary iMED database (not public). Iterative work.
 2. **rev3-f severity tuning for the 32 persistent-impairment priors** — refinement against published persistent-impairment literature to tighten the issHMS CHI fit further (currently Δ −4.68; could close toward K15 ref 94.93). NOT YET QUEUED.
 3. **Peer-review #2 deferred items** (per `paper/peer-review-tier1-application-log.md` §Deferred): α₀ ∈ {1, 10, 100} robustness panel (Stage A), K-S marginal Dirichlet fit test, non-degenerate worked example (F3'), 46-condition leave-the-calibrated-out sensitivity panel, Gelman-Rubin R̂ across 4 independent T=25k chains.
 4. **IMM Phase 3 ML layer** — surrogate model (IMM-52 through IMM-56), vulnerability MLP (IMM-57 through IMM-60), engine toggle + vulnerability mode toggle (IMM-62/63). Unblocks figures I6/I7/I8.
@@ -317,7 +318,7 @@ The full catalog lives in [`docs/iter5_scientific_limitations.md`](docs/iter5_sc
 | Limitation | Severity | Status |
 |---|---|---|
 | **K15 calibration target is itself a model output**, not observed in-flight data. Our "reproduction" validates against another model, not reality. | Fundamental | Inherent to IMM methodology; no public alternative exists. |
-| **37 of 42 tier-B priors use a blanket multiplier** (`tierB_multiplier = 0.55`). Individual conditions are almost certainly over- or under-elicited; the multiplier masks per-condition errors. | High | 5 conditions source-calibrated (rev3-c); rest require per-condition literature audit. |
+| **30 of 42 tier-B priors use a blanket multiplier** (`tierB_multiplier = 0.55`). Individual conditions are almost certainly over- or under-elicited; the multiplier masks per-condition errors. | High | 5 conditions source-calibrated (rev3-c); 7 more have evidence in Python pipeline (proposals_p-d.csv); rest require per-condition literature audit. |
 | **18 tier-C priors are synthetic placeholders** back-fit to K15 aggregate output. They have no per-condition source backing. | Medium | Replaceable as primary literature is found; tracked in `imm-priors.json` provenance tags. |
 | **'none' kit CHI diverges Δ +26** from K15 (85.31 vs 59.20). Untreated-outcome priors under-elicited. | Medium | Accepted: operationally implausible scenario (no real mission has zero medical kit). |
 | **Per-event pEVAC/pLOCL on issHMS/unlimited** are small absolute values but outside K15's tight CI₉₅ brackets. | Low | 5 of 12 metrics are documented-divergent with wider tracking brackets in `validation_k15.test.ts`. |

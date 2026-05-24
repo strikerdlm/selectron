@@ -36,7 +36,7 @@ Update rules:
 - K15 validator + atomic priors writer + Sobol/Morris sensitivity — `974193f`
 - End-to-end integration test — `7c06c92`
 - 50 fast tests pass; 14 slow tests (PyMC NUTS + sensitivity SA). CLI: `python -m selectron --dry-run`
-- Current data reality: 1/41 tier-B fittable (depression, 2 observations). Pipeline is infrastructure for future evidence extraction.
+- **Evidence search (2026-05-24):** Searched 36 evidence/*.md + 12 imm_sources/zotero_imm/*.md files. Extracted 9 empirical rows to `proposals_p-d.csv` from Bhatia 2012 (Antarctic), Wotring 2015 (ISS pharmacy), Pattarini 2016 (McMurdo), Palinkas 2004 (Antarctic psychiatric). Antonsen 2021 simulation data excluded (circular). **7 of 30 Gamma-Poisson conditions now fittable** (was 1): depression (3 obs), respiratory-infection (2), skin-rash (2), gastroenteritis (1), headache-late (1), mouth-ulcer (1), otitis-externa (1).
 
 **Previously: Pre-submission math hardening DONE** (2026-05-24). All peer-review-2 deferred diagnostic items closed:
 - README sampler description fixed (Gamma-normalization, not Metropolis-Hastings) — `60551ee`

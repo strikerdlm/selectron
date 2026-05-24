@@ -4,6 +4,18 @@ from __future__ import annotations
 
 PROPOSAL_TO_PRIOR_ID: dict[str, str] = {
     "depression-anxiety": "depression",
+    "depression": "depression",
+    "respiratory-infection": "respiratory-infection",
+    "mouth-ulcer": "mouth-ulcer",
+    "skin-rash": "skin-rash",
+    "headache-late": "headache-late",
+    "gastroenteritis": "gastroenteritis",
+    "pharyngitis": "pharyngitis",
+    "otitis-externa": "otitis-externa",
+    "otitis-media": "otitis-media",
+    "hypertension": "hypertension",
+    "eye-infection": "eye-infection",
+    "eye-corneal-ulcer": "eye-corneal-ulcer",
 }
 
 UNMAPPED_PROPOSAL_IDS: set[str] = {

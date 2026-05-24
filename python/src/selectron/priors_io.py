@@ -16,6 +16,7 @@ _PROPOSALS_DIR = _REPO_ROOT / "research" / "evidence_extracted"
 _PROPOSAL_FILES = [
     "incidence_rates.proposals_p-a.csv",
     "incidence_rates.proposals_p-b.csv",
+    "incidence_rates.proposals_p-d.csv",
 ]
 
 
