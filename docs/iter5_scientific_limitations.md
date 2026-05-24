@@ -143,6 +143,8 @@ These are out-of-scope **by design** as of 2026-05-22. The catalogued AMM/SMM Ma
 | §3.3 (old) | Stochastic rounding preserved mean but distorted variance (~45 % under-reported for tierB=0.55) | Tier multiplier threaded into λ-sampling site; variance-correct by construction | `ce97dda` |
 | §3.5 (old) | cp3 (permanent impairment) deferred from QTL accumulator | Per-condition fi_cp3 audit: 68 zeroed (fully-resolving), 32 retained (persistent-impairment); cp3 now charged per K15 §II.A.9 | `4521390` |
 | §4.2 (old) | issHMS CHI residual Δ −19.3 | Concurrent-FI engine fix: `fi_cp1×dt_cp1 + fi_cp2×dt_cp2` (sequential phases, not overlapping); Δ now −4.68, within K15 CI₉₅ | `3ac5480` |
+| §1 (new) | README claimed Metropolis-Hastings sampler; code is Gamma-normalization | README fixed to match code; manuscript was already correct | `60551ee` |
+| §1 (new) | Stage B "ESS (= trials)" label was mathematically vacuous | RiskCard row collapsed to single "trials" row; ScoreCard annotated as invariant | `2eadc10` |
 
 ---
 
