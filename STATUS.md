@@ -28,7 +28,17 @@ Update rules:
 
 ## Current state
 
-**Next action:** **Pre-submission math hardening DONE** (2026-05-24). All peer-review-2 deferred diagnostic items closed:
+**Next action:** **Python offline calibration pipeline DONE** (2026-05-24). Full 12-task implementation:
+- Scaffold: pyproject.toml, venv, package structure — `b4d0d56`
+- priors_io + condition_mapping + k15_reference — `d5866e5`
+- forward_mc (primitives + full trial loop + cross-validation) — `1b79516`
+- PyMC Gamma-Poisson fitter (single + batch + CLI) — `4b44b58`
+- K15 validator + atomic priors writer + Sobol/Morris sensitivity — `974193f`
+- End-to-end integration test — `7c06c92`
+- 50 fast tests pass; 14 slow tests (PyMC NUTS + sensitivity SA). CLI: `python -m selectron --dry-run`
+- Current data reality: 1/41 tier-B fittable (depression, 2 observations). Pipeline is infrastructure for future evidence extraction.
+
+**Previously: Pre-submission math hardening DONE** (2026-05-24). All peer-review-2 deferred diagnostic items closed:
 - README sampler description fixed (Gamma-normalization, not Metropolis-Hastings) — `60551ee`
 - ESS labels clarified (RiskCard: single "trials" row; ScoreCard: "ESS (IID ≈ T)") — `2eadc10`
 - K-S marginal Dirichlet goodness-of-fit test (4 tests, betaCDF + ksStatistic) — `1426a5b`
