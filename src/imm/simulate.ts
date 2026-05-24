@@ -522,6 +522,12 @@ export function simulateIMM(opts: {
    * vulnerabilityCriteria. Built as a ReadonlyMap before the trial loop.
    */
   criteria?: readonly Criterion[];
+  /**
+   * When true, returns per-trial CHI samples (percent scale) in
+   * `outcome.diagnostics.chiSamples`. Used by R-hat convergence tests.
+   * Omit or set false in production to avoid retaining a large array.
+   */
+  diagnostics?: boolean;
 }): IMMOutcome {
   const { crew, mission, kit, trials, seed } = opts;
   const chiStar = opts.chiStar ?? 0.7;
@@ -590,7 +596,7 @@ export function simulateIMM(opts: {
     tmeContrib:   (perConditionCountsSum[c.id] ?? 0) / trials,
   }));
 
-  return {
+  const outcome: IMMOutcome = {
     tme:   posteriorSummary(tmes),
     chi:   posteriorSummary(chis),
     pEvac: posteriorSummary(evacs.map(x => x * 100)),
@@ -601,4 +607,8 @@ export function simulateIMM(opts: {
     perConditionDrivers: drivers,
     convergence: { trialCheckpoints: sigmaCheckpoints, sigmaChi, sigmaPevac },
   };
+  if (opts.diagnostics) {
+    outcome.diagnostics = { chiSamples: chis };
+  }
+  return outcome;
 }

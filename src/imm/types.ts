@@ -131,6 +131,12 @@ export type IMMOutcome = {
     trialCheckpoints: number[];
     sigmaChi: number[]; sigmaPevac: number[];
   };
+  /**
+   * Raw per-trial CHI samples (percent scale, 0–100).
+   * Only populated when `diagnostics: true` is passed to `simulateIMM`.
+   * Used by R-hat convergence tests (tests/imm/rhat_convergence.test.ts).
+   */
+  diagnostics?: { chiSamples: number[] };
 };
 
 // ── Crew-composite types (IMM Composite-Crew extension) ───────────────────────
