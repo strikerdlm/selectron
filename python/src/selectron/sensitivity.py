@@ -176,7 +176,8 @@ def run_sobol_analysis(
 ) -> SensitivityReport:
     """Run Sobol first-order and total-order sensitivity analysis."""
     problem = build_problem_definition(condition_ids)
-    param_values = saltelli.sample(problem, n_samples, seed=seed)
+    np.random.seed(seed)
+    param_values = saltelli.sample(problem, n_samples)
 
     n_evals = param_values.shape[0]
     logger.info("Sobol analysis: %d evaluations", n_evals)
