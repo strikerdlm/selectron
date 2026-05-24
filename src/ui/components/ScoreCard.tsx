@@ -46,7 +46,7 @@ export function ScoreCard({ posterior, alias }: Props) {
         <dt className="text-ink-2">Δ width</dt>
         <dd className="text-right tabular-nums text-ink-1">{pct(ci90Width)}</dd>
 
-        <dt className="text-ink-2">ESS</dt>
+        <dt className="text-ink-2">ESS (IID ≈ T)</dt>
         <dd className="text-right tabular-nums text-ink-1">{ess.toFixed(0)}</dd>
       </dl>
 

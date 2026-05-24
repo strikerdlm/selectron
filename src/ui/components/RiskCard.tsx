@@ -9,7 +9,7 @@ const pct = (x: number) => (100 * x).toFixed(1) + "%";
 const days = (x: number) => x.toFixed(1) + "d";
 
 export function RiskCard({ posterior, alias }: Props) {
-  const { chi, pEarlyTermination, expectedLostCrewDays, ess, trials } = posterior;
+  const { chi, pEarlyTermination, expectedLostCrewDays, trials } = posterior;
   const chiCI90Width = chi.ci90[1] - chi.ci90[0];
 
   const sharpness = Math.max(0, Math.min(1, 1 - chiCI90Width / 0.3));
@@ -60,9 +60,6 @@ export function RiskCard({ posterior, alias }: Props) {
 
         <dt className="text-ink-2">trials</dt>
         <dd className="text-right tabular-nums text-ink-1">{trials.toLocaleString()}</dd>
-
-        <dt className="text-ink-2">ESS (= trials)</dt>
-        <dd className="text-right tabular-nums text-ink-1">{ess.toFixed(0)}</dd>
       </dl>
 
       <div className="mt-6">
