@@ -116,6 +116,13 @@ These are out-of-scope **by design** as of 2026-05-22. The catalogued AMM/SMM Ma
 
 **NASA-STD-7009 / 7009A** — full standard PDF still not in corpus. W14 (Task 27) is a 1-page poster, not the full document. Resolution path: NTRS direct download or institutional library proxy.
 
+**New diagnostics (2026-05-24 math-hardening):**
+
+- **K-S marginal Dirichlet fit** (`tests/engine/dirichlet_ks.test.ts`): 3 marginal Beta fits at T=5000 pass K-S at α=0.05 (D < 0.019); 1 rejection of misspecified Beta(10,10). More discriminating than the lag-1 ESS diagnostic for the IID Gamma-normalization sampler.
+- **Gelman-Rubin R̂** (`tests/imm/rhat_convergence.test.ts`): 4 independent chains (seeds 0xc0ffee / 0xdeadbeef / 0x12345678 / 0xfeedface) × T=25k on issHMS. R̂(CHI) ≤ 1.01. Each chain individually satisfies the M18 σ<5% stability rule. Supplements the within-chain σ<5% with between-chain convergence proof.
+- **α₀ robustness panel** (`tests/engine/alpha0_robustness.test.ts`): Stage A posterior at α₀ ∈ {1, 10, 100} with heterogeneous candidate. CI₉₀ width monotonically decreasing (0.50 → 0.21 → 0.07). Closed-form mean matches MC within 2% at all three concentrations.
+- **Leave-calibrated-out sensitivity** (`tests/imm/validation_k15_loo.test.ts`): K15 reproduction with 44 evidence-based conditions only (41 tier-A + 3 source-cited tier-B). TME drops from ~100 → ~42; CHI rises from ~90% → ~97%. Demonstrates honest degradation when calibration-circular conditions are removed.
+
 ---
 
 ## 6 · What Selectron IS appropriate for (v1 scope)

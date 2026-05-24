@@ -28,7 +28,20 @@ Update rules:
 
 ## Current state
 
-**Next action:** **rev3-c DONE** (per-condition source-cited priors for top tier-B contributors). Two major deliverables this turn:
+**Next action:** **Pre-submission math hardening DONE** (2026-05-24). All peer-review-2 deferred diagnostic items closed:
+- README sampler description fixed (Gamma-normalization, not Metropolis-Hastings) — `60551ee`
+- ESS labels clarified (RiskCard: single "trials" row; ScoreCard: "ESS (IID ≈ T)") — `2eadc10`
+- K-S marginal Dirichlet goodness-of-fit test (4 tests, betaCDF + ksStatistic) — `1426a5b`
+- Brooks-Gelman-Rubin R̂ diagnostic (4 tests) — `228d12d`
+- IMM R̂ convergence gate: 4 chains × 25k, R̂(CHI) ≤ 1.01 — `ebf23d0`
+- α₀ robustness panel {1, 10, 100}: CI₉₀ width monotonically decreasing — `6b78a73`
+- Non-degenerate worked example (heterogeneous z-scores for F1/F5) — `e24bd90`
+- Leave-calibrated-out sensitivity: 44 evidence-based conditions only — `8be99ba`
+- Frontend accuracy audit: clean (one "MCMC" hit is a G12 citation, not our sampler)
+- Full regression: 42 files / 299 tests pass; typecheck clean; build green
+- Citation verification: Gelman & Rubin 1992 + Brooks & Gelman 1998 confirmed via Crossref
+
+**Previously: rev3-c DONE** (per-condition source-cited priors for top tier-B contributors). Two major deliverables that turn:
 
 1. **`src/imm/lxc.ts` adapter** — IMM Calculator output (`IMMOutcome`) now feeds the NASA HSRB LxC matrix verdict via the new `assessIMMLxC` function. CrewComposition view shows the colour-coded L×C cell with JSC-66705 verbatim labels + crew-gate fast-fail. Closes Diego's directive that "the calculations are passed to the risk analysis and matrix construction". 10 RTL tests; shared band definitions with `src/risk/lxc-definitions.ts` (pipeline-agnostic NASA standard).
 
