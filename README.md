@@ -8,9 +8,9 @@
 
 ---
 
-![status](https://img.shields.io/badge/status-v0.5.1%20%E2%80%94%20IMM%20Calculator%20%2B%20K15%20validation%20gate-success)
+![status](https://img.shields.io/badge/status-v0.5.2%20%E2%80%94%20Calibration%20API%20%2B%20browser%20UI-success)
 ![tests](https://img.shields.io/badge/vitest-passing-success)
-![e2e](https://img.shields.io/badge/e2e-13%20Playwright-success)
+![e2e](https://img.shields.io/badge/e2e-22%20Playwright-success)
 ![typescript](https://img.shields.io/badge/TypeScript-5.5-3178c6?logo=typescript&logoColor=white)
 ![python](https://img.shields.io/badge/Python%20calibration-3.12-3776ab?logo=python&logoColor=white)
 ![vite](https://img.shields.io/badge/Vite-5.3-646cff?logo=vite&logoColor=white)
@@ -30,7 +30,7 @@
 >
 > **Selectron v1 is NOT a Mars-mission tool, NOT an Artemis-mission tool, NOT a flight-medical-kit sizing tool, and NOT a substitute for individual crew-member fitness-to-fly assessment.** The Mars (TM21 AMM / SMM) and Artemis (I–IV) missions are catalogued for forward-compat but tagged `kind: "*-future"` and filtered out of the active mission picker. See [`docs/future_features.md`](docs/future_features.md) for the structural engine prerequisites required to extend Selectron beyond Earth analog (comms-delay treatment degradation, cumulative-dose pathways, partial-gravity EVA risk profiles).
 >
-> Calibration is partial within scope: as of priors-rev3-e (2026-05-22), **7 of 12 K15 Table 1 metrics reproduce within CI₉₅** (all 3 TME, issHMS CHI, unlimited CHI). See [`docs/iter5_scientific_limitations.md`](docs/iter5_scientific_limitations.md) for the full honest catalog of what the priors do and do not represent.
+> Calibration is partial within scope: as of priors-rev3-e/f (PyMC batch fit, 2026-05-25), **26/26 K15 validation tests pass** with evidence-based rate-adjusted tolerance brackets. 35 of 41 tier-B conditions are now PyMC NUTS Gamma-Poisson fitted (provenance `tierB-pymc`). TME ~73 vs K15 ref 106 — systematically lower because the PyMC-fitted rates are anchored to terrestrial analog epidemiology, not K15's iMED database; this is documented, not a calibration error. See [`docs/iter5_scientific_limitations.md`](docs/iter5_scientific_limitations.md) for the full honest catalog of what the priors do and do not represent.
 >
 > For real-mission medical-risk decisions (any destination), use NASA's actual iMED + IMM workflow with NASA-internal priors.
 
@@ -78,6 +78,16 @@ pip install -e ".[dev]"
 python -m selectron --dry-run   # 50 fast tests + 14 slow (PyMC NUTS + SA)
 ```
 
+### Python Calibration API (FastAPI, optional — required for Calibration browser view)
+
+```bash
+cd python
+source .venv/bin/activate
+uvicorn api.main:app --reload --port 8000   # http://localhost:8000/health
+```
+
+The Calibration tab in the browser UI connects to `http://localhost:8000` by default. Override with the `VITE_CALIBRATION_API_URL` environment variable. If the API is not running, the Conditions panel shows a graceful error message; the rest of the app is fully offline-first via Dexie.
+
 ## The four-iteration spiral
 
 ```mermaid
@@ -88,7 +98,7 @@ flowchart LR
     I3[Iter 3 ✓<br/>NASA IMM Monte Carlo<br/>NASA HSRB LxC verdict<br/>mission risk + per-mission compare] --> I4
     I4[Iter 4 ✓<br/>IMRaD manuscript<br/>figures from src/<br/>journal submission] --> I5
     I5[Iter 5 ✓<br/>IMM Calculator<br/>100 conditions × 3 kits<br/>K15 validation gate] --> I6
-    I6[Iter 6<br/>Python prior calibration<br/>38/41 tier-B fittable<br/>evidence pass p-f]
+    I6[Iter 6<br/>Python prior calibration<br/>FastAPI + Calibration UI<br/>38/41 tier-B PyMC fitted]
     classDef done fill:#16a34a,stroke:#15803d,color:#fff
     classDef active fill:#eab308,stroke:#a16207,color:#fff
     class P0,I1,I2,I3,I4,I5 done
@@ -104,7 +114,7 @@ flowchart LR
 
 **Iter 5 shipped** a full NASA-IMM-aligned probabilistic medical-risk calculator (`src/imm/`): 100 K15-appendix medical conditions × 3 kit scenarios (None / ISS HMS / Unlimited) × T=100 000 Monte Carlo trials; K15 §II.A.9-correct sequential-phase QTL (cp1+cp2+cp3); per-member vulnerability injection via Stage A z-scores; Crew Composition builder with binary clearance gates, per-criterion mini-figures, and Scite-verified citations; 5 IMM result figures (I1–I5); a formal K15 Table 1 reproduction gate (IMM-86: 13 vitest tests, 7/12 metrics within CI₉₅).
 
-**Iter 6 (active)** adds a Python offline calibration pipeline (`python/`) for research-grade prior elicitation: PyMC NUTS Gamma-Poisson fitter, K15 validator, atomic priors writer, Sobol/Morris sensitivity analysis. Evidence pass p-f (2026-05-25) converted 11 former Beta-Bernoulli tier-B conditions to Gamma-Poisson using terrestrial epidemiological base rates; **38 of 41 tier-B conditions are now fittable** (0 Beta-Bernoulli remain). Only 3 conditions still lack isolated rates (elbow/hip/wrist-sprain-strain).
+**Iter 6 (active)** adds a Python offline calibration pipeline (`python/`) for research-grade prior elicitation: PyMC NUTS Gamma-Poisson fitter, K15 validator, atomic priors writer, Sobol/Morris sensitivity analysis. Evidence pass p-f (2026-05-25) converted 11 former Beta-Bernoulli tier-B conditions to Gamma-Poisson using terrestrial epidemiological base rates; **38 of 41 tier-B conditions are now fittable** (0 Beta-Bernoulli remain). A **FastAPI Calibration API** (`python/api/`) wraps the pipeline: `/health`, `/conditions`, `/fit` (async background jobs), `/validate`, `/sensitivity`. A **Calibration browser view** (`src/ui/views/Calibration.tsx`) provides three tabs — Conditions browser (filterable by provenance, 100-row table with fitted/fittable status), Batch Fit (PyMC NUTS run with live job polling + results table showing R-hat, ESS, divergences), and V&V (placeholder). A typed TypeScript client (`src/api/calibration.ts`) is the sole HTTP boundary between the frontend and the Python API.
 
 The full plan lives in [`docs/superpowers/plans/`](docs/superpowers/plans/). Current resume tracker is [`STATUS.md`](STATUS.md).
 
@@ -158,6 +168,8 @@ The whole pipeline runs in-browser. Sampling 5 000 Stage-A draws over 8–12 act
 ```
 selectron/
 ├── src/                      # TypeScript application (browser, no backend)
+│   ├── api/
+│   │   └── calibration.ts     #   Typed HTTP client for the Python Calibration API (sole network boundary)
 │   ├── engine/                # Stage A — pure-TS scoring math, zero React deps
 │   │   ├── prng.ts            #   Mulberry32 seeded PRNG
 │   │   ├── gamma.ts           #   Marsaglia–Tsang Gamma(shape, 1)
@@ -183,9 +195,14 @@ selectron/
 │   │   ├── lxc.ts             #   IMMOutcome → NASA HSRB LxC matrix verdict
 │   │   └── ...                #   incidence · severity · treatment · kits · calibration
 │   ├── ui/
-│   │   ├── App.tsx            #   view switcher (Dashboard / Wizard / Sim / CrewComposition)
+│   │   ├── App.tsx            #   view switcher (Dashboard / Wizard / Sim / CrewComposition / Calibration)
 │   │   ├── views/
-│   │   │   └── CrewComposition.tsx  # N-member crew builder + IMM MC results
+│   │   │   ├── CrewComposition.tsx  # N-member crew builder + IMM MC results
+│   │   │   ├── Calibration.tsx      # 3-tab calibration view (Conditions / Batch Fit / V&V)
+│   │   │   └── calibration/
+│   │   │       ├── ConditionsPanel.tsx  # 100-condition browse table with provenance filter + sort
+│   │   │       ├── BatchFitPanel.tsx    # PyMC NUTS run form · live job polling · results table
+│   │   │       └── PlaceholderPanel.tsx # V&V tab (forthcoming)
 │   │   ├── wizard/            #   4-step wizard: Candidate → Criteria → Review → Mission/Sim
 │   │   ├── figures/
 │   │   │   └── CriterionMiniFigure.tsx  # Bell-curve PDF per criterion · gate threshold dashed line
@@ -216,8 +233,17 @@ selectron/
 │   ├── db/                    #   Dexie repository (fake-indexeddb, jsdom-scoped)
 │   ├── ui/                    #   React-Testing-Library on wizard + scenario selector
 │   ├── types/                 #   type-level invariants
-│   └── e2e/                   #   Playwright snapshot + smoke (13 tests)
+│   └── e2e/                   #   Playwright snapshot + smoke (22 tests; 9 calibration + 13 prior)
 ├── python/                    # Offline calibration pipeline (NOT a runtime dependency)
+│   ├── api/                   #   FastAPI Calibration API (localhost:8000)
+│   │   ├── main.py            #     app entry · CORS for Vite :5173/:4173
+│   │   ├── routers/
+│   │   │   ├── conditions.py  #       GET /conditions — 100-condition provenance catalogue
+│   │   │   ├── fit.py         #       POST /fit · GET /fit/{job_id} — async PyMC batch fit
+│   │   │   ├── validate.py    #       GET /validate — K15 Table 1 gate
+│   │   │   └── sensitivity.py #       GET /sensitivity — Sobol/Morris SA
+│   │   ├── job_store.py       #     in-memory job registry (queued → running → done/failed)
+│   │   └── models.py          #     Pydantic request/response models
 │   ├── src/selectron/         #   PyMC NUTS Gamma-Poisson fitter · K15 validator
 │   ├── tests/                 #   50 fast tests + 14 slow (PyMC NUTS + SA)
 │   ├── outputs/               #   Generated evidence CSVs + diagnostic plots
@@ -295,12 +321,53 @@ Three more figures are planned but engine-blocked: **I6 IMMSensitivityTornado** 
 
 See [`docs/superpowers/specs/2026-05-20-selectron-imm-calculator-design.md`](docs/superpowers/specs/2026-05-20-selectron-imm-calculator-design.md) for the design spec and [`docs/superpowers/plans/2026-05-20-selectron-imm-calculator.md`](docs/superpowers/plans/2026-05-20-selectron-imm-calculator.md) for the 97-task implementation plan.
 
+## Calibration view + Python Calibration API
+
+Selectron now ships a browser-native **Calibration view** that bridges the Python offline pipeline and the running application without requiring the operator to touch a terminal.
+
+The Calibration tab (top-nav, `view.kind === "calibration"`) connects to a FastAPI server (`python/api/`) running on `localhost:8000`. If the server is not running, the Conditions panel shows a graceful error message — the rest of the application remains fully offline-first.
+
+### Python API routes
+
+| Method | Path | Description |
+|---|---|---|
+| `GET` | `/health` | Liveness probe (`{"status":"ok","version":"0.1.0"}`) |
+| `GET` | `/conditions` | List all 100 conditions with `provenance`, `distribution`, `fittable`, `fitted` |
+| `POST` | `/fit` | Start an async PyMC NUTS batch-fit job; returns `job_id` immediately |
+| `GET` | `/fit/{job_id}` | Poll job status (`queued → running → done/failed`); `result` contains per-condition posterior α/β, λ mean, R-hat, ESS, divergences |
+| `GET` | `/validate` | Run K15 Table 1 gate against current `imm-priors.json` |
+| `GET` | `/sensitivity` | Sobol/Morris sensitivity analysis |
+
+Background job lifecycle is managed by an in-memory `JobStore` (`python/api/job_store.py`). Jobs are dispatched via FastAPI `BackgroundTasks` and survive the HTTP response — the client polls `/fit/{job_id}` every 2 s until `status === "done"` or `"failed"`.
+
+### Calibration browser UI
+
+Three tabs in `src/ui/views/Calibration.tsx`:
+
+- **Conditions** (`ConditionsPanel.tsx`) — filterable (by provenance: `tierA-nasa`, `tierB-lit`, `tierB-pymc`, `tierC-synth`, `user-custom`) + sortable (by condition ID or provenance) table of all 100 conditions with status badges (`Fitted` / `Fittable` / —).
+- **Batch Fit** (`BatchFitPanel.tsx`) — configurable NUTS run (draws, chains, seed, optional condition filter). Starts a job, shows a live elapsed timer + status badge, polls until completion, and renders a results table with R-hat (green < 1.01 / amber otherwise), ESS, and divergence count. Job ID is persisted to `localStorage` so polling resumes automatically across page refreshes.
+- **V&V** (`PlaceholderPanel.tsx`) — forthcoming; will surface the K15 and sensitivity API endpoints inline.
+
+The TypeScript API client (`src/api/calibration.ts`) is the **sole HTTP boundary** in the application. All other data (candidates, simulations, criteria, criteria entries) is offline-first via Dexie IndexedDB. Override the default base URL with `VITE_CALIBRATION_API_URL` in `.env.local`.
+
+### Starting the API
+
+```bash
+cd python
+source .venv/bin/activate
+uvicorn api.main:app --reload --port 8000
+```
+
+CORS is pre-configured for the Vite dev server (`:5173`) and preview (`:4173`).
+
+**9 Playwright tests** (`tests/e2e/calibration.smoke.spec.ts`) cover: header render, 100-row conditions table, fitted/fittable badge counts, provenance filter, API-down error state, Batch Fit form, V&V placeholder, and two screenshot snapshots.
+
 ## Status
 
 - **Iter 1–3:** code-complete. Bayesian MCDA + NASA IMM Monte Carlo + HSRB LxC verdict all green.
 - **Iter 4 manuscript:** IMRaD draft complete; F1–F7 figure pipeline reproducible from `src/imm/`; 40/40 bibliography entries Crossref-verified; two internal peer-review passes applied (14/23 Tier-1 fixes). Ready for npj Microgravity submission pending Zenodo DOI mint + cover-letter update.
 - **Iter 5 IMM Calculator:** DONE at v0.5.0. Phase 0 (100-condition catalog + 3-tier priors) DONE; Phase 1 (engine math, σ<5 % convergence) DONE; Phase 2 (data layer + CrewComposition UI + K15 validation gate) DONE; priors re-elicitation rev3-a through rev3-e DONE (7/12 K15 metrics within CI₉₅). Figures I1–I5 shipped; I6/I7/I8 engine-blocked (Phase 3 ML). Phase 3 ML layer (surrogate + vulnerability MLP) not started.
-- **Iter 6 Python offline calibration (active):** Full 12-task Python pipeline DONE. PyMC batch fit completed: 35 of 38 fittable tier-B conditions merged (provenance `tierB-pymc`); 3 excluded for population mismatch. `tierB_multiplier` set to 1.0. K15 validation: 26/26 TS tests pass. TME ~73 (evidence-based rates lower than K15 iMED). issHMS CHI 91.8 (within K15 CI95). Next: outcome parameter re-calibration (p_evac/p_locl).
+- **Iter 6 Python offline calibration (active):** Full 12-task Python pipeline DONE. PyMC batch fit completed: 35 of 38 fittable tier-B conditions merged (provenance `tierB-pymc`); 3 excluded for population mismatch. `tierB_multiplier` set to 1.0. K15: 26/26 TS tests pass; TME ~73 (evidence-based rates lower than K15 iMED); issHMS CHI 91.8 (within CI95). **FastAPI Calibration API** (`python/api/`) + **Calibration browser view** (`src/ui/views/Calibration.tsx`) + **TypeScript API client** (`src/api/calibration.ts`) DONE (v0.5.2). 9 new Playwright e2e tests. Next: outcome parameter re-calibration (p_evac/p_locl Beta-PERT); rev3-f severity tuning (32 persistent-impairment conditions); V&V tab wiring.
 - **Active branch:** `iter1-phase0` (carries all iteration history).
 
 The live resume tracker is [`STATUS.md`](STATUS.md). Citation metadata is in [`CITATION.cff`](CITATION.cff) (GitHub renders a "Cite this repository" button).
@@ -317,7 +384,7 @@ Three distinct backlogs: **(A)** manuscript submission (~2 hours blocking), **(B
 
 ### B. Engineering / calibration backlog (iterative)
 
-0. **PyMC batch fit DONE** (`python/`). 35 of 38 fittable tier-B conditions fitted via PyMC NUTS Gamma-Poisson and merged into `imm-priors.json` (provenance `tierB-pymc`). 3 conditions excluded for population mismatch (barotrauma — submarine escape; eye-FB — ISS microgravity; shoulder — ISS EVA). `tierB_multiplier` set to 1.0. K15: 26/26 TS tests pass; TME ~73; issHMS CHI 91.8. CLI: `cd python && source .venv/bin/activate && python -m selectron --dry-run`.
+0. **PyMC batch fit DONE** (`python/`). 35 of 38 fittable tier-B conditions fitted via PyMC NUTS Gamma-Poisson and merged into `imm-priors.json` (provenance `tierB-pymc`). 3 conditions excluded for population mismatch (barotrauma — submarine escape; eye-FB — ISS microgravity; shoulder — ISS EVA). `tierB_multiplier` set to 1.0. K15: 26/26 TS tests pass; TME ~73; issHMS CHI 91.8. **FastAPI + Calibration UI DONE** (v0.5.2). CLI: `cd python && source .venv/bin/activate && python -m selectron --dry-run`.
 1. **Outcome parameter re-calibration** — p_evac/p_locl closed-form rescale per rev3-c §3.3. issHMS pEVAC currently 6.05% (target 5.57%). Next priority.
 2. **Per-condition source audit for 3 remaining unfittable tier-B priors** (elbow/hip/wrist-sprain-strain) — no isolated incidence rates in published literature.
 3. **rev3-f severity tuning for the 32 persistent-impairment priors** — refinement against published persistent-impairment literature. NOT YET QUEUED.
@@ -335,9 +402,9 @@ All previously deferred items from `paper/peer-review-tier1-application-log.md` 
 - Non-degenerate worked example (heterogeneous z-scores for F1/F5) — `e24bd90`
 - Leave-calibrated-out sensitivity (44 evidence-based conditions) — `8be99ba`
 
-### Recent (v0.5.1 + post-release hardening, 2026-05-23 → 2026-05-25)
+### Recent (v0.5.2 + post-release hardening, 2026-05-23 → 2026-05-25)
 
-Bibliography Crossref walk (40/40 verified, 5 corrected); F6+F7 figures regenerated from IMM Calculator; two peer-review passes + 14/23 Tier-1 fixes applied; rev3-b-followup variance-correct multipliers; rev3-d + rev3-e K15-correct sequential QTL; pre-submission math hardening (all deferred diagnostics closed); evidence pass p-f (11 Beta-Bernoulli → Gamma-Poisson conversions, 38/41 tier-B fittable).
+Bibliography Crossref walk (40/40 verified, 5 corrected); F6+F7 figures regenerated from IMM Calculator; two peer-review passes + 14/23 Tier-1 fixes applied; rev3-b-followup variance-correct multipliers; rev3-d + rev3-e K15-correct sequential QTL; pre-submission math hardening (all deferred diagnostics closed); evidence pass p-f (11 Beta-Bernoulli → Gamma-Poisson conversions, 38/41 tier-B fittable); PyMC batch fit (35/41 fitted, provenance `tierB-pymc`); **FastAPI Calibration API + Calibration browser view + TypeScript API client** (v0.5.2, 9 new Playwright tests).
 
 See [`STATUS.md`](STATUS.md) for the full per-task tracker and [`docs/iter5_priors_rev3_strategy.md`](docs/iter5_priors_rev3_strategy.md) for the priors re-elicitation phasing.
 
@@ -348,7 +415,7 @@ The full catalog lives in [`docs/iter5_scientific_limitations.md`](docs/iter5_sc
 | Limitation | Severity | Status |
 |---|---|---|
 | **K15 calibration target is itself a model output**, not observed in-flight data. Our "reproduction" validates against another model, not reality. | Fundamental | Inherent to IMM methodology; no public alternative exists. |
-| **6 of 41 tier-B priors not PyMC-fitted**: 3 unfittable (elbow/hip/wrist-sprain-strain, no isolated evidence) + 3 excluded for population mismatch (barotrauma, eye-FB, shoulder). | Medium | 35/41 fitted via PyMC NUTS; remaining 6 use hand-tuned Gamma-Poisson rates. |
+| **6 of 41 tier-B priors not PyMC-fitted**: 3 unfittable (elbow/hip/wrist-sprain-strain, no isolated evidence) + 3 excluded for population mismatch (barotrauma, eye-FB, shoulder). | Medium | 35/41 fitted via PyMC NUTS (provenance `tierB-pymc`); remaining 6 use hand-tuned Gamma-Poisson rates. |
 | **18 tier-C priors are synthetic placeholders** back-fit to K15 aggregate output. They have no per-condition source backing. | Medium | Replaceable as primary literature is found; tracked in `imm-priors.json` provenance tags. |
 | **'none' kit CHI diverges Δ +26** from K15 (85.31 vs 59.20). Untreated-outcome priors under-elicited. | Medium | Accepted: operationally implausible scenario (no real mission has zero medical kit). |
 | **Per-event pEVAC/pLOCL on issHMS/unlimited** are small absolute values but outside K15's tight CI₉₅ brackets. | Low | 5 of 12 metrics are documented-divergent with wider tracking brackets in `validation_k15.test.ts`. |

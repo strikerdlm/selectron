@@ -5,6 +5,7 @@ import { Dashboard } from "./views/Dashboard";
 import { Wizard } from "./views/Wizard";
 import { Sim } from "./views/Sim";
 import { CrewComposition } from "./views/CrewComposition";
+import { Calibration } from "./views/Calibration";
 import { ToastHost } from "./components/Toast";
 import { ErrorBoundary } from "./components/ErrorBoundary";
 import { TestFigureHost } from "./testing/TestFigureHost";
@@ -15,7 +16,8 @@ type View =
   | { kind: "dashboard" }
   | { kind: "wizard"; candidateId: string; step: 0 | 1 | 2 | 3 }
   | { kind: "sim"; candidateId: string }
-  | { kind: "crew-composition" };
+  | { kind: "crew-composition" }
+  | { kind: "calibration" };
 
 function useUtcClock() {
   const [now, setNow] = useState(() => new Date());
@@ -83,6 +85,16 @@ export function App() {
               >
                 Crew
               </button>
+              <button
+                className={`uppercase tracking-cap transition-colors ${
+                  view.kind === "calibration"
+                    ? "text-signal border-b border-signal pb-0.5"
+                    : "text-ink-2 hover:text-ink-0"
+                }`}
+                onClick={() => setView({ kind: "calibration" })}
+              >
+                Calibration
+              </button>
               {/* UTC clock + meta */}
               <div className="flex items-center gap-2 hidden sm:flex">
                 <span className="signal-dot" />
@@ -146,6 +158,14 @@ export function App() {
               onReset={() => setView({ kind: "dashboard" })}
             >
               <CrewComposition />
+            </ErrorBoundary>
+          )}
+          {view.kind === "calibration" && (
+            <ErrorBoundary
+              fallbackLabel="The Calibration view crashed during render"
+              onReset={() => setView({ kind: "dashboard" })}
+            >
+              <Calibration />
             </ErrorBoundary>
           )}
         </main>
