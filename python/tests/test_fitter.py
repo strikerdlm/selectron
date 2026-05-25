@@ -177,5 +177,5 @@ class TestFitAllTierB:
             result = report.fitted["depression"]
         else:
             result, _ = report.failed["depression"]
-        assert result.n_studies == 2
-        assert result.total_events == 14
+        assert result.n_studies == 3
+        assert result.total_events == 27

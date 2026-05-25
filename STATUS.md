@@ -1,6 +1,6 @@
 # Selectron — STATUS
 
-**Last updated:** 2026-05-23 ~ 21:00 UTC (**v0.5.1 release + Crossref walk closed**: manuscript figures F6/F7 regenerated from the IMM Calculator; full Crossref bibliography walk verifies 40/40 entries with 5 corrections; two peer-review passes captured in `paper/peer-review-report.md` + `paper/peer-review-2-ml-biomath-npjmgrav.md`; 14/23 Tier-1 items applied per `paper/peer-review-tier1-application-log.md`; CI₉₅-width assertions added to IMM-86 gate; manuscript ready for npj Microgravity submission after Zenodo DOI mint + cover-letter update)
+**Last updated:** 2026-05-25 ~ 00:30 UTC (**evidence pass p-f**: 11 Beta-Bernoulli tier-B conditions converted to Gamma-Poisson with terrestrial epidemiological base rates; 38/41 tier-B now fittable; 0 Beta-Bernoulli remain)
 **Current branch:** `iter1-phase0`
 **Active plan (Iter 1):** [`docs/superpowers/plans/2026-05-18-selectron-iter1-phase0.md`](docs/superpowers/plans/2026-05-18-selectron-iter1-phase0.md)
 **Active plan (Iter 3):** [`docs/superpowers/plans/2026-05-18-selectron-iter3-risk.md`](docs/superpowers/plans/2026-05-18-selectron-iter3-risk.md)
@@ -28,7 +28,13 @@ Update rules:
 
 ## Current state
 
-**Next action:** **Python offline calibration pipeline DONE** (2026-05-24). Full 12-task implementation:
+**Next action:** **Evidence pass p-f DONE** (2026-05-25). Terrestrial base-rate search for 11 former Beta-Bernoulli tier-B conditions. All 11 converted to Gamma-Poisson and added to the fitter pipeline. **38 of 41 tier-B conditions now fittable** (was 27/30). Only 3 remain unfittable (elbow/hip/wrist-sprain-strain — no isolated joint-specific rates).
+- Pass p-f sources: GBD 2021 Lancet Rheumatol (low back pain ASIR 3676/100k/yr), Sonnenberg & Koch NHDS (constipation), Ferrante 2013 PACE / Medlink (TTH 14.2/1000 PY), Morphy 2007 / Morin 2022 (insomnia 3.9%/yr), Stewart 2010 / Dutch GP data (nasal congestion 25/1000), Pallin 2005 NHAMCS (epistaxis 1.7/1000 ED visits), Dyck 1993 Rochester (paresthesias/CTS ~250/100k), Fernandez-Lopez 2022 Spain (urinary incontinence 1.85/1000 PY), Jacobsen 1999 HPFS (urinary retention 0.5/1000 PY), Medscape (fingernail-delamination LOW CONFIDENCE — unknown worldwide incidence), transport epidemiology (motion sickness LOW CONFIDENCE — exposure-dependent).
+- Converted 11 conditions in `imm-priors.json` from Beta-Bernoulli → Gamma-Poisson with α=2 priors anchored to terrestrial rates.
+- Updated `condition_mapping.py` (11 new mappings), `priors_io.py` (added p-c + p-f to file list), test assertions (depression n_studies 2→3, distribution counts 41/0).
+- 0 Beta-Bernoulli conditions remain in tier-B (was 11). Full tier-B is now homogeneous Gamma-Poisson.
+
+**Previously: Python offline calibration pipeline DONE** (2026-05-24). Full 12-task implementation:
 - Scaffold: pyproject.toml, venv, package structure — `b4d0d56`
 - priors_io + condition_mapping + k15_reference — `d5866e5`
 - forward_mc (primitives + full trial loop + cross-validation) — `1b79516`
@@ -566,6 +572,7 @@ This is intentional triage — flag it now if Diego disagrees. The trade-off: ~5
 | 2026-05-24 ~04:05 UTC | Diego (fix request) | FIX-2 — `fix: MissionComparison pickComparisonSet notes parsing`. `pickComparisonSet` used `startsWith("comparison-run-")` but notes are `"tier=<tier> · comparison-run-<runId>"` — comparison runs saved but immediately invisible on cache reload. Fix: `.includes()` + regex extraction. 5 regression tests. Browser-verified: 8-panel grid renders with histograms + LxC chips. |
 | 2026-05-24 ~06:50 UTC | Task 5 implementer | PR2-43 DONE — `feat(engine): Brooks-Gelman-Rubin R̂ convergence diagnostic`. `src/engine/rhat.ts` + `tests/engine/rhat.test.ts`. Added `B === 0` early-return guard not in the spec's verbatim code (spec formula returns √(4/5)≈0.894 for identical chains; guard makes it return 1.0 correctly). 4/4 rhat tests pass; 222/222 full suite green. |
 | 2026-05-24 ~07:30 UTC | Task 6 implementer | PR2-44 DONE `ebf23d0` — `test(imm): Gelman-Rubin R-hat convergence gate — 4 chains x 25k trials`. `tests/imm/rhat_convergence.test.ts` + additive engine changes. `simulateIMM` extended with `diagnostics?: boolean` opt; `IMMOutcome` extended with `diagnostics?: { chiSamples: number[] }` (optional, backward-compatible). Test runs 4 independent seeds (0xc0ffee, 0xdeadbeef, 0x12345678, 0xfeedface), T=25k each, collects raw chi chains, asserts R-hat(CHI) <= 1.01 and sigma(CHI) < 5% in both last 1000-trial windows. 2/2 PASS; typecheck exit 0; run time ~475s (dominated by 4×25k collect phase). Closes peer-review-2 §4.3. |
+| 2026-05-25 ~00:30 UTC | Evidence search (pass p-f) | `feat(python): terrestrial evidence pass p-f — 38/41 conditions fittable`. 11 former Beta-Bernoulli tier-B conditions converted to Gamma-Poisson with terrestrial epidemiological base rates. New file `proposals_p-f.csv` (11 rows). Updated `condition_mapping.py` (+11 mappings), `priors_io.py` (+p-c, +p-f), `imm-priors.json` (11 distribution conversions), test assertions. 0 Beta-Bernoulli conditions remain in tier-B. |
 
 ## IMM Composite-Crew reproducer output (2026-05-21)
 

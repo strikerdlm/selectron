@@ -34,6 +34,17 @@ PROPOSAL_TO_PRIOR_ID: dict[str, str] = {
     "hemorrhoids": "hemorrhoids",
     "vaginal-yeast-infection": "vaginal-yeast-infection",
     "abnormal-uterine-bleeding": "abnormal-uterine-bleeding",
+    "back-pain-space-adaptation": "back-pain-space-adaptation",
+    "constipation-space-adaptation": "constipation-space-adaptation",
+    "fingernail-delamination": "fingernail-delamination",
+    "headache-space-adaptation": "headache-space-adaptation",
+    "insomnia-space-adaptation": "insomnia-space-adaptation",
+    "nasal-congestion-space-adaptation": "nasal-congestion-space-adaptation",
+    "nose-bleed-space-adaptation": "nose-bleed-space-adaptation",
+    "paresthesias": "paresthesias",
+    "space-motion-sickness-space-adaptation": "space-motion-sickness-space-adaptation",
+    "urinary-incontinence-space-adaptation": "urinary-incontinence-space-adaptation",
+    "urinary-retention-space-adaptation": "urinary-retention-space-adaptation",
 }
 
 UNMAPPED_PROPOSAL_IDS: set[str] = {

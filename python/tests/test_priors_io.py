@@ -102,8 +102,8 @@ class TestGetTierBConditions:
             1 for v in tier_b.values()
             if v["incidence"]["distribution"] == "Beta-Bernoulli"
         )
-        assert gamma_count == 30
-        assert beta_count == 11
+        assert gamma_count == 41
+        assert beta_count == 0
 
 
 class TestLoadEvidenceProposals:

@@ -5,7 +5,7 @@
     "acute-sinusitis": {
       "conditionId": "acute-sinusitis",
       "provenance": "tierA-nasa",
-      "source_ref": "research/imm_sources/methods/M18_myers_2018_imm_validation.md#acute-sinusitis; rev3-e (2026-05-22): treated.fi_cp3 = untreated.fi_cp3 = 0 \u2014 condition fully resolves over 180d analog/LEO timeframe regardless of treatment (clinically defensible per K15 \u00a7II.A.5 'permanent impairment for remainder of mission' definition: acute self-limiting condition leaves no persistent impairment)",
+      "source_ref": "research/imm_sources/methods/M18_myers_2018_imm_validation.md#acute-sinusitis; rev3-e (2026-05-22): treated.fi_cp3 = untreated.fi_cp3 = 0 — condition fully resolves over 180d analog/LEO timeframe regardless of treatment (clinically defensible per K15 §II.A.5 'permanent impairment for remainder of mission' definition: acute self-limiting condition leaves no persistent impairment)",
       "incidence": {
         "distribution": "Gamma-Poisson",
         "alpha": 2,
@@ -99,7 +99,7 @@
     "influenza": {
       "conditionId": "influenza",
       "provenance": "tierA-nasa",
-      "source_ref": "research/imm_sources/methods/M18_myers_2018_imm_validation.md#influenza; rev3-e (2026-05-22): treated.fi_cp3 = untreated.fi_cp3 = 0 \u2014 condition fully resolves over 180d analog/LEO timeframe regardless of treatment (clinically defensible per K15 \u00a7II.A.5 'permanent impairment for remainder of mission' definition: acute self-limiting condition leaves no persistent impairment)",
+      "source_ref": "research/imm_sources/methods/M18_myers_2018_imm_validation.md#influenza; rev3-e (2026-05-22): treated.fi_cp3 = untreated.fi_cp3 = 0 — condition fully resolves over 180d analog/LEO timeframe regardless of treatment (clinically defensible per K15 §II.A.5 'permanent impairment for remainder of mission' definition: acute self-limiting condition leaves no persistent impairment)",
       "incidence": {
         "distribution": "Gamma-Poisson",
         "alpha": 2,
@@ -193,7 +193,7 @@
     "skin-laceration": {
       "conditionId": "skin-laceration",
       "provenance": "tierA-nasa",
-      "source_ref": "research/imm_sources/methods/M18_myers_2018_imm_validation.md#skin-laceration; rev3-e (2026-05-22): treated.fi_cp3 = untreated.fi_cp3 = 0 \u2014 condition fully resolves over 180d analog/LEO timeframe regardless of treatment (clinically defensible per K15 \u00a7II.A.5 'permanent impairment for remainder of mission' definition: acute self-limiting condition leaves no persistent impairment)",
+      "source_ref": "research/imm_sources/methods/M18_myers_2018_imm_validation.md#skin-laceration; rev3-e (2026-05-22): treated.fi_cp3 = untreated.fi_cp3 = 0 — condition fully resolves over 180d analog/LEO timeframe regardless of treatment (clinically defensible per K15 §II.A.5 'permanent impairment for remainder of mission' definition: acute self-limiting condition leaves no persistent impairment)",
       "incidence": {
         "distribution": "Gamma-Poisson",
         "alpha": 2,
@@ -287,7 +287,7 @@
     "skin-abrasion": {
       "conditionId": "skin-abrasion",
       "provenance": "tierA-nasa",
-      "source_ref": "research/imm_sources/methods/M18_myers_2018_imm_validation.md#skin-abrasion; rev3-e (2026-05-22): treated.fi_cp3 = untreated.fi_cp3 = 0 \u2014 condition fully resolves over 180d analog/LEO timeframe regardless of treatment (clinically defensible per K15 \u00a7II.A.5 'permanent impairment for remainder of mission' definition: acute self-limiting condition leaves no persistent impairment)",
+      "source_ref": "research/imm_sources/methods/M18_myers_2018_imm_validation.md#skin-abrasion; rev3-e (2026-05-22): treated.fi_cp3 = untreated.fi_cp3 = 0 — condition fully resolves over 180d analog/LEO timeframe regardless of treatment (clinically defensible per K15 §II.A.5 'permanent impairment for remainder of mission' definition: acute self-limiting condition leaves no persistent impairment)",
       "incidence": {
         "distribution": "Gamma-Poisson",
         "alpha": 2,
@@ -381,7 +381,7 @@
     "headache-co2-induced": {
       "conditionId": "headache-co2-induced",
       "provenance": "tierA-nasa",
-      "source_ref": "research/imm_sources/methods/M18_myers_2018_imm_validation.md#headache-co2-induced; Whitmire 2015 WOTR15 (65% crewmembers / 6mo mission with CO2-related headache complaint, supports current tier-A rate); rev3-e (2026-05-22): treated.fi_cp3 = untreated.fi_cp3 = 0 \u2014 condition fully resolves over 180d analog/LEO timeframe regardless of treatment (clinically defensible per K15 \u00a7II.A.5 'permanent impairment for remainder of mission' definition: acute self-limiting condition leaves no persistent impairment)",
+      "source_ref": "research/imm_sources/methods/M18_myers_2018_imm_validation.md#headache-co2-induced; Whitmire 2015 WOTR15 (65% crewmembers / 6mo mission with CO2-related headache complaint, supports current tier-A rate); rev3-e (2026-05-22): treated.fi_cp3 = untreated.fi_cp3 = 0 — condition fully resolves over 180d analog/LEO timeframe regardless of treatment (clinically defensible per K15 §II.A.5 'permanent impairment for remainder of mission' definition: acute self-limiting condition leaves no persistent impairment)",
       "incidence": {
         "distribution": "Gamma-Poisson",
         "alpha": 2,
@@ -475,7 +475,7 @@
     "ankle-sprain-strain": {
       "conditionId": "ankle-sprain-strain",
       "provenance": "tierA-nasa",
-      "source_ref": "research/imm_sources/methods/M18_myers_2018_imm_validation.md#ankle-sprain-strain; rev3-e (2026-05-22): treated.fi_cp3 = untreated.fi_cp3 = 0 \u2014 condition fully resolves over 180d analog/LEO timeframe regardless of treatment (clinically defensible per K15 \u00a7II.A.5 'permanent impairment for remainder of mission' definition: acute self-limiting condition leaves no persistent impairment)",
+      "source_ref": "research/imm_sources/methods/M18_myers_2018_imm_validation.md#ankle-sprain-strain; rev3-e (2026-05-22): treated.fi_cp3 = untreated.fi_cp3 = 0 — condition fully resolves over 180d analog/LEO timeframe regardless of treatment (clinically defensible per K15 §II.A.5 'permanent impairment for remainder of mission' definition: acute self-limiting condition leaves no persistent impairment)",
       "incidence": {
         "distribution": "Gamma-Poisson",
         "alpha": 2,
@@ -569,7 +569,7 @@
     "diarrhea": {
       "conditionId": "diarrhea",
       "provenance": "tierA-nasa",
-      "source_ref": "research/imm_sources/methods/M18_myers_2018_imm_validation.md#diarrhea; rev3-e (2026-05-22): treated.fi_cp3 = untreated.fi_cp3 = 0 \u2014 condition fully resolves over 180d analog/LEO timeframe regardless of treatment (clinically defensible per K15 \u00a7II.A.5 'permanent impairment for remainder of mission' definition: acute self-limiting condition leaves no persistent impairment)",
+      "source_ref": "research/imm_sources/methods/M18_myers_2018_imm_validation.md#diarrhea; rev3-e (2026-05-22): treated.fi_cp3 = untreated.fi_cp3 = 0 — condition fully resolves over 180d analog/LEO timeframe regardless of treatment (clinically defensible per K15 §II.A.5 'permanent impairment for remainder of mission' definition: acute self-limiting condition leaves no persistent impairment)",
       "incidence": {
         "distribution": "Gamma-Poisson",
         "alpha": 2,
@@ -663,7 +663,7 @@
     "eye-abrasion-foreign-body": {
       "conditionId": "eye-abrasion-foreign-body",
       "provenance": "tierA-nasa",
-      "source_ref": "research/imm_sources/methods/M18_myers_2018_imm_validation.md#eye-abrasion-foreign-body; rev3-e (2026-05-22): treated.fi_cp3 = untreated.fi_cp3 = 0 \u2014 condition fully resolves over 180d analog/LEO timeframe regardless of treatment (clinically defensible per K15 \u00a7II.A.5 'permanent impairment for remainder of mission' definition: acute self-limiting condition leaves no persistent impairment)",
+      "source_ref": "research/imm_sources/methods/M18_myers_2018_imm_validation.md#eye-abrasion-foreign-body; rev3-e (2026-05-22): treated.fi_cp3 = untreated.fi_cp3 = 0 — condition fully resolves over 180d analog/LEO timeframe regardless of treatment (clinically defensible per K15 §II.A.5 'permanent impairment for remainder of mission' definition: acute self-limiting condition leaves no persistent impairment)",
       "incidence": {
         "distribution": "Gamma-Poisson",
         "alpha": 2,
@@ -757,7 +757,7 @@
     "acute-cholecystitis-biliary-colic": {
       "conditionId": "acute-cholecystitis-biliary-colic",
       "provenance": "tierA-nasa",
-      "source_ref": "research/imm_sources/methods/G12_gilkey_2012_bayesian_imm.md#acute-cholecystitis-biliary-colic; rev3-e (2026-05-22): treated.fi_cp3 = untreated.fi_cp3 = 0 \u2014 condition fully resolves over 180d analog/LEO timeframe regardless of treatment (clinically defensible per K15 \u00a7II.A.5 'permanent impairment for remainder of mission' definition: acute self-limiting condition leaves no persistent impairment)",
+      "source_ref": "research/imm_sources/methods/G12_gilkey_2012_bayesian_imm.md#acute-cholecystitis-biliary-colic; rev3-e (2026-05-22): treated.fi_cp3 = untreated.fi_cp3 = 0 — condition fully resolves over 180d analog/LEO timeframe regardless of treatment (clinically defensible per K15 §II.A.5 'permanent impairment for remainder of mission' definition: acute self-limiting condition leaves no persistent impairment)",
       "incidence": {
         "distribution": "Lognormal-Poisson",
         "mu_log_lambda": -8.5,
@@ -854,7 +854,7 @@
     "appendicitis": {
       "conditionId": "appendicitis",
       "provenance": "tierA-nasa",
-      "source_ref": "research/imm_sources/methods/G12_gilkey_2012_bayesian_imm.md#appendicitis; rev3-e (2026-05-22): treated.fi_cp3 = untreated.fi_cp3 = 0 \u2014 condition fully resolves over 180d analog/LEO timeframe regardless of treatment (clinically defensible per K15 \u00a7II.A.5 'permanent impairment for remainder of mission' definition: acute self-limiting condition leaves no persistent impairment)",
+      "source_ref": "research/imm_sources/methods/G12_gilkey_2012_bayesian_imm.md#appendicitis; rev3-e (2026-05-22): treated.fi_cp3 = untreated.fi_cp3 = 0 — condition fully resolves over 180d analog/LEO timeframe regardless of treatment (clinically defensible per K15 §II.A.5 'permanent impairment for remainder of mission' definition: acute self-limiting condition leaves no persistent impairment)",
       "incidence": {
         "distribution": "Lognormal-Poisson",
         "mu_log_lambda": -12.8815,
@@ -1048,7 +1048,7 @@
     "nephrolithiasis": {
       "conditionId": "nephrolithiasis",
       "provenance": "tierA-nasa",
-      "source_ref": "research/imm_sources/methods/G12_gilkey_2012_bayesian_imm.md#nephrolithiasis; research/imm_sources/validation/S20_walton_kerstman_2020_iss_quantification.md#nephrolithiasis; rev3-e (2026-05-22): treated.fi_cp3 = untreated.fi_cp3 = 0 \u2014 condition fully resolves over 180d analog/LEO timeframe regardless of treatment (clinically defensible per K15 \u00a7II.A.5 'permanent impairment for remainder of mission' definition: acute self-limiting condition leaves no persistent impairment)",
+      "source_ref": "research/imm_sources/methods/G12_gilkey_2012_bayesian_imm.md#nephrolithiasis; research/imm_sources/validation/S20_walton_kerstman_2020_iss_quantification.md#nephrolithiasis; rev3-e (2026-05-22): treated.fi_cp3 = untreated.fi_cp3 = 0 — condition fully resolves over 180d analog/LEO timeframe regardless of treatment (clinically defensible per K15 §II.A.5 'permanent impairment for remainder of mission' definition: acute self-limiting condition leaves no persistent impairment)",
       "incidence": {
         "distribution": "Lognormal-Poisson",
         "mu_log_lambda": -11.5,
@@ -1239,7 +1239,7 @@
     "herpes-zoster-reactivation-shingles": {
       "conditionId": "herpes-zoster-reactivation-shingles",
       "provenance": "tierA-nasa",
-      "source_ref": "research/imm_sources/zotero_imm/antonsen-2021-comparison-of-health-and-performance.md#table-4; rev3-e (2026-05-22): treated.fi_cp3 = untreated.fi_cp3 = 0 \u2014 condition fully resolves over 180d analog/LEO timeframe regardless of treatment (clinically defensible per K15 \u00a7II.A.5 'permanent impairment for remainder of mission' definition: acute self-limiting condition leaves no persistent impairment)",
+      "source_ref": "research/imm_sources/zotero_imm/antonsen-2021-comparison-of-health-and-performance.md#table-4; rev3-e (2026-05-22): treated.fi_cp3 = untreated.fi_cp3 = 0 — condition fully resolves over 180d analog/LEO timeframe regardless of treatment (clinically defensible per K15 §II.A.5 'permanent impairment for remainder of mission' definition: acute self-limiting condition leaves no persistent impairment)",
       "incidence": {
         "distribution": "Gamma-Poisson",
         "alpha": 2,
@@ -1332,7 +1332,7 @@
     "dental-abscess": {
       "conditionId": "dental-abscess",
       "provenance": "tierA-nasa",
-      "source_ref": "research/imm_sources/zotero_imm/antonsen-2021-comparison-of-health-and-performance.md#table-4; research/imm_sources/methods/G12_gilkey_2012_bayesian_imm.md#table-22 (Bayesian-updated dental abscess submarine + LSAH posterior; tier-A confirmation); rev3-e (2026-05-22): treated.fi_cp3 = untreated.fi_cp3 = 0 \u2014 condition fully resolves over 180d analog/LEO timeframe regardless of treatment (clinically defensible per K15 \u00a7II.A.5 'permanent impairment for remainder of mission' definition: acute self-limiting condition leaves no persistent impairment)",
+      "source_ref": "research/imm_sources/zotero_imm/antonsen-2021-comparison-of-health-and-performance.md#table-4; research/imm_sources/methods/G12_gilkey_2012_bayesian_imm.md#table-22 (Bayesian-updated dental abscess submarine + LSAH posterior; tier-A confirmation); rev3-e (2026-05-22): treated.fi_cp3 = untreated.fi_cp3 = 0 — condition fully resolves over 180d analog/LEO timeframe regardless of treatment (clinically defensible per K15 §II.A.5 'permanent impairment for remainder of mission' definition: acute self-limiting condition leaves no persistent impairment)",
       "incidence": {
         "distribution": "Gamma-Poisson",
         "alpha": 2,
@@ -1426,7 +1426,7 @@
     "urinary-tract-infection": {
       "conditionId": "urinary-tract-infection",
       "provenance": "tierA-nasa",
-      "source_ref": "research/imm_sources/zotero_imm/antonsen-2021-comparison-of-health-and-performance.md#table-4; rev3-e (2026-05-22): treated.fi_cp3 = untreated.fi_cp3 = 0 \u2014 condition fully resolves over 180d analog/LEO timeframe regardless of treatment (clinically defensible per K15 \u00a7II.A.5 'permanent impairment for remainder of mission' definition: acute self-limiting condition leaves no persistent impairment)",
+      "source_ref": "research/imm_sources/zotero_imm/antonsen-2021-comparison-of-health-and-performance.md#table-4; rev3-e (2026-05-22): treated.fi_cp3 = untreated.fi_cp3 = 0 — condition fully resolves over 180d analog/LEO timeframe regardless of treatment (clinically defensible per K15 §II.A.5 'permanent impairment for remainder of mission' definition: acute self-limiting condition leaves no persistent impairment)",
       "incidence": {
         "distribution": "Gamma-Poisson",
         "alpha": 2,
@@ -1613,7 +1613,7 @@
     "eye-chemical-burn": {
       "conditionId": "eye-chemical-burn",
       "provenance": "tierA-nasa",
-      "source_ref": "research/imm_sources/zotero_imm/antonsen-2021-comparison-of-health-and-performance.md#table-4; rev3-e (2026-05-22): treated.fi_cp3 = untreated.fi_cp3 = 0 \u2014 condition fully resolves over 180d analog/LEO timeframe regardless of treatment (clinically defensible per K15 \u00a7II.A.5 'permanent impairment for remainder of mission' definition: acute self-limiting condition leaves no persistent impairment)",
+      "source_ref": "research/imm_sources/zotero_imm/antonsen-2021-comparison-of-health-and-performance.md#table-4; rev3-e (2026-05-22): treated.fi_cp3 = untreated.fi_cp3 = 0 — condition fully resolves over 180d analog/LEO timeframe regardless of treatment (clinically defensible per K15 §II.A.5 'permanent impairment for remainder of mission' definition: acute self-limiting condition leaves no persistent impairment)",
       "incidence": {
         "distribution": "Gamma-Poisson",
         "alpha": 2,
@@ -1803,7 +1803,7 @@
     "small-bowel-obstruction": {
       "conditionId": "small-bowel-obstruction",
       "provenance": "tierA-nasa",
-      "source_ref": "research/imm_sources/zotero_imm/antonsen-2021-comparison-of-health-and-performance.md#table-4; rev3-e (2026-05-22): treated.fi_cp3 = untreated.fi_cp3 = 0 \u2014 condition fully resolves over 180d analog/LEO timeframe regardless of treatment (clinically defensible per K15 \u00a7II.A.5 'permanent impairment for remainder of mission' definition: acute self-limiting condition leaves no persistent impairment)",
+      "source_ref": "research/imm_sources/zotero_imm/antonsen-2021-comparison-of-health-and-performance.md#table-4; rev3-e (2026-05-22): treated.fi_cp3 = untreated.fi_cp3 = 0 — condition fully resolves over 180d analog/LEO timeframe regardless of treatment (clinically defensible per K15 §II.A.5 'permanent impairment for remainder of mission' definition: acute self-limiting condition leaves no persistent impairment)",
       "incidence": {
         "distribution": "Gamma-Poisson",
         "alpha": 2,
@@ -1897,7 +1897,7 @@
     "wrist-fracture": {
       "conditionId": "wrist-fracture",
       "provenance": "tierA-nasa",
-      "source_ref": "research/imm_sources/zotero_imm/antonsen-2021-comparison-of-health-and-performance.md#table-4; rev3-e (2026-05-22): treated.fi_cp3 = untreated.fi_cp3 = 0 \u2014 condition fully resolves over 180d analog/LEO timeframe regardless of treatment (clinically defensible per K15 \u00a7II.A.5 'permanent impairment for remainder of mission' definition: acute self-limiting condition leaves no persistent impairment)",
+      "source_ref": "research/imm_sources/zotero_imm/antonsen-2021-comparison-of-health-and-performance.md#table-4; rev3-e (2026-05-22): treated.fi_cp3 = untreated.fi_cp3 = 0 — condition fully resolves over 180d analog/LEO timeframe regardless of treatment (clinically defensible per K15 §II.A.5 'permanent impairment for remainder of mission' definition: acute self-limiting condition leaves no persistent impairment)",
       "incidence": {
         "distribution": "Gamma-Poisson",
         "alpha": 2,
@@ -2181,7 +2181,7 @@
     "acute-diverticulitis": {
       "conditionId": "acute-diverticulitis",
       "provenance": "tierA-nasa",
-      "source_ref": "research/imm_sources/zotero_imm/antonsen-2021-comparison-of-health-and-performance.md#table-4; rev3-e (2026-05-22): treated.fi_cp3 = untreated.fi_cp3 = 0 \u2014 condition fully resolves over 180d analog/LEO timeframe regardless of treatment (clinically defensible per K15 \u00a7II.A.5 'permanent impairment for remainder of mission' definition: acute self-limiting condition leaves no persistent impairment)",
+      "source_ref": "research/imm_sources/zotero_imm/antonsen-2021-comparison-of-health-and-performance.md#table-4; rev3-e (2026-05-22): treated.fi_cp3 = untreated.fi_cp3 = 0 — condition fully resolves over 180d analog/LEO timeframe regardless of treatment (clinically defensible per K15 §II.A.5 'permanent impairment for remainder of mission' definition: acute self-limiting condition leaves no persistent impairment)",
       "incidence": {
         "distribution": "Gamma-Poisson",
         "alpha": 2,
@@ -2465,7 +2465,7 @@
     "medication-overdose-adverse-reaction": {
       "conditionId": "medication-overdose-adverse-reaction",
       "provenance": "tierA-nasa",
-      "source_ref": "research/imm_sources/zotero_imm/antonsen-2021-comparison-of-health-and-performance.md#table-4; rev3-e (2026-05-22): treated.fi_cp3 = untreated.fi_cp3 = 0 \u2014 condition fully resolves over 180d analog/LEO timeframe regardless of treatment (clinically defensible per K15 \u00a7II.A.5 'permanent impairment for remainder of mission' definition: acute self-limiting condition leaves no persistent impairment)",
+      "source_ref": "research/imm_sources/zotero_imm/antonsen-2021-comparison-of-health-and-performance.md#table-4; rev3-e (2026-05-22): treated.fi_cp3 = untreated.fi_cp3 = 0 — condition fully resolves over 180d analog/LEO timeframe regardless of treatment (clinically defensible per K15 §II.A.5 'permanent impairment for remainder of mission' definition: acute self-limiting condition leaves no persistent impairment)",
       "incidence": {
         "distribution": "Gamma-Poisson",
         "alpha": 2,
@@ -2938,7 +2938,7 @@
     "chest-injury": {
       "conditionId": "chest-injury",
       "provenance": "tierA-nasa",
-      "source_ref": "research/imm_sources/zotero_imm/antonsen-2021-comparison-of-health-and-performance.md#table-6; rev3-e (2026-05-22): treated.fi_cp3 = untreated.fi_cp3 = 0 \u2014 condition fully resolves over 180d analog/LEO timeframe regardless of treatment (clinically defensible per K15 \u00a7II.A.5 'permanent impairment for remainder of mission' definition: acute self-limiting condition leaves no persistent impairment)",
+      "source_ref": "research/imm_sources/zotero_imm/antonsen-2021-comparison-of-health-and-performance.md#table-6; rev3-e (2026-05-22): treated.fi_cp3 = untreated.fi_cp3 = 0 — condition fully resolves over 180d analog/LEO timeframe regardless of treatment (clinically defensible per K15 §II.A.5 'permanent impairment for remainder of mission' definition: acute self-limiting condition leaves no persistent impairment)",
       "incidence": {
         "distribution": "Gamma-Poisson",
         "alpha": 2,
@@ -3128,7 +3128,7 @@
     "skin-infection": {
       "conditionId": "skin-infection",
       "provenance": "tierA-nasa",
-      "source_ref": "research/imm_sources/zotero_imm/antonsen-2021-comparison-of-health-and-performance.md#table-4; rev3-e (2026-05-22): treated.fi_cp3 = untreated.fi_cp3 = 0 \u2014 condition fully resolves over 180d analog/LEO timeframe regardless of treatment (clinically defensible per K15 \u00a7II.A.5 'permanent impairment for remainder of mission' definition: acute self-limiting condition leaves no persistent impairment)",
+      "source_ref": "research/imm_sources/zotero_imm/antonsen-2021-comparison-of-health-and-performance.md#table-4; rev3-e (2026-05-22): treated.fi_cp3 = untreated.fi_cp3 = 0 — condition fully resolves over 180d analog/LEO timeframe regardless of treatment (clinically defensible per K15 §II.A.5 'permanent impairment for remainder of mission' definition: acute self-limiting condition leaves no persistent impairment)",
       "incidence": {
         "distribution": "Gamma-Poisson",
         "alpha": 2,
@@ -3316,7 +3316,7 @@
     "anxiety": {
       "conditionId": "anxiety",
       "provenance": "tierA-nasa",
-      "source_ref": "research/imm_sources/validation/S20_walton_kerstman_2020_iss_quantification.md#anxiety; rev3-e (2026-05-22): treated.fi_cp3 = untreated.fi_cp3 = 0 \u2014 condition fully resolves over 180d analog/LEO timeframe regardless of treatment (clinically defensible per K15 \u00a7II.A.5 'permanent impairment for remainder of mission' definition: acute self-limiting condition leaves no persistent impairment)",
+      "source_ref": "research/imm_sources/validation/S20_walton_kerstman_2020_iss_quantification.md#anxiety; rev3-e (2026-05-22): treated.fi_cp3 = untreated.fi_cp3 = 0 — condition fully resolves over 180d analog/LEO timeframe regardless of treatment (clinically defensible per K15 §II.A.5 'permanent impairment for remainder of mission' definition: acute self-limiting condition leaves no persistent impairment)",
       "incidence": {
         "distribution": "Gamma-Poisson",
         "alpha": 2,
@@ -3409,7 +3409,7 @@
     "indigestion": {
       "conditionId": "indigestion",
       "provenance": "tierA-nasa",
-      "source_ref": "research/imm_sources/validation/S20_walton_kerstman_2020_iss_quantification.md#indigestion; rev3-e (2026-05-22): treated.fi_cp3 = untreated.fi_cp3 = 0 \u2014 condition fully resolves over 180d analog/LEO timeframe regardless of treatment (clinically defensible per K15 \u00a7II.A.5 'permanent impairment for remainder of mission' definition: acute self-limiting condition leaves no persistent impairment)",
+      "source_ref": "research/imm_sources/validation/S20_walton_kerstman_2020_iss_quantification.md#indigestion; rev3-e (2026-05-22): treated.fi_cp3 = untreated.fi_cp3 = 0 — condition fully resolves over 180d analog/LEO timeframe regardless of treatment (clinically defensible per K15 §II.A.5 'permanent impairment for remainder of mission' definition: acute self-limiting condition leaves no persistent impairment)",
       "incidence": {
         "distribution": "Gamma-Poisson",
         "alpha": 2,
@@ -3502,7 +3502,7 @@
     "allergic-reaction-mild-to-moderate": {
       "conditionId": "allergic-reaction-mild-to-moderate",
       "provenance": "tierA-nasa",
-      "source_ref": "research/imm_sources/validation/S20_walton_kerstman_2020_iss_quantification.md#allergic-reaction; rev3-e (2026-05-22): treated.fi_cp3 = untreated.fi_cp3 = 0 \u2014 condition fully resolves over 180d analog/LEO timeframe regardless of treatment (clinically defensible per K15 \u00a7II.A.5 'permanent impairment for remainder of mission' definition: acute self-limiting condition leaves no persistent impairment)",
+      "source_ref": "research/imm_sources/validation/S20_walton_kerstman_2020_iss_quantification.md#allergic-reaction; rev3-e (2026-05-22): treated.fi_cp3 = untreated.fi_cp3 = 0 — condition fully resolves over 180d analog/LEO timeframe regardless of treatment (clinically defensible per K15 §II.A.5 'permanent impairment for remainder of mission' definition: acute self-limiting condition leaves no persistent impairment)",
       "incidence": {
         "distribution": "Gamma-Poisson",
         "alpha": 2,
@@ -3596,7 +3596,7 @@
     "late-insomnia": {
       "conditionId": "late-insomnia",
       "provenance": "tierA-nasa",
-      "source_ref": "research/imm_sources/validation/S20_walton_kerstman_2020_iss_quantification.md#late-insomnia; research/imm_sources/methods/M18_myers_2018_imm_validation.md#late-insomnia; enriched 2026-05-22 with Basner 2014 Mars-500 (1/6 crew chronic insomnia over 520d = 0.117 events/py), Fedyay 2023 SIRIUS-21 sleep-disturbance prevalence, Whitmire 2015 WOTR15 ISS sleep-aid use 45-50% of crewmembers; see research/_priors_rev3c_synthesis.md#2.2; rev3-e (2026-05-22): treated.fi_cp3 = untreated.fi_cp3 = 0 \u2014 condition fully resolves over 180d analog/LEO timeframe regardless of treatment (clinically defensible per K15 \u00a7II.A.5 'permanent impairment for remainder of mission' definition: acute self-limiting condition leaves no persistent impairment)",
+      "source_ref": "research/imm_sources/validation/S20_walton_kerstman_2020_iss_quantification.md#late-insomnia; research/imm_sources/methods/M18_myers_2018_imm_validation.md#late-insomnia; enriched 2026-05-22 with Basner 2014 Mars-500 (1/6 crew chronic insomnia over 520d = 0.117 events/py), Fedyay 2023 SIRIUS-21 sleep-disturbance prevalence, Whitmire 2015 WOTR15 ISS sleep-aid use 45-50% of crewmembers; see research/_priors_rev3c_synthesis.md#2.2; rev3-e (2026-05-22): treated.fi_cp3 = untreated.fi_cp3 = 0 — condition fully resolves over 180d analog/LEO timeframe regardless of treatment (clinically defensible per K15 §II.A.5 'permanent impairment for remainder of mission' definition: acute self-limiting condition leaves no persistent impairment)",
       "incidence": {
         "distribution": "Gamma-Poisson",
         "alpha": 2.0,
@@ -3783,11 +3783,11 @@
     "back-pain-space-adaptation": {
       "conditionId": "back-pain-space-adaptation",
       "provenance": "tierB-lit",
-      "source_ref": "research/evidence/pagel-chouker-2016-effects-isolation-confinement.md; rev3-c note: KERS12 (n=772 flights, 52% SABP / 6mo) is the CHRONIC SABP rate, mechanistically distinct from the acute first-10-days space-adaptation window this prior models. The two are NOT the same condition; do not conflate.; rev3-e (2026-05-22): treated.fi_cp3 = untreated.fi_cp3 = 0 \u2014 condition fully resolves over 180d analog/LEO timeframe regardless of treatment (clinically defensible per K15 \u00a7II.A.5 'permanent impairment for remainder of mission' definition: acute self-limiting condition leaves no persistent impairment)",
+      "source_ref": "research/evidence/pagel-chouker-2016-effects-isolation-confinement.md; rev3-c note: KERS12 (n=772 flights, 52% SABP / 6mo) is the CHRONIC SABP rate, mechanistically distinct from the acute first-10-days space-adaptation window this prior models. The two are NOT the same condition; do not conflate.; rev3-e (2026-05-22): treated.fi_cp3 = untreated.fi_cp3 = 0 — condition fully resolves over 180d analog/LEO timeframe regardless of treatment (clinically defensible per K15 §II.A.5 'permanent impairment for remainder of mission' definition: acute self-limiting condition leaves no persistent impairment); p-f (2026-05-25): converted Beta-Bernoulli(α=7,β=3) → Gamma-Poisson(α=2,β=19859) using terrestrial incidence rates",
       "incidence": {
-        "distribution": "Beta-Bernoulli",
-        "alpha": 7,
-        "beta": 3,
+        "distribution": "Gamma-Poisson",
+        "alpha": 2,
+        "beta": 19859,
         "lambda_unit": "events-per-person-day"
       },
       "severity": {
@@ -3876,11 +3876,11 @@
     "constipation-space-adaptation": {
       "conditionId": "constipation-space-adaptation",
       "provenance": "tierB-lit",
-      "source_ref": "research/evidence/shved-2022-isolation-crowding-countermeasures.md; rev3-e (2026-05-22): treated.fi_cp3 = untreated.fi_cp3 = 0 \u2014 condition fully resolves over 180d analog/LEO timeframe regardless of treatment (clinically defensible per K15 \u00a7II.A.5 'permanent impairment for remainder of mission' definition: acute self-limiting condition leaves no persistent impairment)",
+      "source_ref": "research/evidence/shved-2022-isolation-crowding-countermeasures.md; rev3-e (2026-05-22): treated.fi_cp3 = untreated.fi_cp3 = 0 — condition fully resolves over 180d analog/LEO timeframe regardless of treatment (clinically defensible per K15 §II.A.5 'permanent impairment for remainder of mission' definition: acute self-limiting condition leaves no persistent impairment); p-f (2026-05-25): converted Beta-Bernoulli(α=5,β=5) → Gamma-Poisson(α=2,β=50000) using terrestrial incidence rates",
       "incidence": {
-        "distribution": "Beta-Bernoulli",
-        "alpha": 5,
-        "beta": 5,
+        "distribution": "Gamma-Poisson",
+        "alpha": 2,
+        "beta": 50000,
         "lambda_unit": "events-per-person-day"
       },
       "severity": {
@@ -3969,11 +3969,11 @@
     "headache-space-adaptation": {
       "conditionId": "headache-space-adaptation",
       "provenance": "tierB-lit",
-      "source_ref": "research/evidence/pagel-chouker-2016-effects-isolation-confinement.md; rev3-e (2026-05-22): treated.fi_cp3 = untreated.fi_cp3 = 0 \u2014 condition fully resolves over 180d analog/LEO timeframe regardless of treatment (clinically defensible per K15 \u00a7II.A.5 'permanent impairment for remainder of mission' definition: acute self-limiting condition leaves no persistent impairment)",
+      "source_ref": "research/evidence/pagel-chouker-2016-effects-isolation-confinement.md; rev3-e (2026-05-22): treated.fi_cp3 = untreated.fi_cp3 = 0 — condition fully resolves over 180d analog/LEO timeframe regardless of treatment (clinically defensible per K15 §II.A.5 'permanent impairment for remainder of mission' definition: acute self-limiting condition leaves no persistent impairment); p-f (2026-05-25): converted Beta-Bernoulli(α=6,β=4) → Gamma-Poisson(α=2,β=51408) using terrestrial incidence rates",
       "incidence": {
-        "distribution": "Beta-Bernoulli",
-        "alpha": 6,
-        "beta": 4,
+        "distribution": "Gamma-Poisson",
+        "alpha": 2,
+        "beta": 51408,
         "lambda_unit": "events-per-person-day"
       },
       "severity": {
@@ -4062,11 +4062,11 @@
     "insomnia-space-adaptation": {
       "conditionId": "insomnia-space-adaptation",
       "provenance": "tierB-lit",
-      "source_ref": "research/evidence/palinkas-2004-antarctic-psychiatric-disorders.md; rev3-e (2026-05-22): treated.fi_cp3 = untreated.fi_cp3 = 0 \u2014 condition fully resolves over 180d analog/LEO timeframe regardless of treatment (clinically defensible per K15 \u00a7II.A.5 'permanent impairment for remainder of mission' definition: acute self-limiting condition leaves no persistent impairment)",
+      "source_ref": "research/evidence/palinkas-2004-antarctic-psychiatric-disorders.md; rev3-e (2026-05-22): treated.fi_cp3 = untreated.fi_cp3 = 0 — condition fully resolves over 180d analog/LEO timeframe regardless of treatment (clinically defensible per K15 §II.A.5 'permanent impairment for remainder of mission' definition: acute self-limiting condition leaves no persistent impairment); p-f (2026-05-25): converted Beta-Bernoulli(α=7,β=3) → Gamma-Poisson(α=2,β=18718) using terrestrial incidence rates",
       "incidence": {
-        "distribution": "Beta-Bernoulli",
-        "alpha": 7,
-        "beta": 3,
+        "distribution": "Gamma-Poisson",
+        "alpha": 2,
+        "beta": 18718,
         "lambda_unit": "events-per-person-day"
       },
       "severity": {
@@ -4157,11 +4157,11 @@
     "nasal-congestion-space-adaptation": {
       "conditionId": "nasal-congestion-space-adaptation",
       "provenance": "tierB-lit",
-      "source_ref": "research/evidence/pagel-chouker-2016-effects-isolation-confinement.md; rev3-e (2026-05-22): treated.fi_cp3 = untreated.fi_cp3 = 0 \u2014 condition fully resolves over 180d analog/LEO timeframe regardless of treatment (clinically defensible per K15 \u00a7II.A.5 'permanent impairment for remainder of mission' definition: acute self-limiting condition leaves no persistent impairment)",
+      "source_ref": "research/evidence/pagel-chouker-2016-effects-isolation-confinement.md; rev3-e (2026-05-22): treated.fi_cp3 = untreated.fi_cp3 = 0 — condition fully resolves over 180d analog/LEO timeframe regardless of treatment (clinically defensible per K15 §II.A.5 'permanent impairment for remainder of mission' definition: acute self-limiting condition leaves no persistent impairment); p-f (2026-05-25): converted Beta-Bernoulli(α=8,β=2) → Gamma-Poisson(α=2,β=29200) using terrestrial incidence rates",
       "incidence": {
-        "distribution": "Beta-Bernoulli",
-        "alpha": 8,
-        "beta": 2,
+        "distribution": "Gamma-Poisson",
+        "alpha": 2,
+        "beta": 29200,
         "lambda_unit": "events-per-person-day"
       },
       "severity": {
@@ -4250,11 +4250,11 @@
     "nose-bleed-space-adaptation": {
       "conditionId": "nose-bleed-space-adaptation",
       "provenance": "tierB-lit",
-      "source_ref": "research/evidence/pagel-chouker-2016-effects-isolation-confinement.md; rev3-e (2026-05-22): treated.fi_cp3 = untreated.fi_cp3 = 0 \u2014 condition fully resolves over 180d analog/LEO timeframe regardless of treatment (clinically defensible per K15 \u00a7II.A.5 'permanent impairment for remainder of mission' definition: acute self-limiting condition leaves no persistent impairment)",
+      "source_ref": "research/evidence/pagel-chouker-2016-effects-isolation-confinement.md; rev3-e (2026-05-22): treated.fi_cp3 = untreated.fi_cp3 = 0 — condition fully resolves over 180d analog/LEO timeframe regardless of treatment (clinically defensible per K15 §II.A.5 'permanent impairment for remainder of mission' definition: acute self-limiting condition leaves no persistent impairment); p-f (2026-05-25): converted Beta-Bernoulli(α=4,β=6) → Gamma-Poisson(α=2,β=429412) using terrestrial incidence rates",
       "incidence": {
-        "distribution": "Beta-Bernoulli",
-        "alpha": 4,
-        "beta": 6,
+        "distribution": "Gamma-Poisson",
+        "alpha": 2,
+        "beta": 429412,
         "lambda_unit": "events-per-person-day"
       },
       "severity": {
@@ -4343,11 +4343,11 @@
     "space-motion-sickness-space-adaptation": {
       "conditionId": "space-motion-sickness-space-adaptation",
       "provenance": "tierB-lit",
-      "source_ref": "research/evidence/pagel-chouker-2016-effects-isolation-confinement.md; rev3-e (2026-05-22): treated.fi_cp3 = untreated.fi_cp3 = 0 \u2014 condition fully resolves over 180d analog/LEO timeframe regardless of treatment (clinically defensible per K15 \u00a7II.A.5 'permanent impairment for remainder of mission' definition: acute self-limiting condition leaves no persistent impairment)",
+      "source_ref": "research/evidence/pagel-chouker-2016-effects-isolation-confinement.md; rev3-e (2026-05-22): treated.fi_cp3 = untreated.fi_cp3 = 0 — condition fully resolves over 180d analog/LEO timeframe regardless of treatment (clinically defensible per K15 §II.A.5 'permanent impairment for remainder of mission' definition: acute self-limiting condition leaves no persistent impairment); p-f (2026-05-25): converted Beta-Bernoulli(α=7,β=3) → Gamma-Poisson(α=2,β=200000) using terrestrial incidence rates",
       "incidence": {
-        "distribution": "Beta-Bernoulli",
-        "alpha": 7,
-        "beta": 3,
+        "distribution": "Gamma-Poisson",
+        "alpha": 2,
+        "beta": 200000,
         "lambda_unit": "events-per-person-day"
       },
       "severity": {
@@ -4437,11 +4437,11 @@
     "urinary-incontinence-space-adaptation": {
       "conditionId": "urinary-incontinence-space-adaptation",
       "provenance": "tierB-lit",
-      "source_ref": "research/evidence/pagel-chouker-2016-effects-isolation-confinement.md; rev3-e (2026-05-22): treated.fi_cp3 = untreated.fi_cp3 = 0 \u2014 condition fully resolves over 180d analog/LEO timeframe regardless of treatment (clinically defensible per K15 \u00a7II.A.5 'permanent impairment for remainder of mission' definition: acute self-limiting condition leaves no persistent impairment)",
+      "source_ref": "research/evidence/pagel-chouker-2016-effects-isolation-confinement.md; rev3-e (2026-05-22): treated.fi_cp3 = untreated.fi_cp3 = 0 — condition fully resolves over 180d analog/LEO timeframe regardless of treatment (clinically defensible per K15 §II.A.5 'permanent impairment for remainder of mission' definition: acute self-limiting condition leaves no persistent impairment); p-f (2026-05-25): converted Beta-Bernoulli(α=3,β=7) → Gamma-Poisson(α=2,β=394595) using terrestrial incidence rates",
       "incidence": {
-        "distribution": "Beta-Bernoulli",
-        "alpha": 3,
-        "beta": 7,
+        "distribution": "Gamma-Poisson",
+        "alpha": 2,
+        "beta": 394595,
         "lambda_unit": "events-per-person-day"
       },
       "severity": {
@@ -4532,11 +4532,11 @@
     "urinary-retention-space-adaptation": {
       "conditionId": "urinary-retention-space-adaptation",
       "provenance": "tierB-lit",
-      "source_ref": "research/evidence/pagel-chouker-2016-effects-isolation-confinement.md; rev3-e (2026-05-22): treated.fi_cp3 = untreated.fi_cp3 = 0 \u2014 condition fully resolves over 180d analog/LEO timeframe regardless of treatment (clinically defensible per K15 \u00a7II.A.5 'permanent impairment for remainder of mission' definition: acute self-limiting condition leaves no persistent impairment)",
+      "source_ref": "research/evidence/pagel-chouker-2016-effects-isolation-confinement.md; rev3-e (2026-05-22): treated.fi_cp3 = untreated.fi_cp3 = 0 — condition fully resolves over 180d analog/LEO timeframe regardless of treatment (clinically defensible per K15 §II.A.5 'permanent impairment for remainder of mission' definition: acute self-limiting condition leaves no persistent impairment); p-f (2026-05-25): converted Beta-Bernoulli(α=2,β=8) → Gamma-Poisson(α=2,β=1460000) using terrestrial incidence rates",
       "incidence": {
-        "distribution": "Beta-Bernoulli",
+        "distribution": "Gamma-Poisson",
         "alpha": 2,
-        "beta": 8,
+        "beta": 1460000,
         "lambda_unit": "events-per-person-day"
       },
       "severity": {
@@ -4627,7 +4627,7 @@
     "depression": {
       "conditionId": "depression",
       "provenance": "tierB-lit",
-      "source_ref": "research/evidence/palinkas-2004-antarctic-psychiatric-disorders.md; research/evidence/palinkas-2004-antarctic-psychiatric-disorders.md (5.2%/winter weighted = 1.93e-4/day); Hong 2022 (8.0%/winter, Korean Antarctic); Bhatia 2012 (3 psychiatric / 26 py Maitri = 3.16e-4/day); see research/_priors_rev3c_synthesis.md#2.3; rev3-e (2026-05-22): treated.fi_cp3 = untreated.fi_cp3 = 0 \u2014 condition fully resolves over 180d analog/LEO timeframe regardless of treatment (clinically defensible per K15 \u00a7II.A.5 'permanent impairment for remainder of mission' definition: acute self-limiting condition leaves no persistent impairment)",
+      "source_ref": "research/evidence/palinkas-2004-antarctic-psychiatric-disorders.md; research/evidence/palinkas-2004-antarctic-psychiatric-disorders.md (5.2%/winter weighted = 1.93e-4/day); Hong 2022 (8.0%/winter, Korean Antarctic); Bhatia 2012 (3 psychiatric / 26 py Maitri = 3.16e-4/day); see research/_priors_rev3c_synthesis.md#2.3; rev3-e (2026-05-22): treated.fi_cp3 = untreated.fi_cp3 = 0 — condition fully resolves over 180d analog/LEO timeframe regardless of treatment (clinically defensible per K15 §II.A.5 'permanent impairment for remainder of mission' definition: acute self-limiting condition leaves no persistent impairment)",
       "incidence": {
         "distribution": "Gamma-Poisson",
         "alpha": 2.0,
@@ -4723,7 +4723,7 @@
     "gastroenteritis": {
       "conditionId": "gastroenteritis",
       "provenance": "tierB-lit",
-      "source_ref": "research/evidence/ponomarev-2021-immunological-aspects-isolation-confinement.md; rev3-e (2026-05-22): treated.fi_cp3 = untreated.fi_cp3 = 0 \u2014 condition fully resolves over 180d analog/LEO timeframe regardless of treatment (clinically defensible per K15 \u00a7II.A.5 'permanent impairment for remainder of mission' definition: acute self-limiting condition leaves no persistent impairment)",
+      "source_ref": "research/evidence/ponomarev-2021-immunological-aspects-isolation-confinement.md; rev3-e (2026-05-22): treated.fi_cp3 = untreated.fi_cp3 = 0 — condition fully resolves over 180d analog/LEO timeframe regardless of treatment (clinically defensible per K15 §II.A.5 'permanent impairment for remainder of mission' definition: acute self-limiting condition leaves no persistent impairment)",
       "incidence": {
         "distribution": "Gamma-Poisson",
         "alpha": 2,
@@ -4817,7 +4817,7 @@
     "respiratory-infection": {
       "conditionId": "respiratory-infection",
       "provenance": "tierB-lit",
-      "source_ref": "research/evidence/ponomarev-2021-immunological-aspects-isolation-confinement.md; Bhatia 2012 Maitri Antarctic (9.7% URTI \u00d7 3.58 events/py / 365 = 9.5e-4/day, small-crew analog); Pattarini 2016 McMurdo (large-crew 'polar T-zone' upper bound 1.7e-3/day); 1.43e-3/day = small-crew anchor midpoint; see research/_priors_rev3c_synthesis.md#2.4; rev3-e (2026-05-22): treated.fi_cp3 = untreated.fi_cp3 = 0 \u2014 condition fully resolves over 180d analog/LEO timeframe regardless of treatment (clinically defensible per K15 \u00a7II.A.5 'permanent impairment for remainder of mission' definition: acute self-limiting condition leaves no persistent impairment)",
+      "source_ref": "research/evidence/ponomarev-2021-immunological-aspects-isolation-confinement.md; Bhatia 2012 Maitri Antarctic (9.7% URTI × 3.58 events/py / 365 = 9.5e-4/day, small-crew analog); Pattarini 2016 McMurdo (large-crew 'polar T-zone' upper bound 1.7e-3/day); 1.43e-3/day = small-crew anchor midpoint; see research/_priors_rev3c_synthesis.md#2.4; rev3-e (2026-05-22): treated.fi_cp3 = untreated.fi_cp3 = 0 — condition fully resolves over 180d analog/LEO timeframe regardless of treatment (clinically defensible per K15 §II.A.5 'permanent impairment for remainder of mission' definition: acute self-limiting condition leaves no persistent impairment)",
       "incidence": {
         "distribution": "Gamma-Poisson",
         "alpha": 2.0,
@@ -4911,7 +4911,7 @@
     "pharyngitis": {
       "conditionId": "pharyngitis",
       "provenance": "tierB-lit",
-      "source_ref": "research/evidence/ponomarev-2021-immunological-aspects-isolation-confinement.md; rev3-e (2026-05-22): treated.fi_cp3 = untreated.fi_cp3 = 0 \u2014 condition fully resolves over 180d analog/LEO timeframe regardless of treatment (clinically defensible per K15 \u00a7II.A.5 'permanent impairment for remainder of mission' definition: acute self-limiting condition leaves no persistent impairment)",
+      "source_ref": "research/evidence/ponomarev-2021-immunological-aspects-isolation-confinement.md; rev3-e (2026-05-22): treated.fi_cp3 = untreated.fi_cp3 = 0 — condition fully resolves over 180d analog/LEO timeframe regardless of treatment (clinically defensible per K15 §II.A.5 'permanent impairment for remainder of mission' definition: acute self-limiting condition leaves no persistent impairment)",
       "incidence": {
         "distribution": "Gamma-Poisson",
         "alpha": 2,
@@ -5005,7 +5005,7 @@
     "otitis-externa": {
       "conditionId": "otitis-externa",
       "provenance": "tierB-lit",
-      "source_ref": "research/evidence/malpica-2024-thor-isolation-confinement-responses.md; rev3-e (2026-05-22): treated.fi_cp3 = untreated.fi_cp3 = 0 \u2014 condition fully resolves over 180d analog/LEO timeframe regardless of treatment (clinically defensible per K15 \u00a7II.A.5 'permanent impairment for remainder of mission' definition: acute self-limiting condition leaves no persistent impairment)",
+      "source_ref": "research/evidence/malpica-2024-thor-isolation-confinement-responses.md; rev3-e (2026-05-22): treated.fi_cp3 = untreated.fi_cp3 = 0 — condition fully resolves over 180d analog/LEO timeframe regardless of treatment (clinically defensible per K15 §II.A.5 'permanent impairment for remainder of mission' definition: acute self-limiting condition leaves no persistent impairment)",
       "incidence": {
         "distribution": "Gamma-Poisson",
         "alpha": 2,
@@ -5098,7 +5098,7 @@
     "otitis-media": {
       "conditionId": "otitis-media",
       "provenance": "tierB-lit",
-      "source_ref": "research/evidence/malpica-2024-thor-isolation-confinement-responses.md; rev3-e (2026-05-22): treated.fi_cp3 = untreated.fi_cp3 = 0 \u2014 condition fully resolves over 180d analog/LEO timeframe regardless of treatment (clinically defensible per K15 \u00a7II.A.5 'permanent impairment for remainder of mission' definition: acute self-limiting condition leaves no persistent impairment)",
+      "source_ref": "research/evidence/malpica-2024-thor-isolation-confinement-responses.md; rev3-e (2026-05-22): treated.fi_cp3 = untreated.fi_cp3 = 0 — condition fully resolves over 180d analog/LEO timeframe regardless of treatment (clinically defensible per K15 §II.A.5 'permanent impairment for remainder of mission' definition: acute self-limiting condition leaves no persistent impairment)",
       "incidence": {
         "distribution": "Gamma-Poisson",
         "alpha": 2,
@@ -5192,7 +5192,7 @@
     "skin-rash": {
       "conditionId": "skin-rash",
       "provenance": "tierB-lit",
-      "source_ref": "research/evidence/ponomarev-2021-immunological-aspects-isolation-confinement.md; Pattarini 2016 McMurdo (dermatologic 14% \u00d7 3.58/py / 365 = 1.37e-3/day); Whitmire 2015 WOTR15 ISS (25% crew required rash medication / 6mo \u2248 1.37e-3/day) \u2014 independent anchors converge; see research/_priors_rev3c_synthesis.md#2.5; rev3-e (2026-05-22): treated.fi_cp3 = untreated.fi_cp3 = 0 \u2014 condition fully resolves over 180d analog/LEO timeframe regardless of treatment (clinically defensible per K15 \u00a7II.A.5 'permanent impairment for remainder of mission' definition: acute self-limiting condition leaves no persistent impairment)",
+      "source_ref": "research/evidence/ponomarev-2021-immunological-aspects-isolation-confinement.md; Pattarini 2016 McMurdo (dermatologic 14% × 3.58/py / 365 = 1.37e-3/day); Whitmire 2015 WOTR15 ISS (25% crew required rash medication / 6mo ≈ 1.37e-3/day) — independent anchors converge; see research/_priors_rev3c_synthesis.md#2.5; rev3-e (2026-05-22): treated.fi_cp3 = untreated.fi_cp3 = 0 — condition fully resolves over 180d analog/LEO timeframe regardless of treatment (clinically defensible per K15 §II.A.5 'permanent impairment for remainder of mission' definition: acute self-limiting condition leaves no persistent impairment)",
       "incidence": {
         "distribution": "Gamma-Poisson",
         "alpha": 2.0,
@@ -5286,7 +5286,7 @@
     "eye-infection": {
       "conditionId": "eye-infection",
       "provenance": "tierB-lit",
-      "source_ref": "research/evidence/ponomarev-2021-immunological-aspects-isolation-confinement.md; rev3-e (2026-05-22): treated.fi_cp3 = untreated.fi_cp3 = 0 \u2014 condition fully resolves over 180d analog/LEO timeframe regardless of treatment (clinically defensible per K15 \u00a7II.A.5 'permanent impairment for remainder of mission' definition: acute self-limiting condition leaves no persistent impairment)",
+      "source_ref": "research/evidence/ponomarev-2021-immunological-aspects-isolation-confinement.md; rev3-e (2026-05-22): treated.fi_cp3 = untreated.fi_cp3 = 0 — condition fully resolves over 180d analog/LEO timeframe regardless of treatment (clinically defensible per K15 §II.A.5 'permanent impairment for remainder of mission' definition: acute self-limiting condition leaves no persistent impairment)",
       "incidence": {
         "distribution": "Gamma-Poisson",
         "alpha": 2,
@@ -5379,7 +5379,7 @@
     "mouth-ulcer": {
       "conditionId": "mouth-ulcer",
       "provenance": "tierB-lit",
-      "source_ref": "research/evidence/shved-2022-isolation-crowding-countermeasures.md; rev3-e (2026-05-22): treated.fi_cp3 = untreated.fi_cp3 = 0 \u2014 condition fully resolves over 180d analog/LEO timeframe regardless of treatment (clinically defensible per K15 \u00a7II.A.5 'permanent impairment for remainder of mission' definition: acute self-limiting condition leaves no persistent impairment)",
+      "source_ref": "research/evidence/shved-2022-isolation-crowding-countermeasures.md; rev3-e (2026-05-22): treated.fi_cp3 = untreated.fi_cp3 = 0 — condition fully resolves over 180d analog/LEO timeframe regardless of treatment (clinically defensible per K15 §II.A.5 'permanent impairment for remainder of mission' definition: acute self-limiting condition leaves no persistent impairment)",
       "incidence": {
         "distribution": "Gamma-Poisson",
         "alpha": 2,
@@ -5472,7 +5472,7 @@
     "hemorrhoids": {
       "conditionId": "hemorrhoids",
       "provenance": "tierB-lit",
-      "source_ref": "research/evidence/shved-2022-isolation-crowding-countermeasures.md; rev3-e (2026-05-22): treated.fi_cp3 = untreated.fi_cp3 = 0 \u2014 condition fully resolves over 180d analog/LEO timeframe regardless of treatment (clinically defensible per K15 \u00a7II.A.5 'permanent impairment for remainder of mission' definition: acute self-limiting condition leaves no persistent impairment)",
+      "source_ref": "research/evidence/shved-2022-isolation-crowding-countermeasures.md; rev3-e (2026-05-22): treated.fi_cp3 = untreated.fi_cp3 = 0 — condition fully resolves over 180d analog/LEO timeframe regardless of treatment (clinically defensible per K15 §II.A.5 'permanent impairment for remainder of mission' definition: acute self-limiting condition leaves no persistent impairment)",
       "incidence": {
         "distribution": "Gamma-Poisson",
         "alpha": 2,
@@ -5565,7 +5565,7 @@
     "barotrauma-ear-sinus-block": {
       "conditionId": "barotrauma-ear-sinus-block",
       "provenance": "tierB-lit",
-      "source_ref": "research/evidence/malpica-2024-thor-isolation-confinement-responses.md; rev3-e (2026-05-22): treated.fi_cp3 = untreated.fi_cp3 = 0 \u2014 condition fully resolves over 180d analog/LEO timeframe regardless of treatment (clinically defensible per K15 \u00a7II.A.5 'permanent impairment for remainder of mission' definition: acute self-limiting condition leaves no persistent impairment)",
+      "source_ref": "research/evidence/malpica-2024-thor-isolation-confinement-responses.md; rev3-e (2026-05-22): treated.fi_cp3 = untreated.fi_cp3 = 0 — condition fully resolves over 180d analog/LEO timeframe regardless of treatment (clinically defensible per K15 §II.A.5 'permanent impairment for remainder of mission' definition: acute self-limiting condition leaves no persistent impairment)",
       "incidence": {
         "distribution": "Gamma-Poisson",
         "alpha": 2,
@@ -5658,7 +5658,7 @@
     "headache-late": {
       "conditionId": "headache-late",
       "provenance": "tierB-lit",
-      "source_ref": "research/evidence/basner-2014-mars500-psychological-behavioral-changes.md; rev3-e (2026-05-22): treated.fi_cp3 = untreated.fi_cp3 = 0 \u2014 condition fully resolves over 180d analog/LEO timeframe regardless of treatment (clinically defensible per K15 \u00a7II.A.5 'permanent impairment for remainder of mission' definition: acute self-limiting condition leaves no persistent impairment)",
+      "source_ref": "research/evidence/basner-2014-mars500-psychological-behavioral-changes.md; rev3-e (2026-05-22): treated.fi_cp3 = untreated.fi_cp3 = 0 — condition fully resolves over 180d analog/LEO timeframe regardless of treatment (clinically defensible per K15 §II.A.5 'permanent impairment for remainder of mission' definition: acute self-limiting condition leaves no persistent impairment)",
       "incidence": {
         "distribution": "Gamma-Poisson",
         "alpha": 2,
@@ -5844,11 +5844,11 @@
     "paresthesias": {
       "conditionId": "paresthesias",
       "provenance": "tierB-lit",
-      "source_ref": "research/evidence/malpica-2024-thor-isolation-confinement-responses.md; rev3-e (2026-05-22): treated.fi_cp3 = untreated.fi_cp3 = 0 \u2014 condition fully resolves over 180d analog/LEO timeframe regardless of treatment (clinically defensible per K15 \u00a7II.A.5 'permanent impairment for remainder of mission' definition: acute self-limiting condition leaves no persistent impairment)",
+      "source_ref": "research/evidence/malpica-2024-thor-isolation-confinement-responses.md; rev3-e (2026-05-22): treated.fi_cp3 = untreated.fi_cp3 = 0 — condition fully resolves over 180d analog/LEO timeframe regardless of treatment (clinically defensible per K15 §II.A.5 'permanent impairment for remainder of mission' definition: acute self-limiting condition leaves no persistent impairment); p-f (2026-05-25): converted Beta-Bernoulli(α=3,β=17) → Gamma-Poisson(α=2,β=292000) using terrestrial incidence rates",
       "incidence": {
-        "distribution": "Beta-Bernoulli",
-        "alpha": 3,
-        "beta": 17,
+        "distribution": "Gamma-Poisson",
+        "alpha": 2,
+        "beta": 292000,
         "lambda_unit": "events-per-EVA"
       },
       "severity": {
@@ -5937,11 +5937,11 @@
     "fingernail-delamination": {
       "conditionId": "fingernail-delamination",
       "provenance": "tierB-lit",
-      "source_ref": "research/evidence/malpica-2024-thor-isolation-confinement-responses.md; rev3-e (2026-05-22): treated.fi_cp3 = untreated.fi_cp3 = 0 \u2014 condition fully resolves over 180d analog/LEO timeframe regardless of treatment (clinically defensible per K15 \u00a7II.A.5 'permanent impairment for remainder of mission' definition: acute self-limiting condition leaves no persistent impairment)",
+      "source_ref": "research/evidence/malpica-2024-thor-isolation-confinement-responses.md; rev3-e (2026-05-22): treated.fi_cp3 = untreated.fi_cp3 = 0 — condition fully resolves over 180d analog/LEO timeframe regardless of treatment (clinically defensible per K15 §II.A.5 'permanent impairment for remainder of mission' definition: acute self-limiting condition leaves no persistent impairment); p-f (2026-05-25): converted Beta-Bernoulli(α=2,β=18) → Gamma-Poisson(α=2,β=1000000) using terrestrial incidence rates",
       "incidence": {
-        "distribution": "Beta-Bernoulli",
+        "distribution": "Gamma-Poisson",
         "alpha": 2,
-        "beta": 18,
+        "beta": 1000000,
         "lambda_unit": "events-per-EVA"
       },
       "severity": {
@@ -6030,7 +6030,7 @@
     "vaginal-yeast-infection": {
       "conditionId": "vaginal-yeast-infection",
       "provenance": "tierB-lit",
-      "source_ref": "research/evidence/ponomarev-2021-immunological-aspects-isolation-confinement.md; rev3-e (2026-05-22): treated.fi_cp3 = untreated.fi_cp3 = 0 \u2014 condition fully resolves over 180d analog/LEO timeframe regardless of treatment (clinically defensible per K15 \u00a7II.A.5 'permanent impairment for remainder of mission' definition: acute self-limiting condition leaves no persistent impairment)",
+      "source_ref": "research/evidence/ponomarev-2021-immunological-aspects-isolation-confinement.md; rev3-e (2026-05-22): treated.fi_cp3 = untreated.fi_cp3 = 0 — condition fully resolves over 180d analog/LEO timeframe regardless of treatment (clinically defensible per K15 §II.A.5 'permanent impairment for remainder of mission' definition: acute self-limiting condition leaves no persistent impairment)",
       "incidence": {
         "distribution": "Gamma-Poisson",
         "alpha": 2,
@@ -6126,7 +6126,7 @@
     "hypertension": {
       "conditionId": "hypertension",
       "provenance": "tierB-lit",
-      "source_ref": "research/evidence_tables/medical.md; rev3-e (2026-05-22): treated.fi_cp3 = untreated.fi_cp3 = 0 \u2014 condition fully resolves over 180d analog/LEO timeframe regardless of treatment (clinically defensible per K15 \u00a7II.A.5 'permanent impairment for remainder of mission' definition: acute self-limiting condition leaves no persistent impairment)",
+      "source_ref": "research/evidence_tables/medical.md; rev3-e (2026-05-22): treated.fi_cp3 = untreated.fi_cp3 = 0 — condition fully resolves over 180d analog/LEO timeframe regardless of treatment (clinically defensible per K15 §II.A.5 'permanent impairment for remainder of mission' definition: acute self-limiting condition leaves no persistent impairment)",
       "incidence": {
         "distribution": "Gamma-Poisson",
         "alpha": 2,
@@ -6317,7 +6317,7 @@
     "wrist-sprain-strain": {
       "conditionId": "wrist-sprain-strain",
       "provenance": "tierB-lit",
-      "source_ref": "research/evidence_tables/medical.md; rev3-e (2026-05-22): treated.fi_cp3 = untreated.fi_cp3 = 0 \u2014 condition fully resolves over 180d analog/LEO timeframe regardless of treatment (clinically defensible per K15 \u00a7II.A.5 'permanent impairment for remainder of mission' definition: acute self-limiting condition leaves no persistent impairment)",
+      "source_ref": "research/evidence_tables/medical.md; rev3-e (2026-05-22): treated.fi_cp3 = untreated.fi_cp3 = 0 — condition fully resolves over 180d analog/LEO timeframe regardless of treatment (clinically defensible per K15 §II.A.5 'permanent impairment for remainder of mission' definition: acute self-limiting condition leaves no persistent impairment)",
       "incidence": {
         "distribution": "Gamma-Poisson",
         "alpha": 2,
@@ -6411,7 +6411,7 @@
     "shoulder-sprain-strain": {
       "conditionId": "shoulder-sprain-strain",
       "provenance": "tierB-lit",
-      "source_ref": "research/evidence_tables/medical.md; rev3-e (2026-05-22): treated.fi_cp3 = untreated.fi_cp3 = 0 \u2014 condition fully resolves over 180d analog/LEO timeframe regardless of treatment (clinically defensible per K15 \u00a7II.A.5 'permanent impairment for remainder of mission' definition: acute self-limiting condition leaves no persistent impairment)",
+      "source_ref": "research/evidence_tables/medical.md; rev3-e (2026-05-22): treated.fi_cp3 = untreated.fi_cp3 = 0 — condition fully resolves over 180d analog/LEO timeframe regardless of treatment (clinically defensible per K15 §II.A.5 'permanent impairment for remainder of mission' definition: acute self-limiting condition leaves no persistent impairment)",
       "incidence": {
         "distribution": "Gamma-Poisson",
         "alpha": 2,
@@ -6505,7 +6505,7 @@
     "hip-sprain-strain": {
       "conditionId": "hip-sprain-strain",
       "provenance": "tierB-lit",
-      "source_ref": "research/evidence_tables/medical.md; rev3-e (2026-05-22): treated.fi_cp3 = untreated.fi_cp3 = 0 \u2014 condition fully resolves over 180d analog/LEO timeframe regardless of treatment (clinically defensible per K15 \u00a7II.A.5 'permanent impairment for remainder of mission' definition: acute self-limiting condition leaves no persistent impairment)",
+      "source_ref": "research/evidence_tables/medical.md; rev3-e (2026-05-22): treated.fi_cp3 = untreated.fi_cp3 = 0 — condition fully resolves over 180d analog/LEO timeframe regardless of treatment (clinically defensible per K15 §II.A.5 'permanent impairment for remainder of mission' definition: acute self-limiting condition leaves no persistent impairment)",
       "incidence": {
         "distribution": "Gamma-Poisson",
         "alpha": 2,
@@ -6598,7 +6598,7 @@
     "knee-sprain-strain": {
       "conditionId": "knee-sprain-strain",
       "provenance": "tierB-lit",
-      "source_ref": "research/evidence_tables/medical.md; rev3-e (2026-05-22): treated.fi_cp3 = untreated.fi_cp3 = 0 \u2014 condition fully resolves over 180d analog/LEO timeframe regardless of treatment (clinically defensible per K15 \u00a7II.A.5 'permanent impairment for remainder of mission' definition: acute self-limiting condition leaves no persistent impairment)",
+      "source_ref": "research/evidence_tables/medical.md; rev3-e (2026-05-22): treated.fi_cp3 = untreated.fi_cp3 = 0 — condition fully resolves over 180d analog/LEO timeframe regardless of treatment (clinically defensible per K15 §II.A.5 'permanent impairment for remainder of mission' definition: acute self-limiting condition leaves no persistent impairment)",
       "incidence": {
         "distribution": "Gamma-Poisson",
         "alpha": 2,
@@ -6691,7 +6691,7 @@
     "elbow-sprain-strain": {
       "conditionId": "elbow-sprain-strain",
       "provenance": "tierB-lit",
-      "source_ref": "research/evidence_tables/medical.md; rev3-e (2026-05-22): treated.fi_cp3 = untreated.fi_cp3 = 0 \u2014 condition fully resolves over 180d analog/LEO timeframe regardless of treatment (clinically defensible per K15 \u00a7II.A.5 'permanent impairment for remainder of mission' definition: acute self-limiting condition leaves no persistent impairment)",
+      "source_ref": "research/evidence_tables/medical.md; rev3-e (2026-05-22): treated.fi_cp3 = untreated.fi_cp3 = 0 — condition fully resolves over 180d analog/LEO timeframe regardless of treatment (clinically defensible per K15 §II.A.5 'permanent impairment for remainder of mission' definition: acute self-limiting condition leaves no persistent impairment)",
       "incidence": {
         "distribution": "Gamma-Poisson",
         "alpha": 2,
@@ -6784,7 +6784,7 @@
     "dental-caries": {
       "conditionId": "dental-caries",
       "provenance": "tierA-nasa",
-      "source_ref": "research/evidence_tables/medical.md; research/imm_sources/methods/G12_gilkey_2012_bayesian_imm.md#table-26 (Bayesian update: 240 USN SSBN patrols / 5946.9 py + LSAH posterior; rate 9.41e-3/py = 2.58e-5/day); see research/_priors_rev3c_synthesis.md#2.1; rev3-e (2026-05-22): treated.fi_cp3 = untreated.fi_cp3 = 0 \u2014 condition fully resolves over 180d analog/LEO timeframe regardless of treatment (clinically defensible per K15 \u00a7II.A.5 'permanent impairment for remainder of mission' definition: acute self-limiting condition leaves no persistent impairment)",
+      "source_ref": "research/evidence_tables/medical.md; research/imm_sources/methods/G12_gilkey_2012_bayesian_imm.md#table-26 (Bayesian update: 240 USN SSBN patrols / 5946.9 py + LSAH posterior; rate 9.41e-3/py = 2.58e-5/day); see research/_priors_rev3c_synthesis.md#2.1; rev3-e (2026-05-22): treated.fi_cp3 = untreated.fi_cp3 = 0 — condition fully resolves over 180d analog/LEO timeframe regardless of treatment (clinically defensible per K15 §II.A.5 'permanent impairment for remainder of mission' definition: acute self-limiting condition leaves no persistent impairment)",
       "incidence": {
         "distribution": "Gamma-Poisson",
         "alpha": 2.0,
@@ -6878,7 +6878,7 @@
     "dental-exposed-pulp": {
       "conditionId": "dental-exposed-pulp",
       "provenance": "tierB-lit",
-      "source_ref": "research/evidence_tables/medical.md; rev3-e (2026-05-22): treated.fi_cp3 = untreated.fi_cp3 = 0 \u2014 condition fully resolves over 180d analog/LEO timeframe regardless of treatment (clinically defensible per K15 \u00a7II.A.5 'permanent impairment for remainder of mission' definition: acute self-limiting condition leaves no persistent impairment)",
+      "source_ref": "research/evidence_tables/medical.md; rev3-e (2026-05-22): treated.fi_cp3 = untreated.fi_cp3 = 0 — condition fully resolves over 180d analog/LEO timeframe regardless of treatment (clinically defensible per K15 §II.A.5 'permanent impairment for remainder of mission' definition: acute self-limiting condition leaves no persistent impairment)",
       "incidence": {
         "distribution": "Gamma-Poisson",
         "alpha": 2,
@@ -6973,7 +6973,7 @@
     "dental-avulsion-tooth-loss": {
       "conditionId": "dental-avulsion-tooth-loss",
       "provenance": "tierB-lit",
-      "source_ref": "research/evidence_tables/medical.md; rev3-e (2026-05-22): treated.fi_cp3 = untreated.fi_cp3 = 0 \u2014 condition fully resolves over 180d analog/LEO timeframe regardless of treatment (clinically defensible per K15 \u00a7II.A.5 'permanent impairment for remainder of mission' definition: acute self-limiting condition leaves no persistent impairment)",
+      "source_ref": "research/evidence_tables/medical.md; rev3-e (2026-05-22): treated.fi_cp3 = untreated.fi_cp3 = 0 — condition fully resolves over 180d analog/LEO timeframe regardless of treatment (clinically defensible per K15 §II.A.5 'permanent impairment for remainder of mission' definition: acute self-limiting condition leaves no persistent impairment)",
       "incidence": {
         "distribution": "Gamma-Poisson",
         "alpha": 2,
@@ -7067,7 +7067,7 @@
     "dental-crown-loss": {
       "conditionId": "dental-crown-loss",
       "provenance": "tierB-lit",
-      "source_ref": "research/evidence_tables/medical.md; rev3-e (2026-05-22): treated.fi_cp3 = untreated.fi_cp3 = 0 \u2014 condition fully resolves over 180d analog/LEO timeframe regardless of treatment (clinically defensible per K15 \u00a7II.A.5 'permanent impairment for remainder of mission' definition: acute self-limiting condition leaves no persistent impairment)",
+      "source_ref": "research/evidence_tables/medical.md; rev3-e (2026-05-22): treated.fi_cp3 = untreated.fi_cp3 = 0 — condition fully resolves over 180d analog/LEO timeframe regardless of treatment (clinically defensible per K15 §II.A.5 'permanent impairment for remainder of mission' definition: acute self-limiting condition leaves no persistent impairment)",
       "incidence": {
         "distribution": "Gamma-Poisson",
         "alpha": 2,
@@ -7163,7 +7163,7 @@
     "dental-filling-loss": {
       "conditionId": "dental-filling-loss",
       "provenance": "tierB-lit",
-      "source_ref": "research/evidence_tables/medical.md; rev3-e (2026-05-22): treated.fi_cp3 = untreated.fi_cp3 = 0 \u2014 condition fully resolves over 180d analog/LEO timeframe regardless of treatment (clinically defensible per K15 \u00a7II.A.5 'permanent impairment for remainder of mission' definition: acute self-limiting condition leaves no persistent impairment)",
+      "source_ref": "research/evidence_tables/medical.md; rev3-e (2026-05-22): treated.fi_cp3 = untreated.fi_cp3 = 0 — condition fully resolves over 180d analog/LEO timeframe regardless of treatment (clinically defensible per K15 §II.A.5 'permanent impairment for remainder of mission' definition: acute self-limiting condition leaves no persistent impairment)",
       "incidence": {
         "distribution": "Gamma-Poisson",
         "alpha": 2,
@@ -7256,7 +7256,7 @@
     "abnormal-uterine-bleeding": {
       "conditionId": "abnormal-uterine-bleeding",
       "provenance": "tierB-lit",
-      "source_ref": "research/evidence_tables/medical.md; rev3-e (2026-05-22): treated.fi_cp3 = untreated.fi_cp3 = 0 \u2014 condition fully resolves over 180d analog/LEO timeframe regardless of treatment (clinically defensible per K15 \u00a7II.A.5 'permanent impairment for remainder of mission' definition: acute self-limiting condition leaves no persistent impairment)",
+      "source_ref": "research/evidence_tables/medical.md; rev3-e (2026-05-22): treated.fi_cp3 = untreated.fi_cp3 = 0 — condition fully resolves over 180d analog/LEO timeframe regardless of treatment (clinically defensible per K15 §II.A.5 'permanent impairment for remainder of mission' definition: acute self-limiting condition leaves no persistent impairment)",
       "incidence": {
         "distribution": "Gamma-Poisson",
         "alpha": 2,
@@ -7829,7 +7829,7 @@
     "abdominal-wall-hernia": {
       "conditionId": "abdominal-wall-hernia",
       "provenance": "tierC-synth",
-      "source_ref": "back-fit placeholder; calibrated to K15 Table 1 in Task 31; rev3-e (2026-05-22): treated.fi_cp3 = untreated.fi_cp3 = 0 \u2014 condition fully resolves over 180d analog/LEO timeframe regardless of treatment (clinically defensible per K15 \u00a7II.A.5 'permanent impairment for remainder of mission' definition: acute self-limiting condition leaves no persistent impairment)",
+      "source_ref": "back-fit placeholder; calibrated to K15 Table 1 in Task 31; rev3-e (2026-05-22): treated.fi_cp3 = untreated.fi_cp3 = 0 — condition fully resolves over 180d analog/LEO timeframe regardless of treatment (clinically defensible per K15 §II.A.5 'permanent impairment for remainder of mission' definition: acute self-limiting condition leaves no persistent impairment)",
       "incidence": {
         "distribution": "Gamma-Poisson",
         "alpha": 10,
@@ -7920,7 +7920,7 @@
     "acute-arthritis": {
       "conditionId": "acute-arthritis",
       "provenance": "tierC-synth",
-      "source_ref": "back-fit placeholder; calibrated to K15 Table 1 in Task 31; rev3-e (2026-05-22): treated.fi_cp3 = untreated.fi_cp3 = 0 \u2014 condition fully resolves over 180d analog/LEO timeframe regardless of treatment (clinically defensible per K15 \u00a7II.A.5 'permanent impairment for remainder of mission' definition: acute self-limiting condition leaves no persistent impairment)",
+      "source_ref": "back-fit placeholder; calibrated to K15 Table 1 in Task 31; rev3-e (2026-05-22): treated.fi_cp3 = untreated.fi_cp3 = 0 — condition fully resolves over 180d analog/LEO timeframe regardless of treatment (clinically defensible per K15 §II.A.5 'permanent impairment for remainder of mission' definition: acute self-limiting condition leaves no persistent impairment)",
       "incidence": {
         "distribution": "Gamma-Poisson",
         "alpha": 10,
@@ -8193,7 +8193,7 @@
     "acute-prostatitis": {
       "conditionId": "acute-prostatitis",
       "provenance": "tierC-synth",
-      "source_ref": "back-fit placeholder; calibrated to K15 Table 1 in Task 31; rev3-e (2026-05-22): treated.fi_cp3 = untreated.fi_cp3 = 0 \u2014 condition fully resolves over 180d analog/LEO timeframe regardless of treatment (clinically defensible per K15 \u00a7II.A.5 'permanent impairment for remainder of mission' definition: acute self-limiting condition leaves no persistent impairment)",
+      "source_ref": "back-fit placeholder; calibrated to K15 Table 1 in Task 31; rev3-e (2026-05-22): treated.fi_cp3 = untreated.fi_cp3 = 0 — condition fully resolves over 180d analog/LEO timeframe regardless of treatment (clinically defensible per K15 §II.A.5 'permanent impairment for remainder of mission' definition: acute self-limiting condition leaves no persistent impairment)",
       "incidence": {
         "distribution": "Gamma-Poisson",
         "alpha": 10,
@@ -8375,7 +8375,7 @@
     "altitude-sickness": {
       "conditionId": "altitude-sickness",
       "provenance": "tierC-synth",
-      "source_ref": "back-fit placeholder; calibrated to K15 Table 1 in Task 31; rev3-e (2026-05-22): treated.fi_cp3 = untreated.fi_cp3 = 0 \u2014 condition fully resolves over 180d analog/LEO timeframe regardless of treatment (clinically defensible per K15 \u00a7II.A.5 'permanent impairment for remainder of mission' definition: acute self-limiting condition leaves no persistent impairment)",
+      "source_ref": "back-fit placeholder; calibrated to K15 Table 1 in Task 31; rev3-e (2026-05-22): treated.fi_cp3 = untreated.fi_cp3 = 0 — condition fully resolves over 180d analog/LEO timeframe regardless of treatment (clinically defensible per K15 §II.A.5 'permanent impairment for remainder of mission' definition: acute self-limiting condition leaves no persistent impairment)",
       "incidence": {
         "distribution": "Gamma-Poisson",
         "alpha": 10,
@@ -8648,7 +8648,7 @@
     "elbow-dislocation": {
       "conditionId": "elbow-dislocation",
       "provenance": "tierC-synth",
-      "source_ref": "back-fit placeholder; calibrated to K15 Table 1 in Task 31; rev3-e (2026-05-22): treated.fi_cp3 = untreated.fi_cp3 = 0 \u2014 condition fully resolves over 180d analog/LEO timeframe regardless of treatment (clinically defensible per K15 \u00a7II.A.5 'permanent impairment for remainder of mission' definition: acute self-limiting condition leaves no persistent impairment)",
+      "source_ref": "back-fit placeholder; calibrated to K15 Table 1 in Task 31; rev3-e (2026-05-22): treated.fi_cp3 = untreated.fi_cp3 = 0 — condition fully resolves over 180d analog/LEO timeframe regardless of treatment (clinically defensible per K15 §II.A.5 'permanent impairment for remainder of mission' definition: acute self-limiting condition leaves no persistent impairment)",
       "incidence": {
         "distribution": "Gamma-Poisson",
         "alpha": 2,
@@ -8739,7 +8739,7 @@
     "finger-dislocation": {
       "conditionId": "finger-dislocation",
       "provenance": "tierC-synth",
-      "source_ref": "back-fit placeholder; calibrated to K15 Table 1 in Task 31; rev3-e (2026-05-22): treated.fi_cp3 = untreated.fi_cp3 = 0 \u2014 condition fully resolves over 180d analog/LEO timeframe regardless of treatment (clinically defensible per K15 \u00a7II.A.5 'permanent impairment for remainder of mission' definition: acute self-limiting condition leaves no persistent impairment)",
+      "source_ref": "back-fit placeholder; calibrated to K15 Table 1 in Task 31; rev3-e (2026-05-22): treated.fi_cp3 = untreated.fi_cp3 = 0 — condition fully resolves over 180d analog/LEO timeframe regardless of treatment (clinically defensible per K15 §II.A.5 'permanent impairment for remainder of mission' definition: acute self-limiting condition leaves no persistent impairment)",
       "incidence": {
         "distribution": "Gamma-Poisson",
         "alpha": 10,
@@ -8921,7 +8921,7 @@
     "lower-extremity-le-stress-fracture": {
       "conditionId": "lower-extremity-le-stress-fracture",
       "provenance": "tierC-synth",
-      "source_ref": "back-fit placeholder; calibrated to K15 Table 1 in Task 31; rev3-e (2026-05-22): treated.fi_cp3 = untreated.fi_cp3 = 0 \u2014 condition fully resolves over 180d analog/LEO timeframe regardless of treatment (clinically defensible per K15 \u00a7II.A.5 'permanent impairment for remainder of mission' definition: acute self-limiting condition leaves no persistent impairment)",
+      "source_ref": "back-fit placeholder; calibrated to K15 Table 1 in Task 31; rev3-e (2026-05-22): treated.fi_cp3 = untreated.fi_cp3 = 0 — condition fully resolves over 180d analog/LEO timeframe regardless of treatment (clinically defensible per K15 §II.A.5 'permanent impairment for remainder of mission' definition: acute self-limiting condition leaves no persistent impairment)",
       "incidence": {
         "distribution": "Gamma-Poisson",
         "alpha": 10,
@@ -9378,7 +9378,7 @@
     "tierC_multiplier_iss_hms": 1,
     "tierC_multiplier_iss_none": 1,
     "tierC_multiplier_iss_unlimited": 1,
-    "fit_against": "K15 Table 1 (ISS 6mo/6crew); A22 4-step trial verbatim; M18 \u03c3<5% convergence; TM21 AMM/SMM",
+    "fit_against": "K15 Table 1 (ISS 6mo/6crew); A22 4-step trial verbatim; M18 σ<5% convergence; TM21 AMM/SMM",
     "fit_residuals_within_CI95": false,
     "tierA_multiplier": 1.0,
     "tierB_multiplier": 0.55,

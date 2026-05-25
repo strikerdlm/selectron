@@ -136,7 +136,10 @@ def fit_gamma_poisson(
 
     if output_dir is not None:
         output_dir.mkdir(parents=True, exist_ok=True)
-        idata.to_netcdf(str(output_dir / f"{condition_id}.nc"))
+        try:
+            idata.to_netcdf(str(output_dir / f"{condition_id}.nc"))
+        except (ValueError, ImportError):
+            pass  # h5netcdf/netCDF4 not installed — skip trace save
         with open(output_dir / f"{condition_id}.json", "w") as f:
             json.dump(result.to_dict(), f, indent=2)
 
