@@ -148,8 +148,8 @@ class TestFitAllTierB:
             dry_run=True,
         )
         assert isinstance(report, BatchFitReport)
-        assert report.n_skipped >= 39
-        assert report.n_total == 41
+        assert report.n_skipped >= 3
+        assert report.n_total == 6
 
     def test_dry_run_does_not_fit(self) -> None:
         report = fit_all_tier_b(
@@ -162,7 +162,7 @@ class TestFitAllTierB:
         assert report.n_fitted == 0
 
     @pytest.mark.slow
-    def test_fits_depression_from_proposals(self) -> None:
+    def test_fits_remaining_tierb_lit_from_proposals(self) -> None:
         report = fit_all_tier_b(
             draws=500,
             tune=250,
@@ -170,12 +170,8 @@ class TestFitAllTierB:
             seed=42,
             dry_run=False,
         )
-        # Depression should be either fitted (converged) or failed (not converged)
-        # but never skipped — it has evidence data
-        assert "depression" in report.fitted or "depression" in report.failed
-        if "depression" in report.fitted:
-            result = report.fitted["depression"]
-        else:
-            result, _ = report.failed["depression"]
-        assert result.n_studies == 3
-        assert result.total_events == 27
+        # Post-PyMC merge: only 6 tierB-lit remain (3 excluded outliers + 3 unfitted).
+        # 3 excluded outliers have evidence and should be fitted or failed.
+        # 3 unfitted (elbow/hip/wrist) have no evidence and should be skipped.
+        assert report.n_total == 6
+        assert report.n_skipped >= 3

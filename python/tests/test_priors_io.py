@@ -80,10 +80,10 @@ class TestSavePriors:
 
 
 class TestGetTierBConditions:
-    def test_returns_41_conditions(self) -> None:
+    def test_returns_remaining_tierb_lit_conditions(self) -> None:
         data = load_priors()
         tier_b = get_tier_b_conditions(data)
-        assert len(tier_b) == 41
+        assert len(tier_b) == 6
 
     def test_all_have_tier_b_provenance(self) -> None:
         data = load_priors()
@@ -102,7 +102,7 @@ class TestGetTierBConditions:
             1 for v in tier_b.values()
             if v["incidence"]["distribution"] == "Beta-Bernoulli"
         )
-        assert gamma_count == 41
+        assert gamma_count == 6
         assert beta_count == 0
 
 
