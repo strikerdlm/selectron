@@ -20,6 +20,7 @@ _PROPOSAL_FILES = [
     "incidence_rates.proposals_p-d.csv",
     "incidence_rates.proposals_p-e.csv",
     "incidence_rates.proposals_p-f.csv",
+    "incidence_rates.proposals_p-g.csv",
 ]
 
 
@@ -103,12 +104,15 @@ def load_evidence_proposals(
                 if key in seen:
                     continue
                 seen.add(key)
+                def _parse_int(val: str) -> int:
+                    return int(val.removeprefix("EST:"))
+
                 rows.append(
                     {
                         "condition_id": row["condition_id"],
                         "mapped_prior_id": map_proposal_id(row["condition_id"]),
-                        "person_days": int(row["person_days"]),
-                        "events": int(row["events"]),
+                        "person_days": _parse_int(row["person_days"]),
+                        "events": _parse_int(row["events"]),
                         "study_slug": row["study_slug"],
                         "study_doi": row.get("study_doi", ""),
                         "mission_type": row.get("mission_type", ""),
