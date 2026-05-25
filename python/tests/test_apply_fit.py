@@ -27,21 +27,6 @@ def _make_fit_result(cid: str, r_hat: float = 1.005, divergences: int = 0):
     )
 
 
-def test_passes_gate_on_good_rhat():
-    result = _make_fit_result("shoulder-sprain-strain", r_hat=1.005)
-    assert apply_fit.passes_gate(result) is True
-
-
-def test_fails_gate_on_high_rhat():
-    result = _make_fit_result("hip-sprain-strain", r_hat=1.02)
-    assert apply_fit.passes_gate(result) is False
-
-
-def test_fails_gate_on_high_divergences():
-    result = _make_fit_result("wrist-sprain-strain", r_hat=1.005, divergences=15)
-    assert apply_fit.passes_gate(result) is False
-
-
 def test_write_diagnostics_creates_file(tmp_path: Path):
     result = _make_fit_result("elbow-sprain-strain", r_hat=1.05)
     reasons = ["R_hat 1.0500 > 1.01"]
@@ -62,3 +47,57 @@ def test_write_diagnostics_content(tmp_path: Path):
     assert data["divergences"] == 12
     assert data["posterior_alpha"] == pytest.approx(3.0)
     assert data["posterior_beta"] == pytest.approx(1200.0)
+
+
+def test_write_diagnostics_all_fields_present(tmp_path: Path):
+    result = _make_fit_result("wrist-sprain-strain")
+    apply_fit.write_diagnostics(result, ["test reason"], bridges_dir=tmp_path)
+    data = json.loads((tmp_path / "wrist-sprain-strain_fit_diagnostics.json").read_text())
+    required = {"condition_id", "r_hat", "ess_bulk", "ess_tail", "divergences",
+                "posterior_alpha", "posterior_beta", "n_studies",
+                "total_person_days", "total_events", "reasons"}
+    assert required <= set(data.keys())
+
+
+def test_main_dry_run_does_not_merge(tmp_path: Path):
+    """main() with --dry-run must not call merge_fitted_priors."""
+    from selectron.fitter import BatchFitReport
+    fitted = {"shoulder-sprain-strain": _make_fit_result("shoulder-sprain-strain")}
+    mock_report = MagicMock(spec=BatchFitReport)
+    mock_report.fitted = fitted
+    mock_report.failed = {}
+    mock_report.skipped = {}
+    mock_report.n_fitted = 1
+    mock_report.n_failed = 0
+    mock_report.n_skipped = 0
+
+    with patch("apply_fit.fit_all_tier_b", return_value=mock_report), \
+         patch("apply_fit.merge_fitted_priors") as mock_merge, \
+         patch("sys.argv", ["apply_fit.py", "--dry-run"]):
+        apply_fit.main()
+
+    mock_merge.assert_not_called()
+
+
+def test_main_failed_conditions_write_diagnostics(tmp_path: Path):
+    """main() must call write_diagnostics for each failed condition."""
+    from selectron.fitter import BatchFitReport
+    failed_result = _make_fit_result("barotrauma-ear-sinus-block", r_hat=1.05)
+    mock_report = MagicMock(spec=BatchFitReport)
+    mock_report.fitted = {}
+    mock_report.failed = {"barotrauma-ear-sinus-block": (failed_result, ["R_hat 1.0500 > 1.01"])}
+    mock_report.skipped = {}
+    mock_report.n_fitted = 0
+    mock_report.n_failed = 1
+    mock_report.n_skipped = 0
+
+    with patch("apply_fit.fit_all_tier_b", return_value=mock_report), \
+         patch("apply_fit.merge_fitted_priors"), \
+         patch("apply_fit.write_diagnostics") as mock_write_diag, \
+         patch("sys.argv", ["apply_fit.py"]):
+        apply_fit.main()
+
+    mock_write_diag.assert_called_once_with(
+        failed_result, ["R_hat 1.0500 > 1.01"]
+    )
+    assert mock_write_diag.call_args[0][0].condition_id == "barotrauma-ear-sinus-block"

@@ -24,14 +24,6 @@ _BRIDGES_DIR = _REPO_ROOT / "research" / "evidence" / "bridges"
 logging.basicConfig(level=logging.INFO, format="%(levelname)s %(name)s %(message)s")
 logger = logging.getLogger("apply_fit")
 
-R_HAT_THRESHOLD = 1.01
-DIVERGENCES_THRESHOLD = 10
-
-
-def passes_gate(result: FitResult) -> bool:
-    """Return True if result meets convergence criteria."""
-    return result.r_hat <= R_HAT_THRESHOLD and result.divergences <= DIVERGENCES_THRESHOLD
-
 
 def write_diagnostics(
     result: FitResult,
@@ -80,19 +72,8 @@ def main() -> int:
         report.n_fitted, report.n_failed, report.n_skipped,
     )
 
-    to_merge: dict[str, FitResult] = {}
     for cid, result in report.fitted.items():
-        if passes_gate(result):
-            to_merge[cid] = result
-            logger.info("  PASS %s (R-hat=%.4f, div=%d)", cid, result.r_hat, result.divergences)
-        else:
-            reasons = []
-            if result.r_hat > R_HAT_THRESHOLD:
-                reasons.append(f"R_hat {result.r_hat:.4f} > {R_HAT_THRESHOLD}")
-            if result.divergences > DIVERGENCES_THRESHOLD:
-                reasons.append(f"divergences {result.divergences} > {DIVERGENCES_THRESHOLD}")
-            write_diagnostics(result, reasons)
-            logger.warning("  FAIL %s: %s", cid, "; ".join(reasons))
+        logger.info("  PASS %s (R-hat=%.4f, div=%d)", cid, result.r_hat, result.divergences)
 
     for cid, (result, reasons) in report.failed.items():
         write_diagnostics(result, reasons)
@@ -101,6 +82,7 @@ def main() -> int:
     for cid, reason in report.skipped.items():
         logger.info("  SKIP %s: %s", cid, reason)
 
+    to_merge = report.fitted
     if to_merge and not args.dry_run:
         writer_report = merge_fitted_priors(fitted=to_merge)
         logger.info("Merged %d conditions into imm-priors.json", writer_report.n_updated)
@@ -110,8 +92,7 @@ def main() -> int:
     elif args.dry_run:
         logger.info("DRY RUN: would merge %d conditions", len(to_merge))
 
-    n_failed_gate = len(report.fitted) - len(to_merge)
-    print(f"\nSummary: {len(to_merge)} merged, {n_failed_gate} failed gate, {len(report.skipped)} skipped")
+    print(f"\nSummary: {len(to_merge)} merged, {report.n_failed} failed fit, {report.n_skipped} skipped")
     return 0
 
 
