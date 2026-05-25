@@ -110,7 +110,8 @@ def main() -> int:
     elif args.dry_run:
         logger.info("DRY RUN: would merge %d conditions", len(to_merge))
 
-    print(f"\nSummary: {len(to_merge)} merged, {len(report.failed)} failed gate, {len(report.skipped)} skipped")
+    n_failed_gate = len(report.fitted) - len(to_merge)
+    print(f"\nSummary: {len(to_merge)} merged, {n_failed_gate} failed gate, {len(report.skipped)} skipped")
     return 0
 
 
