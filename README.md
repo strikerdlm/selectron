@@ -370,7 +370,7 @@ Three distinct backlogs, in priority order: **(A)** engineering / calibration (a
 1. **rev3-f severity tuning (IN PROGRESS)** — 12 of 32 persistent-impairment conditions updated against primary-source literature (`severity_f.proposals_rev3f.csv`). Remaining 20 blocked on additional MCP literature search. See `docs/iter5_priors_rev3_strategy.md` §10.
 2. **Outcome parameter re-calibration ATTEMPTED and REVERTED** — closed-form p_evac/p_locl rescale fixes 'none' and 'unlimited' but catastrophically breaks issHMS via RAF-interpolated fall-through coupling. Decision: accept divergence as principled limitation per `docs/iter5_scientific_limitations.md` §3.5.
 3. **Per-condition source audit for 3 unfittable conditions** (elbow/hip/wrist-sprain-strain) — no isolated incidence rates in published literature; remain hand-tuned Gamma-Poisson.
-4. **Fix 5 pre-existing simulate.test.ts failures** — tier multiplier + convergence tests drifted during tierB-pymc calibration. Root cause under investigation.
+4. **~~Fix 5 pre-existing simulate.test.ts failures~~ FIXED** (`dac6b19`): tierB provenance mismatch `"tierB-lit"` → `"tierB-pymc"` + updated test expectations. 37/37 pass. Root cause under investigation.
 5. **IMM Phase 3 ML layer** — surrogate model (IMM-52 through IMM-56), vulnerability MLP (IMM-57 through IMM-60), engine toggle + vulnerability mode toggle (IMM-62/63). Unblocks figures I6/I7/I8.
 6. **TM21 AMM/SMM validation gate (IMM-87)** — deferred until Mars structural engine prerequisites land (see [`docs/future_features.md`](docs/future_features.md)).
 7. **Future features** — Artemis (lunar) and Mars (interplanetary) missions, plus I6/I7/I8 figures, are all in [`docs/future_features.md`](docs/future_features.md) with their structural prerequisites.
