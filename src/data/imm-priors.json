@@ -7737,12 +7737,12 @@
     },
     "abdominal-injury": {
       "conditionId": "abdominal-injury",
-      "provenance": "tierC-synth",
-      "source_ref": "back-fit placeholder; calibrated to K15 Table 1 in Task 31",
+      "provenance": "tierB-pymc",
+      "source_ref": "python/outputs/fitted_priors/abdominal-injury/abdominal-injury.json",
       "incidence": {
         "distribution": "Gamma-Poisson",
-        "alpha": 2,
-        "beta": 10000,
+        "alpha": 6975.584221495469,
+        "beta": 17467039354.512356,
         "lambda_unit": "events-per-person-day"
       },
       "severity": {
@@ -7828,12 +7828,12 @@
     },
     "abdominal-wall-hernia": {
       "conditionId": "abdominal-wall-hernia",
-      "provenance": "tierC-synth",
-      "source_ref": "back-fit placeholder; calibrated to K15 Table 1 in Task 31; rev3-e (2026-05-22): treated.fi_cp3 = untreated.fi_cp3 = 0 \u2014 condition fully resolves over 180d analog/LEO timeframe regardless of treatment (clinically defensible per K15 \u00a7II.A.5 'permanent impairment for remainder of mission' definition: acute self-limiting condition leaves no persistent impairment)",
+      "provenance": "tierB-pymc",
+      "source_ref": "python/outputs/fitted_priors/abdominal-wall-hernia/abdominal-wall-hernia.json",
       "incidence": {
         "distribution": "Gamma-Poisson",
-        "alpha": 10,
-        "beta": 6666.6667,
+        "alpha": 177.99083586544796,
+        "beta": 37622747.44903821,
         "lambda_unit": "events-per-person-day"
       },
       "severity": {
@@ -7919,12 +7919,12 @@
     },
     "acute-arthritis": {
       "conditionId": "acute-arthritis",
-      "provenance": "tierC-synth",
-      "source_ref": "back-fit placeholder; calibrated to K15 Table 1 in Task 31; rev3-e (2026-05-22): treated.fi_cp3 = untreated.fi_cp3 = 0 \u2014 condition fully resolves over 180d analog/LEO timeframe regardless of treatment (clinically defensible per K15 \u00a7II.A.5 'permanent impairment for remainder of mission' definition: acute self-limiting condition leaves no persistent impairment)",
+      "provenance": "tierB-pymc",
+      "source_ref": "python/outputs/fitted_priors/acute-arthritis/acute-arthritis.json",
       "incidence": {
         "distribution": "Gamma-Poisson",
-        "alpha": 10,
-        "beta": 6666.6667,
+        "alpha": 13.893476915100296,
+        "beta": 36389143.83712418,
         "lambda_unit": "events-per-person-day"
       },
       "severity": {
@@ -8010,12 +8010,12 @@
     },
     "acute-compartment-syndrome": {
       "conditionId": "acute-compartment-syndrome",
-      "provenance": "tierC-synth",
-      "source_ref": "back-fit placeholder; calibrated to K15 Table 1 in Task 31",
+      "provenance": "tierB-pymc",
+      "source_ref": "python/outputs/fitted_priors/acute-compartment-syndrome/acute-compartment-syndrome.json",
       "incidence": {
         "distribution": "Gamma-Poisson",
-        "alpha": 2,
-        "beta": 10000,
+        "alpha": 13718.404969304154,
+        "beta": 250237861522.53812,
         "lambda_unit": "events-per-person-day"
       },
       "severity": {
@@ -8101,12 +8101,12 @@
     },
     "acute-pancreatitis": {
       "conditionId": "acute-pancreatitis",
-      "provenance": "tierC-synth",
-      "source_ref": "back-fit placeholder; calibrated to K15 Table 1 in Task 31",
+      "provenance": "tierB-pymc",
+      "source_ref": "python/outputs/fitted_priors/acute-pancreatitis/acute-pancreatitis.json",
       "incidence": {
         "distribution": "Gamma-Poisson",
-        "alpha": 2,
-        "beta": 10000,
+        "alpha": 35.72114692388644,
+        "beta": 36396901.06411481,
         "lambda_unit": "events-per-person-day"
       },
       "severity": {
@@ -8192,12 +8192,12 @@
     },
     "acute-prostatitis": {
       "conditionId": "acute-prostatitis",
-      "provenance": "tierC-synth",
-      "source_ref": "back-fit placeholder; calibrated to K15 Table 1 in Task 31; rev3-e (2026-05-22): treated.fi_cp3 = untreated.fi_cp3 = 0 \u2014 condition fully resolves over 180d analog/LEO timeframe regardless of treatment (clinically defensible per K15 \u00a7II.A.5 'permanent impairment for remainder of mission' definition: acute self-limiting condition leaves no persistent impairment)",
+      "provenance": "tierB-pymc",
+      "source_ref": "python/outputs/fitted_priors/acute-prostatitis/acute-prostatitis.json",
       "incidence": {
         "distribution": "Gamma-Poisson",
-        "alpha": 10,
-        "beta": 6666.6667,
+        "alpha": 17.87364045986011,
+        "beta": 731720.8191312419,
         "lambda_unit": "events-per-person-day"
       },
       "severity": {
@@ -8374,12 +8374,12 @@
     },
     "altitude-sickness": {
       "conditionId": "altitude-sickness",
-      "provenance": "tierC-synth",
-      "source_ref": "back-fit placeholder; calibrated to K15 Table 1 in Task 31; rev3-e (2026-05-22): treated.fi_cp3 = untreated.fi_cp3 = 0 \u2014 condition fully resolves over 180d analog/LEO timeframe regardless of treatment (clinically defensible per K15 \u00a7II.A.5 'permanent impairment for remainder of mission' definition: acute self-limiting condition leaves no persistent impairment)",
+      "provenance": "tierB-pymc",
+      "source_ref": "python/outputs/fitted_priors/altitude-sickness/altitude-sickness.json",
       "incidence": {
         "distribution": "Gamma-Poisson",
-        "alpha": 10,
-        "beta": 6666.6667,
+        "alpha": 182.04323366018033,
+        "beta": 16973.558759227708,
         "lambda_unit": "events-per-person-day"
       },
       "severity": {
@@ -8465,12 +8465,12 @@
     },
     "anaphylaxis": {
       "conditionId": "anaphylaxis",
-      "provenance": "tierC-synth",
-      "source_ref": "back-fit placeholder; calibrated to K15 Table 1 in Task 31",
+      "provenance": "tierB-pymc",
+      "source_ref": "python/outputs/fitted_priors/anaphylaxis/anaphylaxis.json",
       "incidence": {
         "distribution": "Gamma-Poisson",
-        "alpha": 2,
-        "beta": 500000,
+        "alpha": 503.98518082065084,
+        "beta": 437896904.85866547,
         "lambda_unit": "events-per-person-day"
       },
       "severity": {
@@ -8556,12 +8556,12 @@
     },
     "choking-obstructed-airway": {
       "conditionId": "choking-obstructed-airway",
-      "provenance": "tierC-synth",
-      "source_ref": "back-fit placeholder; calibrated to K15 Table 1 in Task 31",
+      "provenance": "tierB-pymc",
+      "source_ref": "python/outputs/fitted_priors/choking-obstructed-airway/choking-obstructed-airway.json",
       "incidence": {
         "distribution": "Gamma-Poisson",
-        "alpha": 2,
-        "beta": 500000,
+        "alpha": 1625.9532171815733,
+        "beta": 123859049352.52509,
         "lambda_unit": "events-per-person-day"
       },
       "severity": {
@@ -8647,12 +8647,12 @@
     },
     "elbow-dislocation": {
       "conditionId": "elbow-dislocation",
-      "provenance": "tierC-synth",
-      "source_ref": "back-fit placeholder; calibrated to K15 Table 1 in Task 31; rev3-e (2026-05-22): treated.fi_cp3 = untreated.fi_cp3 = 0 \u2014 condition fully resolves over 180d analog/LEO timeframe regardless of treatment (clinically defensible per K15 \u00a7II.A.5 'permanent impairment for remainder of mission' definition: acute self-limiting condition leaves no persistent impairment)",
+      "provenance": "tierB-pymc",
+      "source_ref": "python/outputs/fitted_priors/elbow-dislocation/elbow-dislocation.json",
       "incidence": {
         "distribution": "Gamma-Poisson",
-        "alpha": 2,
-        "beta": 10000,
+        "alpha": 36211.4454642718,
+        "beta": 253814905846.31882,
         "lambda_unit": "events-per-person-day"
       },
       "severity": {
@@ -8738,12 +8738,12 @@
     },
     "finger-dislocation": {
       "conditionId": "finger-dislocation",
-      "provenance": "tierC-synth",
-      "source_ref": "back-fit placeholder; calibrated to K15 Table 1 in Task 31; rev3-e (2026-05-22): treated.fi_cp3 = untreated.fi_cp3 = 0 \u2014 condition fully resolves over 180d analog/LEO timeframe regardless of treatment (clinically defensible per K15 \u00a7II.A.5 'permanent impairment for remainder of mission' definition: acute self-limiting condition leaves no persistent impairment)",
+      "provenance": "tierB-pymc",
+      "source_ref": "python/outputs/fitted_priors/finger-dislocation/finger-dislocation.json",
       "incidence": {
         "distribution": "Gamma-Poisson",
-        "alpha": 10,
-        "beta": 6666.6667,
+        "alpha": 158288.34409076892,
+        "beta": 520353802727.0379,
         "lambda_unit": "events-per-person-day"
       },
       "severity": {
@@ -8829,12 +8829,12 @@
     },
     "hip-proximal-femur-fracture": {
       "conditionId": "hip-proximal-femur-fracture",
-      "provenance": "tierC-synth",
-      "source_ref": "back-fit placeholder; calibrated to K15 Table 1 in Task 31",
+      "provenance": "tierB-pymc",
+      "source_ref": "python/outputs/fitted_priors/hip-proximal-femur-fracture/hip-proximal-femur-fracture.json",
       "incidence": {
         "distribution": "Gamma-Poisson",
-        "alpha": 2,
-        "beta": 10000,
+        "alpha": 68.98317882365284,
+        "beta": 39262917.56952739,
         "lambda_unit": "events-per-person-day"
       },
       "severity": {
@@ -8920,12 +8920,12 @@
     },
     "lower-extremity-le-stress-fracture": {
       "conditionId": "lower-extremity-le-stress-fracture",
-      "provenance": "tierC-synth",
-      "source_ref": "back-fit placeholder; calibrated to K15 Table 1 in Task 31; rev3-e (2026-05-22): treated.fi_cp3 = untreated.fi_cp3 = 0 \u2014 condition fully resolves over 180d analog/LEO timeframe regardless of treatment (clinically defensible per K15 \u00a7II.A.5 'permanent impairment for remainder of mission' definition: acute self-limiting condition leaves no persistent impairment)",
+      "provenance": "tierB-pymc",
+      "source_ref": "python/outputs/fitted_priors/lower-extremity-le-stress-fracture/lower-extremity-le-stress-fracture.json",
       "incidence": {
         "distribution": "Gamma-Poisson",
-        "alpha": 10,
-        "beta": 6666.6667,
+        "alpha": 50962.23723035741,
+        "beta": 2122764664.373885,
         "lambda_unit": "events-per-person-day"
       },
       "severity": {
@@ -9011,12 +9011,12 @@
     },
     "lumbar-spine-fracture": {
       "conditionId": "lumbar-spine-fracture",
-      "provenance": "tierC-synth",
-      "source_ref": "back-fit placeholder; calibrated to K15 Table 1 in Task 31",
+      "provenance": "tierB-pymc",
+      "source_ref": "python/outputs/fitted_priors/lumbar-spine-fracture/lumbar-spine-fracture.json",
       "incidence": {
         "distribution": "Gamma-Poisson",
-        "alpha": 2,
-        "beta": 10000,
+        "alpha": 46.48655772826392,
+        "beta": 38192725.228864595,
         "lambda_unit": "events-per-person-day"
       },
       "severity": {
@@ -9102,12 +9102,12 @@
     },
     "neurogenic-shock": {
       "conditionId": "neurogenic-shock",
-      "provenance": "tierC-synth",
-      "source_ref": "back-fit placeholder; calibrated to K15 Table 1 in Task 31",
+      "provenance": "tierB-pymc",
+      "source_ref": "python/outputs/fitted_priors/neurogenic-shock/neurogenic-shock.json",
       "incidence": {
         "distribution": "Gamma-Poisson",
-        "alpha": 2,
-        "beta": 500000,
+        "alpha": 3191.035698854475,
+        "beta": 278740282829.5636,
         "lambda_unit": "events-per-person-day"
       },
       "severity": {
@@ -9193,12 +9193,12 @@
     },
     "shoulder-dislocation": {
       "conditionId": "shoulder-dislocation",
-      "provenance": "tierC-synth",
-      "source_ref": "back-fit placeholder; calibrated to K15 Table 1 in Task 31",
+      "provenance": "tierB-pymc",
+      "source_ref": "python/outputs/fitted_priors/shoulder-dislocation/shoulder-dislocation.json",
       "incidence": {
         "distribution": "Gamma-Poisson",
-        "alpha": 2,
-        "beta": 10000,
+        "alpha": 8971.674088379228,
+        "beta": 13697783238.911798,
         "lambda_unit": "events-per-person-day"
       },
       "severity": {

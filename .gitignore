@@ -33,3 +33,9 @@ python/.venv/
 python/outputs/
 python/src/*.egg-info/
 __pycache__/
+
+# Repo-root outputs (fitted priors, batch reports)
+outputs/
+
+# Graphify skill generated artifacts
+research/graphify-out/

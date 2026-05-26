@@ -16,7 +16,7 @@ from pathlib import Path
 _REPO_ROOT = Path(__file__).parent.parent.resolve()
 sys.path.insert(0, str(_REPO_ROOT / "python" / "src"))
 
-from selectron.fitter import fit_all_tier_b, FitResult
+from selectron.fitter import fit_all_tier_b, fit_all_tier_c, FitResult
 from selectron.writer import merge_fitted_priors
 
 _BRIDGES_DIR = _REPO_ROOT / "research" / "evidence" / "bridges"
@@ -54,18 +54,29 @@ def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--dry-run", action="store_true")
     parser.add_argument("--condition", default=None, help="Fit a single condition by ID")
+    parser.add_argument("--tier", choices=["B", "C"], default="B", help="Tier to fit (B=tierB-lit, C=tierC-synth)")
     args = parser.parse_args()
 
-    logger.info("Running tier-B fit (dry_run=%s, condition_filter=%s)", args.dry_run, args.condition)
-
-    report = fit_all_tier_b(
-        draws=2000,
-        tune=1000,
-        chains=4,
-        seed=42,
-        condition_filter=args.condition,
-        dry_run=args.dry_run,
-    )
+    if args.tier == "B":
+        logger.info("Running tier-B fit (dry_run=%s, condition_filter=%s)", args.dry_run, args.condition)
+        report = fit_all_tier_b(
+            draws=2000,
+            tune=1000,
+            chains=4,
+            seed=42,
+            condition_filter=args.condition,
+            dry_run=args.dry_run,
+        )
+    else:
+        logger.info("Running tier-C fit (dry_run=%s, condition_filter=%s)", args.dry_run, args.condition)
+        report = fit_all_tier_c(
+            draws=2000,
+            tune=1000,
+            chains=4,
+            seed=42,
+            condition_filter=args.condition,
+            dry_run=args.dry_run,
+        )
 
     logger.info(
         "Fit complete: %d fitted, %d failed, %d skipped",

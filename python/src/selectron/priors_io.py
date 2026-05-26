@@ -21,6 +21,7 @@ _PROPOSAL_FILES = [
     "incidence_rates.proposals_p-e.csv",
     "incidence_rates.proposals_p-f.csv",
     "incidence_rates.proposals_p-g.csv",
+    "incidence_rates.proposals_p-h.csv",
 ]
 
 
@@ -76,6 +77,17 @@ def get_tier_b_conditions(
         cid: prior
         for cid, prior in data["conditions"].items()
         if prior.get("provenance") == "tierB-lit"
+    }
+
+
+def get_tier_c_conditions(
+    data: dict[str, Any],
+) -> dict[str, dict[str, Any]]:
+    """Extract all tier-C conditions from a priors dict."""
+    return {
+        cid: prior
+        for cid, prior in data["conditions"].items()
+        if prior.get("provenance") == "tierC-synth"
     }
 
 

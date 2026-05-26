@@ -148,7 +148,7 @@ def fit_gamma_poisson(
 
 # ── Batch fitting ───────────────────────────────────────────────────────────
 
-from selectron.priors_io import load_priors, get_tier_b_conditions, load_evidence_proposals
+from selectron.priors_io import load_priors, get_tier_b_conditions, get_tier_c_conditions, load_evidence_proposals
 
 
 @dataclass
@@ -249,6 +249,91 @@ def fit_all_tier_b(
             logger.warning("Convergence failed for %s: %s", cond_id, reasons)
 
     n_total = len(tier_b) if not condition_filter else 1
+    return BatchFitReport(
+        n_total=n_total,
+        n_fitted=len(fitted),
+        n_skipped=len(skipped),
+        n_failed=len(failed),
+        fitted=fitted,
+        skipped=skipped,
+        failed=failed,
+    )
+
+
+def fit_all_tier_c(
+    *,
+    draws: int = 2000,
+    tune: int = 1000,
+    chains: int = 4,
+    seed: int = 42,
+    output_dir: Path | None = None,
+    dry_run: bool = False,
+    condition_filter: str | None = None,
+) -> BatchFitReport:
+    """Fit all (or one) tier-C conditions that have evidence data."""
+    priors_data = load_priors()
+    tier_c = get_tier_c_conditions(priors_data)
+    evidence = load_evidence_proposals()
+
+    evidence_by_condition: dict[str, list[dict[str, Any]]] = {}
+    for row in evidence:
+        pid = row["mapped_prior_id"]
+        if pid is not None:
+            evidence_by_condition.setdefault(pid, []).append(row)
+
+    fitted: dict[str, FitResult] = {}
+    skipped: dict[str, str] = {}
+    failed: dict[str, tuple[FitResult, list[str]]] = {}
+
+    for cond_id, prior in sorted(tier_c.items()):
+        if condition_filter and cond_id != condition_filter:
+            continue
+
+        dist = prior["incidence"]["distribution"]
+
+        if dist == "Beta-Bernoulli":
+            skipped[cond_id] = "Beta-Bernoulli fitting deferred (CSV schema lacks proportion data)"
+            continue
+
+        obs_rows = evidence_by_condition.get(cond_id, [])
+        if not obs_rows:
+            skipped[cond_id] = "No evidence data in proposal CSVs"
+            continue
+
+        if dry_run:
+            skipped[cond_id] = f"DRY_RUN: would fit with {len(obs_rows)} observations"
+            continue
+
+        observations = [
+            {"person_days": r["person_days"], "events": r["events"]}
+            for r in obs_rows
+        ]
+        alpha_0 = prior["incidence"]["alpha"]
+        beta_0 = prior["incidence"]["beta"]
+
+        logger.info("Fitting %s: %d observations, alpha_0=%.2f, beta_0=%.2f",
+                     cond_id, len(observations), alpha_0, beta_0)
+
+        result = fit_gamma_poisson(
+            condition_id=cond_id,
+            alpha_0=alpha_0,
+            beta_0=beta_0,
+            observations=observations,
+            seed=seed,
+            draws=draws,
+            tune=tune,
+            chains=chains,
+            output_dir=output_dir / cond_id if output_dir else None,
+        )
+
+        ok, reasons = check_convergence(result)
+        if ok:
+            fitted[cond_id] = result
+        else:
+            failed[cond_id] = (result, reasons)
+            logger.warning("Convergence failed for %s: %s", cond_id, reasons)
+
+    n_total = len(tier_c) if not condition_filter else 1
     return BatchFitReport(
         n_total=n_total,
         n_fitted=len(fitted),

@@ -33,7 +33,8 @@ Update rules:
 - All 6 fits converged R-hat=1.000, ESS>2500; all 6 merged into `imm-priors.json` (provenance `tierB-pymc`)
 - **0 tier-B-lit conditions remain** — 100% of 100 IMM conditions are now evidence-based (40 tierA-nasa + 41 tierB-pymc + 19 tierC-synth)
 - K15 delta (all within brackets, exit 0): TME improved dramatically from ~73→98 (none), ~73→98 (issHMS), ~73→99 (unlimited) — evidence-based rates for musculoskeletal/eye conditions are far lower than prior synthetic guesses, bringing TME much closer to K15 reference (98–106). All CHI/pEVAC/pLOCL within K15 CI95.
-- **Next steps:** (1) Outcome parameter re-calibration (p_evac/p_locl closed-form rescale per §3.3). (2) rev3-f severity tuning (32 persistent-impairment conditions). (3) Tier-C synthetic calibration (18 conditions).
+- **Tier-C synthetic calibration DONE** (2026-05-25, v0.5.4). 16 of 18 tierC-synth conditions converted to tierB-pymc via MCP literature search + PyMC NUTS. 2 remain tierC-synth: `acute-radiation-syndrome` (Beta-Bernoulli, pipeline deferred) and `smoke-inhalation` (no evidence found across all 4 MCP tools). New provenance counts: 40 tierA-nasa + 57 tierB-pymc + 3 tierC-synth. K15 validation exit 0 post-merge.
+- **Next steps:** (1) Outcome parameter re-calibration (p_evac/p_locl closed-form rescale per §3.3). (2) rev3-f severity tuning (32 persistent-impairment conditions).
 - HIGH PRIORITY p_evac flag in STATUS.md was stale (pre-rev3-d/e). Actual post-rev3-e state: p_evac is under-elicited for 'none' (9.65% vs 66.90%) and slightly over for issHMS (6.05% vs 5.57%). Root cause is per-event Beta-PERT outcome parameters, not incidence.
 
 **Previously: Evidence pass p-f DONE** (2026-05-25). 11 Beta-Bernoulli → Gamma-Poisson conversions with terrestrial epidemiological base rates. 38/41 tier-B now fittable; 0 Beta-Bernoulli remain.
@@ -588,6 +589,7 @@ This is intentional triage — flag it now if Diego disagrees. The trade-off: ~5
 | 2026-05-25 | proposals_p-g.csv | `data: proposals_p-g — agent-sourced incidence rates for 6 tier-B-lit conditions`. 37 rows: 9 barotrauma-ear, 6 eye-penetration, 6 shoulder, 5 elbow, 5 hip, 6 wrist. Sources: NASA LSAH, hypobaric chamber cohorts, NEISS, GBD, NCAA/UEFA sports surveillance. |
 | 2026-05-25 | priors_io EST: fix | `fix(priors_io): strip EST: prefix from person_days/events before int conversion`. Existing parser assumed all-numeric; new proposals use EST: prefix for estimated values. |
 | 2026-05-25 | Full IMM calibration | `feat(calibration): merge all 6 tier-B-lit posteriors — 100% conditions now tierB-pymc`. All 6 fits converged R-hat=1.000. TME: ~73→98 across all kit scenarios (evidence-based rates correct; prior synthetics were ~4–1000× too high). 0 tierB-lit remain. K15 12/12 metrics within brackets (exit 0). |
+| 2026-05-25 | Tier-C calibration | `feat(calibration): 16/18 tierC-synth → tierB-pymc via MCP search + PyMC NUTS`. 41 evidence rows in `proposals_p-h.csv` (Consensus/Scite/paper-search/Firecrawl). Fits: R-hat=1.0000, div=0 all 16. Skipped: acute-radiation-syndrome (Beta-Bernoulli deferred), smoke-inhalation (no evidence). Merged into imm-priors.json; K15 validation exit 0. |
 
 ## IMM Composite-Crew reproducer output (2026-05-21)
 
