@@ -24,18 +24,6 @@
 
 ---
 
-> ### ⚠ NOT-FOR-FLIGHT — Earth-analog + LEO-ISS scope only
->
-> Selectron v1 is a **research instrument** scoped to **Earth-based analog isolation missions** (MDRS, HI-SEAS, Mars-500, Antarctic winter-over, SIRIUS, AMADEE, D-MARS, CHAPEA) and **LEO / ISS-baseline scenarios** (ISS 6 mo K15 reference, S20 DRM1 / DRM2).
->
-> **Selectron v1 is NOT a Mars-mission tool, NOT an Artemis-mission tool, NOT a flight-medical-kit sizing tool, and NOT a substitute for individual crew-member fitness-to-fly assessment.** The Mars (TM21 AMM / SMM) and Artemis (I–IV) missions are catalogued for forward-compat but tagged `kind: "*-future"` and filtered out of the active mission picker. See [`docs/future_features.md`](docs/future_features.md) for the structural engine prerequisites required to extend Selectron beyond Earth analog (comms-delay treatment degradation, cumulative-dose pathways, partial-gravity EVA risk profiles).
->
-> Calibration is complete within scope: as of priors-rev3-f (2026-05-26), **100% of 100 IMM conditions are evidence-based** (40 tierA-nasa + 57 tierB-pymc + 3 tierC-synth). **26/26 K15 validation tests pass** with documented-divergent brackets where closure is physically impossible (see [`docs/iter5_scientific_limitations.md`](docs/iter5_scientific_limitations.md) §3.5). TME ~98 vs K15 ref 98–106 — consistent with terrestrial analog epidemiology, not a calibration error. The remaining residuals are on the operationally-implausible 'none' scenario (accepted limitation) and small per-event pEVAC/pLOCL deviations on issHMS/unlimited. See [`docs/iter5_scientific_limitations.md`](docs/iter5_scientific_limitations.md) for the full honest catalog.
->
-> For real-mission medical-risk decisions (any destination), use NASA's actual iMED + IMM workflow with NASA-internal priors.
-
----
-
 ## What Selectron is
 
 A working TypeScript application and a methodology paper, in one repository.
