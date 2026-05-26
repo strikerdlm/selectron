@@ -1,6 +1,6 @@
 # Selectron — STATUS
 
-**Last updated:** 2026-05-25 (IMM full calibration complete v0.5.3: all 6 remaining tier-B-lit conditions fitted via MCP literature search + PyMC NUTS; 100% of 100 IMM conditions now evidence-based; TME improved from ~73→98 across all kit scenarios)
+**Last updated:** 2026-05-26 (rev3-f severity tuning 12/32 done; outcome parameter rescale attempted and reverted; calibration is active priority before manuscript)
 **Current branch:** `iter1-phase0`
 **Active plan (Iter 1):** [`docs/superpowers/plans/2026-05-18-selectron-iter1-phase0.md`](docs/superpowers/plans/2026-05-18-selectron-iter1-phase0.md)
 **Active plan (Iter 3):** [`docs/superpowers/plans/2026-05-18-selectron-iter3-risk.md`](docs/superpowers/plans/2026-05-18-selectron-iter3-risk.md)
@@ -28,7 +28,9 @@ Update rules:
 
 ## Current state
 
-**Next action:** **Full IMM calibration DONE** (2026-05-25, v0.5.3). All 6 remaining `tierB-lit` conditions now fitted:
+**Next action:** **Calibration is active priority** (v0.5.4). Manuscript submission blocked until calibration stabilises.
+
+**Full IMM calibration DONE** (2026-05-25, v0.5.3). All 6 remaining `tierB-lit` conditions now fitted:
 - 6 parallel MCP literature search agents (Consensus + Scite + paper-search + Firecrawl) produced 37 evidence rows across barotrauma-ear-sinus-block, eye-penetration-foreign-body, shoulder/elbow/hip/wrist-sprain-strain → `proposals_p-g.csv`
 - All 6 fits converged R-hat=1.000, ESS>2500; all 6 merged into `imm-priors.json` (provenance `tierB-pymc`)
 - **0 tier-B-lit conditions remain** — 100% of 100 IMM conditions are now evidence-based (40 tierA-nasa + 41 tierB-pymc + 19 tierC-synth)
@@ -36,7 +38,10 @@ Update rules:
 - **Tier-C synthetic calibration DONE** (2026-05-25, v0.5.4). 16 of 18 tierC-synth conditions converted to tierB-pymc via MCP literature search + PyMC NUTS. 2 remain tierC-synth: `acute-radiation-syndrome` (Beta-Bernoulli, pipeline deferred) and `smoke-inhalation` (no evidence found across all 4 MCP tools). New provenance counts: 40 tierA-nasa + 57 tierB-pymc + 3 tierC-synth. K15 validation exit 0 post-merge.
 - **rev3-f severity tuning DONE** (2026-05-26). 12 of 32 persistent-impairment conditions updated against `severity_f.proposals_rev3f.csv` (65 evidence rows from MCP literature search). Changes: `worst_case_prob_alpha/beta` re-elicited from treated impairment-fraction means; `fi_cp3` Beta-Pert aligned to tier defaults (Tier A/B/C). Expected impact minimal (<1pp CHI) because these are rare events; validation confirmed. K15 CI95 width baseline updated in `tests/imm/validation_k15.test.ts` (unlimited CHI width 3.5 → 11.5 due to higher cp3 variance — intentional, literature-driven).
 - **Outcome parameter re-calibration ATTEMPTED and REVERTED** (2026-05-26). Closed-form rescale script (`scripts/rescale_outcome_parameters.ts`) applied s_untreated=8.42×/s_treated=3.16× to p_evac/p_locl. 'none' pEVAC improved 12.25 % → 63.90 % (target 66.90 %); unlimited pEVAC improved 1.59 % → 4.86 % (target 4.93 %). However, issHMS pEVAC catastrophically degraded 9.65 % → 53.39 % (target 5.57 %) via RAF-interpolated fall-through coupling — exactly as predicted in `docs/iter5_scientific_limitations.md` §3.5 rationale #4. Priors reverted; script preserved for sensitivity analysis. Limitations doc updated with empirical confirmation. **Decision reaffirmed:** accept 'none' divergence as principled limitation.
-- **Next steps:** (1) Remaining 20 of 32 persistent-impairment conditions (rev3-f continued) — blocked on additional literature search.
+- **Next steps (calibration before manuscript):**
+  1. **rev3-f continued:** remaining 20 of 32 persistent-impairment conditions — blocked on MCP literature search for primary-source severity evidence.
+  2. **Fix 5 pre-existing simulate.test.ts failures** — tier multiplier + convergence tests drifted during tierB-pymc calibration.
+  3. **Manuscript submission** — blocked until calibration stabilises (Zenodo DOI, cover letter, npj Microgravity portal).
 - HIGH PRIORITY p_evac flag in STATUS.md was stale (pre-rev3-d/e). Actual post-rev3-e state: p_evac is under-elicited for 'none' (9.65% vs 66.90%) and slightly over for issHMS (6.05% vs 5.57%). Root cause is per-event Beta-PERT outcome parameters, not incidence.
 
 **Previously: Evidence pass p-f DONE** (2026-05-25). 11 Beta-Bernoulli → Gamma-Poisson conversions with terrestrial epidemiological base rates. 38/41 tier-B now fittable; 0 Beta-Bernoulli remain.
