@@ -1519,7 +1519,7 @@
     "sepsis": {
       "conditionId": "sepsis",
       "provenance": "tierA-nasa",
-      "source_ref": "research/imm_sources/zotero_imm/antonsen-2021-comparison-of-health-and-performance.md#table-4",
+      "source_ref": "research/imm_sources/zotero_imm/antonsen-2021-comparison-of-health-and-performance.md#table-4; rev3-f (2026-05-26): severity tuned against persistent-impairment literature \u2014 treated mean=0.314, n_treated=3, n_untreated=0",
       "incidence": {
         "distribution": "Gamma-Poisson",
         "alpha": 2,
@@ -1527,8 +1527,8 @@
         "lambda_unit": "events-per-person-day"
       },
       "severity": {
-        "worst_case_prob_alpha": 1.5,
-        "worst_case_prob_beta": 3.5
+        "worst_case_prob_alpha": 3.14,
+        "worst_case_prob_beta": 6.86
       },
       "treated": {
         "fi_cp1": {
@@ -1552,9 +1552,9 @@
           "max": 1440
         },
         "fi_cp3": {
-          "min": 0,
-          "mode": 0.02,
-          "max": 0.1
+          "min": 0.0,
+          "mode": 0.8,
+          "max": 0.95
         },
         "p_evac": {
           "min": 0.005,
@@ -1589,9 +1589,9 @@
           "max": 4320
         },
         "fi_cp3": {
-          "min": 0,
-          "mode": 0.2,
-          "max": 0.8
+          "min": 0.0,
+          "mode": 0.96,
+          "max": 1.0
         },
         "p_evac": {
           "min": 0.18,
@@ -1709,7 +1709,7 @@
     "stroke-cerebrovascular-accident": {
       "conditionId": "stroke-cerebrovascular-accident",
       "provenance": "tierA-nasa",
-      "source_ref": "research/imm_sources/zotero_imm/antonsen-2021-comparison-of-health-and-performance.md#table-4",
+      "source_ref": "research/imm_sources/zotero_imm/antonsen-2021-comparison-of-health-and-performance.md#table-4; rev3-f (2026-05-26): severity tuned against persistent-impairment literature \u2014 treated mean=0.53, n_treated=3, n_untreated=3",
       "incidence": {
         "distribution": "Gamma-Poisson",
         "alpha": 2,
@@ -1717,8 +1717,8 @@
         "lambda_unit": "events-per-person-day"
       },
       "severity": {
-        "worst_case_prob_alpha": 1.5,
-        "worst_case_prob_beta": 3.5
+        "worst_case_prob_alpha": 5.3,
+        "worst_case_prob_beta": 4.7
       },
       "treated": {
         "fi_cp1": {
@@ -1742,9 +1742,9 @@
           "max": 1440
         },
         "fi_cp3": {
-          "min": 0,
-          "mode": 0.02,
-          "max": 0.1
+          "min": 0.0,
+          "mode": 0.8,
+          "max": 0.95
         },
         "p_evac": {
           "min": 0.005,
@@ -1779,9 +1779,9 @@
           "max": 4320
         },
         "fi_cp3": {
-          "min": 0,
-          "mode": 0.2,
-          "max": 0.8
+          "min": 0.0,
+          "mode": 0.96,
+          "max": 1.0
         },
         "p_evac": {
           "min": 0.18,
@@ -2369,7 +2369,7 @@
     "traumatic-hypovolemic-shock": {
       "conditionId": "traumatic-hypovolemic-shock",
       "provenance": "tierA-nasa",
-      "source_ref": "research/imm_sources/zotero_imm/antonsen-2021-comparison-of-health-and-performance.md#table-4",
+      "source_ref": "research/imm_sources/zotero_imm/antonsen-2021-comparison-of-health-and-performance.md#table-4; rev3-f (2026-05-26): severity tuned against persistent-impairment literature \u2014 treated mean=0.237, n_treated=3, n_untreated=2",
       "incidence": {
         "distribution": "Gamma-Poisson",
         "alpha": 2,
@@ -2377,8 +2377,8 @@
         "lambda_unit": "events-per-person-day"
       },
       "severity": {
-        "worst_case_prob_alpha": 1.5,
-        "worst_case_prob_beta": 3.5
+        "worst_case_prob_alpha": 2.37,
+        "worst_case_prob_beta": 7.63
       },
       "treated": {
         "fi_cp1": {
@@ -2402,9 +2402,9 @@
           "max": 1440
         },
         "fi_cp3": {
-          "min": 0,
-          "mode": 0.02,
-          "max": 0.1
+          "min": 0.0,
+          "mode": 0.8,
+          "max": 0.95
         },
         "p_evac": {
           "min": 0.005,
@@ -2439,9 +2439,9 @@
           "max": 4320
         },
         "fi_cp3": {
-          "min": 0,
-          "mode": 0.2,
-          "max": 0.8
+          "min": 0.0,
+          "mode": 0.96,
+          "max": 1.0
         },
         "p_evac": {
           "min": 0.18,
@@ -2559,7 +2559,7 @@
     "sudden-cardiac-arrest": {
       "conditionId": "sudden-cardiac-arrest",
       "provenance": "tierA-nasa",
-      "source_ref": "research/imm_sources/zotero_imm/antonsen-2021-comparison-of-health-and-performance.md#table-6",
+      "source_ref": "research/imm_sources/zotero_imm/antonsen-2021-comparison-of-health-and-performance.md#table-6; rev3-f (2026-05-26): severity tuned against persistent-impairment literature \u2014 treated mean=0.11, n_treated=6, n_untreated=1",
       "incidence": {
         "distribution": "Gamma-Poisson",
         "alpha": 2,
@@ -2567,8 +2567,8 @@
         "lambda_unit": "events-per-person-day"
       },
       "severity": {
-        "worst_case_prob_alpha": 1.5,
-        "worst_case_prob_beta": 3.5
+        "worst_case_prob_alpha": 1.09,
+        "worst_case_prob_beta": 8.9
       },
       "treated": {
         "fi_cp1": {
@@ -2592,9 +2592,9 @@
           "max": 1440
         },
         "fi_cp3": {
-          "min": 0,
-          "mode": 0.02,
-          "max": 0.1
+          "min": 0.0,
+          "mode": 0.8,
+          "max": 0.95
         },
         "p_evac": {
           "min": 0.005,
@@ -2629,9 +2629,9 @@
           "max": 4320
         },
         "fi_cp3": {
-          "min": 0,
-          "mode": 0.2,
-          "max": 0.8
+          "min": 0.0,
+          "mode": 0.96,
+          "max": 1.0
         },
         "p_evac": {
           "min": 0.18,
@@ -2653,7 +2653,7 @@
     "burns-secondary-to-fire": {
       "conditionId": "burns-secondary-to-fire",
       "provenance": "tierA-nasa",
-      "source_ref": "research/imm_sources/zotero_imm/antonsen-2021-comparison-of-health-and-performance.md#table-6",
+      "source_ref": "research/imm_sources/zotero_imm/antonsen-2021-comparison-of-health-and-performance.md#table-6; rev3-f (2026-05-26): severity tuned against persistent-impairment literature \u2014 treated mean=0.33, n_treated=5, n_untreated=1",
       "incidence": {
         "distribution": "Gamma-Poisson",
         "alpha": 2,
@@ -2661,8 +2661,8 @@
         "lambda_unit": "events-per-person-day"
       },
       "severity": {
-        "worst_case_prob_alpha": 1.5,
-        "worst_case_prob_beta": 3.5
+        "worst_case_prob_alpha": 3.3,
+        "worst_case_prob_beta": 6.7
       },
       "treated": {
         "fi_cp1": {
@@ -2686,9 +2686,9 @@
           "max": 1440
         },
         "fi_cp3": {
-          "min": 0,
-          "mode": 0.02,
-          "max": 0.1
+          "min": 0.0,
+          "mode": 0.8,
+          "max": 0.95
         },
         "p_evac": {
           "min": 0.005,
@@ -2723,9 +2723,9 @@
           "max": 4320
         },
         "fi_cp3": {
-          "min": 0,
-          "mode": 0.2,
-          "max": 0.8
+          "min": 0.0,
+          "mode": 0.96,
+          "max": 1.0
         },
         "p_evac": {
           "min": 0.18,
@@ -2748,7 +2748,7 @@
     "toxic-exposure-ammonia": {
       "conditionId": "toxic-exposure-ammonia",
       "provenance": "tierA-nasa",
-      "source_ref": "research/imm_sources/zotero_imm/antonsen-2021-comparison-of-health-and-performance.md#table-6",
+      "source_ref": "research/imm_sources/zotero_imm/antonsen-2021-comparison-of-health-and-performance.md#table-6; rev3-f (2026-05-26): severity tuned against persistent-impairment literature \u2014 treated mean=0.702, n_treated=3, n_untreated=0",
       "incidence": {
         "distribution": "Gamma-Poisson",
         "alpha": 2,
@@ -2756,8 +2756,8 @@
         "lambda_unit": "events-per-person-day"
       },
       "severity": {
-        "worst_case_prob_alpha": 1.5,
-        "worst_case_prob_beta": 3.5
+        "worst_case_prob_alpha": 7.02,
+        "worst_case_prob_beta": 2.98
       },
       "treated": {
         "fi_cp1": {
@@ -2781,9 +2781,9 @@
           "max": 1440
         },
         "fi_cp3": {
-          "min": 0,
-          "mode": 0.02,
-          "max": 0.1
+          "min": 0.0,
+          "mode": 0.8,
+          "max": 0.95
         },
         "p_evac": {
           "min": 0.005,
@@ -2818,9 +2818,9 @@
           "max": 4320
         },
         "fi_cp3": {
-          "min": 0,
-          "mode": 0.2,
-          "max": 0.8
+          "min": 0.0,
+          "mode": 0.96,
+          "max": 1.0
         },
         "p_evac": {
           "min": 0.18,
@@ -6219,7 +6219,7 @@
     "cardiogenic-shock-secondary-to-myocardial-infarction": {
       "conditionId": "cardiogenic-shock-secondary-to-myocardial-infarction",
       "provenance": "tierB-pymc",
-      "source_ref": "python/outputs/fitted_priors_run1/cardiogenic-shock-secondary-to-myocardial-infarction/cardiogenic-shock-secondary-to-myocardial-infarction.json",
+      "source_ref": "python/outputs/fitted_priors_run1/cardiogenic-shock-secondary-to-myocardial-infarction/cardiogenic-shock-secondary-to-myocardial-infarction.json; rev3-f (2026-05-26): severity tuned against persistent-impairment literature \u2014 treated mean=0.323, n_treated=4, n_untreated=3",
       "incidence": {
         "distribution": "Gamma-Poisson",
         "alpha": 5.018982852576258,
@@ -6227,8 +6227,8 @@
         "lambda_unit": "events-per-person-day"
       },
       "severity": {
-        "worst_case_prob_alpha": 3,
-        "worst_case_prob_beta": 7
+        "worst_case_prob_alpha": 3.23,
+        "worst_case_prob_beta": 6.78
       },
       "treated": {
         "fi_cp1": {
@@ -6252,9 +6252,9 @@
           "max": 1440
         },
         "fi_cp3": {
-          "min": 0,
-          "mode": 0.02,
-          "max": 0.1
+          "min": 0.0,
+          "mode": 0.8,
+          "max": 0.95
         },
         "p_evac": {
           "min": 0.005,
@@ -6289,9 +6289,9 @@
           "max": 4320
         },
         "fi_cp3": {
-          "min": 0,
-          "mode": 0.2,
-          "max": 0.8
+          "min": 0.0,
+          "mode": 0.96,
+          "max": 1.0
         },
         "p_evac": {
           "min": 0.18,
@@ -8284,7 +8284,7 @@
     "acute-radiation-syndrome": {
       "conditionId": "acute-radiation-syndrome",
       "provenance": "tierC-synth",
-      "source_ref": "back-fit placeholder; calibrated to K15 Table 1 in Task 31",
+      "source_ref": "back-fit placeholder; calibrated to K15 Table 1 in Task 31; rev3-f (2026-05-26): severity tuned against persistent-impairment literature \u2014 treated mean=0.495, n_treated=6, n_untreated=1",
       "incidence": {
         "distribution": "Beta-Bernoulli",
         "alpha": 2,
@@ -8292,8 +8292,8 @@
         "lambda_unit": "events-per-SPE"
       },
       "severity": {
-        "worst_case_prob_alpha": 1.2,
-        "worst_case_prob_beta": 4.8
+        "worst_case_prob_alpha": 4.95,
+        "worst_case_prob_beta": 5.05
       },
       "treated": {
         "fi_cp1": {
@@ -8317,9 +8317,9 @@
           "max": 1440
         },
         "fi_cp3": {
-          "min": 0,
-          "mode": 0.02,
-          "max": 0.1
+          "min": 0.0,
+          "mode": 0.8,
+          "max": 0.95
         },
         "p_evac": {
           "min": 0.005,
@@ -8354,9 +8354,9 @@
           "max": 4320
         },
         "fi_cp3": {
-          "min": 0,
-          "mode": 0.2,
-          "max": 0.8
+          "min": 0.0,
+          "mode": 0.96,
+          "max": 1.0
         },
         "p_evac": {
           "min": 0.18,
@@ -8466,7 +8466,7 @@
     "anaphylaxis": {
       "conditionId": "anaphylaxis",
       "provenance": "tierB-pymc",
-      "source_ref": "python/outputs/fitted_priors/anaphylaxis/anaphylaxis.json",
+      "source_ref": "python/outputs/fitted_priors/anaphylaxis/anaphylaxis.json; rev3-f (2026-05-26): severity tuned against persistent-impairment literature \u2014 treated mean=0.176, n_treated=4, n_untreated=2",
       "incidence": {
         "distribution": "Gamma-Poisson",
         "alpha": 503.98518082065084,
@@ -8474,8 +8474,8 @@
         "lambda_unit": "events-per-person-day"
       },
       "severity": {
-        "worst_case_prob_alpha": 1.2,
-        "worst_case_prob_beta": 4.8
+        "worst_case_prob_alpha": 1.76,
+        "worst_case_prob_beta": 8.24
       },
       "treated": {
         "fi_cp1": {
@@ -8499,9 +8499,9 @@
           "max": 1440
         },
         "fi_cp3": {
-          "min": 0,
-          "mode": 0.02,
-          "max": 0.1
+          "min": 0.0,
+          "mode": 0.8,
+          "max": 0.95
         },
         "p_evac": {
           "min": 0.005,
@@ -8536,9 +8536,9 @@
           "max": 4320
         },
         "fi_cp3": {
-          "min": 0,
-          "mode": 0.2,
-          "max": 0.8
+          "min": 0.0,
+          "mode": 0.96,
+          "max": 1.0
         },
         "p_evac": {
           "min": 0.18,
@@ -8557,7 +8557,7 @@
     "choking-obstructed-airway": {
       "conditionId": "choking-obstructed-airway",
       "provenance": "tierB-pymc",
-      "source_ref": "python/outputs/fitted_priors/choking-obstructed-airway/choking-obstructed-airway.json",
+      "source_ref": "python/outputs/fitted_priors/choking-obstructed-airway/choking-obstructed-airway.json; rev3-f (2026-05-26): severity tuned against persistent-impairment literature \u2014 treated mean=0.387, n_treated=1, n_untreated=1",
       "incidence": {
         "distribution": "Gamma-Poisson",
         "alpha": 1625.9532171815733,
@@ -8565,8 +8565,8 @@
         "lambda_unit": "events-per-person-day"
       },
       "severity": {
-        "worst_case_prob_alpha": 1.2,
-        "worst_case_prob_beta": 4.8
+        "worst_case_prob_alpha": 3.87,
+        "worst_case_prob_beta": 6.13
       },
       "treated": {
         "fi_cp1": {
@@ -8590,9 +8590,9 @@
           "max": 1440
         },
         "fi_cp3": {
-          "min": 0,
-          "mode": 0.02,
-          "max": 0.1
+          "min": 0.0,
+          "mode": 0.8,
+          "max": 0.95
         },
         "p_evac": {
           "min": 0.005,
@@ -8627,9 +8627,9 @@
           "max": 4320
         },
         "fi_cp3": {
-          "min": 0,
-          "mode": 0.2,
-          "max": 0.8
+          "min": 0.0,
+          "mode": 0.96,
+          "max": 1.0
         },
         "p_evac": {
           "min": 0.18,
@@ -9103,7 +9103,7 @@
     "neurogenic-shock": {
       "conditionId": "neurogenic-shock",
       "provenance": "tierB-pymc",
-      "source_ref": "python/outputs/fitted_priors/neurogenic-shock/neurogenic-shock.json",
+      "source_ref": "python/outputs/fitted_priors/neurogenic-shock/neurogenic-shock.json; rev3-f (2026-05-26): severity tuned against persistent-impairment literature \u2014 treated mean=0.809, n_treated=4, n_untreated=2",
       "incidence": {
         "distribution": "Gamma-Poisson",
         "alpha": 3191.035698854475,
@@ -9111,8 +9111,8 @@
         "lambda_unit": "events-per-person-day"
       },
       "severity": {
-        "worst_case_prob_alpha": 1.2,
-        "worst_case_prob_beta": 4.8
+        "worst_case_prob_alpha": 8.1,
+        "worst_case_prob_beta": 1.91
       },
       "treated": {
         "fi_cp1": {
@@ -9136,9 +9136,9 @@
           "max": 1440
         },
         "fi_cp3": {
-          "min": 0,
-          "mode": 0.02,
-          "max": 0.1
+          "min": 0.0,
+          "mode": 0.8,
+          "max": 0.95
         },
         "p_evac": {
           "min": 0.005,
@@ -9173,9 +9173,9 @@
           "max": 4320
         },
         "fi_cp3": {
-          "min": 0,
-          "mode": 0.2,
-          "max": 0.8
+          "min": 0.0,
+          "mode": 0.96,
+          "max": 1.0
         },
         "p_evac": {
           "min": 0.18,
@@ -9285,7 +9285,7 @@
     "smoke-inhalation": {
       "conditionId": "smoke-inhalation",
       "provenance": "tierC-synth",
-      "source_ref": "back-fit placeholder; calibrated to K15 Table 1 in Task 31",
+      "source_ref": "back-fit placeholder; calibrated to K15 Table 1 in Task 31; rev3-f (2026-05-26): severity tuned against persistent-impairment literature \u2014 treated mean=0.514, n_treated=5, n_untreated=1",
       "incidence": {
         "distribution": "Gamma-Poisson",
         "alpha": 2,
@@ -9293,8 +9293,8 @@
         "lambda_unit": "events-per-person-day"
       },
       "severity": {
-        "worst_case_prob_alpha": 1.2,
-        "worst_case_prob_beta": 4.8
+        "worst_case_prob_alpha": 5.14,
+        "worst_case_prob_beta": 4.86
       },
       "treated": {
         "fi_cp1": {
@@ -9318,9 +9318,9 @@
           "max": 1440
         },
         "fi_cp3": {
-          "min": 0,
-          "mode": 0.02,
-          "max": 0.1
+          "min": 0.0,
+          "mode": 0.8,
+          "max": 0.95
         },
         "p_evac": {
           "min": 0.005,
@@ -9355,9 +9355,9 @@
           "max": 4320
         },
         "fi_cp3": {
-          "min": 0,
-          "mode": 0.2,
-          "max": 0.8
+          "min": 0.0,
+          "mode": 0.96,
+          "max": 1.0
         },
         "p_evac": {
           "min": 0.18,

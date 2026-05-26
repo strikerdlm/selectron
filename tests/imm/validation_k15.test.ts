@@ -32,7 +32,7 @@
 // verbatim K15 paper §III ranges captured in
 // research/imm_sources/architecture/K15_keenan_2015_imm_probabilistic_simulation.md.
 //
-// Current accepted state (post-rev3-e, 2026-05-22):
+// Current accepted state (post-rev3-f, 2026-05-26):
 //   5 of 12 metrics within K15 CI₉₅ (all 3 TME ✓; issHMS CHI ✓; unlimited CHI ✓)
 //   7 of 12 metrics documented-divergent:
 //     - none CHI (overshoots; reveals untreated.fi_cp1/cp2 under-elicitation)
@@ -42,6 +42,12 @@
 //     - issHMS pLOCL (slightly under)
 //     - unlimited pEVAC (under)
 //     - unlimited pLOCL (under)
+//
+// rev3-f severity tuning (2026-05-26): updated worst_case_prob + fi_cp3 for 12
+// persistent-impairment conditions against primary-source literature. Expected
+// consequence: higher QTL variance when worst-case events occur, widening CHI
+// CI₉₅ width on scenarios with full resource availability (unlimited CHI width
+// 3.5 → 11.5). Width baseline updated accordingly — see WIDTH_BASELINES.
 //
 // See docs/iter5_priors_rev3_strategy.md §7-§10 for the calibration history
 // and docs/iter5_scientific_limitations.md §4 for the residuals analysis.
@@ -229,21 +235,23 @@ function runScenarioTests(scenarioId: keyof typeof K15) {
   });
 }
 
-// peer-review-2 Issue 5: v0.5.0 observed CI₉₅ widths per scenario × metric.
-// Extracted from the validate_imm run at commit 9e31b85; used as the regression
-// baseline for the width assertions above. Update when the calibration changes
-// substantively (rev3-f etc.); width changes outside ±50 % indicate a real
-// variance regression that should be investigated, not silently re-baselined.
-// Measured by `scripts/extract_v0_5_0_widths.ts` at commit 9e31b85 / v0.5.0.
-// pEvac and pLocl have notable patterns: 'none' and 'issHMS' pEvac CI₉₅ widths
-// are 100 % because the bracketing computation saturates for heavily skewed
-// rare-event posteriors; 'unlimited' pEvac and all pLocl widths are 0 because
-// most trials produce a zero outcome (CI₉₅ at the 2.5%/97.5% percentiles
-// collapses to the same value).
+// peer-review-2 Issue 5: observed CI₉₅ widths per scenario × metric.
+// Baseline extracted post-rev3-f (2026-05-26) via `scripts/extract_v0_5_0_widths.ts`.
+// Update when calibration changes substantively; width changes outside ±50 %
+// indicate a real variance regression that should be investigated.
+//
+// rev3-f impact: unlimited CHI width 3.5 → 11.5 (3.3×). Root cause: 12 persistent-
+// impairment conditions now carry evidence-based fi_cp3 (mode 0.8 vs prior 0.02)
+// and higher worst_case_prob. When unlimited resources make treatment likely,
+// the cp3 QTL tail widens, increasing CHI variance. This is an intentional,
+// literature-driven variance increase — not a regression.
+//
+// pEvac and pLocl patterns unchanged: 'none'/'issHMS' pEvac saturate at 100 %
+// (skewed rare-event posteriors); 'unlimited' pEvac and all pLOCL collapse to 0.
 const WIDTH_BASELINES = {
-  none:      { tme: 38.0, chi: 18.0, pEvac: 100.0, pLocl: 0 },
-  issHMS:    { tme: 37.0, chi: 16.0, pEvac: 100.0, pLocl: 0 },
-  unlimited: { tme: 37.0, chi:  3.5, pEvac:   0,   pLocl: 0 },
+  none:      { tme: 47.0, chi: 16.12, pEvac: 100.0, pLocl: 0 },
+  issHMS:    { tme: 46.0, chi: 15.47, pEvac: 100.0, pLocl: 0 },
+  unlimited: { tme: 45.0, chi: 11.54, pEvac:   0,   pLocl: 0 },
 };
 
 runScenarioTests("none");
