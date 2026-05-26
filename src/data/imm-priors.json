@@ -951,7 +951,7 @@
     "atrial-fibrillation-atrial-flutter": {
       "conditionId": "atrial-fibrillation-atrial-flutter",
       "provenance": "tierA-nasa",
-      "source_ref": "research/imm_sources/methods/G12_gilkey_2012_bayesian_imm.md#atrial-fibrillation-atrial-flutter",
+      "source_ref": "research/imm_sources/methods/G12_gilkey_2012_bayesian_imm.md#atrial-fibrillation-atrial-flutter; rev3-f (2026-05-26T15:22:15Z): severity tuned against persistent-impairment literature \u2014 treated mean=0.42, n_treated=2, n_untreated=1",
       "incidence": {
         "distribution": "Lognormal-Poisson",
         "mu_log_lambda": -13.5442,
@@ -984,9 +984,9 @@
           "max": 720
         },
         "fi_cp3": {
-          "min": 0,
-          "mode": 0.01,
-          "max": 0.05
+          "min": 0.29,
+          "mode": 0.415,
+          "max": 0.5
         },
         "p_evac": {
           "min": 5e-05,
@@ -1021,9 +1021,9 @@
           "max": 2160
         },
         "fi_cp3": {
-          "min": 0,
-          "mode": 0.05,
-          "max": 0.3
+          "min": 0.54,
+          "mode": 0.55,
+          "max": 0.56
         },
         "p_evac": {
           "min": 0.009,
@@ -1145,7 +1145,7 @@
     "seizures": {
       "conditionId": "seizures",
       "provenance": "tierA-nasa",
-      "source_ref": "research/imm_sources/methods/G12_gilkey_2012_bayesian_imm.md#seizures",
+      "source_ref": "research/imm_sources/methods/G12_gilkey_2012_bayesian_imm.md#seizures; rev3-f (2026-05-26T15:22:15Z): severity tuned against persistent-impairment literature \u2014 treated mean=0.59, n_treated=2, n_untreated=1",
       "incidence": {
         "distribution": "Lognormal-Poisson",
         "mu_log_lambda": -14.1233,
@@ -1178,9 +1178,9 @@
           "max": 720
         },
         "fi_cp3": {
-          "min": 0,
-          "mode": 0.01,
-          "max": 0.05
+          "min": 0.39,
+          "mode": 0.595,
+          "max": 0.8
         },
         "p_evac": {
           "min": 5e-05,
@@ -1215,9 +1215,9 @@
           "max": 2160
         },
         "fi_cp3": {
-          "min": 0,
-          "mode": 0.05,
-          "max": 0.3
+          "min": 0.84,
+          "mode": 0.85,
+          "max": 0.86
         },
         "p_evac": {
           "min": 0.009,
@@ -1552,9 +1552,9 @@
           "max": 1440
         },
         "fi_cp3": {
-          "min": 0.0,
-          "mode": 0.8,
-          "max": 0.95
+          "min": 0.027,
+          "mode": 0.314,
+          "max": 0.748
         },
         "p_evac": {
           "min": 0.005,
@@ -1589,9 +1589,9 @@
           "max": 4320
         },
         "fi_cp3": {
-          "min": 0.0,
-          "mode": 0.96,
-          "max": 1.0
+          "min": 0.415,
+          "mode": 0.565,
+          "max": 0.665
         },
         "p_evac": {
           "min": 0.18,
@@ -1742,9 +1742,9 @@
           "max": 1440
         },
         "fi_cp3": {
-          "min": 0.0,
-          "mode": 0.8,
-          "max": 0.95
+          "min": 0.371,
+          "mode": 0.53,
+          "max": 0.64
         },
         "p_evac": {
           "min": 0.005,
@@ -1779,9 +1779,9 @@
           "max": 4320
         },
         "fi_cp3": {
-          "min": 0.0,
-          "mode": 0.96,
-          "max": 1.0
+          "min": 0.27,
+          "mode": 0.517,
+          "max": 0.67
         },
         "p_evac": {
           "min": 0.18,
@@ -1991,7 +1991,7 @@
     "angina-myocardial-infarction": {
       "conditionId": "angina-myocardial-infarction",
       "provenance": "tierA-nasa",
-      "source_ref": "research/imm_sources/zotero_imm/antonsen-2021-comparison-of-health-and-performance.md#table-4",
+      "source_ref": "research/imm_sources/zotero_imm/antonsen-2021-comparison-of-health-and-performance.md#table-4; rev3-f (2026-05-26T15:22:15Z): severity tuned against persistent-impairment literature \u2014 treated mean=0.56, n_treated=2, n_untreated=1",
       "incidence": {
         "distribution": "Gamma-Poisson",
         "alpha": 2,
@@ -2024,9 +2024,9 @@
           "max": 720
         },
         "fi_cp3": {
-          "min": 0,
-          "mode": 0.01,
-          "max": 0.05
+          "min": 0.395,
+          "mode": 0.565,
+          "max": 0.677
         },
         "p_evac": {
           "min": 5e-05,
@@ -2061,9 +2061,9 @@
           "max": 2160
         },
         "fi_cp3": {
-          "min": 0,
-          "mode": 0.05,
-          "max": 0.3
+          "min": 0.74,
+          "mode": 0.75,
+          "max": 0.76
         },
         "p_evac": {
           "min": 0.009,
@@ -2086,7 +2086,7 @@
     "decompression-sickness-secondary-to-extravehicular-activity": {
       "conditionId": "decompression-sickness-secondary-to-extravehicular-activity",
       "provenance": "tierA-nasa",
-      "source_ref": "research/imm_sources/zotero_imm/antonsen-2021-comparison-of-health-and-performance.md#table-4",
+      "source_ref": "research/imm_sources/zotero_imm/antonsen-2021-comparison-of-health-and-performance.md#table-4; rev3-f (2026-05-26T15:22:15Z): severity tuned against persistent-impairment literature \u2014 treated mean=0.31, n_treated=3, n_untreated=0",
       "incidence": {
         "distribution": "Gamma-Poisson",
         "alpha": 2,
@@ -2119,9 +2119,9 @@
           "max": 720
         },
         "fi_cp3": {
-          "min": 0,
-          "mode": 0.01,
-          "max": 0.05
+          "min": 0.197,
+          "mode": 0.306,
+          "max": 0.387
         },
         "p_evac": {
           "min": 5e-05,
@@ -2156,9 +2156,9 @@
           "max": 2160
         },
         "fi_cp3": {
-          "min": 0,
-          "mode": 0.05,
-          "max": 0.3
+          "min": 0.4,
+          "mode": 0.55,
+          "max": 0.65
         },
         "p_evac": {
           "min": 0.009,
@@ -2275,7 +2275,7 @@
     "neck-injury": {
       "conditionId": "neck-injury",
       "provenance": "tierA-nasa",
-      "source_ref": "research/imm_sources/zotero_imm/antonsen-2021-comparison-of-health-and-performance.md#table-4",
+      "source_ref": "research/imm_sources/zotero_imm/antonsen-2021-comparison-of-health-and-performance.md#table-4; rev3-f (2026-05-26T15:22:15Z): severity tuned against persistent-impairment literature \u2014 treated mean=0.34, n_treated=3, n_untreated=1",
       "incidence": {
         "distribution": "Gamma-Poisson",
         "alpha": 2,
@@ -2308,9 +2308,9 @@
           "max": 720
         },
         "fi_cp3": {
-          "min": 0,
-          "mode": 0.01,
-          "max": 0.05
+          "min": 0.24,
+          "mode": 0.343,
+          "max": 0.43
         },
         "p_evac": {
           "min": 5e-05,
@@ -2345,9 +2345,9 @@
           "max": 2160
         },
         "fi_cp3": {
-          "min": 0,
-          "mode": 0.05,
-          "max": 0.3
+          "min": 0.79,
+          "mode": 0.8,
+          "max": 0.81
         },
         "p_evac": {
           "min": 0.009,
@@ -2402,9 +2402,9 @@
           "max": 1440
         },
         "fi_cp3": {
-          "min": 0.0,
-          "mode": 0.8,
-          "max": 0.95
+          "min": 0.06,
+          "mode": 0.237,
+          "max": 0.36
         },
         "p_evac": {
           "min": 0.005,
@@ -2439,9 +2439,9 @@
           "max": 4320
         },
         "fi_cp3": {
-          "min": 0.0,
-          "mode": 0.96,
-          "max": 1.0
+          "min": 0.2,
+          "mode": 0.325,
+          "max": 0.45
         },
         "p_evac": {
           "min": 0.18,
@@ -2592,9 +2592,9 @@
           "max": 1440
         },
         "fi_cp3": {
-          "min": 0.0,
-          "mode": 0.8,
-          "max": 0.95
+          "min": 0.033,
+          "mode": 0.11,
+          "max": 0.195
         },
         "p_evac": {
           "min": 0.005,
@@ -2629,9 +2629,9 @@
           "max": 4320
         },
         "fi_cp3": {
-          "min": 0.0,
-          "mode": 0.96,
-          "max": 1.0
+          "min": 0.223,
+          "mode": 0.233,
+          "max": 0.243
         },
         "p_evac": {
           "min": 0.18,
@@ -2686,9 +2686,9 @@
           "max": 1440
         },
         "fi_cp3": {
-          "min": 0.0,
-          "mode": 0.8,
-          "max": 0.95
+          "min": 0.231,
+          "mode": 0.33,
+          "max": 0.429
         },
         "p_evac": {
           "min": 0.005,
@@ -2723,9 +2723,9 @@
           "max": 4320
         },
         "fi_cp3": {
-          "min": 0.0,
-          "mode": 0.96,
-          "max": 1.0
+          "min": 0.81,
+          "mode": 0.82,
+          "max": 0.83
         },
         "p_evac": {
           "min": 0.18,
@@ -2781,9 +2781,9 @@
           "max": 1440
         },
         "fi_cp3": {
-          "min": 0.0,
-          "mode": 0.8,
-          "max": 0.95
+          "min": 0.105,
+          "mode": 0.702,
+          "max": 1.0
         },
         "p_evac": {
           "min": 0.005,
@@ -2818,8 +2818,8 @@
           "max": 4320
         },
         "fi_cp3": {
-          "min": 0.0,
-          "mode": 0.96,
+          "min": 0.83,
+          "mode": 0.98,
           "max": 1.0
         },
         "p_evac": {
@@ -2842,7 +2842,7 @@
     "head-injury": {
       "conditionId": "head-injury",
       "provenance": "tierA-nasa",
-      "source_ref": "research/imm_sources/zotero_imm/antonsen-2021-comparison-of-health-and-performance.md#table-6",
+      "source_ref": "research/imm_sources/zotero_imm/antonsen-2021-comparison-of-health-and-performance.md#table-6; rev3-f (2026-05-26T15:22:15Z): severity tuned against persistent-impairment literature \u2014 treated mean=0.70, n_treated=3, n_untreated=1",
       "incidence": {
         "distribution": "Gamma-Poisson",
         "alpha": 2,
@@ -2875,9 +2875,9 @@
           "max": 720
         },
         "fi_cp3": {
-          "min": 0,
-          "mode": 0.01,
-          "max": 0.05
+          "min": 0.49,
+          "mode": 0.7,
+          "max": 0.84
         },
         "p_evac": {
           "min": 5e-05,
@@ -2912,9 +2912,9 @@
           "max": 2160
         },
         "fi_cp3": {
-          "min": 0,
-          "mode": 0.05,
-          "max": 0.3
+          "min": 0.94,
+          "mode": 0.95,
+          "max": 0.96
         },
         "p_evac": {
           "min": 0.009,
@@ -3034,7 +3034,7 @@
     "back-injury": {
       "conditionId": "back-injury",
       "provenance": "tierA-nasa",
-      "source_ref": "research/imm_sources/zotero_imm/antonsen-2021-comparison-of-health-and-performance.md#table-4",
+      "source_ref": "research/imm_sources/zotero_imm/antonsen-2021-comparison-of-health-and-performance.md#table-4; rev3-f (2026-05-26T15:22:15Z): severity tuned against persistent-impairment literature \u2014 treated mean=0.27, n_treated=3, n_untreated=0",
       "incidence": {
         "distribution": "Gamma-Poisson",
         "alpha": 2,
@@ -3067,9 +3067,9 @@
           "max": 720
         },
         "fi_cp3": {
-          "min": 0,
-          "mode": 0.01,
-          "max": 0.05
+          "min": 0.11,
+          "mode": 0.27,
+          "max": 0.55
         },
         "p_evac": {
           "min": 5e-05,
@@ -3104,9 +3104,9 @@
           "max": 2160
         },
         "fi_cp3": {
-          "min": 0,
-          "mode": 0.05,
-          "max": 0.3
+          "min": 0.336,
+          "mode": 0.486,
+          "max": 0.586
         },
         "p_evac": {
           "min": 0.009,
@@ -3222,7 +3222,7 @@
     "behavioral-emergency": {
       "conditionId": "behavioral-emergency",
       "provenance": "tierA-nasa",
-      "source_ref": "research/imm_sources/validation/S20_walton_kerstman_2020_iss_quantification.md#behavioral-emergency",
+      "source_ref": "research/imm_sources/validation/S20_walton_kerstman_2020_iss_quantification.md#behavioral-emergency; rev3-f (2026-05-26T15:22:15Z): severity tuned against persistent-impairment literature \u2014 treated mean=0.65, n_treated=2, n_untreated=1",
       "incidence": {
         "distribution": "Gamma-Poisson",
         "alpha": 2,
@@ -3255,9 +3255,9 @@
           "max": 720
         },
         "fi_cp3": {
-          "min": 0,
-          "mode": 0.01,
-          "max": 0.05
+          "min": 0.454,
+          "mode": 0.648,
+          "max": 0.778
         },
         "p_evac": {
           "min": 5e-05,
@@ -3292,9 +3292,9 @@
           "max": 2160
         },
         "fi_cp3": {
-          "min": 0,
-          "mode": 0.05,
-          "max": 0.3
+          "min": 0.79,
+          "mode": 0.8,
+          "max": 0.81
         },
         "p_evac": {
           "min": 0.009,
@@ -3689,7 +3689,7 @@
     "visual-impairment-and-intracranial-pressure-viip-space-adaptation": {
       "conditionId": "visual-impairment-and-intracranial-pressure-viip-space-adaptation",
       "provenance": "tierA-nasa",
-      "source_ref": "research/imm_sources/validation/S20_walton_kerstman_2020_iss_quantification.md#viip",
+      "source_ref": "research/imm_sources/validation/S20_walton_kerstman_2020_iss_quantification.md#viip; rev3-f (2026-05-26T15:22:15Z): severity tuned against persistent-impairment literature \u2014 treated mean=0.79, n_treated=5, n_untreated=0",
       "incidence": {
         "distribution": "Gamma-Poisson",
         "alpha": 2,
@@ -3722,9 +3722,9 @@
           "max": 336
         },
         "fi_cp3": {
-          "min": 0,
-          "mode": 0,
-          "max": 0.01
+          "min": 0.33,
+          "mode": 0.786,
+          "max": 1.0
         },
         "p_evac": {
           "min": 2.5e-06,
@@ -3759,9 +3759,9 @@
           "max": 1080
         },
         "fi_cp3": {
-          "min": 0,
-          "mode": 0.02,
-          "max": 0.1
+          "min": 0.83,
+          "mode": 0.98,
+          "max": 1.0
         },
         "p_evac": {
           "min": 0.00042,
@@ -5751,7 +5751,7 @@
     "hearing-loss": {
       "conditionId": "hearing-loss",
       "provenance": "tierB-pymc",
-      "source_ref": "python/outputs/fitted_priors_run1/hearing-loss/hearing-loss.json",
+      "source_ref": "python/outputs/fitted_priors_run1/hearing-loss/hearing-loss.json; rev3-f (2026-05-26T15:22:15Z): severity tuned against persistent-impairment literature \u2014 treated mean=0.46, n_treated=2, n_untreated=0",
       "incidence": {
         "distribution": "Gamma-Poisson",
         "alpha": 7408.175563755155,
@@ -5784,9 +5784,9 @@
           "max": 336
         },
         "fi_cp3": {
-          "min": 0,
-          "mode": 0,
-          "max": 0.01
+          "min": 0.323,
+          "mode": 0.462,
+          "max": 0.561
         },
         "p_evac": {
           "min": 2.5e-06,
@@ -5821,9 +5821,9 @@
           "max": 1080
         },
         "fi_cp3": {
-          "min": 0,
-          "mode": 0.02,
-          "max": 0.1
+          "min": 0.681,
+          "mode": 0.831,
+          "max": 0.931
         },
         "p_evac": {
           "min": 0.00042,
@@ -6252,9 +6252,9 @@
           "max": 1440
         },
         "fi_cp3": {
-          "min": 0.0,
-          "mode": 0.8,
-          "max": 0.95
+          "min": 0.13,
+          "mode": 0.323,
+          "max": 0.53
         },
         "p_evac": {
           "min": 0.005,
@@ -6289,9 +6289,9 @@
           "max": 4320
         },
         "fi_cp3": {
-          "min": 0.0,
-          "mode": 0.96,
-          "max": 1.0
+          "min": 0.34,
+          "mode": 0.519,
+          "max": 0.7
         },
         "p_evac": {
           "min": 0.18,
@@ -7353,7 +7353,7 @@
     "eye-corneal-ulcer": {
       "conditionId": "eye-corneal-ulcer",
       "provenance": "tierB-pymc",
-      "source_ref": "python/outputs/fitted_priors_run1/eye-corneal-ulcer/eye-corneal-ulcer.json",
+      "source_ref": "python/outputs/fitted_priors_run1/eye-corneal-ulcer/eye-corneal-ulcer.json; rev3-f (2026-05-26T15:22:15Z): severity tuned against persistent-impairment literature \u2014 treated mean=0.28, n_treated=2, n_untreated=0",
       "incidence": {
         "distribution": "Gamma-Poisson",
         "alpha": 3.106119270765471,
@@ -7386,9 +7386,9 @@
           "max": 336
         },
         "fi_cp3": {
-          "min": 0,
-          "mode": 0,
-          "max": 0.01
+          "min": 0.196,
+          "mode": 0.28,
+          "max": 0.336
         },
         "p_evac": {
           "min": 2.5e-06,
@@ -7423,9 +7423,9 @@
           "max": 1080
         },
         "fi_cp3": {
-          "min": 0,
-          "mode": 0.02,
-          "max": 0.1
+          "min": 0.354,
+          "mode": 0.504,
+          "max": 0.604
         },
         "p_evac": {
           "min": 0.00042,
@@ -7449,7 +7449,7 @@
     "eye-penetration-foreign-body": {
       "conditionId": "eye-penetration-foreign-body",
       "provenance": "tierB-pymc",
-      "source_ref": "python/outputs/fitted_priors/eye-penetration-foreign-body/eye-penetration-foreign-body.json",
+      "source_ref": "python/outputs/fitted_priors/eye-penetration-foreign-body/eye-penetration-foreign-body.json; rev3-f (2026-05-26T15:22:15Z): severity tuned against persistent-impairment literature \u2014 treated mean=0.52, n_treated=2, n_untreated=0",
       "incidence": {
         "distribution": "Gamma-Poisson",
         "alpha": 14585942.094105283,
@@ -7482,9 +7482,9 @@
           "max": 720
         },
         "fi_cp3": {
-          "min": 0,
-          "mode": 0.01,
-          "max": 0.05
+          "min": 0.364,
+          "mode": 0.519,
+          "max": 0.623
         },
         "p_evac": {
           "min": 5e-05,
@@ -7519,9 +7519,9 @@
           "max": 2160
         },
         "fi_cp3": {
-          "min": 0,
-          "mode": 0.05,
-          "max": 0.3
+          "min": 0.785,
+          "mode": 0.935,
+          "max": 1.0
         },
         "p_evac": {
           "min": 0.009,
@@ -7546,7 +7546,7 @@
     "retinal-detachment": {
       "conditionId": "retinal-detachment",
       "provenance": "tierB-pymc",
-      "source_ref": "python/outputs/fitted_priors_run1/retinal-detachment/retinal-detachment.json",
+      "source_ref": "python/outputs/fitted_priors_run1/retinal-detachment/retinal-detachment.json; rev3-f (2026-05-26T15:22:15Z): severity tuned against persistent-impairment literature \u2014 treated mean=0.54, n_treated=2, n_untreated=0",
       "incidence": {
         "distribution": "Gamma-Poisson",
         "alpha": 78.59124298931681,
@@ -7579,9 +7579,9 @@
           "max": 720
         },
         "fi_cp3": {
-          "min": 0,
-          "mode": 0.01,
-          "max": 0.05
+          "min": 0.375,
+          "mode": 0.536,
+          "max": 0.643
         },
         "p_evac": {
           "min": 5e-05,
@@ -7616,9 +7616,9 @@
           "max": 2160
         },
         "fi_cp3": {
-          "min": 0,
-          "mode": 0.05,
-          "max": 0.3
+          "min": 0.815,
+          "mode": 0.965,
+          "max": 1.0
         },
         "p_evac": {
           "min": 0.009,
@@ -7641,7 +7641,7 @@
     "acute-glaucoma": {
       "conditionId": "acute-glaucoma",
       "provenance": "tierB-pymc",
-      "source_ref": "python/outputs/fitted_priors_run1/acute-glaucoma/acute-glaucoma.json",
+      "source_ref": "python/outputs/fitted_priors_run1/acute-glaucoma/acute-glaucoma.json; rev3-f (2026-05-26T15:22:15Z): severity tuned against persistent-impairment literature \u2014 treated mean=0.15, n_treated=2, n_untreated=0",
       "incidence": {
         "distribution": "Gamma-Poisson",
         "alpha": 39.4701472185684,
@@ -7674,9 +7674,9 @@
           "max": 720
         },
         "fi_cp3": {
-          "min": 0,
-          "mode": 0.01,
-          "max": 0.05
+          "min": 0.108,
+          "mode": 0.155,
+          "max": 0.205
         },
         "p_evac": {
           "min": 5e-05,
@@ -7711,9 +7711,9 @@
           "max": 2160
         },
         "fi_cp3": {
-          "min": 0,
-          "mode": 0.05,
-          "max": 0.3
+          "min": 0.129,
+          "mode": 0.279,
+          "max": 0.379
         },
         "p_evac": {
           "min": 0.009,
@@ -7738,7 +7738,7 @@
     "abdominal-injury": {
       "conditionId": "abdominal-injury",
       "provenance": "tierB-pymc",
-      "source_ref": "python/outputs/fitted_priors/abdominal-injury/abdominal-injury.json",
+      "source_ref": "python/outputs/fitted_priors/abdominal-injury/abdominal-injury.json; rev3-f (2026-05-26T15:22:15Z): severity tuned against persistent-impairment literature \u2014 treated mean=0.57, n_treated=2, n_untreated=1",
       "incidence": {
         "distribution": "Gamma-Poisson",
         "alpha": 6975.584221495469,
@@ -7771,9 +7771,9 @@
           "max": 720
         },
         "fi_cp3": {
-          "min": 0,
-          "mode": 0.01,
-          "max": 0.05
+          "min": 0.402,
+          "mode": 0.575,
+          "max": 0.69
         },
         "p_evac": {
           "min": 5e-05,
@@ -7808,9 +7808,9 @@
           "max": 2160
         },
         "fi_cp3": {
-          "min": 0,
-          "mode": 0.05,
-          "max": 0.3
+          "min": 0.74,
+          "mode": 0.75,
+          "max": 0.76
         },
         "p_evac": {
           "min": 0.009,
@@ -8011,7 +8011,7 @@
     "acute-compartment-syndrome": {
       "conditionId": "acute-compartment-syndrome",
       "provenance": "tierB-pymc",
-      "source_ref": "python/outputs/fitted_priors/acute-compartment-syndrome/acute-compartment-syndrome.json",
+      "source_ref": "python/outputs/fitted_priors/acute-compartment-syndrome/acute-compartment-syndrome.json; rev3-f (2026-05-26T15:22:15Z): severity tuned against persistent-impairment literature \u2014 treated mean=0.48, n_treated=1, n_untreated=1",
       "incidence": {
         "distribution": "Gamma-Poisson",
         "alpha": 13718.404969304154,
@@ -8044,9 +8044,9 @@
           "max": 720
         },
         "fi_cp3": {
-          "min": 0,
-          "mode": 0.01,
-          "max": 0.05
+          "min": 0.336,
+          "mode": 0.48,
+          "max": 0.576
         },
         "p_evac": {
           "min": 5e-05,
@@ -8081,9 +8081,9 @@
           "max": 2160
         },
         "fi_cp3": {
-          "min": 0,
-          "mode": 0.05,
-          "max": 0.3
+          "min": 0.89,
+          "mode": 0.9,
+          "max": 0.91
         },
         "p_evac": {
           "min": 0.009,
@@ -8102,7 +8102,7 @@
     "acute-pancreatitis": {
       "conditionId": "acute-pancreatitis",
       "provenance": "tierB-pymc",
-      "source_ref": "python/outputs/fitted_priors/acute-pancreatitis/acute-pancreatitis.json",
+      "source_ref": "python/outputs/fitted_priors/acute-pancreatitis/acute-pancreatitis.json; rev3-f (2026-05-26T15:22:15Z): severity tuned against persistent-impairment literature \u2014 treated mean=0.25, n_treated=6, n_untreated=0",
       "incidence": {
         "distribution": "Gamma-Poisson",
         "alpha": 35.72114692388644,
@@ -8135,9 +8135,9 @@
           "max": 720
         },
         "fi_cp3": {
-          "min": 0,
-          "mode": 0.01,
-          "max": 0.05
+          "min": 0.13,
+          "mode": 0.245,
+          "max": 0.35
         },
         "p_evac": {
           "min": 5e-05,
@@ -8172,9 +8172,9 @@
           "max": 2160
         },
         "fi_cp3": {
-          "min": 0,
-          "mode": 0.05,
-          "max": 0.3
+          "min": 0.291,
+          "mode": 0.441,
+          "max": 0.541
         },
         "p_evac": {
           "min": 0.009,
@@ -8317,9 +8317,9 @@
           "max": 1440
         },
         "fi_cp3": {
-          "min": 0.0,
-          "mode": 0.8,
-          "max": 0.95
+          "min": 0.25,
+          "mode": 0.554,
+          "max": 1.0
         },
         "p_evac": {
           "min": 0.005,
@@ -8354,9 +8354,9 @@
           "max": 4320
         },
         "fi_cp3": {
-          "min": 0.0,
-          "mode": 0.96,
-          "max": 1.0
+          "min": 0.34,
+          "mode": 0.35,
+          "max": 0.36
         },
         "p_evac": {
           "min": 0.18,
@@ -8499,9 +8499,9 @@
           "max": 1440
         },
         "fi_cp3": {
-          "min": 0.0,
-          "mode": 0.8,
-          "max": 0.95
+          "min": 0.12,
+          "mode": 0.231,
+          "max": 0.414
         },
         "p_evac": {
           "min": 0.005,
@@ -8536,9 +8536,9 @@
           "max": 4320
         },
         "fi_cp3": {
-          "min": 0.0,
-          "mode": 0.96,
-          "max": 1.0
+          "min": 0.05,
+          "mode": 0.403,
+          "max": 0.755
         },
         "p_evac": {
           "min": 0.18,
@@ -8590,9 +8590,9 @@
           "max": 1440
         },
         "fi_cp3": {
-          "min": 0.0,
-          "mode": 0.8,
-          "max": 0.95
+          "min": 0.271,
+          "mode": 0.387,
+          "max": 0.464
         },
         "p_evac": {
           "min": 0.005,
@@ -8627,9 +8627,9 @@
           "max": 4320
         },
         "fi_cp3": {
-          "min": 0.0,
-          "mode": 0.96,
-          "max": 1.0
+          "min": 0.547,
+          "mode": 0.697,
+          "max": 0.797
         },
         "p_evac": {
           "min": 0.18,
@@ -8830,7 +8830,7 @@
     "hip-proximal-femur-fracture": {
       "conditionId": "hip-proximal-femur-fracture",
       "provenance": "tierB-pymc",
-      "source_ref": "python/outputs/fitted_priors/hip-proximal-femur-fracture/hip-proximal-femur-fracture.json",
+      "source_ref": "python/outputs/fitted_priors/hip-proximal-femur-fracture/hip-proximal-femur-fracture.json; rev3-f (2026-05-26T15:22:15Z): severity tuned against persistent-impairment literature \u2014 treated mean=0.53, n_treated=2, n_untreated=1",
       "incidence": {
         "distribution": "Gamma-Poisson",
         "alpha": 68.98317882365284,
@@ -8863,9 +8863,9 @@
           "max": 720
         },
         "fi_cp3": {
-          "min": 0,
-          "mode": 0.01,
-          "max": 0.05
+          "min": 0.367,
+          "mode": 0.525,
+          "max": 0.63
         },
         "p_evac": {
           "min": 5e-05,
@@ -8900,9 +8900,9 @@
           "max": 2160
         },
         "fi_cp3": {
-          "min": 0,
-          "mode": 0.05,
-          "max": 0.3
+          "min": 0.84,
+          "mode": 0.85,
+          "max": 0.86
         },
         "p_evac": {
           "min": 0.009,
@@ -9012,7 +9012,7 @@
     "lumbar-spine-fracture": {
       "conditionId": "lumbar-spine-fracture",
       "provenance": "tierB-pymc",
-      "source_ref": "python/outputs/fitted_priors/lumbar-spine-fracture/lumbar-spine-fracture.json",
+      "source_ref": "python/outputs/fitted_priors/lumbar-spine-fracture/lumbar-spine-fracture.json; rev3-f (2026-05-26T15:22:15Z): severity tuned against persistent-impairment literature \u2014 treated mean=0.33, n_treated=3, n_untreated=1",
       "incidence": {
         "distribution": "Gamma-Poisson",
         "alpha": 46.48655772826392,
@@ -9045,9 +9045,9 @@
           "max": 720
         },
         "fi_cp3": {
-          "min": 0,
-          "mode": 0.01,
-          "max": 0.05
+          "min": 0.231,
+          "mode": 0.33,
+          "max": 0.4
         },
         "p_evac": {
           "min": 5e-05,
@@ -9082,9 +9082,9 @@
           "max": 2160
         },
         "fi_cp3": {
-          "min": 0,
-          "mode": 0.05,
-          "max": 0.3
+          "min": 0.69,
+          "mode": 0.7,
+          "max": 0.71
         },
         "p_evac": {
           "min": 0.009,
@@ -9136,9 +9136,9 @@
           "max": 1440
         },
         "fi_cp3": {
-          "min": 0.0,
-          "mode": 0.8,
-          "max": 0.95
+          "min": 0.567,
+          "mode": 0.809,
+          "max": 0.971
         },
         "p_evac": {
           "min": 0.005,
@@ -9173,9 +9173,9 @@
           "max": 4320
         },
         "fi_cp3": {
-          "min": 0.0,
-          "mode": 0.96,
-          "max": 1.0
+          "min": 0.95,
+          "mode": 0.965,
+          "max": 0.98
         },
         "p_evac": {
           "min": 0.18,
@@ -9194,7 +9194,7 @@
     "shoulder-dislocation": {
       "conditionId": "shoulder-dislocation",
       "provenance": "tierB-pymc",
-      "source_ref": "python/outputs/fitted_priors/shoulder-dislocation/shoulder-dislocation.json",
+      "source_ref": "python/outputs/fitted_priors/shoulder-dislocation/shoulder-dislocation.json; rev3-f (2026-05-26T15:22:15Z): severity tuned against persistent-impairment literature \u2014 treated mean=0.34, n_treated=2, n_untreated=1",
       "incidence": {
         "distribution": "Gamma-Poisson",
         "alpha": 8971.674088379228,
@@ -9227,9 +9227,9 @@
           "max": 720
         },
         "fi_cp3": {
-          "min": 0,
-          "mode": 0.01,
-          "max": 0.05
+          "min": 0.13,
+          "mode": 0.344,
+          "max": 0.557
         },
         "p_evac": {
           "min": 5e-05,
@@ -9264,9 +9264,9 @@
           "max": 2160
         },
         "fi_cp3": {
-          "min": 0,
-          "mode": 0.05,
-          "max": 0.3
+          "min": 0.79,
+          "mode": 0.8,
+          "max": 0.81
         },
         "p_evac": {
           "min": 0.009,
@@ -9318,9 +9318,9 @@
           "max": 1440
         },
         "fi_cp3": {
-          "min": 0.0,
-          "mode": 0.8,
-          "max": 0.95
+          "min": 0.17,
+          "mode": 0.542,
+          "max": 1.0
         },
         "p_evac": {
           "min": 0.005,
@@ -9355,9 +9355,9 @@
           "max": 4320
         },
         "fi_cp3": {
-          "min": 0.0,
-          "mode": 0.96,
-          "max": 1.0
+          "min": 0.32,
+          "mode": 0.33,
+          "max": 0.34
         },
         "p_evac": {
           "min": 0.18,

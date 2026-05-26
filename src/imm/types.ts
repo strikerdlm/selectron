@@ -38,7 +38,7 @@ export type IMMConditionOutcomes = {
 
 export type IMMPrior = {
   conditionId: string;
-  provenance: "tierA-nasa" | "tierB-lit" | "tierC-synth" | "user-custom";
+  provenance: "tierA-nasa" | "tierB-lit" | "tierB-pymc" | "tierC-synth" | "user-custom";
   source_ref: string;
   incidence: {
     distribution: "Lognormal-Poisson" | "Gamma-Poisson" | "Beta-Bernoulli" | "Fixed";
