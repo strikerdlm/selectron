@@ -1,0 +1,15 @@
+{
+  "condition_id": "barotrauma-ear-sinus-block",
+  "r_hat": 1.05,
+  "ess_bulk": 800.0,
+  "ess_tail": 750.0,
+  "divergences": 0,
+  "posterior_alpha": 3.0,
+  "posterior_beta": 1200.0,
+  "n_studies": 2,
+  "total_person_days": 180000,
+  "total_events": 5,
+  "reasons": [
+    "R_hat 1.0500 > 1.01"
+  ]
+}

@@ -274,7 +274,7 @@ export function runIMMTrial(
       let tierMult = 1.0;
       if (prior.provenance === "tierC-synth")     tierMult = tierCMult;
       else if (prior.provenance === "tierA-nasa") tierMult = tierAMult;
-      else if (prior.provenance === "tierB-lit")  tierMult = tierBMult;
+      else if (prior.provenance === "tierB-pymc") tierMult = tierBMult;
 
       let count = 0;
       if (cond.processType === "general-Poisson") {
