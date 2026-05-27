@@ -1,5 +1,5 @@
 {
-  "generated": "2026-05-23T02:28:03.971Z",
+  "generated": "2026-05-27T20:04:13.015Z",
   "commit": "v0.5.x (regenerate via scripts/extract_imm_worked_example.ts)",
   "seed": 12648430,
   "f6": {
@@ -16,23 +16,23 @@
     },
     "crew_label": "K15 reference (4M 2F; 1 CAC+; 3 contacts; 2 crowns; 1 abdo-surg; 2 EVA-eligible × 6 EVAs)",
     "outcome": {
-      "tme_mean": 99.75992,
-      "chi_mean": 90.25201457136085,
-      "pEvac_mean": 7.804,
-      "pLocl_mean": 0.232,
-      "missionSuccess_mean": 91.994
+      "tme_mean": 98.05542,
+      "chi_mean": 82.84703288864803,
+      "pEvac_mean": 9.649,
+      "pLocl_mean": 0.23,
+      "missionSuccess_mean": 86.221
     },
     "assessment": {
-      "likelihood": 4,
-      "likelihoodLabel": "High",
-      "likelihoodDefinition": "Likelihood is high during the mission or 1% < P ≤ 10%",
-      "consequence": 3,
-      "consequenceLabel": "Significant",
-      "consequenceDefinition": "Significant reduction in crew performance, threatens loss of a mission objective",
-      "score": 18,
-      "color": "yellow",
-      "pMissionFailure": 0.08006000000000002,
-      "fractionLost": 0.0974798542863915
+      "likelihood": 5,
+      "likelihoodLabel": "Very High",
+      "likelihoodDefinition": "More likely to happen than not during the mission or probability (P) > 10%",
+      "consequence": 4,
+      "consequenceLabel": "Severe",
+      "consequenceDefinition": "Severe reduction of crew performance that results in loss of multiple mission objectives",
+      "score": 23,
+      "color": "red",
+      "pMissionFailure": 0.13778999999999997,
+      "fractionLost": 0.1715296711135197
     },
     "k15_reference": {
       "tme_mean": 106,
@@ -54,161 +54,161 @@
         "missionLabel": "ISS 6 month (K15 reference)",
         "durationDays": 180,
         "crewSize": 6,
-        "tme_mean": 99.70572,
-        "chi_mean": 90.26443404245045,
+        "tme_mean": 98.0956,
+        "chi_mean": 82.7777720457231,
         "chi_ci95": [
-          85.43677256974695,
-          94.27258156063108
+          66.88352632220173,
+          90.49275796710354
         ],
-        "pEvac_mean": 7.772,
+        "pEvac_mean": 9.804,
         "pEvac_ci95": [
           0,
           100
         ],
-        "pLocl_mean": 0.2,
+        "pLocl_mean": 0.24,
         "pLocl_ci95": [
           0,
           0
         ],
-        "missionSuccess_mean": 92.056
+        "missionSuccess_mean": 85.964
       },
       {
         "missionId": "iss-drm1",
         "missionLabel": "ISS DRM1 (S20)",
         "durationDays": 365,
         "crewSize": 6,
-        "tme_mean": 182.38536,
-        "chi_mean": 88.05276130745632,
+        "tme_mean": 196.28292,
+        "chi_mean": 77.6923775159062,
         "chi_ci95": [
-          83.2540161506512,
-          91.96785069549682
+          56.66472417885069,
+          88.20880435229287
         ],
-        "pEvac_mean": 16.8,
+        "pEvac_mean": 20.7,
         "pEvac_ci95": [
           0,
           100
         ],
-        "pLocl_mean": 0.52,
+        "pLocl_mean": 0.456,
         "pLocl_ci95": [
           0,
           0
         ],
-        "missionSuccess_mean": 82.808
+        "missionSuccess_mean": 64.872
       },
       {
         "missionId": "mdrs-2wk",
         "missionLabel": "MDRS 2-week rotation",
         "durationDays": 14,
         "crewSize": 6,
-        "tme_mean": 24.28508,
-        "chi_mean": 94.97696141857269,
+        "tme_mean": 7.741,
+        "chi_mean": 95.70436962401902,
         "chi_ci95": [
-          88.28081012307595,
-          98.53957904969351
+          85.44304669961697,
+          99.60124045984269
         ],
-        "pEvac_mean": 0.492,
+        "pEvac_mean": 0.28,
         "pEvac_ci95": [
           0,
           0
         ],
-        "pLocl_mean": 0.02,
+        "pLocl_mean": 0.012,
         "pLocl_ci95": [
           0,
           0
         ],
-        "missionSuccess_mean": 99.488
+        "missionSuccess_mean": 99.704
       },
       {
         "missionId": "hi-seas-45d",
         "missionLabel": "HI-SEAS 45-day",
         "durationDays": 45,
         "crewSize": 6,
-        "tme_mean": 38.50328,
-        "chi_mean": 94.21327947901091,
+        "tme_mean": 24.7196,
+        "chi_mean": 90.01084106935332,
         "chi_ci95": [
-          87.93107221595906,
-          98.07439827885109
+          79.92730681735225,
+          96.93931002569735
         ],
-        "pEvac_mean": 1.376,
+        "pEvac_mean": 1.832,
         "pEvac_ci95": [
           0,
           0
         ],
-        "pLocl_mean": 0.06,
+        "pLocl_mean": 0.04,
         "pLocl_ci95": [
           0,
           0
         ],
-        "missionSuccess_mean": 98.564
+        "missionSuccess_mean": 98.052
       },
       {
         "missionId": "hi-seas-90d",
         "missionLabel": "HI-SEAS 90-day",
         "durationDays": 90,
         "crewSize": 6,
-        "tme_mean": 59.10552,
-        "chi_mean": 92.40178215982878,
+        "tme_mean": 49.42308,
+        "chi_mean": 86.70890894023967,
         "chi_ci95": [
-          86.7627048583663,
-          96.58282291922953
+          75.07983969277706,
+          93.50005904752172
         ],
-        "pEvac_mean": 3.192,
+        "pEvac_mean": 4.28,
         "pEvac_ci95": [
           0,
           100
         ],
-        "pLocl_mean": 0.12,
+        "pLocl_mean": 0.104,
         "pLocl_ci95": [
           0,
           0
         ],
-        "missionSuccess_mean": 96.712
+        "missionSuccess_mean": 95.02
       },
       {
         "missionId": "antarctic-winter",
         "missionLabel": "Antarctic winter-over (365 d)",
         "durationDays": 365,
         "crewSize": 12,
-        "tme_mean": 363.86672,
-        "chi_mean": 86.93929140928068,
+        "tme_mean": 392.41716,
+        "chi_mean": 76.65921592076535,
         "chi_ci95": [
-          83.48354780590853,
-          89.94535547173925
+          61.65998563931916,
+          85.9334795622711
         ],
-        "pEvac_mean": 32.772,
+        "pEvac_mean": 37.776,
         "pEvac_ci95": [
           0,
           100
         ],
-        "pLocl_mean": 1.12,
+        "pLocl_mean": 0.904,
         "pLocl_ci95": [
           0,
           0
         ],
-        "missionSuccess_mean": 66.552
+        "missionSuccess_mean": 52.212
       },
       {
         "missionId": "mars500",
         "missionLabel": "Mars-500 (520 d)",
         "durationDays": 520,
         "crewSize": 6,
-        "tme_mean": 249.56448,
-        "chi_mean": 86.8278492593674,
+        "tme_mean": 276.67484,
+        "chi_mean": 73.70405041003337,
         "chi_ci95": [
-          81.747453637482,
-          91.00435080899844
+          48.7258073080828,
+          87.39388157397003
         ],
-        "pEvac_mean": 24.196,
+        "pEvac_mean": 28.244,
         "pEvac_ci95": [
           0,
           100
         ],
-        "pLocl_mean": 0.72,
+        "pLocl_mean": 0.652,
         "pLocl_ci95": [
           0,
           0
         ],
-        "missionSuccess_mean": 75.296
+        "missionSuccess_mean": 47.544
       }
     ]
   }
