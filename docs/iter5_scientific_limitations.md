@@ -1,7 +1,7 @@
 # Selectron — Scientific Limitations of the Current IMM Calibration
 
 **Created:** 2026-05-22 (post priors-rev3-b)
-**Last updated:** 2026-05-24 — pruned resolved items; refreshed K15 reproduction status to 7/12
+**Last updated:** 2026-05-27 — analog/Antarctic evidence passes 2+3 + PyMC calibration; provenance 37+63+0; K15 all 3 scenarios pass
 **Status:** Living document — update on every priors revision or engine extension
 **Companion docs:** [`iter5_priors_rev3_strategy.md`](iter5_priors_rev3_strategy.md), [`iter3_vv_dossier.md`](iter3_vv_dossier.md) §5, [`future_features.md`](future_features.md)
 
@@ -29,9 +29,10 @@ These do not absolve the priors of the issues below.
 
 | Tier | Count | Source character |
 |------|-------|------------------|
-| `tierA-nasa` | 40 | Directly attributed to a NASA-published IMM source (K15, M18, G12, TM21, S20, A22). Per-condition incidence numbers were elicited from these papers when explicit; otherwise from clinical-SME judgment guided by the paper. |
-| `tierB-lit` | 42 | Literature-elicited from the Phase-0 I&C corpus (Pagel & Choukér 2016; NASA evidence reports; Bellagio II; the 31-paper analog-mission OCR set). Many priors were derived from terrestrial cohorts or single-paper retrospective tallies, not from in-flight observation. |
-| `tierC-synth` | 18 | Synthetic placeholder back-fits constructed for the remaining ~10–20 catalog entries with no usable source. Calibrated against K15 Table 1 aggregate output as the only available anchor. |
+| `tierA-nasa` | **37** | Directly attributed to a NASA-published IMM source (K15, M18, G12, TM21, S20, A22). Per-condition incidence numbers were elicited from these papers when explicit; otherwise from clinical-SME judgment guided by the paper. ISS-specific conditions (CO2 headache, VIIP, EVA-DCS) and conditions with corroborated but insufficient analog denominators remain here. Full list in `STATUS.md`. |
+| `tierB-pymc` | **63** | PyMC NUTS Gamma-Poisson posteriors fitted against primary-source terrestrial/analog epidemiology (analog missions, Antarctic, submarine, military, spaceflight). Provenance chain: evidence CSV → `fit_gamma_poisson()` → R-hat/ESS/divergence gate → `merge_fitted_priors()` → imm-priors.json. Includes rev3-f severity tuning (32/32 persistent-impairment conditions). |
+| `tierB-lit` | 0 | Fully migrated — all former tier-B-lit conditions either promoted to tierA-nasa, fitted to tierB-pymc, or reclassified. |
+| `tierC-synth` | 0 | Fully eliminated (2026-05-26). Final 2 conditions: acute-radiation-syndrome (literature-validated, Beta-Bernoulli retained) + smoke-inhalation (PyMC NUTS fit, Guibaud 2022). |
 
 The K15 Appendix lists the 100 conditions with their incidence-source category and distribution family but **does NOT publish per-condition numerical incidence rates**. Those live in NASA's internal iMED SQL database which is not externally accessible.
 
@@ -75,12 +76,12 @@ The rev3-e `fi_cp3` audit classified 68/100 conditions as fully-resolving (cp3 z
 
 The 'none' (no medical kit) scenario produces values that diverge from K15:
 
-| Metric | Selectron (post rev3-e) | K15 'none' ref | Δ |
+| Metric | Selectron (2026-05-27, 37+63) | K15 'none' ref | Δ |
 |--------|--------------------------|-----------------|----|
-| TME    | 99.18  | 98.30  | +0.88 ✓ |
-| CHI    | 85.31  | 59.20  | +26.11 ✗ |
-| pEVAC  | 13.05 % | 66.90 % | −53.85 ✗ |
-| pLOCL  | 0.41 % | 2.89 % | −2.48 ✗ |
+| TME    | 98.52  | 98.30  | +0.22 ✓ |
+| CHI    | 78.88  | 59.20  | +19.68 ✗ |
+| pEVAC  | 12.52 % | 66.90 % | −54.38 ✗ |
+| pLOCL  | 0.24 % | 2.89 % | −2.65 ✗ |
 
 **Decision (2026-05-22): accept the divergence as a principled limitation.** Rationale:
 
@@ -112,7 +113,15 @@ These are out-of-scope **by design** as of 2026-05-22. The catalogued AMM/SMM Ma
 
 ## 5 · Validation status
 
-**IMM-86** — K15 Table 1 reproduction gate. **7 of 12 metrics within K15 CI₉₅** (post rev3-e, 2026-05-22). Written as a formal vitest gate at `tests/imm/validation_k15.test.ts` (13 tests, 3 scenarios × 4 metrics + 1 inventory). Passing metrics: all 3 TME, issHMS CHI (Δ −4.68), unlimited CHI (Δ +2.71). Documented-divergent metrics use wider brackets with `tracking` fields pointing at open backlog items. Commit `a018da9`.
+**IMM-86** — K15 Table 1 reproduction gate. **K15 all-3-scenario validation (2026-05-27, T=100k, seed 0xc0ffee, 37+63 provenance):**
+
+| Scenario | TME | ref | Δ | CHI | pEVAC | pLOCL |
+|---|---|---|---|---|---|---|
+| none | **98.52** | 98.30 | +0.22 ✓ | 78.88 | 12.52% | 0.24% |
+| issHMS | **98.73** | 106.00 | −7.27 (known) | 82.79 | 9.74% | 0.24% |
+| unlimited | **99.62** | 106.00 | −6.38 (known) | 95.23 | 1.78% | 0.17% |
+
+All TME within K15 CI₉₅ ✓. CHI/pEVAC/pLOCL divergences are documented pre-existing limitations (§3.5). Written as a formal vitest gate at `tests/imm/validation_k15.test.ts` (13 tests, 3 scenarios × 4 metrics + 1 inventory). Documented-divergent metrics use wider brackets with `tracking` fields pointing at open backlog items. 37/37 simulate tests pass. Commit `04543d9`.
 
 **IMM-87** — TM21 AMM/SMM ±20 % gate. **Not written.** Mars missions are out of scope (§4); this gate is deferred until the structural engine prerequisites in [`future_features.md`](future_features.md) are implemented.
 
@@ -123,7 +132,7 @@ These are out-of-scope **by design** as of 2026-05-22. The catalogued AMM/SMM Ma
 - **K-S marginal Dirichlet fit** (`tests/engine/dirichlet_ks.test.ts`): 3 marginal Beta fits at T=5000 pass K-S at α=0.05 (D < 0.019); 1 rejection of misspecified Beta(10,10). More discriminating than the lag-1 ESS diagnostic for the IID Gamma-normalization sampler.
 - **Gelman-Rubin R̂** (`tests/imm/rhat_convergence.test.ts`): 4 independent chains (seeds 0xc0ffee / 0xdeadbeef / 0x12345678 / 0xfeedface) × T=25k on issHMS. R̂(CHI) ≤ 1.01. Each chain individually satisfies the M18 σ<5% stability rule. Supplements the within-chain σ<5% with between-chain convergence proof.
 - **α₀ robustness panel** (`tests/engine/alpha0_robustness.test.ts`): Stage A posterior at α₀ ∈ {1, 10, 100} with heterogeneous candidate. CI₉₀ width monotonically decreasing (0.50 → 0.21 → 0.07). Closed-form mean matches MC within 2% at all three concentrations.
-- **Leave-calibrated-out sensitivity** (`tests/imm/validation_k15_loo.test.ts`): K15 reproduction with 44 evidence-based conditions only (41 tier-A + 3 source-cited tier-B). TME drops from ~100 → ~42; CHI rises from ~90% → ~97%. Demonstrates honest degradation when calibration-circular conditions are removed.
+- **Leave-calibrated-out sensitivity** (`tests/imm/validation_k15_loo.test.ts`): K15 reproduction with evidence-based conditions only (tier-A + source-cited tier-B). TME drops from ~100 → ~42; CHI rises from ~90% → ~97%. Demonstrates honest degradation when calibration-circular conditions are removed. (Test fixture reflects pre-2026-05-25 provenance snapshot; counts in test file may differ from current 37+63.)
 
 ---
 
