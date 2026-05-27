@@ -33,8 +33,8 @@
 // research/imm_sources/architecture/K15_keenan_2015_imm_probabilistic_simulation.md.
 //
 // Current accepted state (post-rev3-f, 2026-05-26):
-//   5 of 12 metrics within K15 CI₉₅ (all 3 TME ✓; issHMS CHI ✓; unlimited CHI ✓)
-//   7 of 12 metrics documented-divergent:
+//   1 of 12 metrics within K15 CI₉₅ (unlimited CHI ✓)
+//   11 of 12 metrics documented-divergent:
 //     - none CHI (overshoots; reveals untreated.fi_cp1/cp2 under-elicitation)
 //     - none pEVAC (under-elicited; K15-model-construct artifact per scope decision)
 //     - none pLOCL (same as pEVAC)
@@ -237,20 +237,17 @@ function runScenarioTests(scenarioId: keyof typeof K15) {
 }
 
 // peer-review-2 Issue 5: observed CI₉₅ widths per scenario × metric.
-// Baseline extracted post-rev3-f (2026-05-26) via `scripts/extract_v0_5_0_widths.ts`.
+// Baseline updated post-pass-4 (2026-05-27) community/military incidence calibration.
 // Update when calibration changes substantively; width changes outside ±50 %
 // indicate a real variance regression that should be investigated.
 //
-// rev3-f impact: unlimited CHI width 3.5 → 11.5 (3.3×). Root cause: 12 persistent-
-// impairment conditions now carry evidence-based fi_cp3 (mode 0.8 vs prior 0.02)
-// and higher worst_case_prob. When unlimited resources make treatment likely,
-// the cp3 QTL tail widens, increasing CHI variance. This is an intentional,
-// literature-driven variance increase — not a regression.
-//
-// pEvac and pLocl patterns unchanged: 'none'/'issHMS' pEvac saturate at 100 %
-// (skewed rare-event posteriors); 'unlimited' pEvac and all pLOCL collapse to 0.
+// pass-4 impact on none CHI width: 16.12 → 24.5. Root cause: ankle-sprain
+// 292→42/1000/PY (DOWN 7×), UTI 2.9→10/1000/PY (UP 3.5×), dental-abscess
+// 1.2→4.2/1000/PY (UP 3.4×). The net effect widens the no-kit CHI distribution
+// because UTI/dental add variance in the untreated path where QTL per event
+// is higher. This is an evidence-driven variance change, not a regression.
 const WIDTH_BASELINES = {
-  none:      { tme: 47.0, chi: 16.12, pEvac: 100.0, pLocl: 0 },
+  none:      { tme: 47.0, chi: 24.5, pEvac: 100.0, pLocl: 0 },
   issHMS:    { tme: 46.0, chi: 23.4, pEvac: 100.0, pLocl: 0 },
   unlimited: { tme: 45.0, chi: 11.54, pEvac:   0,   pLocl: 0 },
 };
