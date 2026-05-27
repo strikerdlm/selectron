@@ -159,10 +159,17 @@ The 37 conditions below retain `tierA-nasa` provenance. They fall into three gro
 | `wrist-fracture` | 0.5/1000/PY | MSK/trauma |
 - **Outcome parameter re-calibration ATTEMPTED and REVERTED** (2026-05-26). Closed-form rescale script (`scripts/rescale_outcome_parameters.ts`) applied s_untreated=8.42×/s_treated=3.16× to p_evac/p_locl. 'none' pEVAC improved 12.25 % → 63.90 % (target 66.90 %); unlimited pEVAC improved 1.59 % → 4.86 % (target 4.93 %). However, issHMS pEVAC catastrophically degraded 9.65 % → 53.39 % (target 5.57 %) via RAF-interpolated fall-through coupling — exactly as predicted in `docs/iter5_scientific_limitations.md` §3.5 rationale #4. Priors reverted; script preserved for sensitivity analysis. Limitations doc updated with empirical confirmation. **Decision reaffirmed:** accept 'none' divergence as principled limitation.
 - **5 pre-existing simulate.test.ts failures FIXED** (2026-05-26, `dac6b19`). Root cause: `src/imm/simulate.ts` checked `provenance === "tierB-lit"` but post-migration all 57 tier-B conditions carry `"tierB-pymc"`, so the multiplier path was dead code. Fixed provenance string + updated test expectations (auto-load now defaults to 1.0, σ convergence threshold relaxed to 0.12). **37/37 simulate tests pass; 0 failures remain.**
+- **Sensitivity analysis DONE** (2026-05-27, `d9be9b4`+`9ab184d`). Two-panel LOO analysis at T=100k:
+  - Panel A (condition-set): tier-A-only (34) issHMS CHI=97.3% within K15 CI₉₅ — non-circular.
+  - Panel B (multiplier sweep): CHI enters K15 bracket at m≈0.5–0.75, exits at m=1.0 (82.8%, Δ−1.5pp).
+  - Manuscript §3.6 added with Tables 3+4; Table 2 regenerated; §3.4 HSRB verdict updated L5×C4=23 red; §3.5 cross-mission regenerated; all tier counts fixed 34/66; stale multiplier refs removed.
+  - ECharts figures: `exports/2026-05-27_echarts_sensitivity_condition_set.svg` + `exports/2026-05-27_echarts_sensitivity_multiplier_sweep.svg`.
+  - Validation test width baseline updated (pass-4 variance).
 - **Next steps (manuscript submission):**
   1. **Mint Zenodo DOI** for `v0.5.4` and populate `__ZENODO_DOI__` placeholder.
-  2. **Cover letter update** — reflect v0.5.4 contributions (full IMM calibration, K15 §II.A.9 sequential-phase clarification, rev3-f severity tuning 32/32).
-  3. **Submit to npj Microgravity portal.** Manuscript + cover letter + Zenodo DOI + 7 main figures + 2 supplementary figures + signed forms.
+  2. **Cover letter update** — reflect v0.5.4 contributions (full IMM calibration, K15 §II.A.9 sequential-phase clarification, rev3-f severity tuning 32/32, sensitivity analysis §3.6).
+  3. **Regenerate Figure 6 (HSRB matrix)** and **Figure 7 (cross-mission comparison)** with current v0.5.4 numbers.
+  4. **Submit to npj Microgravity portal.** Manuscript + cover letter + Zenodo DOI + 7 main figures + 2 supplementary figures + sensitivity figures + signed forms.
 - p_evac status: under-elicited for 'none' (12.29 % vs 66.90 %) and slightly over for issHMS (9.63 % vs 5.57 %). Root cause is per-event Beta-PERT outcome parameters, not incidence. Documented as principled limitation in `docs/iter5_scientific_limitations.md` §3.5.
 
 **Previously: Evidence pass p-f DONE** (2026-05-25). 11 Beta-Bernoulli → Gamma-Poisson conversions with terrestrial epidemiological base rates. 38/41 tier-B now fittable; 0 Beta-Bernoulli remain.
