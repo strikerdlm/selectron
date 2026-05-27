@@ -43,7 +43,7 @@ This protocol is the disconnection-recovery contract: if the controller session 
 
 `src/imm/` is a NASA-IMM-aligned probabilistic medical-risk simulator that runs alongside the existing `src/risk/` Stage B + HSRB-LxC pipeline. **They are independent**: do not refactor one based on the other.
 
-**Three-tier prior provenance**: every entry in `src/data/imm-priors.json` carries a `provenance` tag (`tierA-nasa` / `tierB-lit` / `tierB-pymc` / `tierC-synth`) and a `source_ref` pointing to a markdown file under `research/`. **100% of 100 IMM conditions are now evidence-based** (37 tierA-nasa + 63 tierB-pymc; 0 tierC-synth remain). The `tierB-pymc` tag indicates PyMC NUTS-fitted posteriors from terrestrial epidemiological base rates; `tierB-lit` marks hand-curated literature values that were not refit via PyMC. Never blindly hand-edit priors — re-run the calibration script and commit the updated JSON.
+**Three-tier prior provenance**: every entry in `src/data/imm-priors.json` carries a `provenance` tag (`tierA-nasa` / `tierB-lit` / `tierB-pymc` / `tierC-synth`) and a `source_ref` pointing to a markdown file under `research/`. **100% of 100 IMM conditions are now evidence-based** (34 tierA-nasa + 66 tierB-pymc; 0 tierC-synth remain). The `tierB-pymc` tag indicates PyMC NUTS-fitted posteriors from terrestrial epidemiological base rates; `tierB-lit` marks hand-curated literature values that were not refit via PyMC. Never blindly hand-edit priors — re-run the calibration script and commit the updated JSON.
 
 **Dexie schema is v3** (additive migration). The `imm_sessions` table persists Crew Composition runs. v2 candidate / criterion / attachment tables are untouched.
 

@@ -32,16 +32,20 @@
 // verbatim K15 paper §III ranges captured in
 // research/imm_sources/architecture/K15_keenan_2015_imm_probabilistic_simulation.md.
 //
-// Current accepted state (post-rev3-f, 2026-05-26):
+// Current accepted state (post-pass-4 community/military calibration, 2026-05-27):
 //   1 of 12 metrics within K15 CI₉₅ (unlimited CHI ✓)
 //   11 of 12 metrics documented-divergent:
-//     - none CHI (overshoots; reveals untreated.fi_cp1/cp2 under-elicitation)
-//     - none pEVAC (under-elicited; K15-model-construct artifact per scope decision)
-//     - none pLOCL (same as pEVAC)
-//     - issHMS pEVAC (slightly over)
-//     - issHMS pLOCL (slightly under)
-//     - unlimited pEVAC (under)
-//     - unlimited pLOCL (under)
+//     - none TME     (evidence-based rates systematically lower than K15 iMED)
+//     - none CHI     (overshoots; untreated fi_cp1/cp2 under-elicitation)
+//     - none pEVAC   (under-elicited; K15-model-construct artifact, limitations §4.1)
+//     - none pLOCL   (same root cause as pEVAC)
+//     - issHMS TME   (evidence-based rates; same cause as none TME)
+//     - issHMS CHI   (~82.8 vs K15 94.93; same fi_cp1/cp2 root cause; reclassified post-pass-4)
+//     - issHMS pEVAC (slightly over K15 CI₉₅)
+//     - issHMS pLOCL (slightly under K15 CI₉₅)
+//     - unlimited TME   (evidence-based rates; same cause as none TME)
+//     - unlimited pEVAC (under K15 ref; outcome tuning backlog)
+//     - unlimited pLOCL (under K15 ref; severity-axis backlog)
 //
 // rev3-f severity tuning (2026-05-26): updated worst_case_prob + fi_cp3 for 12
 // persistent-impairment conditions against primary-source literature. Expected
