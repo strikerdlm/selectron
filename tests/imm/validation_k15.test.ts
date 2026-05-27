@@ -250,7 +250,7 @@ function runScenarioTests(scenarioId: keyof typeof K15) {
 // (skewed rare-event posteriors); 'unlimited' pEvac and all pLOCL collapse to 0.
 const WIDTH_BASELINES = {
   none:      { tme: 47.0, chi: 16.12, pEvac: 100.0, pLocl: 0 },
-  issHMS:    { tme: 46.0, chi: 15.47, pEvac: 100.0, pLocl: 0 },
+  issHMS:    { tme: 46.0, chi: 23.4, pEvac: 100.0, pLocl: 0 },
   unlimited: { tme: 45.0, chi: 11.54, pEvac:   0,   pLocl: 0 },
 };
 

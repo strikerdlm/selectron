@@ -70,9 +70,9 @@ describe("Leave-calibrated-out K15 sensitivity", () => {
       .map((c) => c.id)
   );
 
-  it("includes 41–46 evidence-based conditions (41 tier-A + up to 5 source-cited tier-B)", () => {
-    expect(evidenceBasedIds.size).toBeGreaterThanOrEqual(41);
-    expect(evidenceBasedIds.size).toBeLessThanOrEqual(46);
+  it("includes 30–39 evidence-based conditions (34 tier-A after pass 4 + up to 5 source-cited tier-B)", () => {
+    expect(evidenceBasedIds.size).toBeGreaterThanOrEqual(30);
+    expect(evidenceBasedIds.size).toBeLessThanOrEqual(39);
   });
 
   it("TME drops and CHI rises when calibration-circular conditions are removed", () => {
