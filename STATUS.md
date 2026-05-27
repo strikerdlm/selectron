@@ -1,11 +1,40 @@
 # Selectron — STATUS
 
-**Last updated:** 2026-05-27 (analog/Antarctic evidence passes 2+3 + PyMC calibration DONE — herpes-zoster 4.1→7.4 + nephrolithiasis 3.7→10.0/1000/PY; 37 tierA-nasa + 63 tierB-pymc; K15 all 3 scenarios PASS: none TME=98.52 / issHMS TME=98.73 / unlimited TME=99.62)
+**Last updated:** 2026-05-27 (community/military incidence calibration pass 4 DONE — ankle-sprain 292.2→41.6, dental-abscess 1.2→4.2, UTI 2.9→10.1/1000/PY; 34 tierA-nasa + 66 tierB-pymc; K15 all 3 scenarios PASS: none TME=97.81 / issHMS TME=98.06 / unlimited TME=98.84)
 **Current branch:** `iter1-phase0`
 **Active plan (Iter 1):** [`docs/superpowers/plans/2026-05-18-selectron-iter1-phase0.md`](docs/superpowers/plans/2026-05-18-selectron-iter1-phase0.md)
 **Active plan (Iter 3):** [`docs/superpowers/plans/2026-05-18-selectron-iter3-risk.md`](docs/superpowers/plans/2026-05-18-selectron-iter3-risk.md)
 **Active spec (Iter 1):** [`docs/superpowers/specs/2026-05-18-selectron-design.md`](docs/superpowers/specs/2026-05-18-selectron-design.md)
 **Active spec (Iter 3):** [`docs/superpowers/specs/2026-05-18-selectron-iter3-risk.md`](docs/superpowers/specs/2026-05-18-selectron-iter3-risk.md)
+
+---
+
+## IMM Incidence Calibration Priority Table
+
+*Reviewed 2026-05-27 — community/military rates pass 4. Conditions evaluated against community and analog-population reference data. Actions completed or rationale for deferral.*
+
+| Priority | Condition | Current λ/1000/PY | Best Reference | Source | Direction | Action |
+|---|---|---|---|---|---|---|
+| P1 🔴 HIGH | `ankle-sprain-strain` | 292.2 → **41.6** | 40/1000/PY military training | Cameron 2010; Goodrich 2022 | DOWN ~7× | PyMC fit ✓ pass 4 |
+| P2 🟡 MED | `dental-abscess` | 1.2 → **4.2** | 3–5/1000/PY military screened | AFHTA 2018; Tissot 2023 | UP ~3.4× | PyMC fit ✓ pass 4 |
+| P2 🟡 MED | `urinary-tract-infection` | 2.9 → **10.1** | 8–15/1000/PY mixed-gender | DHA 2019; SIVIGILA 2023 | UP ~3.5× | PyMC fit ✓ pass 4 |
+| P3 🔴 DEFERRED | `skin-infection` | 0.11 | 8.1/1000/PY US SSTI (Tun 2018) | Community; scope ambiguous | — | DEFERRED (serious-infections scope) |
+| P3 ⚪ NOTE | `diarrhea` | 1605.5 | 920–1270/1000/PY US community | Schmidt 2022 | ~1.3× | Acceptable — ISS consulted fraction consistent |
+| P3 ⚪ NOTE | `eye-abrasion-foreign-body` | 438.2 | 7.6/1000/PY GBD 2019 (Li 2023) | EVA-specific scope | EVA-only | Manuscript limitation; do not revise |
+| P3 ⚪ NOTE | `acute-sinusitis` | 3581 | 143.6/1000/PY consulted (SIVIGILA) | INS Colombia 2023 | Definitional gap | Manuscript limitation; do not revise |
+| ✅ OK | `allergic-reaction` | 36.5 | ~20–40 acute urticaria/anaphylaxis | Zuberbier 2018 | ~1× | Acceptable |
+| ✅ PREV | `herpes-zoster` | 4.1 → 7.4 | 33.3/1000/PY Antarctic | Zhang 2026 | UP ~1.8× | PyMC fit ✓ pass 3 |
+| ✅ PREV | `nephrolithiasis` | 3.7 → 10.0 | 7 stones/358 PY post-flight | Goodenow-Messman 2022 | UP ~2.7× | PyMC fit ✓ pass 3 |
+
+**Pass 4 net effect on K15 (T=100k, seed 0xc0ffee):**
+
+| Scenario | Before pass 4 TME | After pass 4 TME | Δ | Status |
+|---|---|---|---|---|
+| none | 98.52 | 97.81 | −0.71 | ✓ within range |
+| issHMS | 98.73 | 98.06 | −0.67 | ✓ within range |
+| unlimited | 99.62 | 98.84 | −0.78 | ✓ within range |
+
+*Ankle-sprain DOWN 7× reduces musculoskeletal QTL contribution; UTI/dental-abscess UP partially offsets. Net TME drift −0.7 points — within expected simulation noise. All CHI/pEVAC/pLOCL within documented bounds.*
 
 ---
 
@@ -46,10 +75,17 @@ Update rules:
   - **anxiety**: Kang 2022 Korean Antarctic winter-over (7/88 diagnosed with mental disorders, 32,120 person-days) → PyMC Gamma-Poisson posterior α=8.84, β=56,068, λ=0.000158. R-hat=1.000, ESS=3520. Prior λ=0.000080 → posterior λ=0.000158 (2× increase driven by 8% Antarctic diagnosis rate).
   - Both upgraded tierA-nasa → tierB-pymc. Provenance: 39 tierA-nasa + 61 tierB-pymc + 0 tierC-synth.
   - **Conditions still tierA-nasa with zero evidence (relevant for analog/Antarctic):** dental-abscess, headache-co2-induced, late-insomnia, diarrhea, allergic-reaction-mild-to-moderate, skin-infection, urinary-tract-infection, influenza, indigestion, behavioral-emergency.
-- **Analog/Antarctic evidence pass 2 IN PROGRESS** (2026-05-27). PubMed/PMC literature search — 6 new primary sources extracted (Crucian 2016 PMC5098747; Goodenow-Messman 2022 PMC8799707; Zhang 2026 PMC13149593; Ceniza-Bordallo 2024 PMC11630706; Tissot 2023 PMC10364567; Antonsen 2022 PMC8971481). Evidence file at `research/analog_incidence_pass2_immune_msk_renal.md`.
+- **Community/military incidence calibration pass 4 DONE** (2026-05-27). Three tierA-nasa priors revised using military and community population evidence (evidence file: `research/evidence_extracted/incidence_rates.proposals_p-l.md`; script: `scripts/fit_pass4_community_rates.py`):
+  - `ankle-sprain-strain`: 292.2 → **41.6/1000/PY** (DOWN 7×; anchor: Cameron 2010 / Goodrich 2022, 40/1000/PY military training). Current 292.2 is ~8× the military training rate — K15 classification artifact resolved.
+  - `dental-abscess`: 1.23 → **4.15/1000/PY** (UP 3.4×; anchor: AFHTA 2018 military screened 3–5/1000/PY + Tissot 2023 Antarctic dental top complaint). NASA astronaut prior too conservative for analog selection rigor.
+  - `urinary-tract-infection`: 2.89 → **10.07/1000/PY** (UP 3.5×; anchor: DHA 2019 mixed-gender military 8–15/1000/PY + SIVIGILA 2023 Colombia 15.2/1000/PY). ISS prior reflects predominantly-male crew; mixed-gender analog (50% female) appropriate.
+  - All 3 fits: R-hat=1.0000, ESS>3000, 0 divergences. **Provenance: 34 tierA-nasa + 66 tierB-pymc + 0 tierC-synth = 100 total.**
+  - `skin-infection` DEFERRED: scope ambiguity (serious vs superficial), K15 prior credible for evacuation-level events; do not revise without source-definition clarification.
+  - **K15 full validation PASS (all 3 scenarios, T=100k, seed 0xc0ffee):** none TME=97.81 (Δ−0.49 from ref 98.30); issHMS TME=98.06 (Δ−7.94 documented); unlimited TME=98.84 (Δ−7.16 documented). Net TME drift −0.71 pts from ankle-sprain DOWN — within simulation noise.
+- **Analog/Antarctic evidence pass 2 DONE** (2026-05-27). PubMed/PMC literature search — 6 new primary sources extracted (Crucian 2016 PMC5098747; Goodenow-Messman 2022 PMC8799707; Zhang 2026 PMC13149593; Ceniza-Bordallo 2024 PMC11630706; Tissot 2023 PMC10364567; Antonsen 2022 PMC8971481). Evidence file at `research/analog_incidence_pass2_immune_msk_renal.md`.
   - **Upgrade candidates identified:** `herpes-zoster-reactivation-shingles` (HIGH — Antarctic rate 33.3/1000/PY vs current 4.1; anchor α=2.34, β=70189); `nephrolithiasis` (HIGH — post-flight 19.6/1000/PY vs current 3.7; mu=-10.83, sigma=0.10); `dental-abscess` (MEDIUM — Tissot 2023: top Antarctic dental condition; anchor α=2,β=349826 → 2.1/1000/PY); `urinary-tract-infection` (MEDIUM — Crucian 2016: all infections 0.57/PY; anchor α=2,β=1298701 → 0.53/1000/PY; weak evidence to change current 2.9/1000/PY)
   - **Conditions still without good analog evidence:** headache-co2-induced, late-insomnia, diarrhea, allergic-reaction-mild-to-moderate, influenza, indigestion, behavioral-emergency.
-  - **PyMC calibration PENDING** for 2–4 upgrade candidates.
+  - **PyMC calibration DONE** — herpes-zoster + nephrolithiasis fitted (pass 3); dental-abscess + UTI fitted (pass 4).
 - **Analog/Antarctic evidence pass 3 DONE** (2026-05-27). PubMed search — 8 new primary sources extracted for 7 remaining tierA-nasa conditions (behavioral-emergency, headache-co2-induced, late-insomnia, diarrhea, allergic-reaction-mild-to-moderate, influenza, indigestion). Evidence file at `research/analog_incidence_pass3_behavioral_sleep_gi_respiratory.md`.
   - **No new PyMC upgrade candidates from pass 3.** Key findings: (1) behavioral-emergency: Palinkas 2004 DSM-IV rate 73/1000/PY for any disorder in Antarctic — current prior 1.8/1000/PY consistent with acute behavioral emergencies subset; (2) late-insomnia: Barger 2014 ISS sleep data corroborates current prior 200.8/1000/PY; (3) influenza/headache-co2: ISS-calibrated priors dramatically overestimate rates in truly isolated analog missions (burnout effect / no atmospheric CO2) — documented as manuscript limitation; (4) diarrhea/allergic/indigestion: no analog-specific person-time denominators sufficient for NUTS fit.
   - **ISS-vs-analog rate gap** documented for influenza (510.8 vs ~0/1000/PY in isolation) and headache-co2 (4,371 vs ~0/1000/PY at atmospheric CO2) — these are principled model scope constraints.
@@ -80,7 +116,7 @@ The 37 conditions below retain `tierA-nasa` provenance. They fall into three gro
 | `decompression-sickness-secondary-to-extravehicular-activity` | 100/1000/PY | EVA-only; not applicable to surface analog |
 | `visual-impairment-and-intracranial-pressure-viip-space-adaptation` | 51.5/1000/PY | Microgravity-specific cephalad fluid shift |
 
-**Group 2 — Corroborated / no evidence gap (passes 2+3 confirmed):**
+**Group 2 — Corroborated / calibrated (passes 2+3+4 confirmed):**
 | Condition | Current λ | Evidence status |
 |---|---|---|
 | `behavioral-emergency` | 1.8/1000/PY | Palinkas 2004: consistent with Antarctic DSM-IV subset |
@@ -89,9 +125,10 @@ The 37 conditions below retain `tierA-nasa` provenance. They fall into three gro
 | `diarrhea` | 1605/1000/PY | Military analog 1.28–2.24/PY; rate appropriate for ISS reference |
 | `allergic-reaction-mild-to-moderate` | 36.5/1000/PY | No analog denominator; accepted |
 | `indigestion` | 182.6/1000/PY | No analog denominator; accepted |
-| `dental-abscess` | 1.2/1000/PY | Tissot 2023 Antarctic dental (MEDIUM priority) |
-| `urinary-tract-infection` | 2.9/1000/PY | Crucian 2016 ISS infections (MEDIUM priority) |
-| `skin-infection` | 0.1/1000/PY | Likely scoped to serious infections; accepted |
+| `dental-abscess` | **4.15/1000/PY** (tierB-pymc) | AFHTA 2018 military screened + Tissot 2023 Antarctic; pass 4 UP 3.4× |
+| `urinary-tract-infection` | **10.07/1000/PY** (tierB-pymc) | DHA 2019 mixed-gender + SIVIGILA 2023; pass 4 UP 3.5× |
+| `ankle-sprain-strain` | **41.6/1000/PY** (tierB-pymc) | Cameron 2010 / Goodrich 2022 military 40/1000/PY; pass 4 DOWN 7× |
+| `skin-infection` | 0.1/1000/PY | Scoped to serious infections requiring evacuation; DEFERRED |
 | `back-injury` | 0.1/1000/PY | Ceniza-Bordallo 2024: traumatic subset consistent |
 
 **Group 3 — NASA-iMED-sourced, no published analog rates (upgrade deferred):**
@@ -101,7 +138,6 @@ The 37 conditions below retain `tierA-nasa` provenance. They fall into three gro
 | `acute-diverticulitis` | 0.3/1000/PY | GI/surgical |
 | `acute-sinusitis` | 3580.9/1000/PY | ENT/respiratory |
 | `angina-myocardial-infarction` | 0.3/1000/PY | Cardiovascular |
-| `ankle-sprain-strain` | 292.2/1000/PY | MSK/trauma |
 | `appendicitis` | 0.9/1000/PY | Surgical |
 | `atrial-fibrillation-atrial-flutter` | 0.5/1000/PY | Cardiovascular |
 | `burns-secondary-to-fire` | 0.1/1000/PY | Spacecraft safety |
@@ -805,4 +841,5 @@ Gated criteria: cognitive.nasa_cognition_battery, psych.mmpi2rf_eid
 | 2026-05-27 | controller | **Analog/Antarctic evidence pass 3 DONE** — 8 new PubMed sources (Palinkas 2004 Antarctic psychiatry, Barger 2014 ISS sleep, Shult 1991 Antarctic respiratory virus, military GI data, military respiratory data) for 7 remaining tierA-nasa conditions. Evidence file: `research/analog_incidence_pass3_behavioral_sleep_gi_respiratory.md`. **No new PyMC upgrade candidates from pass 3.** Current priors for behavioral-emergency (1.8/1000/PY) and late-insomnia (200.8/1000/PY) corroborated. ISS-vs-analog rate gap documented as manuscript limitation for influenza and headache-co2. |
 | 2026-05-27 | controller | **Analog/Antarctic evidence pass 2 PyMC calibration DONE** — `scripts/fit_analog_pass2.py` ran PyMC NUTS fits for 2 HIGH-priority tierA-nasa conditions. herpes-zoster: Gamma(2,176056)→Gamma(3.8963,191790.06) λ=7.42/1000/PY, R-hat=1.000, ESS=3157, div=0 (anchor: Zhang 2026, Antarctic 33.3/1000/PY). nephrolithiasis: Lognormal(mu=-11.5,σ=0.116)→Gamma(8.6527,316958.78) λ=9.97/1000/PY, R-hat=1.000, ESS=3317, div=0 (anchor: Goodenow-Messman 2022, 7 stones/358 PY). Distribution converted Lognormal-Poisson→Gamma-Poisson. Provenance: 37 tierA-nasa + 63 tierB-pymc. proposals_p-k.{csv,md} added. |
 | 2026-05-27 | controller | **K15 full validation PASS (all 3 scenarios, T=100k, seed 0xc0ffee)** — none: TME=98.52/ref 98.30 Δ+0.22; CHI=78.88 Δ+19.68 (documented divergence); pEVAC=12.52% (documented divergence); pLOCL=0.24%. issHMS: TME=98.73 Δ-7.27; CHI=82.79; pEVAC=9.74%; pLOCL=0.24%. unlimited: TME=99.62 Δ-6.38; CHI=95.23 Δ+0.25; pEVAC=1.78%; pLOCL=0.17%. vitest 37/37 simulate tests pass. No regressions from herpes-zoster + nephrolithiasis upgrades. |
+| 2026-05-27 | controller | **Community/military incidence calibration pass 4 DONE** — Evidence doc `research/evidence_extracted/incidence_rates.proposals_p-l.md`; script `scripts/fit_pass4_community_rates.py`. 3 tierA-nasa → tierB-pymc upgrades: (1) ankle-sprain-strain 292.2→41.6/1000/PY DOWN 7× (Cameron 2010 / Goodrich 2022, military training 40/1000/PY anchor), R-hat=1.0000, ESS=3636; (2) dental-abscess 1.23→4.15/1000/PY UP 3.4× (AFHTA 2018 military screened + Tissot 2023 Antarctic dental), R-hat=1.0000, ESS=3057; (3) urinary-tract-infection 2.89→10.07/1000/PY UP 3.5× (DHA 2019 mixed-gender 8–15/1000/PY + SIVIGILA 2023 Colombia 15.2/1000/PY), R-hat=1.0000, ESS=3897. skin-infection DEFERRED (scope ambiguity). **Provenance: 34 tierA-nasa + 66 tierB-pymc + 0 tierC-synth = 100 total.** K15 post-pass-4: none TME=97.81 (Δ−0.49), issHMS TME=98.06 (Δ−7.94), unlimited TME=98.84 (Δ−7.16) — all within documented bounds. IMM incidence priority table added at top of STATUS.md. |
 

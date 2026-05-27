@@ -474,12 +474,12 @@
     },
     "ankle-sprain-strain": {
       "conditionId": "ankle-sprain-strain",
-      "provenance": "tierA-nasa",
-      "source_ref": "research/imm_sources/methods/M18_myers_2018_imm_validation.md#ankle-sprain-strain; rev3-e (2026-05-22): treated.fi_cp3 = untreated.fi_cp3 = 0 \u2014 condition fully resolves over 180d analog/LEO timeframe regardless of treatment (clinically defensible per K15 \u00a7II.A.5 'permanent impairment for remainder of mission' definition: acute self-limiting condition leaves no persistent impairment)",
+      "provenance": "tierB-pymc",
+      "source_ref": "research/evidence_extracted/incidence_rates.proposals_p-l.md (Cameron 2010 + Goodrich 2022: 40/1000/PY military; PyMC Gamma-Poisson, R-hat=1.000, ESS=3636)",
       "incidence": {
         "distribution": "Gamma-Poisson",
-        "alpha": 2,
-        "beta": 2500,
+        "alpha": 40.4174,
+        "beta": 354557.117,
         "lambda_unit": "events-per-person-day"
       },
       "severity": {
@@ -1331,12 +1331,12 @@
     },
     "dental-abscess": {
       "conditionId": "dental-abscess",
-      "provenance": "tierA-nasa",
-      "source_ref": "research/imm_sources/zotero_imm/antonsen-2021-comparison-of-health-and-performance.md#table-4; research/imm_sources/methods/G12_gilkey_2012_bayesian_imm.md#table-22 (Bayesian-updated dental abscess submarine + LSAH posterior; tier-A confirmation); rev3-e (2026-05-22): treated.fi_cp3 = untreated.fi_cp3 = 0 \u2014 condition fully resolves over 180d analog/LEO timeframe regardless of treatment (clinically defensible per K15 \u00a7II.A.5 'permanent impairment for remainder of mission' definition: acute self-limiting condition leaves no persistent impairment)",
+      "provenance": "tierB-pymc",
+      "source_ref": "research/evidence_extracted/incidence_rates.proposals_p-l.md (AFHTA 2018 military screened 3-5/1000/PY + Tissot 2023 Antarctic; PyMC Gamma-Poisson, R-hat=1.000, ESS=3057)",
       "incidence": {
         "distribution": "Gamma-Poisson",
-        "alpha": 2,
-        "beta": 595059,
+        "alpha": 10.7974,
+        "beta": 950727.6151,
         "lambda_unit": "events-per-person-day"
       },
       "severity": {
@@ -1425,12 +1425,12 @@
     },
     "urinary-tract-infection": {
       "conditionId": "urinary-tract-infection",
-      "provenance": "tierA-nasa",
-      "source_ref": "research/imm_sources/zotero_imm/antonsen-2021-comparison-of-health-and-performance.md#table-4; rev3-e (2026-05-22): treated.fi_cp3 = untreated.fi_cp3 = 0 \u2014 condition fully resolves over 180d analog/LEO timeframe regardless of treatment (clinically defensible per K15 \u00a7II.A.5 'permanent impairment for remainder of mission' definition: acute self-limiting condition leaves no persistent impairment)",
+      "provenance": "tierB-pymc",
+      "source_ref": "research/evidence_extracted/incidence_rates.proposals_p-l.md (DHA 2019 mixed-gender 8-15/1000/PY; SIVIGILA 2023 Colombia 15.2/1000/PY; PyMC Gamma-Poisson, R-hat=1.000, ESS=3897)",
       "incidence": {
         "distribution": "Gamma-Poisson",
-        "alpha": 2,
-        "beta": 252525,
+        "alpha": 16.5492,
+        "beta": 600308.2294,
         "lambda_unit": "events-per-person-day"
       },
       "severity": {
