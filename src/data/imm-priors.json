@@ -1047,13 +1047,13 @@
     },
     "nephrolithiasis": {
       "conditionId": "nephrolithiasis",
-      "provenance": "tierA-nasa",
-      "source_ref": "research/imm_sources/methods/G12_gilkey_2012_bayesian_imm.md#nephrolithiasis; research/imm_sources/validation/S20_walton_kerstman_2020_iss_quantification.md#nephrolithiasis; rev3-e (2026-05-22): treated.fi_cp3 = untreated.fi_cp3 = 0 \u2014 condition fully resolves over 180d analog/LEO timeframe regardless of treatment (clinically defensible per K15 \u00a7II.A.5 'permanent impairment for remainder of mission' definition: acute self-limiting condition leaves no persistent impairment)",
+      "provenance": "tierB-pymc",
+      "source_ref": "research/evidence_extracted/incidence_rates.proposals_p-k.md (Goodenow-Messman 2022 PMC8799707: 7 post-flight stones/358 PY; PyMC Gamma-Poisson, R-hat=1.000, ESS=3317)",
       "incidence": {
-        "distribution": "Lognormal-Poisson",
-        "mu_log_lambda": -11.5,
-        "sigma_log_lambda": 0.116,
-        "lambda_unit": "events-per-person-day"
+        "distribution": "Gamma-Poisson",
+        "lambda_unit": "events-per-person-day",
+        "alpha": 8.6527,
+        "beta": 316958.777
       },
       "severity": {
         "worst_case_prob_alpha": 1.5,
@@ -1238,12 +1238,12 @@
     },
     "herpes-zoster-reactivation-shingles": {
       "conditionId": "herpes-zoster-reactivation-shingles",
-      "provenance": "tierA-nasa",
-      "source_ref": "research/imm_sources/zotero_imm/antonsen-2021-comparison-of-health-and-performance.md#table-4; rev3-e (2026-05-22): treated.fi_cp3 = untreated.fi_cp3 = 0 \u2014 condition fully resolves over 180d analog/LEO timeframe regardless of treatment (clinically defensible per K15 \u00a7II.A.5 'permanent impairment for remainder of mission' definition: acute self-limiting condition leaves no persistent impairment)",
+      "provenance": "tierB-pymc",
+      "source_ref": "research/evidence_extracted/incidence_rates.proposals_p-k.md (Zhang 2026 PMC13149593: Antarctic HZ 33.3/1000/PY; PyMC Gamma-Poisson, R-hat=1.000, ESS=3157)",
       "incidence": {
         "distribution": "Gamma-Poisson",
-        "alpha": 2,
-        "beta": 176056,
+        "alpha": 3.8963,
+        "beta": 191790.0644,
         "lambda_unit": "events-per-person-day"
       },
       "severity": {

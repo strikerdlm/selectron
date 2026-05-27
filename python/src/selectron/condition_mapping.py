@@ -66,6 +66,8 @@ PROPOSAL_TO_PRIOR_ID: dict[str, str] = {
     "dental-caries": "dental-caries",
     "anxiety": "anxiety",
     "late-insomnia": "late-insomnia",
+    "herpes-zoster-reactivation-shingles": "herpes-zoster-reactivation-shingles",
+    "nephrolithiasis": "nephrolithiasis",
 }
 
 UNMAPPED_PROPOSAL_IDS: set[str] = {

@@ -24,6 +24,7 @@ _PROPOSAL_FILES = [
     "incidence_rates.proposals_p-h.csv",
     "incidence_rates.proposals_p-i.csv",
     "incidence_rates.proposals_p-j.csv",
+    "incidence_rates.proposals_p-k.csv",
 ]
 
 
