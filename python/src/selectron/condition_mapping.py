@@ -63,6 +63,9 @@ PROPOSAL_TO_PRIOR_ID: dict[str, str] = {
     "neurogenic-shock": "neurogenic-shock",
     "shoulder-dislocation": "shoulder-dislocation",
     "smoke-inhalation": "smoke-inhalation",
+    "dental-caries": "dental-caries",
+    "anxiety": "anxiety",
+    "late-insomnia": "late-insomnia",
 }
 
 UNMAPPED_PROPOSAL_IDS: set[str] = {

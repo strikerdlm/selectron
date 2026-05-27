@@ -3315,12 +3315,12 @@
     },
     "anxiety": {
       "conditionId": "anxiety",
-      "provenance": "tierA-nasa",
-      "source_ref": "research/imm_sources/validation/S20_walton_kerstman_2020_iss_quantification.md#anxiety; rev3-e (2026-05-22): treated.fi_cp3 = untreated.fi_cp3 = 0 \u2014 condition fully resolves over 180d analog/LEO timeframe regardless of treatment (clinically defensible per K15 \u00a7II.A.5 'permanent impairment for remainder of mission' definition: acute self-limiting condition leaves no persistent impairment)",
+      "provenance": "tierB-pymc",
+      "source_ref": "research/evidence_extracted/incidence_rates.proposals_p-j.md (Kang 2022: 7 diagnosed mental disorders in 88 Korean Antarctic winterers over 1 year; PyMC Gamma-Poisson posterior, R-hat=1.000, ESS=3520)",
       "incidence": {
         "distribution": "Gamma-Poisson",
-        "alpha": 2,
-        "beta": 25000,
+        "alpha": 8.8379,
+        "beta": 56067.9853,
         "lambda_unit": "events-per-person-day"
       },
       "severity": {
@@ -6783,12 +6783,12 @@
     },
     "dental-caries": {
       "conditionId": "dental-caries",
-      "provenance": "tierA-nasa",
-      "source_ref": "research/evidence_tables/medical.md; research/imm_sources/methods/G12_gilkey_2012_bayesian_imm.md#table-26 (Bayesian update: 240 USN SSBN patrols / 5946.9 py + LSAH posterior; rate 9.41e-3/py = 2.58e-5/day); see research/_priors_rev3c_synthesis.md#2.1; rev3-e (2026-05-22): treated.fi_cp3 = untreated.fi_cp3 = 0 \u2014 condition fully resolves over 180d analog/LEO timeframe regardless of treatment (clinically defensible per K15 \u00a7II.A.5 'permanent impairment for remainder of mission' definition: acute self-limiting condition leaves no persistent impairment)",
+      "provenance": "tierB-pymc",
+      "source_ref": "research/evidence_extracted/incidence_rates.proposals_p-j.md (Deutsch 2008: 53 caries/endodontic events in 2,180,000 submarine person-days; PyMC Gamma-Poisson posterior, R-hat=1.000, ESS=3695)",
       "incidence": {
         "distribution": "Gamma-Poisson",
-        "alpha": 2.0,
-        "beta": 77519.0,
+        "alpha": 54.9568,
+        "beta": 2257559.5858,
         "lambda_unit": "events-per-person-day"
       },
       "severity": {
