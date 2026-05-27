@@ -6,14 +6,16 @@ A Bayesian MCDA scoring engine for analog-astronaut selection. Personal research
 
 ## Sequencing
 
-Four-iteration spiral:
+Four-iteration spiral, plus two post-spiral iterations:
 
-1. **Iter 1** — vertical slice, 5 hardcoded criteria, end-to-end (current).
+1. **Iter 1** — vertical slice, 5 hardcoded criteria, end-to-end.
 2. **Iter 2** — literature-driven criteria + multi-candidate comparison.
 3. **Iter 3** — sensitivity analysis + prior elicitation.
 4. **Iter 4** — paper draft.
+5. **Iter 5** — IMM Calculator (100 conditions × 3 kits, K15 validation gate).
+6. **Iter 6** — Python offline calibration + FastAPI + Calibration UI (59/59 tier-B PyMC fitted, 100% evidence-based).
 
-Phase 0 (6-agent literature fan-out) runs in parallel with Iter 1, gates Iter 2.
+**Manuscript submission (npj Microgravity) is the active priority.** All engineering iterations are complete.
 
 ## Working in this repo
 
@@ -41,7 +43,7 @@ This protocol is the disconnection-recovery contract: if the controller session 
 
 `src/imm/` is a NASA-IMM-aligned probabilistic medical-risk simulator that runs alongside the existing `src/risk/` Stage B + HSRB-LxC pipeline. **They are independent**: do not refactor one based on the other.
 
-**Three-tier prior provenance**: every entry in `src/data/imm-priors.json` carries a `provenance` tag (`tierA-nasa` / `tierB-lit` / `tierC-synth`) and a `source_ref` pointing to a markdown file under `research/`. Tier-C placeholders are back-fit to K15 Table 1 via `npm run calibrate:imm`. Never blindly hand-edit priors — re-run the calibration script and commit the updated JSON.
+**Three-tier prior provenance**: every entry in `src/data/imm-priors.json` carries a `provenance` tag (`tierA-nasa` / `tierB-lit` / `tierB-pymc` / `tierC-synth`) and a `source_ref` pointing to a markdown file under `research/`. **100% of 100 IMM conditions are now evidence-based** (37 tierA-nasa + 63 tierB-pymc; 0 tierC-synth remain). The `tierB-pymc` tag indicates PyMC NUTS-fitted posteriors from terrestrial epidemiological base rates; `tierB-lit` marks hand-curated literature values that were not refit via PyMC. Never blindly hand-edit priors — re-run the calibration script and commit the updated JSON.
 
 **Dexie schema is v3** (additive migration). The `imm_sessions` table persists Crew Composition runs. v2 candidate / criterion / attachment tables are untouched.
 

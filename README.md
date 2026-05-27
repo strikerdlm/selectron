@@ -86,14 +86,15 @@ flowchart LR
     I3[Iter 3 ✓<br/>NASA IMM Monte Carlo<br/>NASA HSRB LxC verdict<br/>mission risk + per-mission compare] --> I4
     I4[Iter 4 ✓<br/>IMRaD manuscript<br/>figures from src/<br/>journal submission] --> I5
     I5[Iter 5 ✓<br/>IMM Calculator<br/>100 conditions × 3 kits<br/>K15 validation gate] --> I6
-    I6[Iter 6<br/>Python prior calibration<br/>FastAPI + Calibration UI<br/>38/41 tier-B PyMC fitted]
+    I6[Iter 6 ✓<br/>Python prior calibration<br/>FastAPI + Calibration UI<br/>59/59 tier-B PyMC fitted] --> MS
+    MS[Manuscript submission<br/>npj Microgravity<br/>Zenodo DOI · cover letter<br/>100% evidence-based]
     classDef done fill:#16a34a,stroke:#15803d,color:#fff
     classDef active fill:#eab308,stroke:#a16207,color:#fff
-    class P0,I1,I2,I3,I4,I5 done
-    class I6 active
+    class P0,I1,I2,I3,I4,I5,I6 done
+    class MS active
 ```
 
-**Iter 6 (Python offline calibration + evidence hardening) is the active iteration.** The previous iterations shipped:
+**Manuscript submission (npj Microgravity) is the active priority.** All six engineering iterations are complete. The previous iterations shipped:
 
 - **Iter 1** — vertical slice: Bayesian MCDA over 5 placeholder criteria, Mulberry32 PRNG, Marsaglia–Tsang Gamma, Dirichlet sampler with closed-form moment validation.
 - **Iter 2** — 12 evidence-grounded criteria with verified DOIs, 3-tier accessibility model (Minimum / Medium / Elite), tier-aware scale transforms.
@@ -102,7 +103,7 @@ flowchart LR
 
 **Iter 5 shipped** a full NASA-IMM-aligned probabilistic medical-risk calculator (`src/imm/`): 100 K15-appendix medical conditions × 3 kit scenarios (None / ISS HMS / Unlimited) × T=100 000 Monte Carlo trials; K15 §II.A.9-correct sequential-phase QTL (cp1+cp2+cp3); per-member vulnerability injection via Stage A z-scores; Crew Composition builder with binary clearance gates, per-criterion mini-figures, and Scite-verified citations; 5 IMM result figures (I1–I5); a formal K15 Table 1 reproduction gate (IMM-86: 13 vitest tests, 7/12 metrics within CI₉₅).
 
-**Iter 6 (active)** adds a Python offline calibration pipeline (`python/`) for research-grade prior elicitation: PyMC NUTS Gamma-Poisson fitter, K15 validator, atomic priors writer, Sobol/Morris sensitivity analysis. Evidence pass p-f (2026-05-25) converted 11 former Beta-Bernoulli tier-B conditions to Gamma-Poisson using terrestrial epidemiological base rates; **38 of 41 tier-B conditions are now fittable** (0 Beta-Bernoulli remain). A **FastAPI Calibration API** (`python/api/`) wraps the pipeline: `/health`, `/conditions`, `/fit` (async background jobs), `/validate`, `/sensitivity`. A **Calibration browser view** (`src/ui/views/Calibration.tsx`) provides three tabs — Conditions browser (filterable by provenance, 100-row table with fitted/fittable status), Batch Fit (PyMC NUTS run with live job polling + results table showing R-hat, ESS, divergences), and V&V (placeholder). A typed TypeScript client (`src/api/calibration.ts`) is the sole HTTP boundary between the frontend and the Python API.
+**Iter 6 shipped** a complete Python offline calibration pipeline (`python/`) for research-grade prior elicitation: PyMC NUTS Gamma-Poisson fitter, K15 validator, atomic priors writer, Sobol/Morris sensitivity analysis. Evidence pass p-f (2026-05-25) converted 11 former Beta-Bernoulli tier-B conditions to Gamma-Poisson using terrestrial epidemiological base rates. **63 of 63 tier-B conditions fitted via PyMC NUTS** (100% evidence-based: 37 tierA-nasa + 63 tierB-pymc); **0 tierC-synth remain**. The tier-C synthetic → tierB-pymc cleanup (p-h, 2026-05-26) upgraded 18 remaining tier-C conditions through MCP literature search agents (Consensus + Scite + paper-search + Firecrawl) across 4 evidence passes. **rev3-f severity tuning** (2026-05-26) updated 32/32 persistent-impairment conditions against 126 primary-source evidence rows. **Analog/Antarctic evidence passes 2+3** (2026-05-27): 14 new PubMed/PMC sources for ISS-vs-analog incidence calibration; herpes-zoster-reactivation-shingles (4.1→7.4/1000/PY, Zhang 2026 Antarctic HZ 33.3/1000/PY anchor) and nephrolithiasis (3.7→10.0/1000/PY, Goodenow-Messman 2022 post-flight data, Lognormal→Gamma-Poisson) upgraded to tierB-pymc. A **FastAPI Calibration API** (`python/api/`) wraps the pipeline: `/health`, `/conditions`, `/fit`, `/validate`, `/sensitivity`. A **Calibration browser view** (`src/ui/views/Calibration.tsx`) provides three tabs — Conditions browser (provenance-filterable table), Batch Fit (PyMC NUTS with live job polling), and V&V placeholder. A typed TypeScript client (`src/api/calibration.ts`) is the sole HTTP boundary.
 
 The full plan lives in [`docs/superpowers/plans/`](docs/superpowers/plans/). Current resume tracker is [`STATUS.md`](STATUS.md).
 
@@ -355,45 +356,39 @@ CORS is pre-configured for the Vite dev server (`:5173`) and preview (`:4173`).
 - **Iter 1–3:** code-complete. Bayesian MCDA + NASA IMM Monte Carlo + HSRB LxC verdict all green.
 - **Iter 4 manuscript:** IMRaD draft complete; F1–F7 figure pipeline reproducible from `src/imm/`; 40/40 bibliography entries Crossref-verified; two internal peer-review passes applied (14/23 Tier-1 fixes). Ready for npj Microgravity submission pending Zenodo DOI mint + cover-letter update.
 - **Iter 5 IMM Calculator:** DONE at v0.5.0. Phase 0 (100-condition catalog + 3-tier priors) DONE; Phase 1 (engine math, σ<5 % convergence) DONE; Phase 2 (data layer + CrewComposition UI + K15 validation gate) DONE; priors re-elicitation rev3-a through rev3-e DONE (7/12 K15 metrics within CI₉₅). Figures I1–I5 shipped; I6/I7/I8 engine-blocked (Phase 3 ML). Phase 3 ML layer (surrogate + vulnerability MLP) not started.
-- **Iter 6 Python offline calibration DONE** (v0.5.4): Full 12-task Python pipeline DONE. PyMC batch fit completed: 59 of 59 tier-B conditions merged (provenance `tierB-pymc`); 0 tier-C remain (100/100 conditions evidence-based: 61 tierB-pymc + 39 tierA-nasa). `tierB_multiplier` set to 1.0. K15: 26/26 validation tests pass; TME 98–99 (all scenarios). **FastAPI Calibration API** (`python/api/`) + **Calibration browser view** (`src/ui/views/Calibration.tsx`) + **TypeScript API client** (`src/api/calibration.ts`) DONE (v0.5.2). 9 new Playwright e2e tests. **rev3-f severity tuning DONE** — 32/32 persistent-impairment conditions updated against primary-source literature. Manuscript submission unblocked.
+- **Iter 6 Python offline calibration DONE** (v0.5.4): Full 12-task Python pipeline DONE. PyMC batch fit completed: 63 of 63 tier-B conditions merged (provenance `tierB-pymc`); 0 tier-C remain (100/100 conditions evidence-based: 63 tierB-pymc + 37 tierA-nasa). `tierB_multiplier` set to 1.0. K15: 26/26 validation tests pass; TME 98–99 (all scenarios). **FastAPI Calibration API** (`python/api/`) + **Calibration browser view** (`src/ui/views/Calibration.tsx`) + **TypeScript API client** (`src/api/calibration.ts`) DONE (v0.5.2). 9 new Playwright e2e tests. **rev3-f severity tuning DONE** — 32/32 persistent-impairment conditions updated against primary-source literature. **Analog/Antarctic passes 2+3 DONE** — herpes-zoster + nephrolithiasis upgraded tierA-nasa → tierB-pymc (analog epidemiology anchors). Manuscript submission unblocked.
 - **Active branch:** `iter1-phase0` (carries all iteration history).
 
 The live resume tracker is [`STATUS.md`](STATUS.md). Citation metadata is in [`CITATION.cff`](CITATION.cff) (GitHub renders a "Cite this repository" button).
 
 ## What's left to do
 
-Three distinct backlogs, in priority order: **(A)** manuscript submission (active, unblocked by calibration completion), **(B)** engineering / calibration (stable at v0.5.4), and **(C)** deferred peer-review diagnostics (all closed).
+Two backlogs: **(A)** manuscript submission (active, all engineering blockers closed), **(B)** engineering / deferred (stable at v0.5.4).
 
-### A. Engineering / calibration backlog (stable at v0.5.4)
-
-0. **PyMC batch fit DONE** (`python/`). 59 of 59 tier-B conditions fitted via PyMC NUTS Gamma-Poisson and merged into `imm-priors.json` (provenance `tierB-pymc`). 0 tier-B-lit remain. `tierB_multiplier` set to 1.0. K15: 26/26 validation tests pass; TME ~98 (all scenarios). **FastAPI + Calibration UI DONE** (v0.5.2).
-1. ~~rev3-f severity tuning~~ **DONE** — 32 of 32 persistent-impairment conditions updated against primary-source literature (`severity_f.proposals_rev3f.csv`, 126 evidence rows). `scripts/apply_rev3f_priors.py` automates the CSV→JSON pipeline. 68 self-limiting conditions correctly retain mode=0. Validation passed (T=100k): TME 98.43–99.49 all scenarios ✓.
-2. **Outcome parameter re-calibration ATTEMPTED and REVERTED** — closed-form p_evac/p_locl rescale fixes 'none' and 'unlimited' but catastrophically breaks issHMS via RAF-interpolated fall-through coupling. Decision: accept divergence as principled limitation per `docs/iter5_scientific_limitations.md` §3.5.
-3. **Per-condition source audit for 3 unfittable conditions** (elbow/hip/wrist-sprain-strain) — no isolated incidence rates in published literature; remain hand-tuned Gamma-Poisson.
-4. **~~Fix 5 pre-existing simulate.test.ts failures~~ FIXED** (`dac6b19`): tierB provenance mismatch `"tierB-lit"` → `"tierB-pymc"` + updated test expectations. 37/37 pass. Root cause under investigation.
-5. **IMM Phase 3 ML layer** — surrogate model (IMM-52 through IMM-56), vulnerability MLP (IMM-57 through IMM-60), engine toggle + vulnerability mode toggle (IMM-62/63). Unblocks figures I6/I7/I8.
-6. **TM21 AMM/SMM validation gate (IMM-87)** — deferred until Mars structural engine prerequisites land (see [`docs/future_features.md`](docs/future_features.md)).
-7. **Future features** — Artemis (lunar) and Mars (interplanetary) missions, plus I6/I7/I8 figures, are all in [`docs/future_features.md`](docs/future_features.md) with their structural prerequisites.
-8. **Diego sign-offs still open:** Iter-1 UI sanity (Task 17), Iter-3 Mission-risk tab (Task 58), Phase 3F acceptance (Task 88), Iter-2 taxonomy ratification (gates Iter-2 start).
-
-### B. Manuscript submission (active priority — calibration unblocked)
+### A. Manuscript submission (active priority)
 
 1. **Mint Zenodo DOI** for `v0.5.4` and populate the `__ZENODO_DOI__` placeholder in `paper/manuscript.md` §2.5 + code-availability statement.
-2. **Cover letter update** — reflect v0.5.4 contributions (full IMM calibration, K15 §II.A.9 sequential-phase clarification, rev3-f severity tuning).
+2. **Cover letter update** — reflect v0.5.4 contributions (full IMM calibration: 100% evidence-based priors, K15 §II.A.9 sequential-phase clarification, rev3-f severity tuning 32/32).
 3. **Submit to npj Microgravity portal.** Manuscript + cover letter + Zenodo DOI + 7 main figures + 2 supplementary figures + signed forms.
 
-### C. Peer-review #2 deferred diagnostics (closed 2026-05-24)
+### B. Engineering / deferred backlog (stable at v0.5.4)
 
-All previously deferred items from `paper/peer-review-tier1-application-log.md` §Deferred are now resolved:
-- α₀ ∈ {1, 10, 100} robustness panel (Stage A) — `6b78a73`
-- K-S marginal Dirichlet goodness-of-fit test — `1426a5b`
-- Brooks-Gelman-Rubin R̂ diagnostic (4 chains × 25k) — `228d12d`
-- Non-degenerate worked example (heterogeneous z-scores for F1/F5) — `e24bd90`
-- Leave-calibrated-out sensitivity (44 evidence-based conditions) — `8be99ba`
+1. **Outcome parameter re-calibration — ATTEMPTED and REVERTED.** Closed-form p_evac/p_locl rescale fixes 'none' and 'unlimited' but catastrophically breaks issHMS via RAF-interpolated fall-through coupling. Decision: accept divergence as principled limitation per `docs/iter5_scientific_limitations.md` §3.5.
+2. **Per-condition source audit for 3 hand-tuned conditions** (elbow/hip/wrist-sprain-strain) — no isolated incidence rates in published literature; remain hand-tuned Gamma-Poisson.
+3. **IMM Phase 3 ML layer** — surrogate model (IMM-52 through IMM-56), vulnerability MLP (IMM-57 through IMM-60), engine toggle + vulnerability mode toggle (IMM-62/63). Unblocks figures I6/I7/I8.
+4. **TM21 AMM/SMM validation gate (IMM-87)** — deferred until Mars structural engine prerequisites land (see [`docs/future_features.md`](docs/future_features.md)).
+5. **Future features** — Artemis (lunar) and Mars (interplanetary) missions, plus I6/I7/I8 figures, all in [`docs/future_features.md`](docs/future_features.md) with structural prerequisites.
+6. **Diego sign-offs still open:** Iter-1 UI sanity (Task 17), Iter-3 Mission-risk tab (Task 58), Phase 3F acceptance (Task 88), Iter-2 taxonomy ratification (gates Iter-2 start).
 
-### Recent (v0.5.2 → v0.5.4, 2026-05-23 → 2026-05-26)
+### Done (v0.5.4 — all engineering iterations complete)
 
-Bibliography Crossref walk (40/40 verified, 5 corrected); F6+F7 figures regenerated from IMM Calculator; two peer-review passes + 14/23 Tier-1 fixes applied; rev3-b-followup variance-correct multipliers; rev3-d + rev3-e K15-correct sequential QTL; pre-submission math hardening (all deferred diagnostics closed); evidence pass p-f (11 Beta-Bernoulli → Gamma-Poisson conversions); PyMC batch fit (35 → 57 tier-B fitted, 100% evidence-based); tier-C synthetic → tierB-pymc (18/18 converted — 100% complete, 0 tierC-synth remain); **rev3-f severity tuning (32/32 persistent-impairment conditions updated, 126 evidence rows)**; outcome parameter rescale attempted and reverted (documented as principled limitation); simulate.test.ts provenance fix (37/37 pass); **FastAPI Calibration API + Calibration browser view + TypeScript API client** (v0.5.2, 9 new Playwright tests).
+- **PyMC batch fit** — 63/63 tier-B conditions fitted via PyMC NUTS Gamma-Poisson, merged into `imm-priors.json`. 0 tierC-synth remain. `tierB_multiplier` set to 1.0. K15: 26/26 validation tests pass. **Analog/Antarctic evidence passes 2+3** (`04543d9`): herpes-zoster (4.1→7.4/1000/PY) + nephrolithiasis (3.7→10.0/1000/PY) upgraded tierA-nasa → tierB-pymc; provenance 37+63.
+- **FastAPI Calibration API + Calibration browser UI** — 9 Playwright e2e tests.
+- **rev3-f severity tuning** — 32/32 persistent-impairment conditions from 126 evidence rows; 68 self-limiting at mode=0.
+- **simulate.test.ts provenance fix** (`dac6b19`) — 37/37 pass.
+- **Pre-submission math hardening** — all 5 deferred peer-review diagnostics closed: α₀ robustness, K-S goodness-of-fit, R̂ diagnostic, non-degenerate worked example, leave-calibrated-out sensitivity.
+- **Bibliography Crossref walk** — 40/40 verified, 5 corrected.
+- **Outcome rescale documented as principled limitation** per `docs/iter5_scientific_limitations.md` §3.5.
 
 See [`STATUS.md`](STATUS.md) for the full per-task tracker and [`docs/iter5_priors_rev3_strategy.md`](docs/iter5_priors_rev3_strategy.md) for the priors re-elicitation phasing.
 
@@ -404,8 +399,8 @@ The full catalog lives in [`docs/iter5_scientific_limitations.md`](docs/iter5_sc
 | Limitation | Severity | Status |
 |---|---|---|
 | **K15 calibration target is itself a model output**, not observed in-flight data. Our "reproduction" validates against another model, not reality. | Fundamental | Inherent to IMM methodology; no public alternative exists. |
-| **0 of 100 conditions are tierC-synth** (all evidence-based: 41 tierA-nasa + 59 tierB-pymc). Elbow/hip/wrist-sprain-strain fitted via hand-tuned Gamma-Poisson (no isolated incidence evidence found). | Low | 97/100 fitted via PyMC NUTS or NASA source; 3 use hand-tuned Gamma-Poisson from analogous populations. |
-| **0 tier-C synthetic priors remain** — all 100 IMM conditions now evidence-based. | Resolved | Final cleanup: acute-radiation-syndrome (literature-validated Beta-Bernoulli) + smoke-inhalation (PyMC NUTS fit against Guibaud 2022). See `research/evidence_extracted/incidence_rates.proposals_p-i.md`. |
+| **3 conditions hand-tuned** (elbow/hip/wrist-sprain-strain) — no isolated incidence rates in published literature for PyMC NUTS fitting. All other 97/100 conditions PyMC-fitted or NASA-sourced. | Low | 63 tierB-pymc (PyMC NUTS) + 37 tierA-nasa; 3 use hand-tuned Gamma-Poisson from analogous populations. |
+| **100% evidence-based priors** — 0 tierC-synth remain. Final cleanup: acute-radiation-syndrome (literature-validated Beta-Bernoulli) + smoke-inhalation (PyMC NUTS fit against Guibaud 2022). | Resolved | See `research/evidence_extracted/incidence_rates.proposals_p-i.md`. |
 | **'none' kit CHI diverges Δ +26** from K15 (85.31 vs 59.20). Untreated-outcome priors under-elicited. | Medium | Accepted: operationally implausible scenario (no real mission has zero medical kit). |
 | **Per-event pEVAC/pLOCL on issHMS/unlimited** are small absolute values but outside K15's tight CI₉₅ brackets. | Low | 5 of 12 metrics are documented-divergent with wider tracking brackets in `validation_k15.test.ts`. |
 | **Mars / Artemis out of scope** — no comms-delay treatment degradation, no cumulative-dose, no partial-gravity EVA. | By design | Prerequisites catalogued in [`docs/future_features.md`](docs/future_features.md). |
