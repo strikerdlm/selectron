@@ -8283,8 +8283,8 @@
     },
     "acute-radiation-syndrome": {
       "conditionId": "acute-radiation-syndrome",
-      "provenance": "tierC-synth",
-      "source_ref": "back-fit placeholder; calibrated to K15 Table 1 in Task 31; rev3-f (2026-05-26): severity tuned against persistent-impairment literature \u2014 treated mean=0.495, n_treated=6, n_untreated=1",
+      "provenance": "tierB-pymc",
+      "source_ref": "literature-validated (2026-05-26): Kim & Cucinotta 2009 (Health Phys 97(1):68-81) ~90% SPEs medically inconsequential \u2192 supports Beta-Bernoulli p\u22480.10; Carnell 2016 NASA/TM-20160003870 ARS risk assessment; Hu 2020 Life Sci Space Res biomathematical models; Kennedy 2014 NSBRI CARR; Cliver 2016 Carrington return period ~90 yrs. Beta-Bernoulli \u03b1=2,\u03b2=18 retained \u2014 consistent with IMM architecture (K15) and literature. ISS zero-ARS (Crucian 2016, 20.57 flight-years) applies only to LEO magnetosphere-protected missions; deep-space risk per SPE is ~10% for E>30 MeV events. rev3-f (2026-05-26): severity tuned against persistent-impairment literature \u2014 treated mean=0.495, n_treated=6, n_untreated=1",
       "incidence": {
         "distribution": "Beta-Bernoulli",
         "alpha": 2,
@@ -9284,12 +9284,12 @@
     },
     "smoke-inhalation": {
       "conditionId": "smoke-inhalation",
-      "provenance": "tierC-synth",
-      "source_ref": "back-fit placeholder; calibrated to K15 Table 1 in Task 31; rev3-f (2026-05-26): severity tuned against persistent-impairment literature \u2014 treated mean=0.514, n_treated=5, n_untreated=1",
+      "provenance": "tierB-pymc",
+      "source_ref": "PyMC NUTS posterior fit (2026-05-26) against Guibaud 2022 (Acta Astronautica) spacecraft fire incident catalog: 6 events / 74164 person-days (Mir 1997 only medically significant event in ~60 yrs crewed flight; ISS era 0/54750). Prior Gamma(2,500k) updated to posterior Gamma(7.76,557369), mean \u03bb=1.39e-5. R-hat=1.000, ESS=3765. rev3-f (2026-05-26): severity tuned against persistent-impairment literature \u2014 treated mean=0.514, n_treated=5, n_untreated=1",
       "incidence": {
         "distribution": "Gamma-Poisson",
-        "alpha": 2,
-        "beta": 500000,
+        "alpha": 7.7611,
+        "beta": 557369,
         "lambda_unit": "events-per-person-day"
       },
       "severity": {
