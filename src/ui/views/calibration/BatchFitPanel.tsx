@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
+import { ConditionCombobox } from "./ConditionCombobox";
 import {
   type FitRequest,
   type FitResult,
@@ -45,7 +46,7 @@ export function BatchFitPanel() {
   const [draws, setDraws] = useState(2000);
   const [chains, setChains] = useState(4);
   const [seed, setSeed] = useState(42);
-  const [conditionFilter, setConditionFilter] = useState("");
+  const [conditionId, setConditionId] = useState<string | null>(null);
   const [job, setJob] = useState<JobStatusResponse | null>(null);
   const [running, setRunning] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -112,7 +113,7 @@ export function BatchFitPanel() {
       draws,
       chains,
       seed,
-      condition_id: conditionFilter.trim() || null,
+      condition_id: conditionId,
     };
     try {
       const res = await startFit(req);
@@ -163,14 +164,8 @@ export function BatchFitPanel() {
             </div>
           ))}
           <div className="flex flex-col gap-1">
-            <label className="label text-ink-3">condition filter (optional)</label>
-            <input
-              type="text"
-              value={conditionFilter}
-              onChange={(e) => setConditionFilter(e.target.value)}
-              placeholder="e.g. depression"
-              className="mono text-[11px] bg-bg-1 border border-line text-ink-1 px-2 py-1.5 rounded-sm focus:outline-none focus:border-signal placeholder:text-ink-3"
-            />
+            <label className="label text-ink-3">condition</label>
+            <ConditionCombobox value={conditionId} onChange={setConditionId} />
           </div>
         </div>
 
