@@ -42,6 +42,10 @@ class ValidateRequest(BaseModel):
     seed: int = 42
     kit: Literal["none", "issHMS", "unlimited"] = "issHMS"
 
+class ValidateJobResponse(BaseModel):
+    job_id: str
+    status: str
+
 class MetricResult(BaseModel):
     metric: str
     scenario: str
