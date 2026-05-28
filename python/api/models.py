@@ -65,10 +65,12 @@ class ValidateResponse(BaseModel):
     metrics: list[MetricResult]
 
 class SensitivityRequest(BaseModel):
-    method: Literal["sobol", "morris"] = "sobol"
-    n_samples: int = 1024
-    trials: int = 10_000
+    method: Literal["sobol", "morris"] = "morris"
+    n_samples: int = 10
+    trials: int = 1000
     seed: int = 42
+    top_n: int = 15
+    condition_ids: list[str] | None = None
 
 class SensitivityIndex(BaseModel):
     parameter: str
@@ -84,6 +86,10 @@ class SensitivityResponse(BaseModel):
     n_params: int
     n_evaluations: int
     indices: list[SensitivityIndex]
+
+class SensitivityJobResponse(BaseModel):
+    job_id: str
+    status: str
 
 class ConditionsListResponse(BaseModel):
     conditions: list[dict]
