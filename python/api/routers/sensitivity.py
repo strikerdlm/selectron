@@ -1,4 +1,6 @@
+import asyncio
 import logging
+from concurrent.futures import ThreadPoolExecutor
 from fastapi import APIRouter, BackgroundTasks, HTTPException
 
 from ..job_store import store
@@ -8,6 +10,8 @@ from selectron.priors_io import load_priors
 
 logger = logging.getLogger(__name__)
 router = APIRouter()
+
+_executor = ThreadPoolExecutor(max_workers=2)
 
 
 def _build_label_map() -> dict[str, str]:
@@ -44,19 +48,24 @@ async def _run_sensitivity(
         ]
         ids_to_use = condition_ids if condition_ids else all_gp_ids
 
+        loop = asyncio.get_event_loop()
         if method == "morris":
-            report = run_morris_screening(
-                condition_ids=ids_to_use,
-                n_trajectories=n_samples,
-                trials_per_eval=trials,
-                seed=seed,
+            report = await loop.run_in_executor(
+                _executor, lambda: run_morris_screening(
+                    condition_ids=ids_to_use,
+                    n_trajectories=n_samples,
+                    trials_per_eval=trials,
+                    seed=seed,
+                )
             )
         else:
-            report = run_sobol_analysis(
-                condition_ids=ids_to_use,
-                n_samples=n_samples,
-                trials_per_eval=trials,
-                seed=seed,
+            report = await loop.run_in_executor(
+                _executor, lambda: run_sobol_analysis(
+                    condition_ids=ids_to_use,
+                    n_samples=n_samples,
+                    trials_per_eval=trials,
+                    seed=seed,
+                )
             )
 
         label_map = _build_label_map()

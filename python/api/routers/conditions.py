@@ -30,7 +30,7 @@ async def list_conditions():
     for cid, prior in priors["conditions"].items():
         dist = prior["incidence"]["distribution"]
         prov = prior["provenance"]
-        fittable = prov == "tierB-lit" and dist == "Gamma-Poisson"
+        fittable = prov in ("tierB-lit", "tierB-pymc") and dist == "Gamma-Poisson"
         fitted = prov == "tierB-pymc"
         if fittable:
             n_fittable += 1

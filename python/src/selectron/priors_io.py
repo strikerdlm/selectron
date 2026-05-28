@@ -75,11 +75,17 @@ def save_priors(data: dict[str, Any], path: Path | None = None) -> None:
 def get_tier_b_conditions(
     data: dict[str, Any],
 ) -> dict[str, dict[str, Any]]:
-    """Extract all tier-B conditions from a priors dict."""
+    """Extract all fittable Gamma-Poisson conditions from a priors dict.
+
+    Includes both tierB-lit (pending fit) and tierB-pymc (already fitted) since
+    either can be re-fit. tierA-nasa conditions are excluded because their priors
+    come from NASA flight data, not terrestrial epidemiology.
+    """
     return {
         cid: prior
         for cid, prior in data["conditions"].items()
-        if prior.get("provenance") == "tierB-lit"
+        if prior.get("provenance") in ("tierB-lit", "tierB-pymc")
+        and prior.get("incidence", {}).get("distribution") == "Gamma-Poisson"
     }
 
 

@@ -1,4 +1,6 @@
+import asyncio
 import logging
+from concurrent.futures import ThreadPoolExecutor
 from fastapi import APIRouter, BackgroundTasks, HTTPException
 
 from ..job_store import store
@@ -9,15 +11,20 @@ from selectron.validator import validate_k15
 logger = logging.getLogger(__name__)
 router = APIRouter()
 
+_executor = ThreadPoolExecutor(max_workers=2)
+
 
 async def _run_validation(job_id: str, trials: int, seed: int) -> None:
     try:
         store.update(job_id, status="running")
-        report = validate_k15(
-            trials=trials,
-            seed=seed,
-            scenarios=["none", "issHMS", "unlimited"],
-            priors_path=IMM_PRIORS_PATH,
+        loop = asyncio.get_event_loop()
+        report = await loop.run_in_executor(
+            _executor, lambda: validate_k15(
+                trials=trials,
+                seed=seed,
+                scenarios=["none", "issHMS", "unlimited"],
+                priors_path=IMM_PRIORS_PATH,
+            )
         )
         metrics = []
         for m in report.metrics:
