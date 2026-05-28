@@ -400,7 +400,7 @@ function immSteps(args: {
         </span>
       ),
       lay:
-        "We add up all the lost crew-days across all conditions to get QTL — Quality Time Lost. The Crew Health Index is QTL expressed as a percentage of the mission's available person-days: 100% means a perfectly healthy mission, 90% means 10% of the mission's productive time was lost. CHI is the headline number because it normalizes for mission length and crew size, so a 14-day MDRS run and a 520-day Mars500 run can be compared on the same scale.",
+        "We add up all the lost crew-days across all conditions to get QTL — Quality Time Lost. The Crew Health Index is QTL expressed as a percentage of the mission's available person-days: 100% means a perfectly healthy mission, 90% means 10% of the mission's productive time was lost. CHI is the headline number because it normalizes for mission length and crew size, so a 14-day campaign and a 520-day campaign can be compared on the same scale.",
       citation: {
         id: "[A22 Fig. 1] / [M18 §2.1.2]",
         label: "QTL aggregation + Crew Health Index definition",

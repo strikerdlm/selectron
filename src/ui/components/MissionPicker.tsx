@@ -17,7 +17,7 @@ function durationBand(days: number): string {
   if (days <= 45) return "Medium (≤6 wk)";
   if (days <= 90) return "Extended (≤3 mo)";
   if (days <= 365) return "Long (≤1 yr)";
-  return "Mars-class (>1 yr)";
+  return "Extended-duration (>1 yr)";
 }
 
 function durationBandColor(days: number): string {

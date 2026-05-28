@@ -21,7 +21,7 @@ export const ANALOG_MISSIONS: readonly AnalogMission[] = [
   {
     id: "antarctic-winter-over",
     type: "antarctic",
-    label: "Antarctic winter-over (Concordia-class station)",
+    label: "365-day campaign",
     durationDays: 365,
     crewSize: 12,
     evaCount: 0,
@@ -39,7 +39,7 @@ export const ANALOG_MISSIONS: readonly AnalogMission[] = [
   {
     id: "mars500-520d",
     type: "mars500",
-    label: "Mars500 — 520-day Mars-mission simulation",
+    label: "520-day campaign",
     durationDays: 520,
     crewSize: 6,
     evaCount: 0,
@@ -60,7 +60,7 @@ export const ANALOG_MISSIONS: readonly AnalogMission[] = [
   {
     id: "hi-seas-90d",
     type: "hi-seas",
-    label: "HI-SEAS Mauna Loa habitat — 90-day mission",
+    label: "90-day campaign",
     durationDays: 90,
     crewSize: 6,
     evaCount: 12, // HI-SEAS missions log ~1 sim-EVA per week
@@ -77,7 +77,7 @@ export const ANALOG_MISSIONS: readonly AnalogMission[] = [
   {
     id: "mdrs-2wk",
     type: "mdrs",
-    label: "Mars Desert Research Station — 2-week rotation",
+    label: "14-day campaign",
     durationDays: 14,
     crewSize: 6,
     evaCount: 5, // MDRS standard rotation logs ~5 EVAs per crew
@@ -93,7 +93,7 @@ export const ANALOG_MISSIONS: readonly AnalogMission[] = [
   {
     id: "emmpol-6",
     type: "emmpol",
-    label: "EMMPOL-6 — European Mars Mission analog (Polish Space Agency)",
+    label: "10-day campaign",
     durationDays: 10, // midpoint of spec's 8–14 d range
     crewSize: 6,
     evaCount: 3,
@@ -110,7 +110,7 @@ export const ANALOG_MISSIONS: readonly AnalogMission[] = [
   {
     id: "short-7d",
     type: "mdrs",
-    label: "Short campaign (7-day) — MDRS one-week rotation",
+    label: "7-day campaign",
     durationDays: 7,
     crewSize: 6,
     evaCount: 3,
@@ -126,7 +126,7 @@ export const ANALOG_MISSIONS: readonly AnalogMission[] = [
   {
     id: "short-22d",
     type: "thor",
-    label: "Short campaign (22-day) — 3-week THOR-class analog",
+    label: "22-day campaign",
     durationDays: 22,
     crewSize: 6,
     evaCount: 4,
@@ -142,7 +142,7 @@ export const ANALOG_MISSIONS: readonly AnalogMission[] = [
   {
     id: "hi-seas-45d",
     type: "hi-seas",
-    label: "HI-SEAS 45-day mission (Mauna Loa Mars analog)",
+    label: "45-day campaign",
     durationDays: 45,
     crewSize: 6,
     evaCount: 12,

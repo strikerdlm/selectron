@@ -458,7 +458,7 @@ export function MissionComparison({ candidateId, accessTier, gate }: MissionComp
                 className="mono text-[10px] uppercase tracking-wide text-ink-2 mb-1 truncate"
                 title={missionLabel}
               >
-                {row.missionId}
+                {missionLabel}
               </div>
 
               {/* Small histogram */}

@@ -602,12 +602,19 @@ export function CrewComposition() {
             />
           </div>
 
-          <div className="panel">
-            <h3 className="label text-ink-1 uppercase tracking-cap mb-4">
-              I5 · K15 Validation Comparison
-            </h3>
-            <IMMValidationCompare outcome={outcome} />
-          </div>
+          {/* I5 — K15 reference only applies to iss-6mo / issHMS DRM.
+              For analog campaigns and other kits, comparing observed TME/CHI/pEVAC/pLOCL
+              against the ISS 180-day reference yields meaningless deltas (e.g. a 7-day
+              campaign shows TME ~5 vs reference 106, an artifact of duration scaling
+              rather than a real divergence). Mirrors the K15ValidationBadge gate above. */}
+          {state.mission.id === "iss-6mo" && state.kit.scenarioId !== "custom" && (
+            <div className="panel">
+              <h3 className="label text-ink-1 uppercase tracking-cap mb-4">
+                I5 · K15 Validation Comparison
+              </h3>
+              <IMMValidationCompare outcome={outcome} />
+            </div>
+          )}
         </div>
       )}
 
