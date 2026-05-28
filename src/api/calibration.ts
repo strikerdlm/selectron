@@ -121,3 +121,93 @@ export function startFit(request: FitRequest): Promise<FitJobResponse> {
 export function getFitStatus(jobId: string): Promise<JobStatusResponse> {
   return _fetch<JobStatusResponse>(`/fit/${encodeURIComponent(jobId)}`);
 }
+
+// ── Validation ────────────────────────────────────────────────────────────
+
+export interface ValidateRequest {
+  trials: number;
+  seed: number;
+}
+
+export interface MetricResult {
+  metric: string;
+  scenario: string;
+  observed: number;
+  reference: number;
+  ci95_low: number;
+  ci95_high: number;
+  delta: number;
+  within_ci95: boolean;
+}
+
+export interface ValidateResponse {
+  timestamp: string;
+  trials: number;
+  seed: number;
+  n_total: number;
+  n_within_ci95: number;
+  metrics: MetricResult[];
+}
+
+export interface ValidateJobResponse {
+  job_id: string;
+  status: string;
+}
+
+export function startValidation(request: ValidateRequest): Promise<ValidateJobResponse> {
+  return _fetch<ValidateJobResponse>("/validate", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(request),
+  });
+}
+
+export function getValidationStatus(jobId: string): Promise<JobStatusResponse> {
+  return _fetch<JobStatusResponse>(`/validate/${encodeURIComponent(jobId)}`);
+}
+
+// ── Sensitivity ───────────────────────────────────────────────────────────
+
+export interface SensitivityRequest {
+  method: "sobol" | "morris";
+  n_samples: number;
+  trials: number;
+  seed: number;
+  top_n: number;
+}
+
+export interface SensitivityIndex {
+  parameter: string;
+  condition_id: string;
+  condition_label: string;
+  s1: number | null;
+  s1_conf: number | null;
+  st: number | null;
+  st_conf: number | null;
+  mu_star: number | null;
+  sigma: number | null;
+}
+
+export interface SensitivityResponse {
+  method: string;
+  n_params: number;
+  n_evaluations: number;
+  indices: SensitivityIndex[];
+}
+
+export interface SensitivityJobResponse {
+  job_id: string;
+  status: string;
+}
+
+export function startSensitivity(request: SensitivityRequest): Promise<SensitivityJobResponse> {
+  return _fetch<SensitivityJobResponse>("/sensitivity", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(request),
+  });
+}
+
+export function getSensitivityStatus(jobId: string): Promise<JobStatusResponse> {
+  return _fetch<JobStatusResponse>(`/sensitivity/${encodeURIComponent(jobId)}`);
+}
