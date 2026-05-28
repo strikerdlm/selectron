@@ -169,7 +169,7 @@ The 37 conditions below retain `tierA-nasa` provenance. They fall into three gro
   1. **Mint Zenodo DOI** for `v0.5.4` and populate `__ZENODO_DOI__` placeholder.
   2. **Cover letter update** — reflect v0.5.4 contributions (full IMM calibration, K15 §II.A.9 sequential-phase clarification, rev3-f severity tuning 32/32, sensitivity analysis §3.6).
   3. **Regenerate Figure 6 (HSRB matrix)** and **Figure 7 (cross-mission comparison)** with current v0.5.4 numbers.
-  4. **Submit to npj Microgravity portal.** Manuscript + cover letter + Zenodo DOI + 7 main figures + 2 supplementary figures + sensitivity figures + signed forms.
+  4. **Submit to Advances in Space Research (Elsevier/COSPAR).** Manuscript + cover letter + Zenodo DOI + 7 main figures + 2 supplementary figures + sensitivity figures. Submission via Elsevier Editorial Manager. Subscription track (no APC). npj Microgravity dropped — APC $3,790 unaffordable.
 - p_evac status: under-elicited for 'none' (12.29 % vs 66.90 %) and slightly over for issHMS (9.63 % vs 5.57 %). Root cause is per-event Beta-PERT outcome parameters, not incidence. Documented as principled limitation in `docs/iter5_scientific_limitations.md` §3.5.
 
 **Previously: Evidence pass p-f DONE** (2026-05-25). 11 Beta-Bernoulli → Gamma-Poisson conversions with terrestrial epidemiological base rates. 38/41 tier-B now fittable; 0 Beta-Bernoulli remain.

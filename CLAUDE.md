@@ -15,7 +15,7 @@ Four-iteration spiral, plus two post-spiral iterations:
 5. **Iter 5** — IMM Calculator (100 conditions × 3 kits, K15 validation gate).
 6. **Iter 6** — Python offline calibration + FastAPI + Calibration UI (59/59 tier-B PyMC fitted, 100% evidence-based).
 
-**Manuscript submission (npj Microgravity) is the active priority.** All engineering iterations are complete.
+**Manuscript submission (Advances in Space Research, Elsevier/COSPAR) is the active priority.** All engineering iterations are complete. npj Microgravity dropped — APC $3,790 unaffordable.
 
 ## Working in this repo
 
