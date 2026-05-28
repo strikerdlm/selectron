@@ -320,7 +320,11 @@ export function CrewComposition() {
                 value={state.mission.id}
                 onChange={(e) => {
                   const m = ACTIVE_MISSIONS.find((x) => x.id === e.target.value);
-                  if (m) setState((s) => ({ ...s, mission: m }));
+                  if (m) {
+                    setState((s) => ({ ...s, mission: m }));
+                    setOutcome(undefined);
+                    setSimState("idle");
+                  }
                 }}
               >
                 {ACTIVE_MISSIONS.map((m) => (
@@ -353,7 +357,7 @@ export function CrewComposition() {
                       color: state.kit.scenarioId === k ? "var(--signal)" : "var(--ink-2)",
                       background: state.kit.scenarioId === k ? "rgba(245,181,65,0.06)" : "transparent",
                     }}
-                    onClick={() => setState((s) => ({ ...s, kit: IMM_KITS[k] }))}
+                    onClick={() => { setState((s) => ({ ...s, kit: IMM_KITS[k] })); setOutcome(undefined); setSimState("idle"); }}
                   >
                     {IMM_KITS[k].label}
                   </button>
