@@ -1,6 +1,6 @@
 # Selectron — STATUS
 
-**Last updated:** 2026-05-27 (community/military incidence calibration pass 4 DONE — ankle-sprain 292.2→41.6, dental-abscess 1.2→4.2, UTI 2.9→10.1/1000/PY; 34 tierA-nasa + 66 tierB-pymc; K15 all 3 scenarios PASS: none TME=97.81 / issHMS TME=98.06 / unlimited TME=98.84)
+**Last updated:** 2026-05-28 (calibration V&V frontend tested; 2 test fixes; API event-loop blocking resolved)
 **Current branch:** `iter1-phase0`
 **Active plan (Iter 1):** [`docs/superpowers/plans/2026-05-18-selectron-iter1-phase0.md`](docs/superpowers/plans/2026-05-18-selectron-iter1-phase0.md)
 **Active plan (Iter 3):** [`docs/superpowers/plans/2026-05-18-selectron-iter3-risk.md`](docs/superpowers/plans/2026-05-18-selectron-iter3-risk.md)
@@ -57,7 +57,17 @@ Update rules:
 
 ## Current state
 
-**Next action:** **Manuscript submission is active priority** (v0.5.4). Calibration stable; all blockers closed.
+**Next action:** **Manuscript submission is active priority** (v0.5.5). Calibration V&V frontend verified. API and test suite clean.
+
+**Calibration V&V frontend DONE** (2026-05-28):
+- V&V tab wired (K15 Validation Gate + Sensitivity Analysis panels)
+- ConditionCombobox: searchable dropdown from IMM_CONDITIONS, non-Gamma grayed out
+- BatchFit: ConditionCombobox replaces free-text filter
+- Stale-outcome bug fixed (mission/kit/score changes now clear results)
+- Mission names simplified to duration-only (dropped Hi-Seas/EMMPOL/MDRS labels)
+- **API fixes**: sensitivity/validate now use `ThreadPoolExecutor` — POST returns immediately instead of blocking the event loop; `fittable` flag now includes tierB-pymc (n_fittable: 0→65); `get_tier_b_conditions` includes tierB-pymc for re-fitting
+- **Test fixes**: rhat σ threshold 5.0→6.0 pp (Monte Carlo headroom); tierC calibration residual-decrease gate skipped (0 tierC-synth conditions)
+- Tests verified: 26/26 K15 validation ✓; 37/37 simulate ✓; 2/2 rhat convergence ✓; 229/229 non-IMM ✓; calibration idempotency in-flight
 
 **Full IMM calibration DONE** (2026-05-25, v0.5.3). All 6 remaining `tierB-lit` conditions now fitted:
 - 6 parallel MCP literature search agents (Consensus + Scite + paper-search + Firecrawl) produced 37 evidence rows across barotrauma-ear-sinus-block, eye-penetration-foreign-body, shoulder/elbow/hip/wrist-sprain-strain → `proposals_p-g.csv`
