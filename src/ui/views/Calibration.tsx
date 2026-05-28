@@ -1,14 +1,14 @@
 import { useState } from "react";
 import { ConditionsPanel } from "./calibration/ConditionsPanel";
 import { BatchFitPanel } from "./calibration/BatchFitPanel";
-import { PlaceholderPanel } from "./calibration/PlaceholderPanel";
+import { VVPanel } from "./calibration/VVPanel";
 
 type CalTab = "conditions" | "batch-fit" | "validation";
 
 const TAB_LABELS: Record<CalTab, { label: string; tag: string }> = {
   conditions: { label: "Conditions", tag: "browse" },
   "batch-fit": { label: "Batch Fit", tag: "PyMC" },
-  validation: { label: "V&V", tag: "soon" },
+  validation: { label: "V&V", tag: "gate" },
 };
 
 export function Calibration() {
@@ -53,7 +53,7 @@ export function Calibration() {
       {/* Panels */}
       {tab === "conditions" && <ConditionsPanel />}
       {tab === "batch-fit" && <BatchFitPanel />}
-      {tab === "validation" && <PlaceholderPanel />}
+      {tab === "validation" && <VVPanel />}
     </div>
   );
 }
