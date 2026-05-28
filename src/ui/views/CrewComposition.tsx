@@ -185,6 +185,8 @@ export function CrewComposition() {
           : m,
       ),
     }));
+    setOutcome(undefined);
+    setSimState("idle");
   }
 
   const runSimulation = useCallback(() => {

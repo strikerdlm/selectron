@@ -66,7 +66,7 @@ const CREW_DEFS: Array<{ label: string; fraction: number }> = [
   { label: "WORST", fraction: 0.0 },
 ];
 
-const MISSION_IDS = ["iss-6mo", "mars500"];
+const MISSION_IDS = ["iss-6mo", "analog-520d"];
 const KIT_KEYS = ["none", "issHMS"] as const;
 
 // ── Helpers ────────────────────────────────────────────────────────────────────
