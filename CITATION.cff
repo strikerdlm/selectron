@@ -11,17 +11,17 @@ authors:
 license: MIT
 repository-code: "https://github.com/strikerdlm/selectron"
 url: "https://github.com/strikerdlm/selectron"
-version: "0.5.0"
-date-released: "2026-05-22"
+version: "0.5.5"
+date-released: "2026-05-29"
 preferred-citation:
   type: article
-  title: "Bayesian Multi-Criteria Decision Analysis with NASA Human-System-Risk-Board Likelihood × Consequence Mapping for Analog-Astronaut Selection"
+  title: "Reproducible NASA Integrated Medical Model Mission-Risk Simulation with HSRB Likelihood × Consequence Mapping: A Bayesian MCDA Pipeline for Analog-Astronaut Selection"
   authors:
     - family-names: "Malpica"
       given-names: "Diego L."
-  journal: "npj Microgravity"
+  journal: "Advances in Space Research"
   year: 2026
-  month: 7
+  month: 6
 keywords:
   - "analog astronaut selection"
   - "Bayesian MCDA"

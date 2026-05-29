@@ -127,9 +127,11 @@ export type IMMTrialOpts = {
  * Returns modifiedLambda = applyVulnerabilityMultiplier(baseLambda, beta, z).
  * Falls through to baseLambda when no criteria are present or no stageAScores.
  *
- * Production conditions currently have empty vulnerabilityCriteria (auto-generated
- * conditions.ts). This path becomes active once conditions are updated with real
- * criterion linkages (Iter-2+).
+ * 58 of the 100 production conditions now carry vulnerabilityCriteria, so this
+ * path is active whenever a crew member supplies stageAScores. It falls through to
+ * the unmodified baseLambda for crews without Stage-A scores — e.g. the K15
+ * reference crew used in all reported validation and figure runs, which is why
+ * those runs reproduce the uncoupled NASA iMED model (manuscript §2.3, §4.4).
  */
 export function applyStageAVulnerabilityMultiplier(
   baseLambda: number,

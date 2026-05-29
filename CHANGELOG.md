@@ -5,6 +5,42 @@ All notable changes to Selectron are documented here. Format roughly follows
 references to the commits and STATUS.md audit-log entries that produced each
 entry.
 
+## [0.5.5] — 2026-05-29 — Iter-6 calibration, ASR retarget, manuscript hardening
+
+### Changed
+- **Submission target → Advances in Space Research** (Elsevier/COSPAR, subscription
+  track, no APC). npj Microgravity dropped (fully OA, APC $3,790 unaffordable).
+  Manuscript retitled to lead with the reproducible NASA-IMM mission-risk + HSRB-LxC
+  contribution rather than the personnel-selection frame.
+- **Prior provenance → 100 % evidence-based:** 34 `tierA-nasa` + 66 `tierB-pymc`
+  + 0 `tierC-synth` (final, after community/military pass 4 moved ankle-sprain /
+  dental-abscess / UTI from tier-A to PyMC-fitted tier-B). All 66 tier-B fitted via
+  PyMC NUTS (R-hat = 1.000, ESS > 2500); elbow/hip/wrist proxy-anchored.
+- **K15 reproduction** (post-pass-4, T = 100 000, seed `0xc0ffee`): all 3 TME +
+  unlimited CHI (95.3, Δ +0.3) within K15 CI₉₅; issHMS CHI 82.8 (Δ −12.1) marginally
+  below CI₉₅ after the evidence-based incidence recalibration; 8 documented-divergent.
+
+### Added
+- Iter-6 Python offline calibration pipeline (PyMC NUTS fitter, K15 validator,
+  Sobol/Morris SA) + FastAPI Calibration API + Calibration browser view.
+- rev3-f severity tuning — 32/32 persistent-impairment conditions from 126 evidence rows.
+
+### Manuscript hardening (2026-05-29)
+- Internal-consistency fixes: removed the §2.3 "restored reproduction within CI₉₅ on
+  issHMS CHI" overclaim; corrected the §1 "synthetic placeholder" tier description to
+  fully-evidence-based; "eight-mission" → seven (matches the F7 generator); reconciled
+  §4.4 (8 divergent) vs §4.5 (7 outcome-parameter-driven); corrected the dental-caries
+  tier label (`tierB-pymc`, not "promoted to tier-A").
+- Honest-cap framing: same-kit-K15-is-yellow disclosure (§3.4); metric-specific
+  non-circularity (tier-A reproduces CHI, not TME); Fig 7 T = 25 000 rare-event
+  convergence caveat; PyMC-convergence ≠ evidential-pedigree note (§4.4).
+- Narrowed the "aircrew" novelty claim and cited Taylan et al. (2024) pilot-MCDM
+  precedent; resolved the 2 orphan bibliography entries (now cited).
+- Replaced raw `__COMMIT_SHA__` / `__ZENODO_DOI__` template tokens with clean editorial
+  placeholders filled at the submission commit.
+- Reconciled living docs to the manuscript (README, CITATION.cff, supplementary
+  frontmatter, this changelog, superseded npj submission checklist).
+
 ## [0.5.0] — 2026-05-22 — Iter-5 IMM Calculator
 
 This is the **Iter-5 release** of Selectron. It ships the NASA-IMM-aligned

@@ -1,6 +1,6 @@
 ---
 title: "Supplementary Methods 2 — NASA Monte-Carlo Trial-Count Audit"
-parent: "Selectron manuscript (npj Microgravity submission, July 2026)"
+parent: "Selectron manuscript (Advances in Space Research submission, 2026)"
 generated_from: "docs/iter3_nasa_monte_carlo_audit.md"
 ---
 

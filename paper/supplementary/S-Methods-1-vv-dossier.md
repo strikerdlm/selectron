@@ -1,6 +1,6 @@
 ---
 title: "Supplementary Methods 1 — Verification & Validation Dossier"
-parent: "Selectron manuscript (npj Microgravity submission, July 2026)"
+parent: "Selectron manuscript (Advances in Space Research submission, 2026)"
 generated_from: "docs/iter3_vv_dossier.md"
 ---
 
