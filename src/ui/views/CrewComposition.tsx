@@ -607,7 +607,8 @@ export function CrewComposition() {
               against the ISS 180-day reference yields meaningless deltas (e.g. a 7-day
               campaign shows TME ~5 vs reference 106, an artifact of duration scaling
               rather than a real divergence). Mirrors the K15ValidationBadge gate above. */}
-          {state.mission.id === "iss-6mo" && state.kit.scenarioId !== "custom" && (
+          {state.mission.id === "iss-6mo" &&
+            (["none", "issHMS", "unlimited"] as const).includes(state.kit.scenarioId as "none" | "issHMS" | "unlimited") && (
             <div className="panel">
               <h3 className="label text-ink-1 uppercase tracking-cap mb-4">
                 I5 · K15 Validation Comparison
@@ -822,6 +823,7 @@ export function K15ValidationBadge({
   if (!outcome) return null;
   if (missionId !== "iss-6mo") return null;
   if (kitScenarioId === "custom") return null;
+  if (kitScenarioId === "medium") return null; // analog tier has no published K15 anchor
 
   const scenarioRef: K15ScenarioRef = K15_TABLE1[kitScenarioId];
 
