@@ -64,11 +64,9 @@ describe("health-support engine integration", () => {
     expect(out.tme.mean).toBeLessThan(126);
   });
 
-  // SKIPPED until Task 4 adds IMM_KITS.medium. Do NOT un-skip in this task.
-  it.skip("medium CHI sits strictly between none and issHMS", () => {
+  it("medium CHI sits strictly between none and issHMS", () => {
     const opts = { crew: K15_REFERENCE_CREW, mission: iss6, trials: 4000, seed: 0xc0ffee };
     const none = simulateIMM({ ...opts, kit: IMM_KITS.none }).chi.mean;
-    // @ts-expect-error IMM_KITS.medium lands in Task 4; this test stays .skip until then.
     const medium = simulateIMM({ ...opts, kit: IMM_KITS.medium }).chi.mean;
     const iss = simulateIMM({ ...opts, kit: IMM_KITS.issHMS }).chi.mean;
     expect(medium).toBeGreaterThan(none);

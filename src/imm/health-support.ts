@@ -89,3 +89,58 @@ export function deliverability(
 
 // Re-export capability enums for UI typing convenience.
 export type { Telemedicine, CareProvider };
+
+import { IMM_KITS } from "./kits";
+
+export interface HealthSupportItem {
+  id: string;
+  label: string;
+  category: "medications" | "procedures";
+  packClass?: string;
+  deliveryClass: DeliveryClass;
+  source_ref: string;
+}
+
+export interface HealthSupportTier {
+  tierId: IMMKitScenario["scenarioId"];
+  label: string;
+  levelOfCare: "I" | "II–III" | "IV" | "V";
+  summary: string;
+  capabilities: { telemedicine: Telemedicine; provider: CareProvider };
+  source_ref: string;
+}
+
+export const HEALTH_SUPPORT_TIERS: HealthSupportTier[] = [
+  { tierId: "none", label: "None", levelOfCare: "I",
+    summary: "Self/buddy first aid + basic life support; private audio only. No formulary, no provider.",
+    capabilities: IMM_KITS.none.capabilities!, source_ref: "loc-conops-mars" },
+  { tierId: "medium", label: "Medium (Analog / Antarctic)", levelOfCare: "II–III",
+    summary: "Single station physician + video telemedicine + point-of-care diagnostics; limited ALS/surgery, no resupply.",
+    capabilities: IMM_KITS.medium.capabilities!, source_ref: "analog-carmm" },
+  { tierId: "issHMS", label: "ISS (HMS)", levelOfCare: "IV",
+    summary: "Crew Medical Officer + weekly PMC telemedicine; full nine-pack formulary, sustainable ALS, limited surgery, imaging.",
+    capabilities: IMM_KITS.issHMS.capabilities!, source_ref: "iss-ochmo-tb006" },
+  { tierId: "unlimited", label: "Unlimited", levelOfCare: "V",
+    summary: "Theoretical ceiling: autonomous advanced life support, ambulatory and basic surgical care.",
+    capabilities: IMM_KITS.unlimited.capabilities!, source_ref: "loc-conops-mars" },
+];
+
+/**
+ * Curated, cited item catalogue for the breakdown UI. Representative (not
+ * exhaustive). Every entry carries a source_ref; keys exist in issHmsResources /
+ * RESOURCE_DELIVERY_CLASS.
+ */
+export const HEALTH_SUPPORT_ITEMS: HealthSupportItem[] = [
+  { id: "antibiotic-broad-spectrum", label: "Broad-spectrum antibiotic (e.g., Augmentin)", category: "medications", packClass: "Oral Med Pack", deliveryClass: "self", source_ref: "iss-3001kit" },
+  { id: "antiviral", label: "Valacyclovir (Valtrex)", category: "medications", packClass: "Oral Med Pack", deliveryClass: "self", source_ref: "iss-3001kit" },
+  { id: "antiemetic", label: "Ondansetron (Zofran) / Meclizine", category: "medications", packClass: "Oral Med Pack", deliveryClass: "self", source_ref: "iss-3001kit" },
+  { id: "sleep-aid", label: "Sleep aid (most-used class on ISS)", category: "medications", packClass: "Oral Med Pack", deliveryClass: "self", source_ref: "iss-wotring2015" },
+  { id: "anti-anxiety", label: "Lorazepam (Ativan)", category: "medications", packClass: "Behavioral Health", deliveryClass: "self", source_ref: "iss-3001kit" },
+  { id: "analgesic-strong", label: "Strong analgesic", category: "medications", packClass: "Oral Med Pack", deliveryClass: "self", source_ref: "iss-3001kit" },
+  { id: "iv-fluid", label: "IV fluid (saline)", category: "medications", packClass: "IV Supply Pack", deliveryClass: "guided", source_ref: "iss-hms-ntrs" },
+  { id: "epinephrine", label: "Epinephrine (ACLS)", category: "medications", packClass: "Emergency Medical Pack", deliveryClass: "provider", source_ref: "iss-hms-ntrs" },
+  { id: "suture-kit", label: "Minor surgical / suture kit", category: "procedures", packClass: "Minor Treatment Pack", deliveryClass: "guided", source_ref: "iss-hms-ntrs" },
+  { id: "defibrillator", label: "Defibrillator / AED (ECG, pacing)", category: "procedures", packClass: "Advanced Life Support Pack", deliveryClass: "provider", source_ref: "iss-hms-ntrs" },
+  { id: "oxygen-supplemental", label: "Respiratory Support Pack (ventilation, O₂)", category: "procedures", packClass: "Respiratory Support Pack", deliveryClass: "guided", source_ref: "iss-hms-ntrs" },
+  { id: "cardiac-monitor", label: "Cardiac monitor / Physician Equipment Pack", category: "procedures", packClass: "Physician Equipment Pack", deliveryClass: "provider", source_ref: "iss-hms-ntrs" },
+];
