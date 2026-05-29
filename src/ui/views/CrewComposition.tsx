@@ -798,7 +798,7 @@ function withinK15CI95(value: number, ci95: [number, number]): boolean {
 export type K15ValidationBadgeProps = {
   outcome: IMMOutcome | undefined;
   missionId: string;
-  kitScenarioId: "none" | "issHMS" | "unlimited" | "custom";
+  kitScenarioId: "none" | "medium" | "issHMS" | "unlimited" | "custom";
 };
 
 /**
