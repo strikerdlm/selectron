@@ -5,6 +5,46 @@ All notable changes to Selectron are documented here. Format roughly follows
 references to the commits and STATUS.md audit-log entries that produced each
 entry.
 
+## [0.5.6] — 2026-05-29 — UI / UX hardening + interaction bug-fixes
+
+Frontend-only pass driven by Diego's live feedback. No engine math changed
+(the `src/imm/` IMM Calculator and `src/risk/` Monte Carlo are untouched except
+the synthetic-scaffold priors below); the manuscript pipeline is unaffected.
+
+### Fixed
+- **Mission comparison "thor" → CHI 100 % bug.** `short-22d` uses mission type
+  `"thor"`, which the hardcoded `SYNTHETIC_PRIORS` type list omitted, so that
+  mission found no prior for any condition → zero events → a spurious "perfect,
+  GO" verdict. Mission types are now derived from the catalog (cannot drift).
+- **Mission comparison ranked by cumulative risk** (total expected lost
+  crew-days) instead of the per-time CHI fraction, so longer / more EVA-intensive
+  missions correctly rank as higher risk — the previous "7-day worse than
+  365-day" inversion is gone. Per-condition λ is now shared across mission types
+  (the per-type scaffold values were noise, not evidence).
+- **"Sharpness" relabelled "estimate precision"** (ScoreCard + RiskCard) with a
+  tooltip — it measures posterior CI₉₀ certainty, not candidate/mission quality.
+
+### Changed
+- **Crew Composition** rebuilt around manual configuration: the preset-crew
+  dropdown (which loaded score-less, gate-failing "red" crews) is removed; crew
+  size is a 1–6 stepper with add / remove and editable per-member fields (sex,
+  risk flags, EVA eligibility + count); mission duration is editable; a prominent
+  live **Mission-severity** dashboard (CHI, Δ-vs-ISS, mission-success, pEVAC,
+  HSRB L×C) sits at the top.
+- **"How we scored" calculation trace** is collapsible (collapsed by default in
+  the wizard / Sim views; paper figure F4 stays fully expanded).
+- **Health-support breakdown** reorganised into a care-capability dashboard,
+  collapsed by default.
+
+### Added
+- **Calibration run persistence.** A root-level `CalibrationJobsProvider` keeps
+  fit / validation / sensitivity jobs polling and their results intact across
+  Calibration-tab switches and full page refreshes (localStorage); a nav dot
+  shows background activity.
+- **Config-only session saving + autosave.** IMM sessions can be saved before a
+  run completes (`IMMSession.outcomes` is now nullable), and the working crew /
+  mission / kit / settings auto-persist to localStorage and restore on refresh.
+
 ## [0.5.5] — 2026-05-29 — Iter-6 calibration, ASR retarget, manuscript hardening
 
 ### Changed

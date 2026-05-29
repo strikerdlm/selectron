@@ -8,7 +8,7 @@
 
 ---
 
-![status](https://img.shields.io/badge/status-v0.5.5%20%E2%80%94%20Community%20incidence%20calibration%20pass%204-success)
+![status](https://img.shields.io/badge/status-v0.5.6%20%E2%80%94%20UI%2FUX%20hardening%20%2B%20interaction%20fixes-success)
 ![tests](https://img.shields.io/badge/vitest-passing-success)
 ![e2e](https://img.shields.io/badge/e2e-22%20Playwright-success)
 ![typescript](https://img.shields.io/badge/TypeScript-5.5-3178c6?logo=typescript&logoColor=white)
@@ -103,7 +103,7 @@ flowchart LR
 
 **Iter 5 shipped** a full NASA-IMM-aligned probabilistic medical-risk calculator (`src/imm/`): 100 K15-appendix medical conditions × 3 kit scenarios (None / ISS HMS / Unlimited) × T=100 000 Monte Carlo trials; K15 §II.A.9-correct sequential-phase QTL (cp1+cp2+cp3); per-member vulnerability injection via Stage A z-scores; Crew Composition builder with binary clearance gates, per-criterion mini-figures, and Scite-verified citations; 5 IMM result figures (I1–I5); a formal K15 Table 1 reproduction gate (IMM-86: 26 validation assertions at T=100k; current state all 3 TME + unlimited CHI within K15 CI₉₅, 8 documented-divergent).
 
-**Iter 6 shipped** a complete Python offline calibration pipeline (`python/`) for research-grade prior elicitation: PyMC NUTS Gamma-Poisson fitter, K15 validator, atomic priors writer, Sobol/Morris sensitivity analysis. Evidence pass p-f (2026-05-25) converted 11 former Beta-Bernoulli tier-B conditions to Gamma-Poisson using terrestrial epidemiological base rates. **100 of 100 IMM conditions evidence-based** (34 tierA-nasa + 66 tierB-pymc); **0 tierC-synth remain**. The tier-C synthetic → tierB-pymc cleanup (p-h, 2026-05-26) upgraded 18 remaining tier-C conditions through MCP literature search agents (Consensus + Scite + paper-search + Firecrawl) across 4 evidence passes. **rev3-f severity tuning** (2026-05-26) updated 32/32 persistent-impairment conditions against 126 primary-source evidence rows. **Analog/Antarctic evidence passes 2+3** (2026-05-27): 14 new PubMed/PMC sources; herpes-zoster-reactivation-shingles (4.1→7.4/1000/PY, Zhang 2026 Antarctic anchor) and nephrolithiasis (3.7→10.0/1000/PY, Goodenow-Messman 2022, Lognormal→Gamma-Poisson) upgraded to tierB-pymc. **Community/military incidence calibration pass 4** (2026-05-27): three tierA-nasa priors revised against military training and community population data — ankle-sprain-strain (292.2→41.6/1000/PY DOWN 7×, Cameron 2010/Goodrich 2022), dental-abscess (1.2→4.2/1000/PY UP 3.4×, AFHTA 2018/Tissot 2023), urinary-tract-infection (2.9→10.1/1000/PY UP 3.5× for mixed-gender crew, DHA 2019/SIVIGILA 2023); all R-hat=1.000, ESS>3000; K15 TME post-pass-4: 97.81/98.06/98.84. A **FastAPI Calibration API** (`python/api/`) wraps the pipeline: `/health`, `/conditions`, `/fit`, `/validate`, `/sensitivity`. A **Calibration browser view** (`src/ui/views/Calibration.tsx`) provides three tabs — Conditions browser (provenance-filterable table), Batch Fit (PyMC NUTS with live job polling), and V&V placeholder. A typed TypeScript client (`src/api/calibration.ts`) is the sole HTTP boundary.
+**Iter 6 shipped** a complete Python offline calibration pipeline (`python/`) for research-grade prior elicitation: PyMC NUTS Gamma-Poisson fitter, K15 validator, atomic priors writer, Sobol/Morris sensitivity analysis. Evidence pass p-f (2026-05-25) converted 11 former Beta-Bernoulli tier-B conditions to Gamma-Poisson using terrestrial epidemiological base rates. **100 of 100 IMM conditions evidence-based** (34 tierA-nasa + 66 tierB-pymc); **0 tierC-synth remain**. The tier-C synthetic → tierB-pymc cleanup (p-h, 2026-05-26) upgraded 18 remaining tier-C conditions through MCP literature search agents (Consensus + Scite + paper-search + Firecrawl) across 4 evidence passes. **rev3-f severity tuning** (2026-05-26) updated 32/32 persistent-impairment conditions against 126 primary-source evidence rows. **Analog/Antarctic evidence passes 2+3** (2026-05-27): 14 new PubMed/PMC sources; herpes-zoster-reactivation-shingles (4.1→7.4/1000/PY, Zhang 2026 Antarctic anchor) and nephrolithiasis (3.7→10.0/1000/PY, Goodenow-Messman 2022, Lognormal→Gamma-Poisson) upgraded to tierB-pymc. **Community/military incidence calibration pass 4** (2026-05-27): three tierA-nasa priors revised against military training and community population data — ankle-sprain-strain (292.2→41.6/1000/PY DOWN 7×, Cameron 2010/Goodrich 2022), dental-abscess (1.2→4.2/1000/PY UP 3.4×, AFHTA 2018/Tissot 2023), urinary-tract-infection (2.9→10.1/1000/PY UP 3.5× for mixed-gender crew, DHA 2019/SIVIGILA 2023); all R-hat=1.000, ESS>3000; K15 TME post-pass-4: 97.81/98.06/98.84. A **FastAPI Calibration API** (`python/api/`) wraps the pipeline: `/health`, `/conditions`, `/fit`, `/validate`, `/sensitivity`. A **Calibration browser view** (`src/ui/views/Calibration.tsx`) provides three tabs — Conditions browser (provenance-filterable table), Batch Fit (PyMC NUTS with live job polling), and V&V (K15 validation gate + Sobol/Morris sensitivity). Calibration runs persist across tab switches and page refreshes via a root-level `CalibrationJobsProvider` (v0.5.6). A typed TypeScript client (`src/api/calibration.ts`) is the sole HTTP boundary.
 
 The full plan lives in [`docs/superpowers/plans/`](docs/superpowers/plans/). Current resume tracker is [`STATUS.md`](STATUS.md).
 
@@ -191,7 +191,7 @@ selectron/
 │   │   │   └── calibration/
 │   │   │       ├── ConditionsPanel.tsx  # 100-condition browse table with provenance filter + sort
 │   │   │       ├── BatchFitPanel.tsx    # PyMC NUTS run form · live job polling · results table
-│   │   │       └── PlaceholderPanel.tsx # V&V tab (forthcoming)
+│   │   │       └── VVPanel.tsx          # V&V tab: K15 validation gate + Sobol/Morris sensitivity
 │   │   ├── wizard/            #   4-step wizard: Candidate → Criteria → Review → Mission/Sim
 │   │   ├── figures/
 │   │   │   └── CriterionMiniFigure.tsx  # Bell-curve PDF per criterion · gate threshold dashed line
@@ -293,6 +293,8 @@ Selectron now ships a **NASA-IMM-aligned probabilistic medical-risk calculator**
 - **IMM Monte Carlo (Web Worker)**: T=100k 4-step trial across 100 NASA-EMCL medical conditions × mission profile × resource kit. Outputs TME, CHI, pEVAC, pLOCL, and the new **Mission Success Probability** (no LOCL ∧ no EVAC ∧ CHI ≥ χ\*).
 - **Three kit scenarios**: None / ISS HMS / Unlimited per K15 Table 1; custom kit override available.
 
+**Interaction model (v0.5.6).** The crew is configured manually — a 1–6 crew-size stepper with add / remove and per-member editable fields (sex, risk flags, EVA eligibility + count); the previous preset-crew dropdown was removed because its members carried no Stage-A scores and rendered as disqualified "red" crews. Mission duration is editable. A prominent live **Mission-severity dashboard** (CHI, Δ-vs-ISS, mission-success, pEVAC, HSRB L×C verdict) sits at the top, fed by a fast T=5 000 preview. The working configuration and completed sessions auto-persist to `localStorage`, and a session can be saved before a run completes (config-only).
+
 **Architecture:** parallel `src/imm/` engine alongside existing `src/risk/`. Engine math: Lognormal-Poisson + Gamma-Poisson + Beta-Bernoulli incidence, Beta-Pert outcomes (RAF interpolation), concurrent FI per K15 §II.A.9, per-member z-scored Stage A vulnerability injection.
 
 **Citations:** every gate threshold + criterion + composite method + MSP formulation cites a Scite-verified primary source via `src/data/citations.ts` (30 entries, 20 Scite-verified, 3 DOIs replaced after Scite caught wrong-paper attribution).
@@ -334,8 +336,10 @@ Background job lifecycle is managed by an in-memory `JobStore` (`python/api/job_
 Three tabs in `src/ui/views/Calibration.tsx`:
 
 - **Conditions** (`ConditionsPanel.tsx`) — filterable (by provenance: `tierA-nasa`, `tierB-lit`, `tierB-pymc`, `tierC-synth`, `user-custom`) + sortable (by condition ID or provenance) table of all 100 conditions with status badges (`Fitted` / `Fittable` / —).
-- **Batch Fit** (`BatchFitPanel.tsx`) — configurable NUTS run (draws, chains, seed, optional condition filter). Starts a job, shows a live elapsed timer + status badge, polls until completion, and renders a results table with R-hat (green < 1.01 / amber otherwise), ESS, and divergence count. Job ID is persisted to `localStorage` so polling resumes automatically across page refreshes.
-- **V&V** (`PlaceholderPanel.tsx`) — forthcoming; will surface the K15 and sensitivity API endpoints inline.
+- **Batch Fit** (`BatchFitPanel.tsx`) — configurable NUTS run (draws, chains, seed, optional condition filter). Starts a job, shows a live elapsed timer + status badge, polls until completion, and renders a results table with R-hat (green < 1.01 / amber otherwise), ESS, and divergence count.
+- **V&V** (`VVPanel.tsx`) — runs the K15 validation gate (3 scenarios × 4 metrics, within-CI₉₅ pass/fail) and Sobol/Morris sensitivity analysis (tornado figure + numeric indices) inline against the live `imm-priors.json`.
+
+**Run persistence (2026-05-29).** Job state for all three kinds (fit / validation / sensitivity) lives in a root-level `CalibrationJobsProvider` (`src/contexts/CalibrationJobsContext.tsx`) mounted above the view switcher, so a run keeps polling — and its result is preserved — even when you leave the Calibration tab, and resumes from `localStorage` after a full page refresh. A pulsing dot on the Calibration nav button signals a background run.
 
 The TypeScript API client (`src/api/calibration.ts`) is the **sole HTTP boundary** in the application. All other data (candidates, simulations, criteria, criteria entries) is offline-first via Dexie IndexedDB. Override the default base URL with `VITE_CALIBRATION_API_URL` in `.env.local`.
 
@@ -349,7 +353,7 @@ uvicorn api.main:app --reload --port 8000
 
 CORS is pre-configured for the Vite dev server (`:5173`) and preview (`:4173`).
 
-**9 Playwright tests** (`tests/e2e/calibration.smoke.spec.ts`) cover: header render, 100-row conditions table, fitted/fittable badge counts, provenance filter, API-down error state, Batch Fit form, V&V placeholder, and two screenshot snapshots.
+**9 Playwright tests** (`tests/e2e/calibration.smoke.spec.ts`) cover: header render, 100-row conditions table, fitted/fittable badge counts, provenance filter, API-down error state, Batch Fit form, the V&V validation + sensitivity panels, and two screenshot snapshots.
 
 ## Status
 
@@ -363,7 +367,7 @@ The live resume tracker is [`STATUS.md`](STATUS.md). Citation metadata is in [`C
 
 ## What's left to do
 
-Two backlogs: **(A)** manuscript submission — manuscript/doc **sources** hardened, but **gated on remaining bug-fixes + software-readiness** (the rendered `paper/submission/*.docx` are rebuilt *last*); **(B)** engineering / bug-fixing (v0.5.5).
+Two backlogs: **(A)** manuscript submission — manuscript/doc **sources** hardened, but **gated on remaining bug-fixes + software-readiness** (the rendered `paper/submission/*.docx` are rebuilt *last*); **(B)** engineering / bug-fixing (v0.5.6).
 
 ### A. Manuscript submission (gated on software-readiness)
 
@@ -374,7 +378,7 @@ Two backlogs: **(A)** manuscript submission — manuscript/doc **sources** harde
 3. **Cover letter update** — reflect the current contributions (full IMM calibration: 100% evidence-based priors, K15 §II.A.9 sequential-phase clarification, rev3-f severity tuning 32/32).
 4. **Submit to Advances in Space Research portal** (Editorial Manager, `https://www.editorialmanager.com/AISR`). Manuscript + cover letter + Zenodo DOI + 7 main figures (separate files per ASR) + competing-interests declaration.
 
-### B. Engineering / deferred backlog (stable at v0.5.5)
+### B. Engineering / deferred backlog (stable at v0.5.6)
 
 1. **Outcome parameter re-calibration — ATTEMPTED and REVERTED.** Closed-form p_evac/p_locl rescale fixes 'none' and 'unlimited' but catastrophically breaks issHMS via RAF-interpolated fall-through coupling. Decision: accept divergence as principled limitation per `docs/iter5_scientific_limitations.md` §3.5.
 2. **Per-condition source audit for 3 proxy-anchored conditions** (elbow/hip/wrist-sprain-strain) — PyMC-fitted (`tierB-pymc`) from analogous-population (shoulder/ankle) anchors because no condition-specific isolated incidence rates exist in the published literature; a direct primary-source fit remains open.
@@ -382,6 +386,14 @@ Two backlogs: **(A)** manuscript submission — manuscript/doc **sources** harde
 4. **TM21 AMM/SMM validation gate (IMM-87)** — deferred until Mars structural engine prerequisites land (see [`docs/future_features.md`](docs/future_features.md)).
 5. **Future features** — Artemis (lunar) and Mars (interplanetary) missions, plus I6/I7/I8 figures, all in [`docs/future_features.md`](docs/future_features.md) with structural prerequisites.
 6. **Diego sign-offs still open:** Iter-1 UI sanity (Task 17), Iter-3 Mission-risk tab (Task 58), Phase 3F acceptance (Task 88), Iter-2 taxonomy ratification (gates Iter-2 start).
+
+### Done (v0.5.6 — UI / UX hardening + interaction fixes, 2026-05-29)
+
+- **Mission comparison fixed** — the `short-22d` "thor" mission type had no priors → spurious CHI = 100 % "GO"; mission types are now derived from the catalog. The comparison ranks by **cumulative risk** (total expected lost crew-days) so longer / EVA-heavier missions read as worse (the old "7-day worse than 365-day" inversion is gone). Regression guard: `tests/risk/synthetic_priors_coverage.test.ts`.
+- **Calibration run persistence** — `CalibrationJobsProvider` keeps fit / validation / sensitivity runs alive (and their results) across Calibration-tab switches and page refreshes.
+- **Crew Composition** — manual crew config (size stepper, add / remove, editable member fields + mission duration), prominent live Mission-severity dashboard, config-only session saving + localStorage autosave; preset dropdown removed.
+- **Clarity** — "sharpness" relabelled "estimate precision" (+ tooltip); "how we scored" trace collapsible; health-support care-capability dashboard collapsed by default.
+- All green: typecheck 0; UI suite 72/72, risk + cache 128/128, calibration e2e 9/9, crew / health / phase3f e2e 17/17.
 
 ### Done (v0.5.5 — all engineering iterations complete)
 
