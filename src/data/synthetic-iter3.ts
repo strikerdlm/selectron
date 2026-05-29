@@ -16,21 +16,10 @@ import { makeRng } from "@/engine/prng";
 const PRIORS_SEED = 0xfeed;
 const SAMPLES_PER_MISSION = 1000;
 
-// The original five mission types, in their original order. Their priors are
-// built FIRST, with the exact original salt sequence, so every existing mission
-// (and every test that pins their behaviour — e.g. the M18 σ-convergence gate
-// on mdrs-2wk) stays byte-identical.
-const LEGACY_MISSION_TYPES = ["antarctic", "mars500", "hi-seas", "mdrs", "emmpol"] as const;
-
-// Any mission type present in the catalog but NOT in the legacy list. When the
-// catalog was expanded, "thor" (short-22d) was added but never given priors —
-// so that mission found no prior for any condition → zero events → CHI = 100 %
-// (a spurious "perfect, GO" verdict). These extra types are covered in a second
-// ADDITIVE pass below, fixing the silent zero-risk bug without perturbing the
-// legacy missions' λ. Deriving from the catalog means it can never drift again.
-const EXTRA_MISSION_TYPES = Array.from(new Set(ANALOG_MISSIONS.map((m) => m.type))).filter(
-  (t) => !(LEGACY_MISSION_TYPES as readonly string[]).includes(t),
-);
+// Every mission type present in the catalog. Derived (not hardcoded) so a new
+// mission type can never be silently dropped — that gap left "thor" (short-22d)
+// with no priors → zero events → CHI = 100 % (a spurious "perfect, GO" verdict).
+const MISSION_TYPES = Array.from(new Set(ANALOG_MISSIONS.map((m) => m.type)));
 
 const SD_LOG = 0.3;
 const meanLogFor = (kind: string): number => (kind === "event" ? Math.log(0.05) : Math.log(0.0005));
@@ -57,14 +46,18 @@ function makeMissionEntry(meanLog: number, seed: number) {
 function buildSyntheticPriors(): PriorsJson {
   const conditions: PriorsJson["conditions"] = {};
   let salt = PRIORS_SEED;
-  // Pass 1 — legacy mission types, original order → identical salt sequence →
-  // byte-identical λ to before this fix (no existing mission's behaviour moves).
   for (const c of ANALOG_CONDITIONS) {
     const meanLog = meanLogFor(c.kind);
+    // ONE posterior per condition, SHARED across all mission types. The Iter-3
+    // scaffold has no evidence for per-environment rate differences, so drawing
+    // a fresh per-type sample only injected spurious noise into the mission
+    // comparison (e.g. a 45-day and 90-day HI-SEAS mission — same type, same EVA
+    // count — disagreeing for no physical reason). With a shared posterior the
+    // comparison varies only with real mission parameters: duration (Poisson
+    // scaling), crew size, and EVA count. (Diego 2026-05-29.)
+    const entry = makeMissionEntry(meanLog, ++salt);
     const missions: PriorsJson["conditions"][string]["missions"] = {};
-    for (const m of LEGACY_MISSION_TYPES) {
-      missions[m] = makeMissionEntry(meanLog, ++salt);
-    }
+    for (const m of MISSION_TYPES) missions[m] = entry;
     conditions[c.id] = {
       missions,
       vulnerability_beta:
@@ -98,15 +91,6 @@ function buildSyntheticPriors(): PriorsJson {
       treated_lost_days_mean: 1.0,
       untreated_lost_days_mean: 4.0,
     };
-  }
-  // Pass 2 — additively cover any extra mission types (e.g. "thor" / short-22d).
-  // Salt continues AFTER all legacy increments, so legacy λ are untouched; this
-  // only ADDS coverage so no mission silently scores zero risk (CHI = 100 %).
-  for (const c of ANALOG_CONDITIONS) {
-    const meanLog = meanLogFor(c.kind);
-    for (const m of EXTRA_MISSION_TYPES) {
-      conditions[c.id].missions[m] = makeMissionEntry(meanLog, ++salt);
-    }
   }
   return {
     model_version: "synthetic-iter3-ui-scaffold",
