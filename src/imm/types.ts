@@ -204,7 +204,12 @@ export type IMMSession = {
   overrides: Record<string, Partial<IMMPrior>>;
   vulnerabilityMode: "boolean-flags" | "selectron-stage-a-ml";
   engine: "monte-carlo" | "surrogate-ml";
-  outcomes: IMMOutcome;
+  /**
+   * Monte Carlo result. `null` for a config-only session saved before a run
+   * completes (Diego 2026-05-29 — "session saving for running simulations").
+   * Loading such a session restores the setup; the user then runs it.
+   */
+  outcomes: IMMOutcome | null;
   validation: {
     vsK15Table1: {
       delta_tme: number; delta_chi: number;

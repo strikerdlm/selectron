@@ -17,7 +17,6 @@ import { IMM_KITS } from "../../imm/kits";
 import type { IMMKitScenario } from "../../imm/types";
 import { HealthSupportTierPicker } from "../health/HealthSupportTierPicker";
 import { HealthSupportBreakdown } from "../health/HealthSupportBreakdown";
-import { HealthSupportSeverityReadout } from "../health/HealthSupportSeverityReadout";
 import { ISS_HMS_BASELINE_CHI } from "../../imm/health-support";
 import { aggregateCrewComposite } from "../../imm/composite";
 import { evaluateCrewGates } from "../../imm/crew-gates";
@@ -30,7 +29,6 @@ import { IMMConditionDrivers } from "../figures/IMMConditionDrivers";
 import { IMMConvergencePlot } from "../figures/IMMConvergencePlot";
 import { IMMValidationCompare } from "../figures/IMMValidationCompare";
 import { assessIMMLxC } from "../../imm/lxc";
-import { PRESET_CREWS, PRESET_KEYS } from "../../data/imm-preset-crews";
 import { notify } from "../components/Toast";
 import { createIMMSession, recentIMMSessionsFor } from "../../db/repository";
 import type { IMMSession } from "../../imm/types";
@@ -130,8 +128,94 @@ const INITIAL_STATE: CrewState = {
   chiStar: 0.7,
 };
 
+// ─── localStorage autosave (Diego 2026-05-29) ────────────────────────────────
+// Persist the working crew / mission / kit / sim config so a page refresh
+// restores the in-progress setup ("session saving for running simulations").
+// Kit is rehydrated from IMM_KITS by scenarioId (canonical resource vector).
+// Guarded for non-browser environments.
+const PERSIST_KEY = "selectron:crew-state:v1";
+
+function persistCrewState(s: CrewState): void {
+  try {
+    localStorage.setItem(
+      PERSIST_KEY,
+      JSON.stringify({
+        members: s.members,
+        mission: s.mission,
+        kitScenarioId: s.kit.scenarioId,
+        trials: s.trials,
+        seed: s.seed,
+        aggregator: s.aggregator,
+        chiStar: s.chiStar,
+      }),
+    );
+  } catch {
+    /* storage unavailable (private mode / SSR / test) — non-fatal */
+  }
+}
+
+function loadPersistedCrewState(): CrewState | null {
+  try {
+    const raw = localStorage.getItem(PERSIST_KEY);
+    if (!raw) return null;
+    const p = JSON.parse(raw) as Partial<{
+      members: IMMCrewMember[];
+      mission: IMMMission;
+      kitScenarioId: IMMKitScenario["scenarioId"];
+      trials: number;
+      seed: number;
+      aggregator: CrewCompositeMethod;
+      chiStar: number;
+    }>;
+    if (!Array.isArray(p.members) || !p.mission) return null;
+    const kit =
+      IMM_KITS[(p.kitScenarioId ?? "issHMS") as keyof typeof IMM_KITS] ?? IMM_KITS.issHMS;
+    return {
+      members: p.members,
+      mission: p.mission,
+      kit,
+      trials: p.trials ?? INITIAL_STATE.trials,
+      seed: p.seed ?? INITIAL_STATE.seed,
+      aggregator: p.aggregator ?? INITIAL_STATE.aggregator,
+      chiStar: p.chiStar ?? INITIAL_STATE.chiStar,
+    };
+  } catch {
+    return null;
+  }
+}
+
+// ─── crew add / remove / resize helpers (Diego 2026-05-29) ───────────────────
+const NATO = [
+  "Alpha", "Bravo", "Charlie", "Delta", "Echo", "Foxtrot",
+  "Golf", "Hotel", "India", "Juliet", "Kilo", "Lima",
+];
+/** Manual-add ceiling (presets may load more, e.g. antarctic-winter = 12). */
+const MAX_CREW = 6;
+
+function nextMemberId(members: IMMCrewMember[]): string {
+  const used = new Set(members.map((m) => m.id));
+  for (const n of NATO) if (!used.has(n)) return n;
+  let i = members.length + 1;
+  while (used.has(`Crew-${i}`)) i++;
+  return `Crew-${i}`;
+}
+
+function makeDefaultMember(id: string): IMMCrewMember {
+  return {
+    id,
+    sex: "male",
+    contacts: false,
+    crowns: false,
+    CAC_positive: false,
+    abdominal_surgery_history: false,
+    EVA_eligible: false,
+    EVA_count: 0,
+    stageAScores: defaultScores({ default: 0.65 }),
+  };
+}
+
 export function CrewComposition() {
-  const [state, setState] = useState<CrewState>(INITIAL_STATE);
+  const [state, setState] = useState<CrewState>(() => loadPersistedCrewState() ?? INITIAL_STATE);
   const [expandedIds, setExpandedIds] = useState<Set<string>>(new Set());
   const [simState, setSimState] = useState<SimState>("idle");
   const [simError, setSimError] = useState<string | undefined>();
@@ -163,6 +247,13 @@ export function CrewComposition() {
   const composite = useMemo(
     () => aggregateCrewComposite(state.members, PLACEHOLDER_CRITERIA, state.aggregator),
     [state.members, state.aggregator],
+  );
+
+  // Total EVAs is derived from per-member EVA_count (the engine's only EVA lever);
+  // mission.totalEVAs is display metadata the engine never reads.
+  const totalEVAs = useMemo(
+    () => state.members.reduce((sum, m) => sum + (m.EVA_count || 0), 0),
+    [state.members],
   );
 
   // ── live gate evaluation ────────────────────────────────────────────────
@@ -252,6 +343,65 @@ export function CrewComposition() {
     }));
     setOutcome(undefined);
     setSimState("idle");
+  }
+
+  // ── autosave the working config so a page refresh restores it ────────────
+  useEffect(() => { persistCrewState(state); }, [state]);
+
+  // ── crew add / remove / resize + mission editing (clear stale outcome) ────
+  const invalidateOutcome = useCallback(() => {
+    setOutcome(undefined);
+    setSimState("idle");
+  }, []);
+
+  function addMember() {
+    setState((s) =>
+      s.members.length >= MAX_CREW
+        ? s
+        : { ...s, members: [...s.members, makeDefaultMember(nextMemberId(s.members))] },
+    );
+    invalidateOutcome();
+  }
+
+  function removeMember(id: string) {
+    setState((s) => ({ ...s, members: s.members.filter((m) => m.id !== id) }));
+    setExpandedIds((prev) => {
+      const next = new Set(prev);
+      next.delete(id);
+      return next;
+    });
+    invalidateOutcome();
+  }
+
+  function changeMember(id: string, patch: Partial<IMMCrewMember>) {
+    setState((s) => ({
+      ...s,
+      members: s.members.map((m) => (m.id === id ? { ...m, ...patch } : m)),
+    }));
+    invalidateOutcome();
+  }
+
+  /** Resize the crew to `n` members (1…MAX_CREW): truncate, or append defaults. */
+  function setCrewSize(n: number) {
+    const target = Math.max(1, Math.min(MAX_CREW, Math.round(n)));
+    setState((s) => {
+      if (target === s.members.length) return s;
+      if (target < s.members.length) return { ...s, members: s.members.slice(0, target) };
+      const members = [...s.members];
+      while (members.length < target) members.push(makeDefaultMember(nextMemberId(members)));
+      return { ...s, members };
+    });
+    invalidateOutcome();
+  }
+
+  /** Edit mission duration (the engine's only mission-level lever) → custom mission. */
+  function editMissionDuration(days: number) {
+    const d = Math.max(1, Math.min(1000, Math.round(days || 0)));
+    setState((s) => ({
+      ...s,
+      mission: { ...s.mission, id: "custom", label: `Custom · ${d} d`, durationDays: d },
+    }));
+    invalidateOutcome();
   }
 
   const runSimulation = useCallback(() => {
@@ -345,35 +495,78 @@ export function CrewComposition() {
           : ""}
       </div>
 
-      {/* IMM-49: quick-load preset crew dropdown */}
-      <div className="flex flex-wrap items-baseline gap-2">
-        <label htmlFor="preset-crew-select" className="label uppercase tracking-cap text-ink-2">
-          Load preset crew configuration:
-        </label>
-        <select
-          id="preset-crew-select"
-          aria-label="Load preset crew configuration"
-          className="mono text-xs border border-line/40 bg-transparent text-ink-1 px-2 py-1"
-          value=""
-          onChange={(e) => {
-            const key = e.target.value;
-            if (!key) return;
-            const preset = PRESET_CREWS[key];
-            if (!preset) return;
-            setState((s) => ({ ...s, members: preset.members }));
-            setOutcome(undefined);
-            notify(`loaded preset: ${preset.label}`, "info");
-            e.target.value = ""; // reset to sentinel so re-selecting same preset still fires
-          }}
-        >
-          <option value="">— load preset crew —</option>
-          {PRESET_KEYS.map((k) => (
-            <option key={k} value={k}>
-              {PRESET_CREWS[k].label}
-            </option>
-          ))}
-        </select>
-      </div>
+      {/* ── Mission severity — prominent live dashboard (Diego 2026-05-29) ───
+           The headline output. Updates live from the T=5,000 preview as you
+           configure crew / mission / scenario; replaced by the authoritative
+           T=100,000 run when one is present. */}
+      {(() => {
+        const sev = readoutLxc ? (readoutLxc.color === "gray" ? "red" : readoutLxc.color) : null;
+        const textCls =
+          sev === "red" ? "text-red-500" : sev === "yellow" ? "text-amber-400" : "text-go";
+        const chipCls =
+          sev === "red" ? "bg-red-500/15 text-red-300"
+          : sev === "yellow" ? "bg-amber-400/15 text-amber-300"
+          : "bg-go/15 text-go";
+        const delta = readoutOutcome ? readoutOutcome.chi.mean - ISS_HMS_BASELINE_CHI : 0;
+        return (
+          <div
+            className={"panel border-l-4 " +
+              (sev === "red" ? "border-l-red-500" : sev === "yellow" ? "border-l-amber-400" : sev === "green" ? "border-l-go" : "border-l-line")}
+            role="region"
+            aria-label="mission severity"
+          >
+            <div className="flex flex-wrap items-center justify-between gap-x-8 gap-y-4">
+              <div className="flex flex-wrap items-center gap-x-8 gap-y-3">
+                <div className="flex flex-col gap-0.5">
+                  <span className="label text-[10px] text-ink-2 uppercase tracking-cap">
+                    Mission severity
+                    {readoutIsPreview ? " · live preview (T=5,000)" : readoutOutcome ? " · full run" : ""}
+                  </span>
+                  {readoutOutcome ? (
+                    <div className="flex items-baseline gap-2">
+                      <span className={"display text-5xl leading-none tabular-nums " + textCls}>
+                        {readoutOutcome.chi.mean.toFixed(1)}
+                      </span>
+                      <span className="mono text-xs text-ink-2">CHI %</span>
+                      <span className="mono text-[11px] text-ink-3 ml-1">
+                        {delta >= 0 ? "+" : "−"}{Math.abs(delta).toFixed(1)} vs ISS
+                      </span>
+                    </div>
+                  ) : (
+                    <span className="mono text-sm text-ink-3">
+                      {state.members.length === 0
+                        ? "add crew members to estimate severity"
+                        : previewState === "running"
+                          ? "estimating severity (T=5,000)…"
+                          : "configure the crew, then run the simulation"}
+                    </span>
+                  )}
+                </div>
+                {readoutOutcome && (
+                  <dl className="mono text-[11px] text-ink-2 grid grid-cols-[auto_auto] gap-x-3 gap-y-0.5">
+                    <dt className="text-ink-3">mission success</dt>
+                    <dd className="tabular-nums text-right text-ink-1">{readoutOutcome.missionSuccess.mean.toFixed(1)}%</dd>
+                    <dt className="text-ink-3">p(evacuation)</dt>
+                    <dd className="tabular-nums text-right text-ink-1">{readoutOutcome.pEvac.mean.toFixed(2)}%</dd>
+                    <dt className="text-ink-3">scenario</dt>
+                    <dd className="text-right text-ink-1">{state.kit.label}</dd>
+                  </dl>
+                )}
+              </div>
+              {readoutLxc && (
+                <div className="flex flex-col items-end gap-1.5">
+                  <span className={"display text-3xl tabular-nums " + textCls}>
+                    L{readoutLxc.likelihood} × C{readoutLxc.consequence} = {readoutLxc.score}
+                  </span>
+                  <span className={"mono uppercase tracking-cap text-xs px-2 py-1 rounded " + chipCls}>
+                    HSRB {sev}
+                  </span>
+                </div>
+              )}
+            </div>
+          </div>
+        );
+      })()}
 
       {/* ── three-zone layout ───────────────────────────────────────────── */}
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-12" role="main" aria-labelledby="crew-composition-heading">
@@ -398,42 +591,73 @@ export function CrewComposition() {
                   }
                 }}
               >
+                {/* Custom (edited) mission has no preset entry — surface it so the
+                    select still reflects state.mission.id rather than going blank. */}
+                {!ACTIVE_MISSIONS.some((m) => m.id === state.mission.id) && (
+                  <option value={state.mission.id}>{state.mission.label}</option>
+                )}
                 {ACTIVE_MISSIONS.map((m) => (
                   <option key={m.id} value={m.id}>{m.label}</option>
                 ))}
               </select>
             </div>
 
-            {/* Mission meta */}
-            <dl className="mono text-[11px] grid grid-cols-2 gap-x-3 gap-y-1">
+            {/* Mission meta — editable duration / crew size / EVAs (recompute on change) */}
+            <dl className="mono text-[11px] grid grid-cols-[auto_1fr] items-center gap-x-3 gap-y-2">
               <dt className="text-ink-3">duration</dt>
-              <dd className="text-ink-1">{state.mission.durationDays} d</dd>
+              <dd className="flex items-center gap-1">
+                <input
+                  type="number"
+                  min={1}
+                  max={1000}
+                  value={state.mission.durationDays}
+                  onChange={(e) => editMissionDuration(Number(e.target.value))}
+                  className="w-20 mono text-[11px] bg-transparent border border-line rounded px-1.5 py-0.5
+                             text-ink-1 focus:border-signal focus:outline-none tabular-nums"
+                  aria-label="mission duration in days"
+                />
+                <span className="text-ink-3">d</span>
+              </dd>
+
               <dt className="text-ink-3">crew size</dt>
-              <dd className="text-ink-1">{state.mission.crewSize}</dd>
+              <dd className="flex items-center gap-1.5">
+                <button
+                  type="button"
+                  className="mono text-[12px] leading-none w-5 h-5 rounded border border-line/50
+                             text-ink-2 hover:text-ink-0 hover:border-signal disabled:opacity-30 disabled:cursor-not-allowed"
+                  onClick={() => setCrewSize(state.members.length - 1)}
+                  disabled={state.members.length <= 1}
+                  aria-label="remove one crew member"
+                >−</button>
+                <span className="text-ink-1 tabular-nums w-5 text-center">{state.members.length}</span>
+                <button
+                  type="button"
+                  className="mono text-[12px] leading-none w-5 h-5 rounded border border-line/50
+                             text-ink-2 hover:text-ink-0 hover:border-signal disabled:opacity-30 disabled:cursor-not-allowed"
+                  onClick={() => setCrewSize(state.members.length + 1)}
+                  disabled={state.members.length >= MAX_CREW}
+                  aria-label="add one crew member"
+                >+</button>
+                <span className="text-ink-3 text-[10px]">(max {MAX_CREW})</span>
+              </dd>
+
               <dt className="text-ink-3">EVAs</dt>
-              <dd className="text-ink-1">{state.mission.totalEVAs}</dd>
+              <dd className="text-ink-1 tabular-nums" title="Total EVAs = sum of per-member EVA counts (edit in each crew card)">
+                {totalEVAs}
+                <span className="text-ink-3 text-[10px] ml-1">Σ per-member</span>
+              </dd>
             </dl>
 
-            {/* Health-support tier selector (Health-Support feature) */}
+            {/* Health-support scenario selector. The severity it drives is shown
+                in the prominent Mission-severity dashboard at the top of the page;
+                the per-item Care-capability breakdown below is collapsed by default. */}
             <div className="flex flex-col gap-1.5">
-              <label className="label text-[10px] text-ink-2 uppercase tracking-cap">Health Support</label>
+              <label className="label text-[10px] text-ink-2 uppercase tracking-cap">Health Support (scenario)</label>
               <HealthSupportTierPicker
                 selectedId={state.kit.scenarioId}
                 onSelect={(kit) => { setState((s) => ({ ...s, kit })); setOutcome(undefined); setSimState("idle"); }}
               />
               <HealthSupportBreakdown tierId={state.kit.scenarioId} />
-              {previewState === "running" && !readoutOutcome && (
-                <p className="mono text-[10px] text-ink-3">estimating severity (T=5,000)…</p>
-              )}
-              {readoutOutcome && readoutLxc && (
-                <HealthSupportSeverityReadout
-                  tierLabel={state.kit.label + (readoutIsPreview ? " · preview (T=5,000)" : "")}
-                  chiMean={readoutOutcome.chi.mean}
-                  issBaselineChi={ISS_HMS_BASELINE_CHI}
-                  verdictColor={readoutLxc.color === "gray" ? "red" : readoutLxc.color}
-                  verdictScore={readoutLxc.score}
-                />
-              )}
             </div>
 
             {/* Sim config (χ* + seed) */}
@@ -478,19 +702,34 @@ export function CrewComposition() {
               Crew Members
               <span className="ml-2 text-ink-3 normal-case tracking-normal">({state.members.length})</span>
             </h3>
-            {/* Expand-all toggle */}
-            <button
-              type="button"
-              className="mono text-[10px] uppercase tracking-cap text-ink-3 hover:text-ink-1
-                         border border-line rounded px-2 py-0.5 transition-colors"
-              onClick={() => {
-                const allIds = state.members.map((m) => m.id);
-                const allExpanded = allIds.every((id) => expandedIds.has(id));
-                setExpandedIds(allExpanded ? new Set() : new Set(allIds));
-              }}
-            >
-              {state.members.every((m) => expandedIds.has(m.id)) ? "collapse all" : "expand all"}
-            </button>
+            <div className="flex items-center gap-2">
+              {/* Add member (manual cap MAX_CREW) */}
+              <button
+                type="button"
+                className="mono text-[10px] uppercase tracking-cap text-ink-3 hover:text-ink-1
+                           border border-line rounded px-2 py-0.5 transition-colors
+                           disabled:opacity-30 disabled:cursor-not-allowed"
+                onClick={addMember}
+                disabled={state.members.length >= MAX_CREW}
+                aria-label="add crew member"
+                title={state.members.length >= MAX_CREW ? `max ${MAX_CREW} crew` : "add a crew member"}
+              >
+                + add
+              </button>
+              {/* Expand-all toggle */}
+              <button
+                type="button"
+                className="mono text-[10px] uppercase tracking-cap text-ink-3 hover:text-ink-1
+                           border border-line rounded px-2 py-0.5 transition-colors"
+                onClick={() => {
+                  const allIds = state.members.map((m) => m.id);
+                  const allExpanded = allIds.every((id) => expandedIds.has(id));
+                  setExpandedIds(allExpanded ? new Set() : new Set(allIds));
+                }}
+              >
+                {state.members.every((m) => expandedIds.has(m.id)) ? "collapse all" : "expand all"}
+              </button>
+            </div>
           </div>
 
           {state.members.length === 0 ? (
@@ -531,6 +770,8 @@ export function CrewComposition() {
                   criteria={PLACEHOLDER_CRITERIA}
                   onScoreChange={handleScoreChange}
                   figures={figures}
+                  onMemberChange={changeMember}
+                  onRemove={removeMember}
                 />
               );
             })
@@ -688,10 +929,12 @@ export function CrewComposition() {
         </div>
       )}
 
-      {/* IMM-50: save / load / export toolbar.
+      {/* IMM-50 / 2026-05-29: save / load / export toolbar.
        *   - Load dropdown is ALWAYS visible (loading a saved session brings in
        *     an outcome from Dexie; gating it on outcome would be chicken-and-egg).
-       *   - Save and Export buttons mount only when an outcome exists.
+       *   - Save / Export are ALWAYS available now: a session can be saved as a
+       *     config-only setup (outcomes = null) before a run completes. The
+       *     working state is also auto-persisted to localStorage on every change.
        */}
       <div
         className="panel flex flex-wrap items-baseline gap-3 mt-4"
@@ -701,43 +944,50 @@ export function CrewComposition() {
         <h3 className="label uppercase tracking-cap text-ink-1 mr-2">
           Session
         </h3>
+        <span className="mono text-[10px] text-ink-3 mr-1" title="The working crew, mission, kit, and sim settings auto-save locally and restore on refresh.">
+          autosaved{outcome ? "" : " · config only (no run yet)"}
+        </span>
 
-        {outcome && (
-          <button
-            type="button"
-            aria-label="Save current IMM session"
-            className="mono text-xs border border-line/40 px-2 py-1 hover:bg-line/10"
-            onClick={async () => {
-              try {
-                const id = await createIMMSession({
-                  candidateId: null,
-                  mission: { ...state.mission },
-                  crew: state.members.map((m) => ({ ...m })),
-                  kit: state.kit,
-                  trials: state.trials,
-                  seed: state.seed,
-                  overrides: {},
-                  vulnerabilityMode: "boolean-flags",
-                  engine: "monte-carlo",
-                  outcomes: outcome,
-                  validation: {
-                    vsK15Table1: {
-                      delta_tme: 0, delta_chi: 0, delta_pEvac: 0, delta_pLocl: 0,
-                      within_ci95: false,
-                    },
+        <button
+          type="button"
+          aria-label="Save current IMM session"
+          className="mono text-xs border border-line/40 px-2 py-1 hover:bg-line/10"
+          onClick={async () => {
+            try {
+              const id = await createIMMSession({
+                candidateId: null,
+                // Sync display metadata to the actual crew before persisting.
+                mission: { ...state.mission, crewSize: state.members.length, totalEVAs },
+                crew: state.members.map((m) => ({ ...m })),
+                kit: state.kit,
+                trials: state.trials,
+                seed: state.seed,
+                overrides: {},
+                vulnerabilityMode: "boolean-flags",
+                engine: "monte-carlo",
+                outcomes: outcome ?? null,
+                validation: {
+                  vsK15Table1: {
+                    delta_tme: 0, delta_chi: 0, delta_pEvac: 0, delta_pLocl: 0,
+                    within_ci95: false,
                   },
-                  laypersonCaptionsExpanded: {},
-                });
-                notify(`session saved (id: ${id.slice(0, 8)}…)`, "info");
-                reloadRecentSessions();
-              } catch (err) {
-                notify(`save failed: ${(err as Error).message}`, "error");
-              }
-            }}
-          >
-            💾 Save
-          </button>
-        )}
+                },
+                laypersonCaptionsExpanded: {},
+              });
+              notify(
+                outcome
+                  ? `session saved (id: ${id.slice(0, 8)}…)`
+                  : `config saved — run it after loading (id: ${id.slice(0, 8)}…)`,
+                "info",
+              );
+              reloadRecentSessions();
+            } catch (err) {
+              notify(`save failed: ${(err as Error).message}`, "error");
+            }
+          }}
+        >
+          💾 Save
+        </button>
 
         <label htmlFor="recent-session-select" className="sr-only">
           Load recent IMM session
@@ -760,51 +1010,53 @@ export function CrewComposition() {
               seed: s.seed,
               members: s.crew,
             }));
-            setOutcome(s.outcomes);
-            notify(`session loaded`, "info");
+            // A config-only session has no outcome — clear any stale result so
+            // the user re-runs the loaded setup.
+            setOutcome(s.outcomes ?? undefined);
+            setSimState("idle");
+            notify(s.outcomes ? `session loaded` : `config loaded — press run`, "info");
             e.target.value = "";
           }}
         >
           <option value="">— select session —</option>
           {recentSessions.map((s) => (
             <option key={s.id} value={s.id}>
-              {s.createdAt.slice(0, 19)} · {s.mission.label} · CHI {s.outcomes.chi.mean.toFixed(1)}%
+              {s.createdAt.slice(0, 19)} · {s.mission.label} ·{" "}
+              {s.outcomes ? `CHI ${s.outcomes.chi.mean.toFixed(1)}%` : "config only"}
             </option>
           ))}
         </select>
 
-        {outcome && (
-          <button
-            type="button"
-            aria-label="Export current IMM session as JSON"
-            className="mono text-xs border border-line/40 px-2 py-1 hover:bg-line/10"
-            onClick={() => {
-              const payload = {
-                mission: state.mission,
-                kit: state.kit.scenarioId,
-                trials: state.trials,
-                seed: state.seed,
-                members: state.members,
-                outcome: outcome ?? null,
-              };
-              const blob = new Blob([JSON.stringify(payload, null, 2)], {
-                type: "application/json",
-              });
-              const url = URL.createObjectURL(blob);
-              const a = document.createElement("a");
-              a.href = url;
-              const date = new Date().toISOString().slice(0, 10);
-              const seedHex = state.seed.toString(16);
-              a.download = `selectron-imm-session-${date}-${seedHex}.json`;
-              document.body.appendChild(a);
-              a.click();
-              document.body.removeChild(a);
-              URL.revokeObjectURL(url);
-            }}
-          >
-            ⬇ Export JSON
-          </button>
-        )}
+        <button
+          type="button"
+          aria-label="Export current IMM session as JSON"
+          className="mono text-xs border border-line/40 px-2 py-1 hover:bg-line/10"
+          onClick={() => {
+            const payload = {
+              mission: { ...state.mission, crewSize: state.members.length, totalEVAs },
+              kit: state.kit.scenarioId,
+              trials: state.trials,
+              seed: state.seed,
+              members: state.members,
+              outcome: outcome ?? null,
+            };
+            const blob = new Blob([JSON.stringify(payload, null, 2)], {
+              type: "application/json",
+            });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement("a");
+            a.href = url;
+            const date = new Date().toISOString().slice(0, 10);
+            const seedHex = state.seed.toString(16);
+            a.download = `selectron-imm-session-${date}-${seedHex}.json`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+          }}
+        >
+          ⬇ Export JSON
+        </button>
       </div>
     </div>
   );
