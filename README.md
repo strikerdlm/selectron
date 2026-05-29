@@ -363,13 +363,16 @@ The live resume tracker is [`STATUS.md`](STATUS.md). Citation metadata is in [`C
 
 ## What's left to do
 
-Two backlogs: **(A)** manuscript submission (active, all engineering blockers closed), **(B)** engineering / deferred (stable at v0.5.5).
+Two backlogs: **(A)** manuscript submission — manuscript/doc **sources** hardened, but **gated on remaining bug-fixes + software-readiness** (the rendered `paper/submission/*.docx` are rebuilt *last*); **(B)** engineering / bug-fixing (v0.5.5).
 
-### A. Manuscript submission (active priority)
+### A. Manuscript submission (gated on software-readiness)
 
-1. **Mint Zenodo DOI** for the submission commit and record it + the figure-generation commit SHA in `paper/manuscript.md` §2.5 + Code-availability statement (the manuscript now carries clean editorial placeholders for both, filled at the submission commit).
-2. **Cover letter update** — reflect the current contributions (full IMM calibration: 100% evidence-based priors, K15 §II.A.9 sequential-phase clarification, rev3-f severity tuning 32/32).
-3. **Submit to Advances in Space Research portal** (Editorial Manager, `https://www.editorialmanager.com/AISR`). Manuscript + cover letter + Zenodo DOI + 7 main figures (separate files per ASR) + competing-interests declaration.
+> ⚠️ The rendered `paper/submission/manuscript.docx` + `cover-letter.docx` are **STALE** (built 2026-05-28, before the 2026-05-29 source hardening — old title, "aircrew" overreach, raw `__TOKEN__` placeholders). **Do not submit the current docx.** The rebuild is deferred until the software is ready. Full sequencing + the pre-build checklist live in [`STATUS.md`](STATUS.md).
+
+1. **(Deferred — after software-ready)** Rebuild the submission package: `cd paper && make all`, then run the pre-build checklist in `STATUS.md` (build prereqs, `Figure S#` coverage, clean reference list, rendered-output verification).
+2. **Mint Zenodo DOI** for the submission commit and record it + the figure-generation commit SHA in `paper/manuscript.md` §2.5 + Code-availability statement (the manuscript now carries clean editorial placeholders for both, filled at the submission commit).
+3. **Cover letter update** — reflect the current contributions (full IMM calibration: 100% evidence-based priors, K15 §II.A.9 sequential-phase clarification, rev3-f severity tuning 32/32).
+4. **Submit to Advances in Space Research portal** (Editorial Manager, `https://www.editorialmanager.com/AISR`). Manuscript + cover letter + Zenodo DOI + 7 main figures (separate files per ASR) + competing-interests declaration.
 
 ### B. Engineering / deferred backlog (stable at v0.5.5)
 
