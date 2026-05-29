@@ -102,10 +102,19 @@ export type IMMMission = {
   evaSchedule: number[];
 };
 
+export type Telemedicine = "none" | "audio" | "video";
+export type CareProvider = "none" | "cmo" | "physician";
+
 export type IMMKitScenario = {
-  scenarioId: "none" | "issHMS" | "unlimited" | "custom";
+  scenarioId: "none" | "medium" | "issHMS" | "unlimited" | "custom";
   label: string;
   resources: Record<string, number>;
+  /**
+   * Health-support care capabilities (Health-Support feature, 2026-05-28).
+   * Optional for backward-compat; absent → treated as full capability (identity).
+   * Drives delivery-class gating in src/imm/health-support.ts::gateAvailable.
+   */
+  capabilities?: { telemedicine: Telemedicine; provider: CareProvider };
 };
 
 export type PosteriorSummary = {
