@@ -399,6 +399,7 @@ function PaperF4() {
         alias={PAPER_ALIAS}
         seed={PAPER_SEED}
         accessTier={PAPER_TIER}
+        collapsible={false}
       />
     </div>
   );
