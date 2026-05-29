@@ -112,7 +112,8 @@ export type IMMKitScenario = {
   /**
    * Health-support care capabilities (Health-Support feature, 2026-05-28).
    * Optional for backward-compat; absent → treated as full capability (identity).
-   * Drives delivery-class gating in src/imm/health-support.ts::gateAvailable.
+   * UI-descriptive metadata only: the delivery-class gating in
+   * src/imm/health-support.ts::gateAvailable keys off scenarioId/tierId, not this field.
    */
   capabilities?: { telemedicine: Telemedicine; provider: CareProvider };
 };

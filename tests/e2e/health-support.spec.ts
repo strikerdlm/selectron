@@ -25,8 +25,8 @@ test("selecting the Medium health-support tier updates the breakdown", async ({ 
   await expect(mediumBtn).toHaveAttribute("aria-checked", "true");
 
   // The breakdown panel should now show a procedure item that requires a provider.
-  // "Defibrillator / AED (ECG, pacing)" is a provider-class item — dims under
-  // Medium (deliverability=0) but its label node is still in the DOM.
+  // "Defibrillator / AED (ECG, pacing)" is a provider-class item; under Medium it
+  // remains shown (provider deliverability 0.6 > 0 — it would dim only under None).
   await expect(
     page.getByText(/Defibrillator/i).first()
   ).toBeVisible({ timeout: 5_000 });
