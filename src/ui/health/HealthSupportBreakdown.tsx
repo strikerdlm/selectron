@@ -1,5 +1,5 @@
 import {
-  HEALTH_SUPPORT_TIERS, HEALTH_SUPPORT_ITEMS, deliverability,
+  HEALTH_SUPPORT_TIERS, HEALTH_SUPPORT_ITEMS, deliverability, classOf,
 } from "../../imm/health-support";
 import type { IMMKitScenario } from "../../imm/types";
 
@@ -15,7 +15,8 @@ export function HealthSupportBreakdown({ tierId }: Props) {
   const procs = HEALTH_SUPPORT_ITEMS.filter((i) => i.category === "procedures");
 
   const Item = ({ item }: { item: typeof HEALTH_SUPPORT_ITEMS[number] }) => {
-    const deliver = deliverability(item.deliveryClass, tierId) > 0;
+    const cls = classOf(item.id);
+    const deliver = deliverability(cls, tierId) > 0;
     return (
       <div
         data-deliverable={deliver ? "true" : "false"}
@@ -24,7 +25,7 @@ export function HealthSupportBreakdown({ tierId }: Props) {
       >
         <span>{item.label}</span>
         <span className="flex items-center gap-1.5">
-          {!deliver && <span className="text-[9px] uppercase text-warn">needs {item.deliveryClass}</span>}
+          {!deliver && <span className="text-[9px] uppercase text-warn">needs {cls}</span>}
           <span className="text-[9px] text-ink-3" title={item.source_ref}>[{item.source_ref}]</span>
         </span>
       </div>

@@ -18,6 +18,7 @@ import type { IMMKitScenario } from "../../imm/types";
 import { HealthSupportTierPicker } from "../health/HealthSupportTierPicker";
 import { HealthSupportBreakdown } from "../health/HealthSupportBreakdown";
 import { HealthSupportSeverityReadout } from "../health/HealthSupportSeverityReadout";
+import { ISS_HMS_BASELINE_CHI } from "../../imm/health-support";
 import { aggregateCrewComposite } from "../../imm/composite";
 import { evaluateCrewGates } from "../../imm/crew-gates";
 import { CrewMemberCard } from "../components/CrewMemberCard";
@@ -361,7 +362,7 @@ export function CrewComposition() {
                 <HealthSupportSeverityReadout
                   tierLabel={state.kit.label}
                   chiMean={outcome.chi.mean}
-                  issBaselineChi={82.8} /* documented ISS-HMS K15 baseline CHI; manuscript §3.3 */
+                  issBaselineChi={ISS_HMS_BASELINE_CHI}
                   verdictColor={lxc.color === "gray" ? "red" : lxc.color}
                   verdictScore={lxc.score}
                 />

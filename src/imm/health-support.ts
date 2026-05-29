@@ -97,7 +97,6 @@ export interface HealthSupportItem {
   label: string;
   category: "medications" | "procedures";
   packClass?: string;
-  deliveryClass: DeliveryClass;
   source_ref: string;
 }
 
@@ -131,16 +130,23 @@ export const HEALTH_SUPPORT_TIERS: HealthSupportTier[] = [
  * RESOURCE_DELIVERY_CLASS.
  */
 export const HEALTH_SUPPORT_ITEMS: HealthSupportItem[] = [
-  { id: "antibiotic-broad-spectrum", label: "Broad-spectrum antibiotic (e.g., Augmentin)", category: "medications", packClass: "Oral Med Pack", deliveryClass: "self", source_ref: "iss-3001kit" },
-  { id: "antiviral", label: "Valacyclovir (Valtrex)", category: "medications", packClass: "Oral Med Pack", deliveryClass: "self", source_ref: "iss-3001kit" },
-  { id: "antiemetic", label: "Ondansetron (Zofran) / Meclizine", category: "medications", packClass: "Oral Med Pack", deliveryClass: "self", source_ref: "iss-3001kit" },
-  { id: "sleep-aid", label: "Sleep aid (most-used class on ISS)", category: "medications", packClass: "Oral Med Pack", deliveryClass: "self", source_ref: "iss-wotring2015" },
-  { id: "anti-anxiety", label: "Lorazepam (Ativan)", category: "medications", packClass: "Behavioral Health", deliveryClass: "self", source_ref: "iss-3001kit" },
-  { id: "analgesic-strong", label: "Strong analgesic", category: "medications", packClass: "Oral Med Pack", deliveryClass: "self", source_ref: "iss-3001kit" },
-  { id: "iv-fluid", label: "IV fluid (saline)", category: "medications", packClass: "IV Supply Pack", deliveryClass: "guided", source_ref: "iss-hms-ntrs" },
-  { id: "epinephrine", label: "Epinephrine (ACLS)", category: "medications", packClass: "Emergency Medical Pack", deliveryClass: "provider", source_ref: "iss-hms-ntrs" },
-  { id: "suture-kit", label: "Minor surgical / suture kit", category: "procedures", packClass: "Minor Treatment Pack", deliveryClass: "guided", source_ref: "iss-hms-ntrs" },
-  { id: "defibrillator", label: "Defibrillator / AED (ECG, pacing)", category: "procedures", packClass: "Advanced Life Support Pack", deliveryClass: "provider", source_ref: "iss-hms-ntrs" },
-  { id: "oxygen-supplemental", label: "Respiratory Support Pack (ventilation, O₂)", category: "procedures", packClass: "Respiratory Support Pack", deliveryClass: "guided", source_ref: "iss-hms-ntrs" },
-  { id: "cardiac-monitor", label: "Cardiac monitor / Physician Equipment Pack", category: "procedures", packClass: "Physician Equipment Pack", deliveryClass: "provider", source_ref: "iss-hms-ntrs" },
+  { id: "antibiotic-broad-spectrum", label: "Broad-spectrum antibiotic (e.g., Augmentin)", category: "medications", packClass: "Oral Med Pack", source_ref: "iss-3001kit" },
+  { id: "antiviral", label: "Valacyclovir (Valtrex)", category: "medications", packClass: "Oral Med Pack", source_ref: "iss-3001kit" },
+  { id: "antiemetic", label: "Ondansetron (Zofran) / Meclizine", category: "medications", packClass: "Oral Med Pack", source_ref: "iss-3001kit" },
+  { id: "sleep-aid", label: "Sleep aid (most-used class on ISS)", category: "medications", packClass: "Oral Med Pack", source_ref: "iss-wotring2015" },
+  { id: "anti-anxiety", label: "Lorazepam (Ativan)", category: "medications", packClass: "Behavioral Health", source_ref: "iss-3001kit" },
+  { id: "analgesic-strong", label: "Strong analgesic", category: "medications", packClass: "Oral Med Pack", source_ref: "iss-3001kit" },
+  { id: "iv-fluid", label: "IV fluid (saline)", category: "medications", packClass: "IV Supply Pack", source_ref: "iss-hms-ntrs" },
+  { id: "epinephrine", label: "Epinephrine (ACLS)", category: "medications", packClass: "Emergency Medical Pack", source_ref: "iss-hms-ntrs" },
+  { id: "suture-kit", label: "Minor surgical / suture kit", category: "procedures", packClass: "Minor Treatment Pack", source_ref: "iss-hms-ntrs" },
+  { id: "defibrillator", label: "Defibrillator / AED (ECG, pacing)", category: "procedures", packClass: "Advanced Life Support Pack", source_ref: "iss-hms-ntrs" },
+  { id: "oxygen-supplemental", label: "Respiratory Support Pack (ventilation, O₂)", category: "procedures", packClass: "Respiratory Support Pack", source_ref: "iss-hms-ntrs" },
+  { id: "cardiac-monitor", label: "Cardiac monitor / Physician Equipment Pack", category: "procedures", packClass: "Physician Equipment Pack", source_ref: "iss-hms-ntrs" },
 ];
+
+/**
+ * Selectron's issHMS Crew Health Index at the K15 reference configuration
+ * (manuscript §3.3). Baseline for the "vs ISS" delta in the severity readout.
+ * Update if the IMM calibration changes the issHMS CHI output.
+ */
+export const ISS_HMS_BASELINE_CHI = 82.8;
