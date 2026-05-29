@@ -1,31 +1,7 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { ConditionCombobox } from "./ConditionCombobox";
-import {
-  type FitRequest,
-  type FitResult,
-  type JobStatusResponse,
-  startFit,
-  getFitStatus,
-} from "@/api/calibration";
-
-const STORAGE_KEY = "selectron:activeFitJob";
-
-function loadStoredJobId(): string | null {
-  try {
-    return localStorage.getItem(STORAGE_KEY);
-  } catch {
-    return null;
-  }
-}
-
-function saveStoredJobId(id: string | null) {
-  try {
-    if (id) localStorage.setItem(STORAGE_KEY, id);
-    else localStorage.removeItem(STORAGE_KEY);
-  } catch {
-    // ignore
-  }
-}
+import { type FitResult } from "@/api/calibration";
+import { useCalibrationJobs } from "@/contexts/CalibrationJobsContext";
 
 function fmtDuration(ms: number): string {
   const s = Math.floor(ms / 1000);
@@ -47,93 +23,28 @@ export function BatchFitPanel() {
   const [chains, setChains] = useState(4);
   const [seed, setSeed] = useState(42);
   const [conditionId, setConditionId] = useState<string | null>(null);
-  const [job, setJob] = useState<JobStatusResponse | null>(null);
-  const [running, setRunning] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [startTime, setStartTime] = useState<number | null>(null);
-  const [elapsed, setElapsed] = useState(0);
 
-  const pollRef = useRef<ReturnType<typeof setInterval> | null>(null);
-  const mounted = useRef(true);
+  // Job state lives in the app-root CalibrationJobsProvider so it survives
+  // leaving the Calibration tab (and a page refresh). See the provider.
+  const { fit, startFitJob } = useCalibrationJobs();
+  const running = fit.status === "queued" || fit.status === "running";
+  const error = fit.error;
 
+  // Live elapsed readout: tick every second while running; frozen once done.
+  const [, forceTick] = useState(0);
   useEffect(() => {
-    mounted.current = true;
-    return () => {
-      mounted.current = false;
-      if (pollRef.current) clearInterval(pollRef.current);
-    };
-  }, []);
-
-  // Resume polling if a job is stored on mount
-  useEffect(() => {
-    const storedId = loadStoredJobId();
-    if (storedId) {
-      checkJob(storedId);
-    }
-  }, []);
-
-  // Elapsed timer
-  useEffect(() => {
-    if (!running || !startTime) return;
-    const t = setInterval(() => {
-      if (mounted.current) setElapsed(Date.now() - startTime);
-    }, 1000);
+    if (!running) return;
+    const t = setInterval(() => forceTick((n) => n + 1), 1000);
     return () => clearInterval(t);
-  }, [running, startTime]);
+  }, [running]);
+  const elapsed = fit.startedAt ? (fit.finishedAt ?? Date.now()) - fit.startedAt : 0;
 
-  const checkJob = useCallback(async (jobId: string) => {
-    try {
-      const status = await getFitStatus(jobId);
-      if (!mounted.current) return;
-      setJob(status);
-      if (status.status === "done" || status.status === "failed") {
-        setRunning(false);
-        saveStoredJobId(null);
-        if (pollRef.current) {
-          clearInterval(pollRef.current);
-          pollRef.current = null;
-        }
-      }
-    } catch (e) {
-      if (!mounted.current) return;
-      setError(e instanceof Error ? e.message : String(e));
-      setRunning(false);
-      if (pollRef.current) {
-        clearInterval(pollRef.current);
-        pollRef.current = null;
-      }
-    }
-  }, []);
-
-  async function handleStart() {
-    setError(null);
-    setJob(null);
-    setElapsed(0);
-    const req: FitRequest = {
-      draws,
-      chains,
-      seed,
-      condition_id: conditionId,
-    };
-    try {
-      const res = await startFit(req);
-      if (!mounted.current) return;
-      saveStoredJobId(res.job_id);
-      setRunning(true);
-      setStartTime(Date.now());
-      // Immediate first check
-      await checkJob(res.job_id);
-      // Then poll every 2s
-      if (pollRef.current) clearInterval(pollRef.current);
-      pollRef.current = setInterval(() => checkJob(res.job_id), 2000);
-    } catch (e) {
-      if (!mounted.current) return;
-      setError(e instanceof Error ? e.message : String(e));
-    }
+  function handleStart() {
+    void startFitJob({ draws, chains, seed, condition_id: conditionId });
   }
 
-  const fittedEntries: [string, FitResult][] = job?.result?.fitted
-    ? Object.entries(job.result.fitted)
+  const fittedEntries: [string, FitResult][] = fit.result?.fitted
+    ? Object.entries(fit.result.fitted)
     : [];
 
   return (
@@ -186,7 +97,7 @@ export function BatchFitPanel() {
             <span className="flex items-center gap-2">
               <span className="signal-dot" />
               <span className="mono text-[11px] text-ink-2">
-                {job?.status ?? "queued"} · {fmtDuration(elapsed)}
+                {fit.status} · {fmtDuration(elapsed)}
               </span>
             </span>
           )}
@@ -202,12 +113,12 @@ export function BatchFitPanel() {
       )}
 
       {/* Job result */}
-      {job?.status === "done" && (
+      {fit.status === "done" && (
         <div className="panel p-6 fadein">
           <div className="flex items-baseline gap-x-3 mb-4">
             <h4 className="display text-lg text-ink-0 tracking-tight">Results</h4>
             <span className="label text-go">
-              {job.result?.n_fitted} fitted · {job.result?.n_failed} failed
+              {fit.result?.n_fitted} fitted · {fit.result?.n_failed} failed
             </span>
             <span className="mono text-[10px] text-ink-3 ml-auto">
               elapsed {fmtDuration(elapsed)}
@@ -273,10 +184,10 @@ export function BatchFitPanel() {
         </div>
       )}
 
-      {job?.status === "failed" && (
+      {fit.status === "failed" && (
         <div className="panel p-6 border-warn/50 fadein">
           <p className="mono text-[11px] uppercase tracking-cap text-warn mb-1">Job Failed</p>
-          <p className="mono text-[11px] text-ink-1">{job.error ?? "Unknown error"}</p>
+          <p className="mono text-[11px] text-ink-1">{fit.error ?? "Unknown error"}</p>
         </div>
       )}
     </div>

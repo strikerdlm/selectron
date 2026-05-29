@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { DbProvider } from "@/contexts/DbContext";
+import { CalibrationJobsProvider, useCalibrationJobs } from "@/contexts/CalibrationJobsContext";
 import { createCandidate } from "@/db/repository";
 import { Dashboard } from "./views/Dashboard";
 import { Wizard } from "./views/Wizard";
@@ -31,6 +32,27 @@ function useUtcClock() {
 const fmtUtc = (d: Date) => d.toISOString().slice(11, 19) + "Z";
 const fmtDate = (d: Date) => d.toISOString().slice(0, 10);
 
+/**
+ * Pulsing dot on the Calibration nav button — visible whenever a fit /
+ * validation / sensitivity job is running in the background, so the user
+ * knows a run is still in flight even from another tab. Rendered inside
+ * CalibrationJobsProvider (it's in the header), so the hook resolves.
+ */
+function CalibrationActivityDot() {
+  const { fit, validation, sensitivity } = useCalibrationJobs();
+  const active = [fit, validation, sensitivity].some(
+    (j) => j.status === "queued" || j.status === "running",
+  );
+  if (!active) return null;
+  return (
+    <span
+      className="signal-dot"
+      title="A calibration job is running in the background"
+      aria-label="calibration job running"
+    />
+  );
+}
+
 export function App() {
   const [view, setView] = useState<View>({ kind: "dashboard" });
 
@@ -47,6 +69,7 @@ export function App() {
 
   return (
     <DbProvider>
+     <CalibrationJobsProvider>
       <div className="min-h-screen text-ink-0">
         {/* HEADER ─────────────────────────────────────────────────────────────── */}
         <header className="border-b border-line">
@@ -86,7 +109,7 @@ export function App() {
                 Crew
               </button>
               <button
-                className={`uppercase tracking-cap transition-colors ${
+                className={`uppercase tracking-cap transition-colors inline-flex items-center gap-1.5 ${
                   view.kind === "calibration"
                     ? "text-signal border-b border-signal pb-0.5"
                     : "text-ink-2 hover:text-ink-0"
@@ -94,6 +117,7 @@ export function App() {
                 onClick={() => setView({ kind: "calibration" })}
               >
                 Calibration
+                <CalibrationActivityDot />
               </button>
               {/* UTC clock + meta */}
               <div className="flex items-center gap-2 hidden sm:flex">
@@ -190,6 +214,7 @@ export function App() {
         </footer>
         <ToastHost />
       </div>
+     </CalibrationJobsProvider>
     </DbProvider>
   );
 }

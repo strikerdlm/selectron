@@ -1,13 +1,6 @@
-import { useCallback, useEffect, useRef, useState } from "react";
-import {
-  type MetricResult,
-  type ValidateResponse,
-  type SensitivityResponse,
-  startValidation,
-  getValidationStatus,
-  startSensitivity,
-  getSensitivityStatus,
-} from "@/api/calibration";
+import { useEffect, useState } from "react";
+import { type MetricResult } from "@/api/calibration";
+import { useCalibrationJobs } from "@/contexts/CalibrationJobsContext";
 import { SensitivityTornado } from "@/ui/figures/SensitivityTornado";
 
 const TRIAL_OPTIONS = [1_000, 5_000, 10_000, 50_000, 100_000];
@@ -42,71 +35,23 @@ function SummaryBadge({ n, total }: { n: number; total: number }) {
 function ValidationSection() {
   const [trials, setTrials] = useState(10_000);
   const [seed, setSeed] = useState(DEFAULT_SEED);
-  const [running, setRunning] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [result, setResult] = useState<ValidateResponse | null>(null);
-  const [startTime, setStartTime] = useState<number | null>(null);
-  const [elapsed, setElapsed] = useState(0);
-  const pollRef = useRef<ReturnType<typeof setInterval> | null>(null);
-  const mounted = useRef(true);
 
-  useEffect(() => {
-    mounted.current = true;
-    return () => {
-      mounted.current = false;
-      if (pollRef.current) clearInterval(pollRef.current);
-    };
-  }, []);
+  // Persisted across tab switches + refresh via the app-root provider.
+  const { validation, startValidationJob } = useCalibrationJobs();
+  const running = validation.status === "queued" || validation.status === "running";
+  const error = validation.error;
+  const result = validation.result;
 
+  const [, forceTick] = useState(0);
   useEffect(() => {
-    if (!running || !startTime) return;
-    const t = setInterval(() => {
-      if (mounted.current) setElapsed(Date.now() - startTime);
-    }, 1000);
+    if (!running) return;
+    const t = setInterval(() => forceTick((n) => n + 1), 1000);
     return () => clearInterval(t);
-  }, [running, startTime]);
+  }, [running]);
+  const elapsed = validation.startedAt ? (validation.finishedAt ?? Date.now()) - validation.startedAt : 0;
 
-  const checkJob = useCallback(async (jobId: string) => {
-    try {
-      const status = await getValidationStatus(jobId);
-      if (!mounted.current) return;
-      if (status.status === "done" && status.result) {
-        setResult(status.result as unknown as ValidateResponse);
-        setRunning(false);
-        if (pollRef.current) { clearInterval(pollRef.current); pollRef.current = null; }
-      } else if (status.status === "failed") {
-        setError(status.error ?? "Unknown error");
-        setRunning(false);
-        if (pollRef.current) { clearInterval(pollRef.current); pollRef.current = null; }
-      }
-    } catch (e) {
-      if (!mounted.current) return;
-      setError(e instanceof Error ? e.message : String(e));
-      setRunning(false);
-      if (pollRef.current) { clearInterval(pollRef.current); pollRef.current = null; }
-    }
-  }, []);
-
-  async function handleRun() {
-    setError(null);
-    setResult(null);
-    setElapsed(0);
-    setRunning(true);
-    setStartTime(Date.now());
-    try {
-      const res = await startValidation({ trials, seed });
-      if (!mounted.current) return;
-      if (res.status === "done") {
-        await checkJob(res.job_id);
-      } else {
-        if (pollRef.current) clearInterval(pollRef.current);
-        pollRef.current = setInterval(() => checkJob(res.job_id), 2000);
-      }
-    } catch (e) {
-      if (!mounted.current) return;
-      setError(e instanceof Error ? e.message : String(e));
-      setRunning(false);
-    }
+  function handleRun() {
+    void startValidationJob({ trials, seed });
   }
 
   const groupedMetrics: Record<string, MetricResult[]> = {};
@@ -236,73 +181,32 @@ function SensitivitySection() {
   const [trialsPerEval, setTrialsPerEval] = useState(1000);
   const [topN, setTopN] = useState(15);
   const [seed, setSeed] = useState(42);
-  const [running, setRunning] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [result, setResult] = useState<SensitivityResponse | null>(null);
-  const [startTime, setStartTime] = useState<number | null>(null);
-  const [elapsed, setElapsed] = useState(0);
-  const pollRef = useRef<ReturnType<typeof setInterval> | null>(null);
-  const mounted = useRef(true);
 
-  useEffect(() => {
-    mounted.current = true;
-    return () => {
-      mounted.current = false;
-      if (pollRef.current) clearInterval(pollRef.current);
-    };
-  }, []);
+  // Persisted across tab switches + refresh via the app-root provider.
+  const { sensitivity, startSensitivityJob } = useCalibrationJobs();
+  const running = sensitivity.status === "queued" || sensitivity.status === "running";
+  const error = sensitivity.error;
+  const result = sensitivity.result;
+  // Render results by the method that PRODUCED them (the persisted result may
+  // differ from the current form selection), not the live `method` input.
+  const resultMethod: "sobol" | "morris" = result?.method === "sobol" ? "sobol" : "morris";
 
+  const [, forceTick] = useState(0);
   useEffect(() => {
-    if (!running || !startTime) return;
-    const t = setInterval(() => {
-      if (mounted.current) setElapsed(Date.now() - startTime);
-    }, 1000);
+    if (!running) return;
+    const t = setInterval(() => forceTick((n) => n + 1), 1000);
     return () => clearInterval(t);
-  }, [running, startTime]);
+  }, [running]);
+  const elapsed = sensitivity.startedAt ? (sensitivity.finishedAt ?? Date.now()) - sensitivity.startedAt : 0;
 
-  const checkJob = useCallback(async (jobId: string) => {
-    try {
-      const status = await getSensitivityStatus(jobId);
-      if (!mounted.current) return;
-      if (status.status === "done" && status.result) {
-        setResult(status.result as unknown as SensitivityResponse);
-        setRunning(false);
-        if (pollRef.current) { clearInterval(pollRef.current); pollRef.current = null; }
-      } else if (status.status === "failed") {
-        setError(status.error ?? "Unknown error");
-        setRunning(false);
-        if (pollRef.current) { clearInterval(pollRef.current); pollRef.current = null; }
-      }
-    } catch (e) {
-      if (!mounted.current) return;
-      setError(e instanceof Error ? e.message : String(e));
-      setRunning(false);
-      if (pollRef.current) { clearInterval(pollRef.current); pollRef.current = null; }
-    }
-  }, []);
-
-  async function handleRun() {
-    setError(null);
-    setResult(null);
-    setElapsed(0);
-    setRunning(true);
-    setStartTime(Date.now());
-    try {
-      const res = await startSensitivity({
-        method,
-        n_samples: nSamples,
-        trials: trialsPerEval,
-        seed,
-        top_n: topN,
-      });
-      if (!mounted.current) return;
-      if (pollRef.current) clearInterval(pollRef.current);
-      pollRef.current = setInterval(() => checkJob(res.job_id), 3000);
-    } catch (e) {
-      if (!mounted.current) return;
-      setError(e instanceof Error ? e.message : String(e));
-      setRunning(false);
-    }
+  function handleRun() {
+    void startSensitivityJob({
+      method,
+      n_samples: nSamples,
+      trials: trialsPerEval,
+      seed,
+      top_n: topN,
+    });
   }
 
   return (
@@ -401,7 +305,7 @@ function SensitivitySection() {
             </span>
           </div>
 
-          <SensitivityTornado indices={result.indices} method={method} topN={topN} />
+          <SensitivityTornado indices={result.indices} method={resultMethod} topN={topN} />
 
           <details>
             <summary className="mono text-[10px] uppercase tracking-cap text-ink-2 cursor-pointer hover:text-ink-0 transition-colors">
@@ -411,7 +315,7 @@ function SensitivitySection() {
               <table className="w-full text-left border-collapse">
                 <thead>
                   <tr className="border-b border-line">
-                    {(method === "sobol"
+                    {(resultMethod === "sobol"
                       ? ["Condition", "S1", "S1 conf", "ST", "ST conf"]
                       : ["Condition", "μ*", "σ"]
                     ).map((h) => (
@@ -423,7 +327,7 @@ function SensitivitySection() {
                   {result.indices.map((d) => (
                     <tr key={d.condition_id} className="border-b border-line/50 hover:bg-bg-2/50 transition-colors">
                       <td className="px-3 py-2 mono text-[11px] text-ink-0">{d.condition_label}</td>
-                      {method === "sobol" ? (
+                      {resultMethod === "sobol" ? (
                         <>
                           <td className="px-3 py-2 mono text-[11px] text-ink-1">{(d.s1 ?? 0).toFixed(4)}</td>
                           <td className="px-3 py-2 mono text-[11px] text-ink-2">{(d.s1_conf ?? 0).toFixed(4)}</td>
