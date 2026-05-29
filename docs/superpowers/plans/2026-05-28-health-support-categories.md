@@ -864,10 +864,26 @@ Replace the block at lines ~348–368 (the `{/* Kit selector */}` div through it
             </div>
 ```
 
+- [ ] **Step 2b: Exclude `medium` from the K15 reference comparisons (REQUIRED — `K15_TABLE1` has no `medium` key)**
+
+`K15_TABLE1` is typed `Record<"none"|"issHMS"|"unlimited", …>`. With `"medium"` now a selectable kit, the badge/comparison would do `K15_TABLE1["medium"]` → `undefined.tme.ref` (runtime crash) and/or a TS index error. Make two edits so Medium shows no K15 anchor (correct — there is no published K15 reference for an analog tier):
+
+1. In `function K15ValidationBadge(...)`, after the existing `if (kitScenarioId === "custom") return null;` line, add:
+```ts
+  if (kitScenarioId === "medium") return null; // no K15 anchor for the analog tier
+```
+
+2. In the "I5 · K15 Validation Comparison" render guard (currently
+`{state.mission.id === "iss-6mo" && state.kit.scenarioId !== "custom" && (`), tighten it to a whitelist of the three K15 scenarios:
+```tsx
+{state.mission.id === "iss-6mo" &&
+  (["none", "issHMS", "unlimited"] as const).includes(state.kit.scenarioId as "none" | "issHMS" | "unlimited") && (
+```
+
 - [ ] **Step 3: Typecheck + unit tests**
 
 Run: `npm run typecheck && npm test`
-Expected: PASS. (`state.kit` is now `IMMKitScenario`; the worker payload `kit: state.kit` and the K15-badge guard `state.kit.scenarioId !== "custom"` still typecheck. The K15 badge only renders for `none/issHMS/unlimited` on `iss-6mo`; `medium` correctly shows no badge.)
+Expected: PASS. (`state.kit` is now `IMMKitScenario`; the worker payload `kit: state.kit` typechecks. After Step 2b, the K15 badge and the I5 comparison render only for `none/issHMS/unlimited` on `iss-6mo`; `medium` correctly shows no K15 badge and does not index `K15_TABLE1["medium"]`.)
 
 - [ ] **Step 4: (Optional, recommended) wire the live severity readout**
 
