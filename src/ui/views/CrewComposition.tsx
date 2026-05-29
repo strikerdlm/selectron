@@ -14,6 +14,10 @@ import { PLACEHOLDER_CRITERIA } from "../../data/placeholder-criteria";
 import { ACTIVE_MISSIONS } from "../../data/imm-missions";
 import type { IMMMission } from "../../imm/types";
 import { IMM_KITS } from "../../imm/kits";
+import type { IMMKitScenario } from "../../imm/types";
+import { HealthSupportTierPicker } from "../health/HealthSupportTierPicker";
+import { HealthSupportBreakdown } from "../health/HealthSupportBreakdown";
+import { HealthSupportSeverityReadout } from "../health/HealthSupportSeverityReadout";
 import { aggregateCrewComposite } from "../../imm/composite";
 import { evaluateCrewGates } from "../../imm/crew-gates";
 import { CrewMemberCard } from "../components/CrewMemberCard";
@@ -108,7 +112,7 @@ const INITIAL_CREW: IMMCrewMember[] = [
 interface CrewState {
   members: IMMCrewMember[];
   mission: IMMMission;
-  kit: typeof IMM_KITS["issHMS"];
+  kit: IMMKitScenario;
   trials: number;
   seed: number;
   aggregator: CrewCompositeMethod;
@@ -345,26 +349,23 @@ export function CrewComposition() {
               <dd className="text-ink-1">{state.mission.totalEVAs}</dd>
             </dl>
 
-            {/* Kit selector */}
+            {/* Health-support tier selector (Health-Support feature) */}
             <div className="flex flex-col gap-1.5">
-              <label className="label text-[10px] text-ink-2 uppercase tracking-cap">Medical Kit</label>
-              <div className="flex flex-col gap-1">
-                {(["none", "issHMS", "unlimited"] as const).map((k) => (
-                  <button
-                    key={k}
-                    type="button"
-                    className="mono text-[11px] rounded border px-3 py-1.5 text-left transition-colors"
-                    style={{
-                      borderColor: state.kit.scenarioId === k ? "var(--signal)" : "var(--line)",
-                      color: state.kit.scenarioId === k ? "var(--signal)" : "var(--ink-2)",
-                      background: state.kit.scenarioId === k ? "rgba(245,181,65,0.06)" : "transparent",
-                    }}
-                    onClick={() => { setState((s) => ({ ...s, kit: IMM_KITS[k] })); setOutcome(undefined); setSimState("idle"); }}
-                  >
-                    {IMM_KITS[k].label}
-                  </button>
-                ))}
-              </div>
+              <label className="label text-[10px] text-ink-2 uppercase tracking-cap">Health Support</label>
+              <HealthSupportTierPicker
+                selectedId={state.kit.scenarioId}
+                onSelect={(kit) => { setState((s) => ({ ...s, kit })); setOutcome(undefined); setSimState("idle"); }}
+              />
+              <HealthSupportBreakdown tierId={state.kit.scenarioId} />
+              {outcome && lxc && (
+                <HealthSupportSeverityReadout
+                  tierLabel={state.kit.label}
+                  chiMean={outcome.chi.mean}
+                  issBaselineChi={82.8} /* documented ISS-HMS K15 baseline CHI; manuscript §3.3 */
+                  verdictColor={lxc.color === "gray" ? "red" : lxc.color}
+                  verdictScore={lxc.score}
+                />
+              )}
             </div>
 
             {/* Sim config (χ* + seed) */}
