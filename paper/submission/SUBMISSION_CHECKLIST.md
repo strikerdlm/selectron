@@ -20,6 +20,11 @@
 - [x] `figures/F7.png` — Fig. 7: Cross-mission CHI comparison
 - [ ] `competing-interests-declaration.docx` — from Elsevier declarations tool
 
+### Supplementary materials (peer-review R4, 2026-05-29)
+- [x] **S-Methods-1 / S-Methods-2 dossiers EXCLUDED** — stale; describe the retired `src/risk/` 12-condition engine and contradict the manuscript's V&V / 100 %-evidence-based claims. Banners added in-place; the manuscript body (§2.6) is the authoritative, self-contained V&V statement. Rewrite against the current IMM Calculator before any future inclusion.
+- [x] Broken `Figure S3 / S4` references removed from §3.6 (the data is in Tables 4 and 5 inline).
+- [ ] **Supplementary figures:** only `Figure S2` (per-mission ESS table, `figures/S2_ess_table.png`) is cited in the body (§3.5). `figures/S1_vv_dossier.png` is an orphan tied to the excluded V&V dossier — drop it and renumber the ESS table S2 → **S1** (sole supplementary figure) when the package is built, so the body reference and the shipped file agree.
+
 ### Manuscript content checks
 - [x] Title ≤ ~150 characters
 - [x] Abstract ≤ 250 words (unstructured plain paragraph per ASR)

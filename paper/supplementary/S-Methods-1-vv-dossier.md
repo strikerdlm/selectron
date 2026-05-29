@@ -4,6 +4,19 @@ parent: "Selectron manuscript (Advances in Space Research submission, 2026)"
 generated_from: "docs/iter3_vv_dossier.md"
 ---
 
+> **⚠ SUPERSEDED — NOT FOR SUBMISSION (peer-review R4, 2026-05-29).**
+> This dossier describes the retired `src/risk/` 12-condition engine and an
+> earlier V&V status ("4/8 factors satisfied", "Validation UNSATISFIED",
+> `synthetic-iter3-ui-scaffold` placeholder priors). It does **not** describe
+> the current 100-condition IMM Calculator and **contradicts the manuscript**,
+> which reports NASA-STD-7009A factors 1–3 satisfied (Factor 2 via the K15
+> reproduction gate) and a 100 %-evidence-based prior set (34 tier-A + 66
+> tier-B PyMC-fitted; zero synthetic placeholders). The manuscript body (§2.6)
+> is self-contained and is the authoritative V&V statement. This file is
+> **excluded from the submission package** and retained only as development
+> history; it must be rewritten against the current engine before any future
+> inclusion.
+
 # Iter-3 V&V Dossier — NASA-STD-7009 Eight Credibility Factors
 
 **Status:** living document. Last revised 2026-05-19 (Phase 3F closure; Phase 3A in-flight, Phase 3B blocked on Diego's T37 curation).
