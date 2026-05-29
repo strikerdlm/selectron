@@ -30,6 +30,9 @@ test("selecting the Medium health-support tier updates the breakdown", async ({ 
   // After clicking, the button must carry aria-checked="true".
   await expect(mediumBtn).toHaveAttribute("aria-checked", "true", { timeout: 10_000 });
 
+  // The care-capability dashboard is collapsed by default (Diego 2026-05-29) — expand it.
+  await page.getByRole("button", { name: /Care capability/i }).click({ timeout: 10_000 });
+
   // The breakdown panel should now show a procedure item that requires a provider.
   // "Defibrillator / AED (ECG, pacing)" is a provider-class item; under Medium it
   // remains shown (provider deliverability 0.6 > 0 — it would dim only under None).
