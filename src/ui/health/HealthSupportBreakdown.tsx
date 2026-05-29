@@ -1,3 +1,4 @@
+import { useState, type ReactNode } from "react";
 import {
   HEALTH_SUPPORT_TIERS, HEALTH_SUPPORT_ITEMS, deliverability, classOf,
 } from "../../imm/health-support";
@@ -5,14 +6,38 @@ import type { IMMKitScenario } from "../../imm/types";
 
 type Props = { tierId: IMMKitScenario["scenarioId"] };
 
-function CategoryHeader({ children }: { children: React.ReactNode }) {
-  return <h4 className="label text-[10px] text-ink-2 uppercase tracking-cap mt-3 mb-1">{children}</h4>;
-}
-
 export function HealthSupportBreakdown({ tierId }: Props) {
   const tier = HEALTH_SUPPORT_TIERS.find((t) => t.tierId === tierId)!;
   const meds = HEALTH_SUPPORT_ITEMS.filter((i) => i.category === "medications");
   const procs = HEALTH_SUPPORT_ITEMS.filter((i) => i.category === "procedures");
+
+  // Collapsible category sections (spec §7.2). All open by default.
+  const [collapsed, setCollapsed] = useState<Set<string>>(new Set());
+  const toggle = (k: string) =>
+    setCollapsed((prev) => {
+      const next = new Set(prev);
+      if (next.has(k)) next.delete(k);
+      else next.add(k);
+      return next;
+    });
+
+  const Section = ({ id, title, children }: { id: string; title: string; children: ReactNode }) => {
+    const open = !collapsed.has(id);
+    return (
+      <div className="flex flex-col gap-1">
+        <button
+          type="button"
+          onClick={() => toggle(id)}
+          aria-expanded={open}
+          className="flex items-center gap-1.5 label text-[10px] text-ink-2 uppercase tracking-cap mt-3 mb-1 hover:text-ink-1 cursor-pointer text-left"
+        >
+          <span className="mono text-ink-3 inline-block w-3" aria-hidden>{open ? "▾" : "▸"}</span>
+          {title}
+        </button>
+        {open && children}
+      </div>
+    );
+  };
 
   const Item = ({ item }: { item: typeof HEALTH_SUPPORT_ITEMS[number] }) => {
     const cls = classOf(item.id);
@@ -34,14 +59,18 @@ export function HealthSupportBreakdown({ tierId }: Props) {
 
   return (
     <div className="panel flex flex-col gap-1 text-left">
-      <CategoryHeader>Telemedicine / ground support</CategoryHeader>
-      <p className="mono text-[11px] text-ink-1">{tier.capabilities.telemedicine} · ground flight-surgeon link</p>
-      <CategoryHeader>Onboard provider</CategoryHeader>
-      <p className="mono text-[11px] text-ink-1">{tier.capabilities.provider}</p>
-      <CategoryHeader>Medication formulary</CategoryHeader>
-      {meds.map((i) => <Item key={i.id} item={i} />)}
-      <CategoryHeader>Procedures &amp; equipment</CategoryHeader>
-      {procs.map((i) => <Item key={i.id} item={i} />)}
+      <Section id="telemedicine" title="Telemedicine / ground support">
+        <p className="mono text-[11px] text-ink-1">{tier.capabilities.telemedicine} · ground flight-surgeon link</p>
+      </Section>
+      <Section id="provider" title="Onboard provider">
+        <p className="mono text-[11px] text-ink-1">{tier.capabilities.provider}</p>
+      </Section>
+      <Section id="medications" title="Medication formulary">
+        {meds.map((i) => <Item key={i.id} item={i} />)}
+      </Section>
+      <Section id="procedures" title="Procedures &amp; equipment">
+        {procs.map((i) => <Item key={i.id} item={i} />)}
+      </Section>
       <p className="mono text-[9px] text-ink-3 mt-2">Sources → research/2026-05-28_health_support_sourcing.md</p>
     </div>
   );

@@ -35,6 +35,13 @@ describe("HealthSupportBreakdown", () => {
     const defib = screen.getByText(/Defibrillator/i).closest("[data-deliverable]");
     expect(defib?.getAttribute("data-deliverable")).toBe("true");
   });
+
+  it("collapses a category section when its header is clicked", () => {
+    render(<HealthSupportBreakdown tierId="issHMS" />);
+    expect(screen.getByText(/Defibrillator/i)).toBeTruthy(); // procedures open by default
+    fireEvent.click(screen.getByRole("button", { name: /Procedures.*equipment/i }));
+    expect(screen.queryByText(/Defibrillator/i)).toBeNull(); // collapsed → not in DOM
+  });
 });
 
 describe("HealthSupportSeverityReadout", () => {

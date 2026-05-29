@@ -138,6 +138,13 @@ export function CrewComposition() {
   const [outcome, setOutcome] = useState<IMMOutcome | undefined>();
   const workerRef = useRef<Worker | null>(null);
 
+  // ── live severity preview (spec §7.3): a fast T=5,000 sim for the selected
+  // tier so the readout updates without waiting for the authoritative T=100,000 run.
+  const previewWorkerRef = useRef<Worker | null>(null);
+  const previewReqRef = useRef(0);
+  const [previewOutcome, setPreviewOutcome] = useState<IMMOutcome | undefined>();
+  const [previewState, setPreviewState] = useState<SimState>("idle");
+
   // ── IMM-50: recent saved sessions for the load dropdown ─────────────────
   const [recentSessions, setRecentSessions] = useState<IMMSession[]>([]);
   const reloadRecentSessions = useCallback(async () => {
@@ -171,6 +178,59 @@ export function CrewComposition() {
     () => (outcome ? assessIMMLxC(outcome, gateResult) : undefined),
     [outcome, gateResult],
   );
+
+  // Preview LxC verdict from the fast preview outcome.
+  const previewLxc = useMemo(
+    () => (previewOutcome ? assessIMMLxC(previewOutcome, gateResult) : undefined),
+    [previewOutcome, gateResult],
+  );
+
+  // The severity readout prefers the authoritative full-sim outcome; otherwise the preview.
+  const readoutOutcome = outcome ?? previewOutcome;
+  const readoutLxc = outcome ? lxc : previewLxc;
+  const readoutIsPreview = !outcome && previewOutcome !== undefined;
+
+  // Auto-run a debounced T=5,000 preview whenever the tier / mission / crew / seed /
+  // threshold changes, so the readout reflects the selected tier immediately. Debounced
+  // (400 ms), race-guarded (previewReqRef), and cleanup-safe; the Worker construction is
+  // try/caught so non-browser (test) environments simply no-op.
+  useEffect(() => {
+    if (state.members.length === 0) { setPreviewOutcome(undefined); return; }
+    const reqId = ++previewReqRef.current;
+    setPreviewState("running");
+    const handle = setTimeout(() => {
+      if (previewWorkerRef.current) { previewWorkerRef.current.terminate(); previewWorkerRef.current = null; }
+      let w: Worker;
+      try {
+        w = new Worker(new URL("../../workers/imm-simulate.worker.ts", import.meta.url), { type: "module" });
+      } catch {
+        if (reqId === previewReqRef.current) setPreviewState("idle");
+        return;
+      }
+      previewWorkerRef.current = w;
+      w.onmessage = (e: MessageEvent<{ ok: true; result: IMMOutcome } | { ok: false; error: string }>) => {
+        if (reqId === previewReqRef.current) {
+          if (e.data.ok) { setPreviewOutcome(e.data.result); setPreviewState("done"); }
+          else setPreviewState("idle");
+        }
+        w.terminate();
+        if (previewWorkerRef.current === w) previewWorkerRef.current = null;
+      };
+      w.onerror = () => {
+        if (reqId === previewReqRef.current) setPreviewState("idle");
+        w.terminate();
+        if (previewWorkerRef.current === w) previewWorkerRef.current = null;
+      };
+      w.postMessage({
+        crew: state.members, mission: state.mission, kit: state.kit,
+        trials: 5000, seed: state.seed, chiStar: state.chiStar, criteria: PLACEHOLDER_CRITERIA,
+      });
+    }, 400);
+    return () => {
+      clearTimeout(handle);
+      if (previewWorkerRef.current) { previewWorkerRef.current.terminate(); previewWorkerRef.current = null; }
+    };
+  }, [state.members, state.mission, state.kit, state.seed, state.chiStar]);
 
   function toggleMember(id: string) {
     setExpandedIds((prev) => {
@@ -250,6 +310,10 @@ export function CrewComposition() {
       if (workerRef.current) {
         workerRef.current.terminate();
         workerRef.current = null;
+      }
+      if (previewWorkerRef.current) {
+        previewWorkerRef.current.terminate();
+        previewWorkerRef.current = null;
       }
     };
   }, []);
@@ -358,13 +422,16 @@ export function CrewComposition() {
                 onSelect={(kit) => { setState((s) => ({ ...s, kit })); setOutcome(undefined); setSimState("idle"); }}
               />
               <HealthSupportBreakdown tierId={state.kit.scenarioId} />
-              {outcome && lxc && (
+              {previewState === "running" && !readoutOutcome && (
+                <p className="mono text-[10px] text-ink-3">estimating severity (T=5,000)…</p>
+              )}
+              {readoutOutcome && readoutLxc && (
                 <HealthSupportSeverityReadout
-                  tierLabel={state.kit.label}
-                  chiMean={outcome.chi.mean}
+                  tierLabel={state.kit.label + (readoutIsPreview ? " · preview (T=5,000)" : "")}
+                  chiMean={readoutOutcome.chi.mean}
                   issBaselineChi={ISS_HMS_BASELINE_CHI}
-                  verdictColor={lxc.color === "gray" ? "red" : lxc.color}
-                  verdictScore={lxc.score}
+                  verdictColor={readoutLxc.color === "gray" ? "red" : readoutLxc.color}
+                  verdictScore={readoutLxc.score}
                 />
               )}
             </div>
