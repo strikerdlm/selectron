@@ -29,12 +29,13 @@ test.describe("Calibration view — Python API integration", () => {
 
   test("Conditions tab shows fitted/fittable status badges", async ({ page }) => {
     await expect(page.locator("text=100 total")).toBeVisible({ timeout: 10000 });
-    await expect(page.locator("text=35 fitted")).toBeVisible();
-    await expect(page.locator("text=6 fittable")).toBeVisible();
+    await expect(page.locator("text=66 fitted")).toBeVisible();
+    await expect(page.locator("text=65 fittable")).toBeVisible();
     const fittedBadges = await page.locator("td >> text=Fitted").count();
-    expect(fittedBadges).toBe(35);
+    expect(fittedBadges).toBe(66);
+    // All 65 fittable conditions are already fitted (0 fittable-but-not-yet-fitted remain)
     const fittableBadges = await page.locator("td >> text=Fittable").count();
-    expect(fittableBadges).toBe(6);
+    expect(fittableBadges).toBe(0);
   });
 
   test("Conditions tab provenance filter works", async ({ page }) => {
@@ -42,7 +43,7 @@ test.describe("Calibration view — Python API integration", () => {
     const select = page.locator("select").first();
     await select.selectOption("tierB-pymc");
     const rows = page.locator("tbody tr");
-    expect(await rows.count()).toBe(35);
+    expect(await rows.count()).toBe(66);
   });
 
   test("Conditions tab handles API error gracefully", async ({ page }) => {
@@ -62,14 +63,14 @@ test.describe("Calibration view — Python API integration", () => {
     await expect(page.locator("label:has-text('draws')")).toBeVisible();
     await expect(page.locator("label:has-text('chains')")).toBeVisible();
     await expect(page.locator("label:has-text('seed')")).toBeVisible();
-    await expect(page.locator("label:has-text('condition filter')")).toBeVisible();
+    await expect(page.locator("label:has-text('condition')")).toBeVisible();
     await expect(page.locator("button:has-text('Run Fit')")).toBeEnabled();
   });
 
-  test("V&V tab shows placeholder", async ({ page }) => {
+  test("V&V tab shows validation and sensitivity panels", async ({ page }) => {
     await page.click("button:has-text('V&V')");
-    await expect(page.locator("text=Validation & Sensitivity")).toBeVisible();
-    await expect(page.locator("text=coming soon")).toBeVisible();
+    await expect(page.locator("h3:has-text('K15 Validation Gate')")).toBeVisible();
+    await expect(page.locator("h3:has-text('Sensitivity Analysis')")).toBeVisible();
   });
 
   test("screenshot: Conditions tab with data", async ({ page }) => {

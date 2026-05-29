@@ -11,12 +11,12 @@
 //
 // CHI is in percent scale (0–100), so the σ threshold is 6.0 pp (not 0.05).
 
-import { describe, it, expect } from "vitest";
+import { describe, it, expect, beforeAll } from "vitest";
 import { simulateIMM } from "../../src/imm/simulate";
 import { IMM_KITS } from "../../src/imm/kits";
 import { IMM_MISSIONS } from "../../src/data/imm-missions";
 import { computeRhat } from "../../src/engine/rhat";
-import type { IMMCrewMember } from "../../src/imm/types";
+import type { IMMCrewMember, IMMOutcome } from "../../src/imm/types";
 
 // ── Crew: 6 members, alternating male/female, EVA_count=2 each ───────────────
 // EVA_eligible=true for all so EVA_count=2 actually drives EVA-coupled sampling.
@@ -35,17 +35,21 @@ const KIT    = IMM_KITS.issHMS;
 const T      = 25_000;
 const SEEDS  = [0xc0ffee, 0xdeadbeef, 0x12345678, 0xfeedface];
 
-// ── Run 4 chains ──────────────────────────────────────────────────────────────
-// Build chains outside describe() so the expensive work runs once per file load.
-// vitest executes top-level module code before any test, so the results are
-// available immediately when each it() runs.
-const chains = SEEDS.map(seed =>
-  simulateIMM({ crew: CREW, mission: ISS6, kit: KIT, trials: T, seed, diagnostics: true }),
-);
-
 // ── Tests ─────────────────────────────────────────────────────────────────────
 
 describe("IMM CHI — Gelman-Rubin R̂ convergence (peer-review-2 §4.3)", () => {
+  // Build the 4 chains once, in beforeAll — at RUN time, not COLLECTION time.
+  // A prior version computed these at module top-level "so the work runs once
+  // per file load"; but vitest executes top-level module code during collection
+  // (it imports every test file before running any test), so 4×T=25k simulations
+  // ran during the collect phase and `npm test` appeared to "hang at collection".
+  // beforeAll defers the work to test execution, where the per-test timeouts apply.
+  let chains: IMMOutcome[];
+  beforeAll(() => {
+    chains = SEEDS.map(seed =>
+      simulateIMM({ crew: CREW, mission: ISS6, kit: KIT, trials: T, seed, diagnostics: true }),
+    );
+  }, 300_000);
   it(
     "R̂(CHI) <= 1.01 across 4 independent chains (between-chain convergence)",
     { timeout: 180_000 },
