@@ -3,6 +3,9 @@ import { IMM_KITS } from "../../src/imm/kits";
 import {
   gateAvailable, DELIVERABILITY, RESOURCE_DELIVERY_CLASS,
 } from "../../src/imm/health-support";
+import { simulateIMM } from "../../src/imm/simulate";
+import { K15_REFERENCE_CREW } from "../../src/imm/calibration";
+import { ACTIVE_MISSIONS } from "../../src/data/imm-missions";
 
 describe("health-support delivery-class gating", () => {
   it("is the identity transform for issHMS (K15 invariant)", () => {
@@ -46,5 +49,29 @@ describe("health-support delivery-class gating", () => {
     for (const k of Object.keys(IMM_KITS.issHMS.resources)) {
       expect(RESOURCE_DELIVERY_CLASS[k]).toBeDefined();
     }
+  });
+});
+
+describe("health-support engine integration", () => {
+  const iss6 = ACTIVE_MISSIONS.find((m) => m.id === "iss-6mo")!;
+
+  it("issHMS TME is unchanged by gating (identity → K15 safe)", () => {
+    const out = simulateIMM({
+      crew: K15_REFERENCE_CREW, mission: iss6,
+      kit: IMM_KITS.issHMS, trials: 3000, seed: 0xc0ffee,
+    });
+    expect(out.tme.mean).toBeGreaterThan(87);
+    expect(out.tme.mean).toBeLessThan(126);
+  });
+
+  // SKIPPED until Task 4 adds IMM_KITS.medium. Do NOT un-skip in this task.
+  it.skip("medium CHI sits strictly between none and issHMS", () => {
+    const opts = { crew: K15_REFERENCE_CREW, mission: iss6, trials: 4000, seed: 0xc0ffee };
+    const none = simulateIMM({ ...opts, kit: IMM_KITS.none }).chi.mean;
+    // @ts-expect-error IMM_KITS.medium lands in Task 4; this test stays .skip until then.
+    const medium = simulateIMM({ ...opts, kit: IMM_KITS.medium }).chi.mean;
+    const iss = simulateIMM({ ...opts, kit: IMM_KITS.issHMS }).chi.mean;
+    expect(medium).toBeGreaterThan(none);
+    expect(medium).toBeLessThan(iss);
   });
 });

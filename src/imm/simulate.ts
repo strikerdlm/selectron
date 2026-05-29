@@ -25,6 +25,7 @@ import { sampleSeverity } from "./severity";
 import { sampleBetaPert } from "./outcomes";
 import { interpolateBetaPertByRAF } from "./treatment";
 import { computeRAF } from "./kits";
+import { gateAvailable } from "./health-support";
 import type { Criterion } from "../types";
 
 /**
@@ -246,7 +247,10 @@ export function runIMMTrial(
     ? IMM_CONDITIONS.filter(opts.conditionFilter)
     : IMM_CONDITIONS;
 
-  const availableResources: Record<string, number> = { ...kit.resources };
+  // Health-Support gating: scale each resource by the tier's per-delivery-class
+  // deliverability before RAF. Identity for issHMS/unlimited (K15 invariant);
+  // only bites for none/medium. See src/imm/health-support.ts.
+  const availableResources: Record<string, number> = gateAvailable(kit.resources, kit.scenarioId);
   const occurrences: Occurrence[] = [];
   const earlyTerminated = new Set<number>();
   const rafHistory: Array<{ conditionId: string; raf: number }> = [];
