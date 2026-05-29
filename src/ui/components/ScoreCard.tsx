@@ -11,9 +11,11 @@ export function ScoreCard({ posterior, alias }: Props) {
   const { mean, ci90, ci95, ess } = posterior;
   const ci90Width = ci90[1] - ci90[0];
 
-  // Sharpness gauge: narrow CI = "confident"
-  // Map 0%–30% CI width to 100%–0% sharpness.
-  const sharpness = Math.max(0, Math.min(1, 1 - ci90Width / 0.3));
+  // Estimate-precision gauge: narrow CI = "confident estimate".
+  // Map 0%–30% CI₉₀ width to 100%–0% precision. This measures how tightly the
+  // posterior has pinned the score (epistemic certainty) — NOT candidate merit.
+  // A low-scoring candidate can be estimated very precisely.
+  const precision = Math.max(0, Math.min(1, 1 - ci90Width / 0.3));
 
   return (
     <div className="panel p-6">
@@ -52,13 +54,19 @@ export function ScoreCard({ posterior, alias }: Props) {
 
       <div className="mt-6">
         <div className="mono mb-1 flex items-center justify-between text-[10px] text-ink-2">
-          <span>sharpness</span>
-          <span className="tabular-nums">{(100 * sharpness).toFixed(0)}%</span>
+          <span
+            className="inline-flex items-center gap-1 cursor-help border-b border-dotted border-ink-3/50"
+            title="Estimate precision — how tightly the 90% credible interval is pinned (1 − CI₉₀width/0.30). This is the certainty of the score estimate, NOT a measure of candidate quality: a low-scoring candidate can be estimated just as precisely as a high-scoring one."
+          >
+            estimate precision
+            <span aria-hidden className="text-ink-3">ⓘ</span>
+          </span>
+          <span className="tabular-nums">{(100 * precision).toFixed(0)}%</span>
         </div>
         <div className="relative h-[3px] w-full bg-line">
           <div
             className="absolute inset-y-0 left-0 bg-signal transition-[width] duration-300 ease-out"
-            style={{ width: `${100 * sharpness}%` }}
+            style={{ width: `${100 * precision}%` }}
           />
         </div>
       </div>

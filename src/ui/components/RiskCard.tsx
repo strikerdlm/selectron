@@ -12,7 +12,9 @@ export function RiskCard({ posterior, alias }: Props) {
   const { chi, pEarlyTermination, expectedLostCrewDays, trials } = posterior;
   const chiCI90Width = chi.ci90[1] - chi.ci90[0];
 
-  const sharpness = Math.max(0, Math.min(1, 1 - chiCI90Width / 0.3));
+  // Estimate-precision gauge (1 − CI₉₀width/0.30): certainty of the CHI estimate,
+  // NOT mission quality. A poor CHI can be estimated just as precisely as a good one.
+  const precision = Math.max(0, Math.min(1, 1 - chiCI90Width / 0.3));
 
   return (
     <div className="panel p-6">
@@ -64,13 +66,19 @@ export function RiskCard({ posterior, alias }: Props) {
 
       <div className="mt-6">
         <div className="mono mb-1 flex items-center justify-between text-[10px] text-ink-2">
-          <span>CHI sharpness</span>
-          <span className="tabular-nums">{(100 * sharpness).toFixed(0)}%</span>
+          <span
+            className="inline-flex items-center gap-1 cursor-help border-b border-dotted border-ink-3/50"
+            title="Estimate precision — how tightly the 90% credible interval is pinned (1 − CI₉₀width/0.30). This is the certainty of the CHI estimate, NOT mission quality: a poor CHI can be estimated just as precisely as a good one."
+          >
+            CHI estimate precision
+            <span aria-hidden className="text-ink-3">ⓘ</span>
+          </span>
+          <span className="tabular-nums">{(100 * precision).toFixed(0)}%</span>
         </div>
         <div className="relative h-[3px] w-full bg-line">
           <div
             className="absolute inset-y-0 left-0 bg-signal transition-[width] duration-300 ease-out"
-            style={{ width: `${100 * sharpness}%` }}
+            style={{ width: `${100 * precision}%` }}
           />
         </div>
       </div>
