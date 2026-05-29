@@ -46,14 +46,18 @@ export const RESOURCE_DELIVERY_CLASS: Record<string, DeliveryClass> = {
   "burn-dressing": "self", "bandage-large": "self", "bandage-small": "self",
   "dental-temporary-filling": "self", "dental-filling-material": "self",
   "dental-crown-cement": "self",
-  "opioid": "guided", "sedative": "guided", "muscle-relaxant": "guided",
+  // final-review capability refinement: an anaphylaxis autoinjector (NASA-STD-3001
+  // Level I "anaphylaxis response") and oral behavioral-health / muscle-relaxant meds
+  // (OCHMO TB-006 oral packs) are self-administrable, not provider/guided-gated.
+  "epinephrine": "self", "muscle-relaxant": "self", "antipsychotic": "self",
+  "opioid": "guided", "sedative": "guided",
   "iv-fluid": "guided", "suture-kit": "guided", "splint": "guided",
   "cervical-collar": "guided", "catheter-urinary": "guided",
   "ophthalmic-exam": "guided", "eye-irrigation-kit": "guided",
-  "oxygen-supplemental": "guided", "antipsychotic": "guided",
-  "epinephrine": "provider", "atropine": "provider", "lidocaine": "provider",
+  "oxygen-supplemental": "guided", "aed": "guided",
+  "atropine": "provider", "lidocaine": "provider",
   "antiarrhythmic": "provider", "defibrillator-pad": "provider",
-  "defibrillator": "provider", "aed": "provider", "cardiac-monitor": "provider",
+  "defibrillator": "provider", "cardiac-monitor": "provider",
   "chest-tube": "provider",
 };
 
@@ -137,7 +141,7 @@ export const HEALTH_SUPPORT_ITEMS: HealthSupportItem[] = [
   { id: "anti-anxiety", label: "Lorazepam (Ativan)", category: "medications", packClass: "Behavioral Health", source_ref: "iss-3001kit" },
   { id: "analgesic-strong", label: "Strong analgesic", category: "medications", packClass: "Oral Med Pack", source_ref: "iss-3001kit" },
   { id: "iv-fluid", label: "IV fluid (saline)", category: "medications", packClass: "IV Supply Pack", source_ref: "iss-hms-ntrs" },
-  { id: "epinephrine", label: "Epinephrine (ACLS)", category: "medications", packClass: "Emergency Medical Pack", source_ref: "iss-hms-ntrs" },
+  { id: "epinephrine", label: "Epinephrine (anaphylaxis autoinjector)", category: "medications", packClass: "Emergency Medical Pack", source_ref: "iss-hms-ntrs" },
   { id: "suture-kit", label: "Minor surgical / suture kit", category: "procedures", packClass: "Minor Treatment Pack", source_ref: "iss-hms-ntrs" },
   { id: "defibrillator", label: "Defibrillator / AED (ECG, pacing)", category: "procedures", packClass: "Advanced Life Support Pack", source_ref: "iss-hms-ntrs" },
   { id: "oxygen-supplemental", label: "Respiratory Support Pack (ventilation, O₂)", category: "procedures", packClass: "Respiratory Support Pack", source_ref: "iss-hms-ntrs" },

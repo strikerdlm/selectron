@@ -28,3 +28,20 @@ No fabricated data (Diego's directive, 2026-05-28).
 - `analog-carmm` — Australian Antarctic Division Polar Medicine Unit / CARMM (sole station doctor, telehealth, point-of-care diagnostics).
 - `analog-concordia` — ESA Concordia ("White Mars") station-physician model.
 - `analog-pattarini2016` — Pattarini JM et al. (already in paper/references.bib).
+
+
+## Delivery-class classification basis (self / guided / provider)
+
+Each resource's delivery class in `src/imm/health-support.ts::RESOURCE_DELIVERY_CLASS`
+encodes the minimum care capability needed to *use* it, derived from:
+- `loc-std3001` / `loc-conops-mars` — NASA-STD-3001 Vol 1 levels of care. Level I (→ `self`):
+  first aid, basic life support, **anaphylaxis response** (epinephrine autoinjector), space
+  motion sickness. Level II (→ `guided`): clinical diagnostics + ambulatory care under
+  telemedicine (injectables, IV, minor procedures). Level III–IV (→ `provider`): advanced
+  life support, trauma, surgery (ACLS drugs, manual defibrillation, chest tube).
+- `iss-ochmo-tb006` / `iss-hms-ntrs` — NASA ISS pack structure: Convenience / Oral /
+  Behavioral-Health packs → `self`; IV Supply / Minor Treatment → `guided`; Advanced Life
+  Support / Physician Equipment Pack → `provider`.
+
+Classification affects only the `none` / `medium` tiers; `issHMS` / `unlimited` deliverability
+is the identity (all classes ×1), so the K15 reproduction gate is unaffected by these labels.
