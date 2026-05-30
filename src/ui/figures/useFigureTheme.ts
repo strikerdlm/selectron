@@ -1,5 +1,5 @@
 // src/ui/figures/useFigureTheme.ts
-import { useTheme } from "@/ui/theme/ThemeContext";
+import { useFigureThemeMode } from "@/ui/theme/ThemeContext";
 import { NATURE_THEME_NAME } from "./theme";
 import { DARK_THEME_NAME } from "./theme-dark";
 
@@ -24,7 +24,7 @@ export const DARK_TOKENS: ChartTokens = {
 };
 
 export function useFigureTheme(): { themeName: string; tokens: ChartTokens } {
-  const { theme } = useTheme();
+  const theme = useFigureThemeMode();
   return theme === "light"
     ? { themeName: NATURE_THEME_NAME, tokens: LIGHT_TOKENS }
     : { themeName: DARK_THEME_NAME, tokens: DARK_TOKENS };
