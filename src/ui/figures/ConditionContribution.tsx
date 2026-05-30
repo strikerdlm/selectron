@@ -244,7 +244,7 @@ export function ConditionContribution({
       )}
 
       {/* family legend */}
-      <div className="mono mt-3 flex flex-wrap items-center gap-3 text-[12px] text-ink-2">
+      <div className="mono mt-3 flex flex-wrap items-center gap-3 text-[10px] text-ink-2">
         {familiesPresent.map((fam) => (
           <span key={fam} className="flex items-center gap-1.5">
             <span
@@ -260,7 +260,7 @@ export function ConditionContribution({
       {entries.length > 0 && (
         <>
           <div className="hairline my-3" />
-          <ul className="mono space-y-1 text-[13px] text-ink-1">
+          <ul className="mono space-y-1 text-[11px] text-ink-1">
             {entries.slice(0, 3).map((e, i) => (
               <li key={e.id} className="flex items-baseline justify-between">
                 <span>
