@@ -5,6 +5,7 @@ import { describe, it, expect, afterEach, vi } from "vitest";
 import { render, cleanup } from "@testing-library/react";
 import { ThemeProvider } from "@/ui/theme/ThemeContext";
 import { ParallelCriteria } from "@/ui/figures/ParallelCriteria";
+import { Analysis } from "@/ui/views/Analysis";
 import { PLACEHOLDER_CRITERIA } from "@/data/placeholder-criteria";
 import { makeDemoCohort } from "@/analysis/demo-cohort";
 
@@ -12,6 +13,11 @@ vi.mock("echarts-for-react/lib/core", () => ({
   default: ({ option }: { option: { series?: unknown[] } }) => (
     <div data-testid="echarts-mock" data-series-count={Array.isArray(option.series) ? option.series.length : 0} />
   ),
+}));
+
+vi.mock("@/db/repository", () => ({
+  listCandidates: async () => [],
+  listCriterionEntries: async () => [],
 }));
 
 afterEach(cleanup);
@@ -89,13 +95,6 @@ describe("VulnerabilityCouplingHeatmap", () => {
     expect(container.textContent).toContain("Figure A5");
   });
 });
-
-import { Analysis } from "@/ui/views/Analysis";
-
-vi.mock("@/db/repository", () => ({
-  listCandidates: async () => [],
-  listCriterionEntries: async () => [],
-}));
 
 describe("Analysis view", () => {
   it("renders all five figure panels with the demo cohort fallback", async () => {

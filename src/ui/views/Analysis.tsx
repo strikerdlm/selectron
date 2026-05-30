@@ -1,5 +1,5 @@
 // src/ui/views/Analysis.tsx
-import { useEffect, useState, type ReactNode } from "react";
+import { useEffect, useMemo, useState, type ReactNode } from "react";
 import type { Candidate } from "@/types";
 import { PLACEHOLDER_CRITERIA } from "@/data/placeholder-criteria";
 import { listCandidates, listCriterionEntries } from "@/db/repository";
@@ -52,14 +52,17 @@ export function Analysis() {
     return () => { alive = false; };
   }, [criteria]);
 
-  const { points, excluded } = buildBubbleData(IMM_CONDITIONS, loadIMMPriors().conditions, MISSION_DAYS);
+  const { points, excluded } = useMemo(
+    () => buildBubbleData(IMM_CONDITIONS, loadIMMPriors().conditions, MISSION_DAYS),
+    [],
+  );
 
   return (
-    <div className="space-y-6">
+    <div className="fadein space-y-6">
       <div className="flex items-baseline justify-between">
         <h1 className="display text-xl text-ink-0">Correlation analysis</h1>
         <span className="mono text-[12px] uppercase tracking-cap text-ink-3">
-          {isDemo ? "demo cohort · N=" + cohort.length : "live pool · N=" + cohort.length}
+          {isDemo ? `demo cohort · N=${cohort.length}` : `live pool · N=${cohort.length}`}
         </span>
       </div>
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
