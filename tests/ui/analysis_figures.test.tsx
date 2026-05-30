@@ -48,3 +48,17 @@ describe("RiskBubbleScatter", () => {
     expect(container.textContent).toContain("no rate-based conditions");
   });
 });
+
+import { CriteriaSplom } from "@/ui/figures/CriteriaSplom";
+
+describe("CriteriaSplom", () => {
+  it("renders the matrix + caption", () => {
+    const { container, getByTestId } = wrap(<CriteriaSplom cohort={cohort} criteria={PLACEHOLDER_CRITERIA} isDemo />);
+    expect(getByTestId("echarts-mock")).toBeTruthy();
+    expect(container.textContent).toContain("Figure A3");
+  });
+  it("empty state under 3 candidates", () => {
+    const { container } = wrap(<CriteriaSplom cohort={cohort.slice(0, 2)} criteria={PLACEHOLDER_CRITERIA} isDemo />);
+    expect(container.textContent).toContain("need ≥3 candidates");
+  });
+});
