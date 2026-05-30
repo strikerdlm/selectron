@@ -29,3 +29,22 @@ describe("ParallelCriteria", () => {
     expect(container.textContent).toContain("need ≥2 candidates");
   });
 });
+
+import { RiskBubbleScatter } from "@/ui/figures/RiskBubbleScatter";
+import { buildBubbleData } from "@/analysis/imm-bubbles";
+import { IMM_CONDITIONS } from "@/imm/conditions";
+import { loadIMMPriors } from "@/imm/priors";
+
+describe("RiskBubbleScatter", () => {
+  const { points, excluded } = buildBubbleData(IMM_CONDITIONS, loadIMMPriors().conditions, 180);
+  it("renders bubbles + caption from the real priors", () => {
+    const { container, getByTestId } = wrap(<RiskBubbleScatter points={points} excluded={excluded.length} missionDays={180} />);
+    expect(getByTestId("echarts-mock")).toBeTruthy();
+    expect(container.textContent).toContain("Figure A2");
+    expect(points.length).toBeGreaterThan(20);
+  });
+  it("shows an empty state with no points", () => {
+    const { container } = wrap(<RiskBubbleScatter points={[]} excluded={0} missionDays={180} />);
+    expect(container.textContent).toContain("no rate-based conditions");
+  });
+});
