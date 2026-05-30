@@ -35,7 +35,7 @@ import type { Criterion } from "../types";
  * Same values as SYNTHETIC_PRIORS in src/data/synthetic-iter3.ts — these are the
  * authoritative operational values pending Phase 3B PyMC fit.
  */
-const FAMILY_BETA: Partial<Record<IMMConditionFamily, number>> = {
+export const FAMILY_BETA: Partial<Record<IMMConditionFamily, number>> = {
   psychiatric:      -0.4,
   behavioral:       -0.3,
   neurologic:       -0.3,
@@ -48,7 +48,7 @@ const FAMILY_BETA: Partial<Record<IMMConditionFamily, number>> = {
   // "space-adaptation", "traumatic", "dental", "dermatologic", "ENT",
   // "endocrine", "GU", "hematologic", "ophthalmologic", "toxicologic" → default -0.2
 };
-const FAMILY_BETA_DEFAULT = -0.2;
+export const FAMILY_BETA_DEFAULT = -0.2;
 
 type Occurrence = {
   conditionId: string;
