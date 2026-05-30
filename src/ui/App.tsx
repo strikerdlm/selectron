@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
 import { DbProvider } from "@/contexts/DbContext";
 import { CalibrationJobsProvider, useCalibrationJobs } from "@/contexts/CalibrationJobsContext";
+import { ThemeProvider } from "./theme/ThemeContext";
+import { ThemeToggle } from "./theme/ThemeToggle";
 import { createCandidate } from "@/db/repository";
 import { Dashboard } from "./views/Dashboard";
 import { Wizard } from "./views/Wizard";
@@ -68,8 +70,9 @@ export function App() {
   }
 
   return (
-    <DbProvider>
-     <CalibrationJobsProvider>
+    <ThemeProvider>
+     <DbProvider>
+      <CalibrationJobsProvider>
       <div className="min-h-screen text-ink-0">
         {/* HEADER ─────────────────────────────────────────────────────────────── */}
         <header className="border-b border-line">
@@ -87,6 +90,7 @@ export function App() {
               <span className="label text-signal">iter 03 · phase 3f</span>
             </div>
             <div className="mono flex items-center gap-4 text-[13px] text-ink-2">
+              <ThemeToggle />
               {/* Nav links */}
               <button
                 className={`uppercase tracking-cap transition-colors ${
@@ -214,7 +218,8 @@ export function App() {
         </footer>
         <ToastHost />
       </div>
-     </CalibrationJobsProvider>
-    </DbProvider>
+      </CalibrationJobsProvider>
+     </DbProvider>
+    </ThemeProvider>
   );
 }
