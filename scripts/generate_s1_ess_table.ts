@@ -1,5 +1,5 @@
-// Emit an SVG table of per-mission Stage B diagnostics for the 8 canonical
-// analog missions (the same set the manuscript walks in §3.5). For each
+// Emit an SVG table of per-mission Stage B diagnostics for the seven canonical
+// analog + LEO-ISS missions (the same set the manuscript walks in §3.5). For each
 // mission, run a real T=100 000 forward Monte Carlo, then capture:
 //   • trials
 //   • ESS (forward MC IID Dirichlet → ESS ≈ trials by construction)
@@ -8,7 +8,7 @@
 //   • χ mean + 90 % CI
 //   • LxC L · C · score · color
 //
-// Output: paper/figures/S2_ess_table.svg + .png
+// Output: paper/figures/S1_ess_table.svg + .png
 
 import { writeFileSync } from "node:fs";
 import { ANALOG_MISSIONS } from "../src/data/analog-missions";
@@ -145,5 +145,5 @@ const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}" 
   ${bodyRows}
 </svg>`;
 
-writeFileSync("paper/figures/S2_ess_table.svg", svg);
-console.log(`wrote paper/figures/S2_ess_table.svg (${svg.length} bytes); ${rows.length} missions`);
+writeFileSync("paper/figures/S1_ess_table.svg", svg);
+console.log(`wrote paper/figures/S1_ess_table.svg (${svg.length} bytes); ${rows.length} missions`);

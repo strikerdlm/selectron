@@ -58,7 +58,7 @@ const doc = new Document({
         children: [
           new TextRun({ text: 'Re: Manuscript submission — ', font: FONT, size: BODY_HP, bold: true }),
           new TextRun({
-            text: 'Bayesian Multi-Criteria Decision Analysis with NASA Human-System-Risk-Board Likelihood × Consequence Mapping for Analog-Astronaut Selection',
+            text: 'From Mission Medical Risk to Crew Selection: A Reproducible NASA-IMM and HSRB Pipeline for Analog Astronauts',
             font: FONT, size: BODY_HP, bold: true, italics: true,
           }),
         ],
@@ -85,7 +85,7 @@ const doc = new Document({
       new Paragraph({
         spacing: { before: 0, after: 120, line: 360, lineRule: 'auto' },
         indent: { left: 720 },
-        children: [new TextRun({ text: '1. A Bayesian multi-criteria decision analysis (MCDA) pipeline that produces a posterior distribution over each candidate\'s total score with credible-interval rank semantics — the first such pipeline applied to astronaut, aircrew, or analog-astronaut selection in the indexed literature.', font: FONT, size: BODY_HP })],
+        children: [new TextRun({ text: '1. A Bayesian multi-criteria decision analysis (MCDA) pipeline that produces a posterior distribution over each candidate\'s total score with credible-interval rank semantics — to our knowledge the first Bayesian MCDA pipeline delivering per-candidate composite-score posteriors and rank credible intervals for analog-astronaut selection (deterministic and fuzzy MCDM for pilot/aircrew selection is established — e.g. Taylan et al., 2024 — but a Bayesian formulation coupled to a mission-risk model is not).', font: FONT, size: BODY_HP })],
       }),
 
       new Paragraph({
@@ -95,7 +95,7 @@ const doc = new Document({
       }),
 
       // Body paragraph 2 — IMM
-      p('The IMM Calculator aligns to the NASA Integrated Medical Model of Keenan et al. (2015) and reproduces the K15 §II.A.9 sum-of-products per-event quality-time-lost formula across the canonical 100-condition K15 catalogue at T = 100,000 trials. All 100 per-condition priors are evidence-based (34 tier-A NASA-attributed, 66 tier-B PyMC NUTS-fitted from terrestrial, Antarctic, submarine, and military population epidemiological data across 10 calibration passes); zero synthetic placeholders remain. A two-panel condition-set sensitivity analysis demonstrates that the K15 reproduction is non-circular: the 34 NASA-sourced conditions alone produce issHMS CHI within K15\'s published CI₉₅, and the 66 independently-fitted tier-B conditions add evidence-based risk that is not back-calibrated against K15 aggregates.'),
+      p('The IMM Calculator aligns to the NASA Integrated Medical Model of Keenan et al. (2015) and reproduces the K15 §II.A.9 sum-of-products per-event quality-time-lost formula across the canonical 100-condition K15 catalogue at T = 100,000 trials. All 100 per-condition priors are evidence-based (34 tier-A NASA-attributed, 66 tier-B PyMC NUTS-fitted from terrestrial, Antarctic, submarine, and military population epidemiological data across iterative calibration passes); zero synthetic placeholders remain. A two-panel condition-set sensitivity analysis demonstrates that the K15 reproduction is non-circular: the 34 NASA-sourced conditions alone produce issHMS CHI within K15\'s published CI₉₅, and the 66 independently-fitted tier-B conditions add evidence-based risk that is not back-calibrated against K15 aggregates.'),
 
       // Body paragraph 3 — V&V
       p('Internal validation follows NASA-STD-7009A\'s first three credibility factors: closed-form Dirichlet moments, ESS, the Poisson-Gamma conjugate test, the verbatim JSC-66705 Figure 4 grid check, and the σ < 5% convergence rule at the NASA-canonical T = 100,000 trials per Myers (2018) and Antonsen (2022). Outcome validation against analog-mission incident catalogues is explicitly out-of-scope and disclosed as a limitation; the paper is framed as a methodology contribution, not an outcome-prediction study.'),
@@ -104,8 +104,8 @@ const doc = new Document({
       new Paragraph({
         spacing: { before: 0, after: 200, line: 360, lineRule: 'auto' },
         children: [
-          new TextRun({ text: 'The software artifact is MIT-licensed and Zenodo-archived (doi: ', font: FONT, size: BODY_HP }),
-          new TextRun({ text: '__ZENODO_DOI__', font: FONT, size: BODY_HP, italics: true }),
+          new TextRun({ text: 'The software artifact is MIT-licensed and Zenodo-archived (DOI ', font: FONT, size: BODY_HP }),
+          new TextRun({ text: 'assigned upon archival', font: FONT, size: BODY_HP, italics: true }),
           new TextRun({ text: ') at the commit used to generate every figure. The repository at ', font: FONT, size: BODY_HP }),
           new TextRun({ text: 'github.com/strikerdlm/selectron', font: FONT, size: BODY_HP }),
           new TextRun({ text: ' contains the full source, the test suite (355+ vitest + 20 Playwright tests), the V&V dossier, and reproducibility instructions.', font: FONT, size: BODY_HP }),

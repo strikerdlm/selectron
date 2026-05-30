@@ -1,6 +1,6 @@
 **To:** The Editors, *Advances in Space Research*
 **From:** Diego L. Malpica, MD — Direction of Aerospace Medicine, Colombian Aerospace Force (FAC), Bogotá, Colombia
-**Re:** Manuscript submission — *Reproducible NASA Integrated Medical Model Mission-Risk Simulation with HSRB Likelihood × Consequence Mapping: A Bayesian MCDA Pipeline for Analog-Astronaut Selection*
+**Re:** Manuscript submission — *From Mission Medical Risk to Crew Selection: A Reproducible NASA-IMM and HSRB Pipeline for Analog Astronauts*
 
 Dear Editors,
 

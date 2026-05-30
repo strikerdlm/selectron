@@ -23,7 +23,7 @@
 ### Supplementary materials (peer-review R4, 2026-05-29)
 - [x] **S-Methods-1 / S-Methods-2 dossiers EXCLUDED** — stale; describe the retired `src/risk/` 12-condition engine and contradict the manuscript's V&V / 100 %-evidence-based claims. Banners added in-place; the manuscript body (§2.6) is the authoritative, self-contained V&V statement. Rewrite against the current IMM Calculator before any future inclusion.
 - [x] Broken `Figure S3 / S4` references removed from §3.6 (the data is in Tables 4 and 5 inline).
-- [ ] **Supplementary figures:** only `Figure S2` (per-mission ESS table, `figures/S2_ess_table.png`) is cited in the body (§3.5). `figures/S1_vv_dossier.png` is an orphan tied to the excluded V&V dossier — drop it and renumber the ESS table S2 → **S1** (sole supplementary figure) when the package is built, so the body reference and the shipped file agree.
+- [x] **Supplementary figures renumbered (R4, 2026-05-29):** the sole supplementary figure is **Figure S1** (per-mission ESS / convergence table, `figures/S1_ess_table.png`), cited in §3.5. The orphan `S1_vv_dossier.*` and its generator (`scripts/generate_s1_vv.ts`) were removed; the ESS generator is now `scripts/generate_s1_ess_table.ts`. **Build step:** regenerate `S1_ess_table.png` (the renamed file still carries the prior render) and add it to the upload set when packaging.
 
 ### Manuscript content checks
 - [x] Title ≤ ~150 characters
@@ -39,12 +39,15 @@
 - [x] Ethics statement: no human/animal subjects
 - [x] Life sciences content excluded (ASR scopes computational/PRA only)
 
+### docx rebuilt 2026-05-29 (R4)
+`make all` regenerated `submission/manuscript.docx` + `cover-letter.docx` from the current source. Verified in the rendered output: new title *"From Mission Medical Risk to Crew Selection: A Reproducible NASA-IMM and HSRB Pipeline for Analog Astronauts"*; matching running header; Tables 1–5; LTWA-abbreviated reference list with **no `note`-field leakage**; no `__COMMIT_SHA__` / `__ZENODO_DOI__` / old-title / un-narrowed-aircrew strings. Cover letter carries the new title, the narrowed novelty claim (cites Taylan 2024), "iterative calibration passes", and a "DOI assigned upon archival" placeholder.
+
 ### TODOs before final submission
-- [ ] Mint Zenodo DOI — replace `__ZENODO_DOI__` placeholder in manuscript + cover letter
-- [ ] Update `__COMMIT_SHA__` placeholder in manuscript (paper/manuscript.md)
-- [ ] Upload figures as SEPARATE files (not embedded in manuscript per ASR rules)
+- [ ] Mint Zenodo DOI + fill the figure-generation commit SHA — manuscript and cover letter now carry editorial placeholders (`[Zenodo DOI — assigned upon archival]` / "assigned upon archival"); replace with the real DOI/SHA at the submission commit.
+- [ ] Regenerate `figures/S1_ess_table.png` (renamed from S2; current file is the prior render) and upload it as the sole supplementary figure.
+- [ ] Upload figures as SEPARATE files (not embedded in manuscript per ASR rules) — staged in `submission/figures/`.
 - [ ] Complete Elsevier declarations tool → download competing-interests .docx
-- [ ] Abstract: verify it is ≤ 250 words with word counter
+- [x] Abstract ≤ 250 words — **241 words** (R4-verified).
 - [ ] Word count of main body: verify within reasonable range for methods paper
 - [ ] Note: ASR explicitly excludes life-sciences content → manuscript keeps computational/PRA framing ✓
 

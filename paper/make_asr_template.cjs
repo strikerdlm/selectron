@@ -131,7 +131,7 @@ const paragraphStyles = [
 ];
 
 // ── Header: running title (right-aligned) ─────────────────────────────────────
-const runningTitle = 'Bayesian MCDA + LxC for analog-astronaut selection';
+const runningTitle = 'Mission medical risk to analog-astronaut selection';
 const pageHeader = new Header({
   children: [
     new Paragraph({

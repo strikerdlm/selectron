@@ -1,5 +1,5 @@
 cff-version: 1.2.0
-title: "Selectron: A Bayesian Multi-Criteria Decision Engine with NASA HSRB Likelihood × Consequence Mapping and IMM Calculator for Analog-Astronaut Selection"
+title: "Selectron: From Mission Medical Risk to Crew Selection — A Reproducible NASA-IMM and HSRB Pipeline for Analog Astronauts"
 message: "If you use Selectron in academic work, please cite this software as below, plus the underlying NASA Integrated Medical Model papers listed in `references`."
 type: software
 authors:
