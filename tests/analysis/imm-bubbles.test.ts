@@ -38,6 +38,14 @@ describe("conditionRate", () => {
     expect(conditionRate(prior({ incidence: { distribution: "Beta-Bernoulli", alpha: 2, beta: 18 } } as Partial<IMMPrior>)))
       .toBeNull();
   });
+  it("returns null for per-EVA units even on Gamma-Poisson", () => {
+    expect(conditionRate(prior({ incidence: { distribution: "Gamma-Poisson", alpha: 2, beta: 7307, lambda_unit: "events-per-EVA" } } as Partial<IMMPrior>)))
+      .toBeNull();
+  });
+  it("Lognormal-Poisson λ = exp(μ + σ²/2)", () => {
+    expect(conditionRate(prior({ incidence: { distribution: "Lognormal-Poisson", mu_log_lambda: 0, sigma_log_lambda: 0 } } as Partial<IMMPrior>)))
+      .toBeCloseTo(365_000, 0);
+  });
 });
 
 describe("worstCaseSeverity", () => {

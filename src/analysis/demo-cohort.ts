@@ -6,10 +6,10 @@ import type { Candidate, Criterion } from "@/types";
 export const DEMO_SEED = 0xc0ffee;
 export const DEMO_N = 40;
 
-// LCG identical to TestFigureHost's, mapped to [0,1).
+// Numerical Recipes LCG (same constants as TestFigureHost), mapped to [0,1).
 function lcg(seed: number): () => number {
   let s = seed >>> 0;
-  return () => { s = (s * 1664525 + 1013904223) >>> 0; return s / 0xffffffff; };
+  return () => { s = (s * 1664525 + 1013904223) >>> 0; return s / 0x100000000; };
 }
 // Standard normal via Box-Muller.
 function gauss(rng: () => number): number {

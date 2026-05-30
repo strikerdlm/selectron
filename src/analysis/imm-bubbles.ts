@@ -5,9 +5,11 @@ import type { IMMPrior, IMMCondition, IMMConditionFamily } from "@/imm/types";
 
 const DAYS_PER_YEAR = 365;
 
-// Events per person-day → events per 1000 person-years. null for non-rate (per-event) priors.
 export function conditionRate(prior: IMMPrior): number | null {
   const inc = prior.incidence;
+  // Only per-person-day rates belong on the per-1000-PY axis. EVA/SPE per-event
+  // units and Beta-Bernoulli per-event probabilities are not per-person-time rates.
+  if (inc.lambda_unit && inc.lambda_unit !== "events-per-person-day") return null;
   let perDay: number;
   switch (inc.distribution) {
     case "Gamma-Poisson":
@@ -20,7 +22,7 @@ export function conditionRate(prior: IMMPrior): number | null {
       if (inc.lambda_fixed == null) return null;
       perDay = inc.lambda_fixed; break;
     default:
-      return null; // Beta-Bernoulli: per-EVA / per-SPE probability, not a per-person-time rate
+      return null; // Beta-Bernoulli: per-event probability, not a per-person-time rate
   }
   if (!(perDay > 0)) return null;
   return perDay * DAYS_PER_YEAR * 1000;
