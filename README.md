@@ -66,12 +66,27 @@ pip install -e ".[dev]"
 python -m selectron --dry-run   # 50 fast tests + 14 slow (PyMC NUTS + SA)
 ```
 
+**Windows (PowerShell):**
+```powershell
+cd python
+python -m venv .venv; .venv\Scripts\activate
+pip install -e ".[dev]"
+python -m selectron --dry-run
+```
+
 ### Python Calibration API (FastAPI, optional — required for Calibration browser view)
 
 ```bash
 cd python
 source .venv/bin/activate
 uvicorn api.main:app --reload --port 8000   # http://localhost:8000/health
+```
+
+**Windows (PowerShell):**
+```powershell
+cd python
+.venv\Scripts\activate
+python -m uvicorn api.main:app --reload --port 8000   # http://localhost:8000/health
 ```
 
 The Calibration tab in the browser UI connects to `http://localhost:8000` by default. Override with the `VITE_CALIBRATION_API_URL` environment variable. If the API is not running, the Conditions panel shows a graceful error message; the rest of the app is fully offline-first via Dexie.
@@ -349,6 +364,13 @@ The TypeScript API client (`src/api/calibration.ts`) is the **sole HTTP boundary
 cd python
 source .venv/bin/activate
 uvicorn api.main:app --reload --port 8000
+```
+
+**Windows (PowerShell):**
+```powershell
+cd python
+.venv\Scripts\activate
+python -m uvicorn api.main:app --reload --port 8000
 ```
 
 CORS is pre-configured for the Vite dev server (`:5173`) and preview (`:4173`).
