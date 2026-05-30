@@ -89,3 +89,21 @@ describe("VulnerabilityCouplingHeatmap", () => {
     expect(container.textContent).toContain("Figure A5");
   });
 });
+
+import { Analysis } from "@/ui/views/Analysis";
+
+vi.mock("@/db/repository", () => ({
+  listCandidates: async () => [],
+  listCriterionEntries: async () => [],
+}));
+
+describe("Analysis view", () => {
+  it("renders all five figure panels with the demo cohort fallback", async () => {
+    const { container, findByText } = wrap(<Analysis />);
+    expect(await findByText(/Figure A1/)).toBeTruthy();
+    for (const id of ["A2", "A3", "A4", "A5"]) {
+      expect(container.textContent).toContain(`Figure ${id}`);
+    }
+    expect(container.textContent).toContain("demo cohort");
+  });
+});
