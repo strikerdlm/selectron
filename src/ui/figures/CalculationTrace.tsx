@@ -47,7 +47,7 @@ function TraceStepCard({ step, last }: { step: TraceStep; last: boolean }) {
           >
             {step.n}
           </span>
-          <h4 className="display text-base text-ink-0 leading-tight">{step.title}</h4>
+          <h4 className="display text-[16px] text-ink-0 leading-tight">{step.title}</h4>
         </div>
 
         {/* EQUATION — scientific notation, monospace */}
@@ -75,7 +75,7 @@ function TraceStepCard({ step, last }: { step: TraceStep; last: boolean }) {
             in plain English
           </span>
         </div>
-        <p className="text-sm text-ink-1 leading-relaxed pl-3 mt-1">{step.lay}</p>
+        <p className="text-[14px] text-ink-1 leading-relaxed pl-3 mt-1">{step.lay}</p>
 
         {/* CITATION */}
         <div className="mt-4 pt-3 border-t border-line/40 mono text-[10px] text-ink-3">
@@ -256,15 +256,15 @@ function TraceShell({
   const headerInner = (
     <>
       <div className="flex items-baseline justify-between gap-3">
-        <h3 className="display text-lg text-ink-0 flex items-center gap-2">
+        <h3 className="display text-[18px] text-ink-0 flex items-center gap-2">
           {collapsible && (
-            <span className="mono text-signal text-sm" aria-hidden>{expanded ? "▾" : "▸"}</span>
+            <span className="mono text-signal text-[14px]" aria-hidden>{expanded ? "▾" : "▸"}</span>
           )}
           {title}
         </h3>
         <div className="flex items-center gap-2">{badges}</div>
       </div>
-      <p className="text-sm text-ink-1 mt-2 leading-relaxed">
+      <p className="text-[14px] text-ink-1 mt-2 leading-relaxed">
         {expanded ? (
           intro
         ) : (
