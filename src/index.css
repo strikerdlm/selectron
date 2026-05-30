@@ -6,28 +6,49 @@
 @tailwind utilities;
 
 :root {
-  --bg-0: #08090a;
-  --bg-1: #0c0d0f;
-  --bg-2: #131517;
-  --line: #1f2226;
-  --line-2: #2a2e34;
-  --ink-0: #f0f4fa;
-  --ink-1: #d8dde4;
-  --ink-2: #b0b6bd;
-  --ink-3: #8a8f96;
-  --signal: #f5b541;
-  --signal-dim: #f5b54122;
-  --signal-bright: #ffd479;
-  --go: #56d6a0;
-  --warn: #ff6b5e;
+  --bg-0: 8 9 10;
+  --bg-1: 12 13 15;
+  --bg-2: 19 21 23;
+  --line: 31 34 38;
+  --line-2: 42 46 52;
+  --ink-0: 240 244 250;
+  --ink-1: 216 221 228;
+  --ink-2: 176 182 189;
+  --ink-3: 138 143 150;
+  --signal: 245 181 65;
+  --signal-bright: 255 212 121;
+  --go: 86 214 160;
+  --warn: 255 107 94;
+  --grid-dot: 255 255 255;
+  --signal-dim: rgb(245 181 65 / 0.13);
 
   color-scheme: dark;
 }
 
+:root[data-theme="light"] {
+  --bg-0: 247 248 250;
+  --bg-1: 255 255 255;
+  --bg-2: 238 241 245;
+  --line: 216 222 230;
+  --line-2: 195 204 214;
+  --ink-0: 12 15 20;
+  --ink-1: 43 50 60;
+  --ink-2: 86 95 107;
+  --ink-3: 107 116 128;
+  --signal: 176 111 0;
+  --signal-bright: 217 138 19;
+  --go: 15 122 82;
+  --warn: 194 56 31;
+  --grid-dot: 12 15 20;
+  --signal-dim: rgb(176 111 0 / 0.13);
+
+  color-scheme: light;
+}
+
 @layer base {
   html, body {
-    background-color: var(--bg-0);
-    color: var(--ink-0);
+    background-color: rgb(var(--bg-0));
+    color: rgb(var(--ink-0));
     font-family: 'Recursive', system-ui, sans-serif;
     font-variation-settings: 'MONO' 0, 'CASL' 0, 'wght' 380, 'slnt' 0, 'CRSV' 0;
     font-feature-settings: 'ss01', 'ss02', 'ss12';
@@ -37,15 +58,15 @@
 
   body {
     background-image:
-      radial-gradient(rgba(255, 255, 255, 0.04) 1px, transparent 1px);
+      radial-gradient(rgb(var(--grid-dot) / 0.04) 1px, transparent 1px);
     background-size: 18px 18px;
     background-position: 0 0;
     min-height: 100vh;
   }
 
   ::selection {
-    background-color: var(--signal);
-    color: var(--bg-0);
+    background-color: rgb(var(--signal));
+    color: rgb(var(--bg-0));
   }
 }
 
@@ -66,17 +87,17 @@
     text-transform: uppercase;
     letter-spacing: 0.14em;
     font-size: 10px;
-    color: var(--ink-2);
+    color: rgb(var(--ink-2));
   }
 
   .hairline {
     height: 1px;
-    background: linear-gradient(90deg, transparent, var(--line-2), transparent);
+    background: linear-gradient(90deg, transparent, rgb(var(--line-2)), transparent);
   }
 
   .panel {
-    background-color: var(--bg-1);
-    border: 1px solid var(--line);
+    background-color: rgb(var(--bg-1));
+    border: 1px solid rgb(var(--line));
     position: relative;
   }
 
@@ -85,7 +106,7 @@
     position: absolute;
     width: 8px;
     height: 8px;
-    border: 1px solid var(--ink-3);
+    border: 1px solid rgb(var(--ink-3));
   }
   .panel::before { top: -1px; left: -1px; border-right: none; border-bottom: none; }
   .panel::after { bottom: -1px; right: -1px; border-left: none; border-top: none; }
@@ -94,8 +115,8 @@
     width: 6px;
     height: 6px;
     border-radius: 999px;
-    background: var(--go);
-    box-shadow: 0 0 0 0 var(--go);
+    background: rgb(var(--go));
+    box-shadow: 0 0 0 0 rgb(var(--go));
     animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
   }
 
@@ -111,12 +132,12 @@
   }
   input[type="range"].instrument::-webkit-slider-runnable-track {
     height: 1px;
-    background: var(--line-2);
+    background: rgb(var(--line-2));
     border: 0;
   }
   input[type="range"].instrument::-moz-range-track {
     height: 1px;
-    background: var(--line-2);
+    background: rgb(var(--line-2));
     border: 0;
   }
   input[type="range"].instrument::-webkit-slider-thumb {
@@ -125,34 +146,34 @@
     height: 14px;
     width: 14px;
     border-radius: 999px;
-    background: var(--signal);
-    border: 2px solid var(--bg-0);
+    background: rgb(var(--signal));
+    border: 2px solid rgb(var(--bg-0));
     margin-top: -7px;
-    box-shadow: 0 0 0 1px var(--signal), 0 0 12px var(--signal-dim);
+    box-shadow: 0 0 0 1px rgb(var(--signal)), 0 0 12px var(--signal-dim);
     transition: box-shadow 120ms ease;
   }
   input[type="range"].instrument::-moz-range-thumb {
     height: 14px;
     width: 14px;
     border-radius: 999px;
-    background: var(--signal);
-    border: 2px solid var(--bg-0);
-    box-shadow: 0 0 0 1px var(--signal), 0 0 12px var(--signal-dim);
+    background: rgb(var(--signal));
+    border: 2px solid rgb(var(--bg-0));
+    box-shadow: 0 0 0 1px rgb(var(--signal)), 0 0 12px var(--signal-dim);
     transition: box-shadow 120ms ease;
   }
   input[type="range"].instrument:hover::-webkit-slider-thumb,
   input[type="range"].instrument:focus::-webkit-slider-thumb {
-    box-shadow: 0 0 0 1px var(--signal), 0 0 24px var(--signal);
+    box-shadow: 0 0 0 1px rgb(var(--signal)), 0 0 24px rgb(var(--signal));
   }
   input[type="range"].instrument:hover::-moz-range-thumb,
   input[type="range"].instrument:focus::-moz-range-thumb {
-    box-shadow: 0 0 0 1px var(--signal), 0 0 24px var(--signal);
+    box-shadow: 0 0 0 1px rgb(var(--signal)), 0 0 24px rgb(var(--signal));
   }
 }
 
 @keyframes pulse {
   0%, 100% {
-    box-shadow: 0 0 0 0 var(--go);
+    box-shadow: 0 0 0 0 rgb(var(--go));
     opacity: 1;
   }
   50% {
