@@ -222,6 +222,14 @@ describe("conditionRate", () => {
     expect(conditionRate(prior({ incidence: { distribution: "Beta-Bernoulli", alpha: 2, beta: 18 } } as Partial<IMMPrior>)))
       .toBeNull();
   });
+  it("returns null for per-EVA units even on Gamma-Poisson", () => {
+    expect(conditionRate(prior({ incidence: { distribution: "Gamma-Poisson", alpha: 2, beta: 7307, lambda_unit: "events-per-EVA" } } as Partial<IMMPrior>)))
+      .toBeNull();
+  });
+  it("Lognormal-Poisson λ = exp(μ + σ²/2)", () => {
+    expect(conditionRate(prior({ incidence: { distribution: "Lognormal-Poisson", mu_log_lambda: 0, sigma_log_lambda: 0 } } as Partial<IMMPrior>)))
+      .toBeCloseTo(365_000, 0);
+  });
 });
 
 describe("worstCaseSeverity", () => {
@@ -283,6 +291,9 @@ const DAYS_PER_YEAR = 365;
 // Events per person-day → events per 1000 person-years. null for non-rate (per-event) priors.
 export function conditionRate(prior: IMMPrior): number | null {
   const inc = prior.incidence;
+  // Only per-person-day rates belong on the per-1000-PY axis. EVA/SPE per-event
+  // units and Beta-Bernoulli per-event probabilities are not per-person-time rates.
+  if (inc.lambda_unit && inc.lambda_unit !== "events-per-person-day") return null;
   let perDay: number;
   switch (inc.distribution) {
     case "Gamma-Poisson":
@@ -566,10 +577,10 @@ import type { Candidate, Criterion } from "@/types";
 export const DEMO_SEED = 0xc0ffee;
 export const DEMO_N = 40;
 
-// LCG identical to TestFigureHost's, mapped to [0,1).
+// Numerical Recipes LCG (same constants as TestFigureHost), mapped to [0,1).
 function lcg(seed: number): () => number {
   let s = seed >>> 0;
-  return () => { s = (s * 1664525 + 1013904223) >>> 0; return s / 0xffffffff; };
+  return () => { s = (s * 1664525 + 1013904223) >>> 0; return s / 0x100000000; };
 }
 // Standard normal via Box-Muller.
 function gauss(rng: () => number): number {
@@ -674,13 +685,13 @@ Replace the existing `:root { … }` block (lines ~8–25) with:
   --ink-0: 12 15 20;
   --ink-1: 43 50 60;
   --ink-2: 86 95 107;
-  --ink-3: 107 116 128;
-  --signal: 176 111 0;
-  --signal-bright: 217 138 19;
+  --ink-3: 100 108 119;
+  --signal: 165 104 0;
+  --signal-bright: 205 131 18;
   --go: 15 122 82;
   --warn: 194 56 31;
   --grid-dot: 12 15 20;
-  --signal-dim: rgb(176 111 0 / 0.13);
+  --signal-dim: rgb(165 104 0 / 0.13);
 
   color-scheme: light;
 }
@@ -773,10 +784,10 @@ fontSize: {
 
 - [ ] **Step 2: Bump hard-coded `text-[Npx]` literals +2px (ordered, largest→smallest)**
 
-Run exactly (descending order prevents a freshly-bumped token from being re-matched):
+Run exactly (descending order prevents a freshly-bumped token from being re-matched). **Exclude `src/ui/figures/`** — those components render the locked manuscript figures (F1–F7) and must stay byte-identical (spec §3 N2 / §6); they are deliberately left out of the +2pt bump:
 
 ```bash
-grep -rlE 'text-\[(8|9|10|11|12|13|14|16)px\]' src --include='*.tsx' | xargs sed -i \
+grep -rlE 'text-\[(8|9|10|11|12|13|14|16)px\]' src --include='*.tsx' | grep -v '/ui/figures/' | xargs sed -i \
   -e 's/text-\[16px\]/text-[18px]/g' \
   -e 's/text-\[14px\]/text-[16px]/g' \
   -e 's/text-\[13px\]/text-[15px]/g' \
@@ -1001,7 +1012,7 @@ import { echarts } from "./echarts-base";
 
 const OKABE_ITO = ["#0072B2","#E69F00","#009E73","#CC79A7","#56B4E9","#D55E00","#F0E442","#FFFFFF"];
 const MONO = "'JetBrains Mono','Fira Mono',monospace";
-const SANS = "'Inter',system-ui,-apple-system,sans-serif";
+const SANS = "'Recursive',system-ui,sans-serif"; // loaded app font (Inter is not bundled)
 
 echarts.registerTheme("selectron-dark", {
   color: OKABE_ITO,
