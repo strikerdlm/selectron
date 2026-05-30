@@ -18,6 +18,37 @@ RHAT_THRESHOLD = 1.01
 ESS_BULK_THRESHOLD = 400
 ESS_TAIL_THRESHOLD = 400
 
+# Weakly-informative base prior the fitter fits FROM (Diego 2026-05-29).
+#
+# CRITICAL: the fit is conjugate Gamma-Poisson, so the posterior is
+# Gamma(alpha_0 + Σevents, beta_0 + Σperson_days). Earlier the fitter read
+# alpha_0/beta_0 from incidence.alpha/beta — i.e. the *fitted posterior* — so
+# every re-run re-applied the evidence on top of the previous fit and
+# double-counted it (depression alpha 29.67 -> 55.55 on a second run). Fitting
+# from a FIXED base instead makes re-runs idempotent and the posteriors
+# reproducible from (base + evidence).
+#
+# alpha=1, beta=1 is one pseudo-event over one pseudo-person-day — negligible
+# against the real evidence (Σperson_days ranges ~7e3 .. ~6e12), so the
+# posterior is evidence-driven. A condition may override this with an explicit
+# incidence.prior_alpha / incidence.prior_beta.
+BASE_PRIOR_ALPHA = 1.0
+BASE_PRIOR_BETA = 1.0
+
+
+def base_prior_for(incidence: dict[str, Any]) -> tuple[float, float]:
+    """Return the (alpha_0, beta_0) base prior the fitter should fit FROM.
+
+    Uses an explicit per-condition base (``incidence.prior_alpha`` /
+    ``prior_beta``) when present, else the fixed weakly-informative default.
+    NEVER returns the live ``incidence.alpha`` / ``incidence.beta`` — those are
+    the fitted posterior, and fitting from them double-counts the evidence.
+    """
+    return (
+        float(incidence.get("prior_alpha", BASE_PRIOR_ALPHA)),
+        float(incidence.get("prior_beta", BASE_PRIOR_BETA)),
+    )
+
 
 @dataclass
 class FitResult:
@@ -223,8 +254,9 @@ def fit_all_tier_b(
             {"person_days": r["person_days"], "events": r["events"]}
             for r in obs_rows
         ]
-        alpha_0 = prior["incidence"]["alpha"]
-        beta_0 = prior["incidence"]["beta"]
+        # Fit FROM the fixed weakly-informative base — never the live posterior
+        # (incidence.alpha/beta), which would double-count the evidence on re-run.
+        alpha_0, beta_0 = base_prior_for(prior["incidence"])
 
         logger.info("Fitting %s: %d observations, alpha_0=%.2f, beta_0=%.2f",
                      cond_id, len(observations), alpha_0, beta_0)
@@ -308,8 +340,9 @@ def fit_all_tier_c(
             {"person_days": r["person_days"], "events": r["events"]}
             for r in obs_rows
         ]
-        alpha_0 = prior["incidence"]["alpha"]
-        beta_0 = prior["incidence"]["beta"]
+        # Fit FROM the fixed weakly-informative base — never the live posterior
+        # (incidence.alpha/beta), which would double-count the evidence on re-run.
+        alpha_0, beta_0 = base_prior_for(prior["incidence"])
 
         logger.info("Fitting %s: %d observations, alpha_0=%.2f, beta_0=%.2f",
                      cond_id, len(observations), alpha_0, beta_0)

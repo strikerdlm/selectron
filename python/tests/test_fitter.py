@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import json
 from typing import Any
 
 import numpy as np
@@ -13,7 +14,95 @@ from selectron.fitter import (
     check_convergence,
     fit_all_tier_b,
     BatchFitReport,
+    base_prior_for,
+    BASE_PRIOR_ALPHA,
+    BASE_PRIOR_BETA,
 )
+from selectron.writer import merge_fitted_priors
+
+
+def _fit_result(cid: str, alpha: float, beta: float) -> FitResult:
+    """A minimal FitResult for merge tests (other values irrelevant here)."""
+    return FitResult(
+        condition_id=cid,
+        posterior_alpha=alpha,
+        posterior_beta=beta,
+        posterior_lambda_mean=alpha / beta,
+        posterior_lambda_sd=1e-5,
+        r_hat=1.0,
+        ess_bulk=3000.0,
+        ess_tail=3000.0,
+        divergences=0,
+        n_studies=3,
+        total_person_days=185675,
+        total_events=27,
+    )
+
+
+class TestBasePriorIdempotency:
+    """Regression for the non-idempotent-fitter bug (Diego 2026-05-29).
+
+    The fit is conjugate Gamma-Poisson: posterior = Gamma(alpha_0 + Σevents,
+    beta_0 + Σperson_days). The fitter previously read alpha_0/beta_0 from
+    incidence.alpha/beta — the *fitted posterior* — so a second fit re-applied
+    the evidence and double-counted it (depression alpha 29.67 -> 55.55).
+    base_prior_for() must always return the fixed base, never the live posterior.
+    """
+
+    def test_base_prior_is_default_not_posterior(self) -> None:
+        inc = {"distribution": "Gamma-Poisson", "alpha": 55.55, "beta": 378240.0}
+        assert base_prior_for(inc) == (BASE_PRIOR_ALPHA, BASE_PRIOR_BETA)
+        assert base_prior_for(inc) != (inc["alpha"], inc["beta"])
+
+    def test_base_prior_honors_explicit_override(self) -> None:
+        inc = {
+            "distribution": "Gamma-Poisson",
+            "alpha": 55.55,
+            "beta": 378240.0,
+            "prior_alpha": 2.0,
+            "prior_beta": 5000.0,
+        }
+        assert base_prior_for(inc) == (2.0, 5000.0)
+
+    def test_merge_then_refit_does_not_double_count(self, tmp_path) -> None:
+        """fit -> merge -> (would-be) refit: the base is unchanged after merge."""
+        priors_path = tmp_path / "imm-priors.json"
+        priors_path.write_text(
+            json.dumps(
+                {
+                    "schema_version": 1,
+                    "conditions": {
+                        "demo": {
+                            "provenance": "tierB-lit",
+                            "source_ref": "fixture",
+                            "incidence": {
+                                "distribution": "Gamma-Poisson",
+                                "alpha": 2.0,
+                                "beta": 1000.0,
+                            },
+                        }
+                    },
+                }
+            )
+        )
+
+        inc_before = json.loads(priors_path.read_text())["conditions"]["demo"]["incidence"]
+        base_before = base_prior_for(inc_before)
+
+        # Run 1: merge a fitted posterior into the file.
+        merge_fitted_priors(
+            fitted={"demo": _fit_result("demo", alpha=55.5, beta=378240.0)},
+            priors_path=priors_path,
+        )
+
+        inc_after = json.loads(priors_path.read_text())["conditions"]["demo"]["incidence"]
+        # The posterior was written...
+        assert inc_after["alpha"] == 55.5
+        assert inc_after["beta"] == 378240.0
+        # ...but a Run-2 refit still fits FROM the fixed base, not the merged
+        # posterior, so the evidence is NOT double-counted on re-run.
+        assert base_prior_for(inc_after) == base_before
+        assert base_prior_for(inc_after) != (inc_after["alpha"], inc_after["beta"])
 
 
 class TestFitGammaPoisson:
