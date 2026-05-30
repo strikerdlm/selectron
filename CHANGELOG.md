@@ -42,15 +42,14 @@ are byte-identical. Spec/plan: `docs/superpowers/{specs,plans}/2026-05-30-select
   `src/ui/figures/` are deliberately excluded so the manuscript figures (F3/F4/F6/F7,
   generated from those components) stay reproducible at their original scale.
 
-### Notes / caveat
-- The +2px scale is global to *named* Tailwind text classes, which the paper-figure
-  components use, so regenerating the manuscript figures via
-  `tests/e2e/paper-figures.spec.ts` would render them at +2pt. The committed
-  `paper/figures/*.png` and `manuscript.docx` are untouched, so the in-submission
-  manuscript is unaffected. To reproduce the exact submitted figures, regenerate at
-  commit ≤ `776e225` (pre-bump) or wrap the `?testFigure=` render path in an
-  original-scale reset (`.paper-figure-scope`). Open author decision: whether the
-  figures should also adopt the +2pt scale.
+### Notes
+- The +2pt scale applies to live-app chrome only. The three paper-figure components
+  (`CalculationTrace`, `PaperF6IMM`, `PaperF7IMM`) have **both** their `text-[Npx]`
+  literals (`6cf24cb`) and their named text classes (`52c0747`) pinned to original sizes,
+  so regenerating the manuscript figures (F4/F6/F7) via `tests/e2e/paper-figures.spec.ts`
+  reproduces them at their original scale; the committed `paper/figures/*.png` and
+  `manuscript.docx` are byte-identical. (Optional author choice: if the figures themselves
+  should adopt +2pt, unpin those literals and regenerate intentionally.)
 
 ## [0.5.6] — 2026-05-29 — UI / UX hardening + interaction bug-fixes
 
