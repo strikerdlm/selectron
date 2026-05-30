@@ -21,7 +21,7 @@
 import ReactEChartsCore from "echarts-for-react/lib/core";
 import type { CustomSeriesRenderItemAPI } from "echarts";
 import { echarts } from "./echarts-base";
-import { NATURE_THEME_NAME } from "./theme";
+import { useFigureTheme } from "./useFigureTheme";
 import type { Condition, ConditionFamily, RiskPosterior } from "@/types/risk";
 import { FigureCaption } from "./FigureCaption";
 import { f3Caption } from "./captions/F3.captions";
@@ -46,60 +46,62 @@ type Props = {
 
 const days = (x: number) => x.toFixed(2) + "d";
 
-// CI band renderItem — a thin vertical line with end-caps at a given x position
-// on the value axis. Used to render CI90 uncertainty per stacked segment.
+// CI band renderItem factory — returns a renderItem function for CI90 uncertainty
+// whiskers. Accepts markerStroke so the overlay adapts to light/dark themes.
 // Receives [xLo, xHi] as values 0,1 to draw the whisker span.
-function ciWhiskerRenderItem(
-  _params: unknown,
-  api: CustomSeriesRenderItemAPI,
-) {
-  const xLo = api.value(0) as number;
-  const xHi = api.value(1) as number;
+function makeCiWhiskerRenderItem(markerStroke: string) {
+  return function ciWhiskerRenderItem(
+    _params: unknown,
+    api: CustomSeriesRenderItemAPI,
+  ) {
+    const xLo = api.value(0) as number;
+    const xHi = api.value(1) as number;
 
-  // coord([xValue, yCategory]) — our single category row is index 0
-  const loCoord = api.coord([xLo, 0]);
-  const hiCoord = api.coord([xHi, 0]);
+    // coord([xValue, yCategory]) — our single category row is index 0
+    const loCoord = api.coord([xLo, 0]);
+    const hiCoord = api.coord([xHi, 0]);
 
-  // Vertical cap half-height (pixels)
-  const capHalf = 5;
+    // Vertical cap half-height (pixels)
+    const capHalf = 5;
 
-  return {
-    type: "group",
-    children: [
-      // Horizontal span bar (the CI band)
-      {
-        type: "rect",
-        shape: {
-          x:      loCoord[0],
-          y:      loCoord[1] - capHalf,
-          width:  Math.max(hiCoord[0] - loCoord[0], 0),
-          height: capHalf * 2,
+    return {
+      type: "group",
+      children: [
+        // Horizontal span bar (the CI band)
+        {
+          type: "rect",
+          shape: {
+            x:      loCoord[0],
+            y:      loCoord[1] - capHalf,
+            width:  Math.max(hiCoord[0] - loCoord[0], 0),
+            height: capHalf * 2,
+          },
+          style: {
+            fill: `${markerStroke}26`,   // 15% opacity
+            stroke: `${markerStroke}66`, // 40% opacity
+            lineWidth: 1,
+          },
         },
-        style: {
-          fill: "rgba(255,255,255,0.15)",
-          stroke: "rgba(255,255,255,0.40)",
-          lineWidth: 1,
+        // Left cap
+        {
+          type: "line",
+          shape: {
+            x1: loCoord[0], y1: loCoord[1] - capHalf,
+            x2: loCoord[0], y2: loCoord[1] + capHalf,
+          },
+          style: { lineWidth: 1.5, stroke: `${markerStroke}8c` }, // 55% opacity
         },
-      },
-      // Left cap
-      {
-        type: "line",
-        shape: {
-          x1: loCoord[0], y1: loCoord[1] - capHalf,
-          x2: loCoord[0], y2: loCoord[1] + capHalf,
+        // Right cap
+        {
+          type: "line",
+          shape: {
+            x1: hiCoord[0], y1: hiCoord[1] - capHalf,
+            x2: hiCoord[0], y2: hiCoord[1] + capHalf,
+          },
+          style: { lineWidth: 1.5, stroke: `${markerStroke}8c` }, // 55% opacity
         },
-        style: { lineWidth: 1.5, stroke: "rgba(255,255,255,0.55)" },
-      },
-      // Right cap
-      {
-        type: "line",
-        shape: {
-          x1: hiCoord[0], y1: hiCoord[1] - capHalf,
-          x2: hiCoord[0], y2: hiCoord[1] + capHalf,
-        },
-        style: { lineWidth: 1.5, stroke: "rgba(255,255,255,0.55)" },
-      },
-    ],
+      ],
+    };
   };
 }
 
@@ -111,6 +113,7 @@ export function ConditionContribution({
   missionId = "—",
   priorsVersion = "synthetic-iter3-ui-scaffold",
 }: Props) {
+  const { themeName, tokens } = useFigureTheme();
   // Build and sort entries descending by mean QTL.
   const entries = conditions
     .map((c) => {
@@ -171,7 +174,7 @@ export function ConditionContribution({
   const whiskerSeries = {
     name:        "CI₉₀",
     type:        "custom" as const,
-    renderItem:  ciWhiskerRenderItem,
+    renderItem:  makeCiWhiskerRenderItem(tokens.markerStroke),
     data:        ciWhiskerData,
     encode:      { x: [0, 1], y: 0 },
     z:           8,
@@ -193,12 +196,12 @@ export function ConditionContribution({
 
     tooltip: {
       trigger:    "item",
-      backgroundColor: "#0c0d0f",
-      borderColor: "#2a2e34",
+      backgroundColor: tokens.tooltipBg,
+      borderColor: tokens.axisLine,
       borderWidth: 1,
       padding:    [8, 12],
       textStyle: {
-        color:      "#f9fafb",
+        color:      tokens.tooltipText,
         fontFamily: "'JetBrains Mono', 'Fira Mono', monospace",
         fontSize:   11,
       },
@@ -236,7 +239,7 @@ export function ConditionContribution({
           <ReactEChartsCore
             echarts={echarts}
             option={option}
-            theme={NATURE_THEME_NAME}
+            theme={themeName}
             style={{ height: 80, width: "100%" }}
             notMerge
           />

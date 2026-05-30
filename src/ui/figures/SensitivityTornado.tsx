@@ -1,6 +1,6 @@
 import { useEffect, useRef } from "react";
 import { echarts } from "./echarts-base";
-import { NATURE_THEME_NAME } from "./theme";
+import { useFigureTheme } from "./useFigureTheme";
 import type { SensitivityIndex } from "@/api/calibration";
 
 interface SensitivityTornadoProps {
@@ -14,12 +14,13 @@ function truncate(s: string, max: number): string {
 }
 
 export function SensitivityTornado({ indices, method, topN }: SensitivityTornadoProps) {
+  const { themeName } = useFigureTheme();
   const chartRef = useRef<HTMLDivElement>(null);
   const instanceRef = useRef<ReturnType<typeof echarts.init> | null>(null);
 
   useEffect(() => {
     if (!chartRef.current) return;
-    const chart = echarts.init(chartRef.current, NATURE_THEME_NAME);
+    const chart = echarts.init(chartRef.current, themeName);
     instanceRef.current = chart;
 
     const sorted = [...indices]
@@ -99,7 +100,7 @@ export function SensitivityTornado({ indices, method, topN }: SensitivityTornado
       window.removeEventListener("resize", onResize);
       chart.dispose();
     };
-  }, [indices, method, topN]);
+  }, [indices, method, topN, themeName]);
 
   const height = Math.max(300, topN * 40);
 

@@ -20,7 +20,7 @@
 import { useState } from "react";
 import ReactEChartsCore from "echarts-for-react/lib/core";
 import { echarts } from "./echarts-base";
-import { NATURE_THEME_NAME } from "./theme";
+import { useFigureTheme } from "./useFigureTheme";
 import { FigureCaption } from "./FigureCaption";
 import { IMM_CONDITIONS } from "../../imm/conditions";
 import type { IMMOutcome, IMMConditionFamily } from "../../imm/types";
@@ -81,6 +81,7 @@ export function IMMConditionDrivers({
   mission,
   topN = 15,
 }: IMMConditionDriversProps) {
+  const { themeName, tokens } = useFigureTheme();
   const [metric, setMetric] = useState<Metric>("pEvac");
 
   const drivers = outcome.perConditionDrivers ?? [];
@@ -140,7 +141,7 @@ export function IMMConditionDrivers({
 
   const dotData = entries.map((e, i) => ({
     value: [e.value, i],
-    itemStyle: { color: e.color, borderColor: "#ffffff", borderWidth: 1 },
+    itemStyle: { color: e.color, borderColor: tokens.markerStroke, borderWidth: 1 },
   }));
 
   const option = {
@@ -158,12 +159,12 @@ export function IMMConditionDrivers({
 
     tooltip: {
       trigger: "item" as const,
-      backgroundColor: "#0c0d0f",
-      borderColor: "#2a2e34",
+      backgroundColor: tokens.tooltipBg,
+      borderColor: tokens.axisLine,
       borderWidth: 1,
       padding: [8, 12],
       textStyle: {
-        color: "#f9fafb",
+        color: tokens.tooltipText,
         fontFamily: "'JetBrains Mono', 'Fira Mono', monospace",
         fontSize: 11,
       },
@@ -288,7 +289,7 @@ export function IMMConditionDrivers({
         <ReactEChartsCore
           echarts={echarts}
           option={option}
-          theme={NATURE_THEME_NAME}
+          theme={themeName}
           style={{ height: Math.max(220, 28 * shownCount + 80), width: "100%" }}
           notMerge
         />
