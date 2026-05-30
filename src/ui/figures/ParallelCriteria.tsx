@@ -24,7 +24,10 @@ export function ParallelCriteria({ cohort, criteria, isDemo }: Props) {
   }));
   const data = cohort.map((cand) => {
     const row = criteria.map((c) => cand.scores[c.id] ?? c.scale.min);
-    const z = criteria.map((c) => normalizeScore(cand.scores[c.id] ?? c.scale.min, c.scale, c.higherIsBetter));
+    const z = criteria.map((c) => {
+      const raw = Math.min(c.scale.max, Math.max(c.scale.min, cand.scores[c.id] ?? c.scale.min));
+      return normalizeScore(raw, c.scale, c.higherIsBetter);
+    });
     const total = z.reduce((s, v) => s + v, 0) / z.length;
     return [...row, total];
   });

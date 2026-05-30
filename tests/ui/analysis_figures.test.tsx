@@ -28,6 +28,13 @@ describe("ParallelCriteria", () => {
     const { container } = wrap(<ParallelCriteria cohort={cohort.slice(0, 1)} criteria={PLACEHOLDER_CRITERIA} isDemo />);
     expect(container.textContent).toContain("need ≥2 candidates");
   });
+  it("does not throw when a score exceeds the criterion scale", () => {
+    const bad: typeof cohort = [
+      { id: "oor", alias: "OOR", scores: Object.fromEntries(PLACEHOLDER_CRITERIA.map((c) => [c.id, c.scale.max + 999])) },
+      ...cohort.slice(0, 2),
+    ];
+    expect(() => wrap(<ParallelCriteria cohort={bad} criteria={PLACEHOLDER_CRITERIA} isDemo />)).not.toThrow();
+  });
 });
 
 import { RiskBubbleScatter } from "@/ui/figures/RiskBubbleScatter";

@@ -34,6 +34,7 @@ export function CriteriaSplom({ cohort, criteria, isDemo }: Props) {
       if (r === c) {
         title.push({ left: `${left + span * 0.39}%`, top: `${top + span * 0.3}%`, textAlign: "center", text: cols[r].label.split(/[ (]/)[0], textStyle: { color: tokens.label, fontSize: 11, fontWeight: "normal" } });
       } else {
+        // idx serves triple duty here: grid index, xAxisIndex, and yAxisIndex are all aligned 1:1.
         series.push({
           type: "scatter", xAxisIndex: idx, yAxisIndex: idx, symbolSize: 4,
           data: cohort.map((_, k) => [vectors[c][k], vectors[r][k]]),
@@ -46,7 +47,7 @@ export function CriteriaSplom({ cohort, criteria, isDemo }: Props) {
   return (
     <>
       <ReactEChartsCore echarts={echarts} option={option} theme={themeName} style={{ height: 500, width: "100%" }} notMerge />
-      <FigureCaption block={analysisCaptions.splom({ n: cohort.length, isDemo, ids: cols.map((c) => c.label.split(/[ (]/)[0]) })} />
+      <FigureCaption block={analysisCaptions.splom({ n: cohort.length, isDemo, ids: cols.map((c) => c.label.split(/[ (]/)[0]), k: criteria.length })} />
     </>
   );
 }

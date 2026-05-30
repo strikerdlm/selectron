@@ -35,7 +35,7 @@ export function RiskBubbleScatter({ points, excluded, missionDays }: Props) {
       backgroundColor: tokens.tooltipBg, borderColor: tokens.axisLine,
       textStyle: { color: tokens.tooltipText, fontSize: 12 },
       formatter: (p: { data: { name: string; value: number[] } }) =>
-        `<b>${p.data.name}</b><br/>rate ${p.data.value[0].toFixed(1)} / 1000·PY` +
+        `<b>${p.data.name}</b><br/>rate ${p.data.value[0] >= 1 ? p.data.value[0].toFixed(1) : p.data.value[0].toPrecision(2)} / 1000·PY` +
         `<br/>severity ${(p.data.value[1] * 100).toFixed(1)}%` +
         `<br/>contribution ${p.data.value[2].toExponential(2)}`,
     },

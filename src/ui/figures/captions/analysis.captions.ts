@@ -21,10 +21,10 @@ export const analysisCaptions = {
     source: "src/data/imm-priors.json (34 tierA-nasa + 66 tierB-pymc) joined with src/imm/conditions.ts.",
     reproducibility: "Pure function of the committed priors + condition catalog.",
   }),
-  splom: ({ n, isDemo, ids }: { n: number; isDemo: boolean; ids: string[] }): CaptionBlock => ({
+  splom: ({ n, isDemo, ids, k }: { n: number; isDemo: boolean; ids: string[]; k: number }): CaptionBlock => ({
     figureId: "A3",
     oneLine: `Scatterplot matrix of ${ids.length} representative criteria over ${n} candidates.`,
-    methods: `Pairwise raw-score scatter for the criteria [${ids.join(", ")}]; diagonal labels the variable. Capped to ${ids.length} criteria for legibility — the full ${"12×12"} relationships appear in the correlation heatmap (A4).`,
+    methods: `Pairwise raw-score scatter for the criteria [${ids.join(", ")}]; diagonal labels the variable. Capped to ${ids.length} criteria for legibility — the full ${k}×${k} relationships appear in the correlation heatmap (A4).`,
     source: demoNote(isDemo, n),
     reproducibility: "Deterministic given the cohort.",
   }),
