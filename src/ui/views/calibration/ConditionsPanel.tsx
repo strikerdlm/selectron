@@ -13,7 +13,7 @@ const PROVENANCE_META: Record<Provenance, { label: string; color: string }> = {
 function provenanceBadge(p: Provenance) {
   const meta = PROVENANCE_META[p] ?? { label: p, color: "text-ink-2" };
   return (
-    <span className={`mono text-[10px] uppercase tracking-cap ${meta.color}`}>
+    <span className={`mono text-[12px] uppercase tracking-cap ${meta.color}`}>
       {meta.label}
     </span>
   );
@@ -65,7 +65,7 @@ export function ConditionsPanel() {
   if (loading) {
     return (
       <div className="panel p-12 text-center fadein">
-        <p className="mono text-[11px] uppercase tracking-cap text-ink-2">loading conditions…</p>
+        <p className="mono text-[13px] uppercase tracking-cap text-ink-2">loading conditions…</p>
       </div>
     );
   }
@@ -73,7 +73,7 @@ export function ConditionsPanel() {
   if (error) {
     return (
       <div className="panel p-12 text-center fadein">
-        <p className="mono text-[11px] uppercase tracking-cap text-warn">{error}</p>
+        <p className="mono text-[13px] uppercase tracking-cap text-warn">{error}</p>
         <p className="text-ink-3 mt-2">Is the Python API running on localhost:8000?</p>
       </div>
     );
@@ -94,7 +94,7 @@ export function ConditionsPanel() {
           <select
             value={filterProv}
             onChange={(e) => setFilterProv(e.target.value as Provenance | "all")}
-            className="mono text-[11px] bg-bg-1 border border-line text-ink-1 px-2 py-1.5 rounded-sm focus:outline-none focus:border-signal cursor-pointer"
+            className="mono text-[13px] bg-bg-1 border border-line text-ink-1 px-2 py-1.5 rounded-sm focus:outline-none focus:border-signal cursor-pointer"
           >
             <option value="all">All ({provCounts.all})</option>
             {(
@@ -115,7 +115,7 @@ export function ConditionsPanel() {
           <select
             value={sortKey}
             onChange={(e) => setSortKey(e.target.value as "id" | "prov")}
-            className="mono text-[11px] bg-bg-1 border border-line text-ink-1 px-2 py-1.5 rounded-sm focus:outline-none focus:border-signal cursor-pointer"
+            className="mono text-[13px] bg-bg-1 border border-line text-ink-1 px-2 py-1.5 rounded-sm focus:outline-none focus:border-signal cursor-pointer"
           >
             <option value="id">ID</option>
             <option value="prov">Provenance</option>
@@ -145,28 +145,28 @@ export function ConditionsPanel() {
                 className="border-b border-line/50 hover:bg-bg-2/50 transition-colors"
               >
                 <td className="px-4 py-2.5">
-                  <div className="mono text-[11px] text-ink-0">{c.condition_id}</div>
-                  <div className="mono text-[10px] text-ink-3">{c.display_name}</div>
+                  <div className="mono text-[13px] text-ink-0">{c.condition_id}</div>
+                  <div className="mono text-[12px] text-ink-3">{c.display_name}</div>
                 </td>
                 <td className="px-4 py-2.5">{provenanceBadge(c.provenance)}</td>
                 <td className="px-4 py-2.5">
-                  <span className="mono text-[11px] text-ink-2">{c.distribution}</span>
+                  <span className="mono text-[13px] text-ink-2">{c.distribution}</span>
                 </td>
                 <td className="px-4 py-2.5">
                   {c.fitted ? (
                     <span className="flex items-center gap-1.5">
                       <span className="w-2 h-2 rounded-full bg-sky-400" />
-                      <span className="mono text-[10px] uppercase tracking-cap text-sky-400">Fitted</span>
+                      <span className="mono text-[12px] uppercase tracking-cap text-sky-400">Fitted</span>
                     </span>
                   ) : c.fittable ? (
                     <span className="flex items-center gap-1.5">
                       <span className="w-2 h-2 rounded-full bg-go" />
-                      <span className="mono text-[10px] uppercase tracking-cap text-go">Fittable</span>
+                      <span className="mono text-[12px] uppercase tracking-cap text-go">Fittable</span>
                     </span>
                   ) : (
                     <span className="flex items-center gap-1.5">
                       <span className="w-2 h-2 rounded-full bg-line-2" />
-                      <span className="mono text-[10px] uppercase tracking-cap text-ink-3">—</span>
+                      <span className="mono text-[12px] uppercase tracking-cap text-ink-3">—</span>
                     </span>
                   )}
                 </td>
@@ -176,7 +176,7 @@ export function ConditionsPanel() {
         </table>
         {filtered.length === 0 && (
           <div className="p-12 text-center">
-            <p className="mono text-[11px] uppercase tracking-cap text-ink-3">no conditions match the filter</p>
+            <p className="mono text-[13px] uppercase tracking-cap text-ink-3">no conditions match the filter</p>
           </div>
         )}
       </div>

@@ -19,7 +19,7 @@ function Breadcrumb({
   return (
     <div className="border-b border-line/40 px-8 py-3">
       <div className="mx-auto max-w-7xl">
-        <div className="mono text-[11px] uppercase tracking-cap text-ink-2 flex items-center gap-2">
+        <div className="mono text-[13px] uppercase tracking-cap text-ink-2 flex items-center gap-2">
           <button onClick={onExitToDashboard} className="hover:text-signal">
             dashboard
           </button>
@@ -53,7 +53,7 @@ function WizardBody({ onExitToDashboard, onExitToSim }: { onExitToDashboard: () 
         )}
       </div>
       <div className="mt-6 flex items-center justify-between">
-        <button onClick={onExitToDashboard} className="mono text-[11px] uppercase text-ink-2 hover:text-ink-0">
+        <button onClick={onExitToDashboard} className="mono text-[13px] uppercase text-ink-2 hover:text-ink-0">
           ← back to dashboard
         </button>
         {(step === 2 || step === 3) && candidate.status === "draft" && (
@@ -62,7 +62,7 @@ function WizardBody({ onExitToDashboard, onExitToSim }: { onExitToDashboard: () 
               enqueueCandidatePatch({ status: "ready" });
               notify("marked ready");
             }}
-            className="mono uppercase tracking-cap text-[11px] px-3 py-2 border border-signal text-signal hover:bg-signal/10 rounded-md"
+            className="mono uppercase tracking-cap text-[13px] px-3 py-2 border border-signal text-signal hover:bg-signal/10 rounded-md"
           >
             Mark ready
           </button>

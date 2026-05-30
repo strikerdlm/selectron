@@ -49,7 +49,7 @@ function FamilyBadge({ family }: { family: string }) {
   };
   return (
     <span
-      className="mono text-[9px] uppercase tracking-cap px-1.5 py-0.5 rounded-full"
+      className="mono text-[11px] uppercase tracking-cap px-1.5 py-0.5 rounded-full"
       style={{
         color: colours[family] ?? "var(--ink-2)",
         background: (colours[family] ?? "var(--ink-2)") + "18",
@@ -95,14 +95,14 @@ export function PerScoreCard({ criterion, rawScore, onScoreChange, figure }: Per
       <div className="flex items-start justify-between gap-2">
         <div className="flex flex-col gap-0.5 min-w-0">
           <div className="flex items-center gap-2 flex-wrap">
-            <span className="mono text-[12px] text-ink-0 font-medium">
+            <span className="mono text-[14px] text-ink-0 font-medium">
               {criterion.label}
             </span>
             <FamilyBadge family={criterion.family} />
             {/* Gate indicator */}
             {criterion.gateThreshold && (
               <span
-                className="mono text-[9px] uppercase tracking-cap px-1.5 py-0.5 rounded-full border"
+                className="mono text-[11px] uppercase tracking-cap px-1.5 py-0.5 rounded-full border"
                 style={{
                   color: gate === "fail" ? "var(--warn)" : "var(--go)",
                   borderColor: gate === "fail" ? "var(--warn)" : "var(--go)",
@@ -114,7 +114,7 @@ export function PerScoreCard({ criterion, rawScore, onScoreChange, figure }: Per
             )}
           </div>
           {/* Instrument */}
-          <span className="mono text-[10px] text-ink-3 truncate">
+          <span className="mono text-[12px] text-ink-3 truncate">
             {criterion.instrument}
           </span>
         </div>
@@ -122,12 +122,12 @@ export function PerScoreCard({ criterion, rawScore, onScoreChange, figure }: Per
         {/* Normalised score */}
         <div className="shrink-0 flex flex-col items-end">
           <span
-            className="mono text-[16px] tabular-nums font-medium"
+            className="mono text-[18px] tabular-nums font-medium"
             style={{ color: scoreColor(normScore) }}
           >
             {Math.round(normScore * 100)}%
           </span>
-          <span className="mono text-[9px] text-ink-3">
+          <span className="mono text-[11px] text-ink-3">
             norm.
           </span>
         </div>
@@ -157,7 +157,7 @@ export function PerScoreCard({ criterion, rawScore, onScoreChange, figure }: Per
           aria-valuetext={`${clampedRaw.toFixed(1)} (${criterion.higherIsBetter ? "higher is better" : "lower is better"})`}
         />
         {/* Scale labels */}
-        <div className="flex justify-between mono text-[9px] text-ink-3">
+        <div className="flex justify-between mono text-[11px] text-ink-3">
           <span>{criterion.scale.min}</span>
           <span className="text-ink-1 font-medium">
             {clampedRaw.toFixed(1)}
@@ -169,7 +169,7 @@ export function PerScoreCard({ criterion, rawScore, onScoreChange, figure }: Per
       {/* Gate threshold annotation */}
       {criterion.gateThreshold && (
         <div
-          className="mono text-[10px] px-2 py-1 rounded"
+          className="mono text-[12px] px-2 py-1 rounded"
           style={{
             background: "rgba(0,0,0,0.15)",
             color: gate === "fail" ? "var(--warn)" : "var(--ink-3)",
@@ -193,7 +193,7 @@ export function PerScoreCard({ criterion, rawScore, onScoreChange, figure }: Per
         )}
         {gateCitation && gateCitation !== primaryCitation && (
           <div className="flex items-baseline gap-1.5">
-            <span className="mono text-[9px] uppercase tracking-cap text-ink-3">gate:</span>
+            <span className="mono text-[11px] uppercase tracking-cap text-ink-3">gate:</span>
             <CitationChip citation={gateCitation} />
           </div>
         )}

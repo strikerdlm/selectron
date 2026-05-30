@@ -44,13 +44,13 @@ export function HealthSupportBreakdown({ tierId }: Props) {
           type="button"
           onClick={() => toggle(id)}
           aria-expanded={sectionOpen}
-          className="flex items-center justify-between gap-1.5 label text-[10px] text-ink-2 uppercase tracking-cap mt-2 hover:text-ink-1 cursor-pointer text-left"
+          className="flex items-center justify-between gap-1.5 label text-[12px] text-ink-2 uppercase tracking-cap mt-2 hover:text-ink-1 cursor-pointer text-left"
         >
           <span className="flex items-center gap-1.5">
             <span className="mono text-ink-3 inline-block w-3" aria-hidden>{sectionOpen ? "▾" : "▸"}</span>
             {title}
           </span>
-          <span className="mono text-[9px] text-ink-3 normal-case tracking-normal">{count}</span>
+          <span className="mono text-[11px] text-ink-3 normal-case tracking-normal">{count}</span>
         </button>
         {sectionOpen && <div className="pl-3">{children}</div>}
       </div>
@@ -63,13 +63,13 @@ export function HealthSupportBreakdown({ tierId }: Props) {
     return (
       <div
         data-deliverable={deliver ? "true" : "false"}
-        className={"flex items-center justify-between gap-2 mono text-[11px] py-0.5 " +
+        className={"flex items-center justify-between gap-2 mono text-[13px] py-0.5 " +
           (deliver ? "text-ink-1" : "text-ink-3 opacity-50")}
       >
         <span>{item.label}</span>
         <span className="flex items-center gap-1.5">
-          {!deliver && <span className="text-[9px] uppercase text-warn">needs {cls}</span>}
-          <span className="text-[9px] text-ink-3" title={item.source_ref}>[{item.source_ref}]</span>
+          {!deliver && <span className="text-[11px] uppercase text-warn">needs {cls}</span>}
+          <span className="text-[11px] text-ink-3" title={item.source_ref}>[{item.source_ref}]</span>
         </span>
       </div>
     );
@@ -77,8 +77,8 @@ export function HealthSupportBreakdown({ tierId }: Props) {
 
   const CapabilityCard = ({ title, body }: { title: string; body: string }) => (
     <div className="rounded border border-line/40 bg-bg-1/40 px-2.5 py-2 flex flex-col gap-0.5">
-      <span className="label text-[9px] text-ink-3 uppercase tracking-cap">{title}</span>
-      <span className="mono text-[11px] text-ink-1 leading-snug">{body}</span>
+      <span className="label text-[11px] text-ink-3 uppercase tracking-cap">{title}</span>
+      <span className="mono text-[13px] text-ink-1 leading-snug">{body}</span>
     </div>
   );
 
@@ -89,18 +89,18 @@ export function HealthSupportBreakdown({ tierId }: Props) {
         type="button"
         onClick={() => setOpen((o) => !o)}
         aria-expanded={open}
-        className="flex items-center justify-between gap-2 label text-[10px] text-ink-2 uppercase tracking-cap hover:text-ink-1 cursor-pointer text-left"
+        className="flex items-center justify-between gap-2 label text-[12px] text-ink-2 uppercase tracking-cap hover:text-ink-1 cursor-pointer text-left"
       >
         <span className="flex items-center gap-1.5">
           <span className="mono text-ink-3 inline-block w-3" aria-hidden>{open ? "▾" : "▸"}</span>
           Care capability
         </span>
-        <span className="mono text-[9px] text-ink-3 normal-case tracking-normal">{tier.label}</span>
+        <span className="mono text-[11px] text-ink-3 normal-case tracking-normal">{tier.label}</span>
       </button>
 
       {/* Collapsed summary — at-a-glance dashboard line. */}
       {!open && (
-        <p className="mono text-[10px] text-ink-3 leading-snug">
+        <p className="mono text-[12px] text-ink-3 leading-snug">
           Telemedicine: {tier.capabilities.telemedicine} · meds {medsOk}/{meds.length} · procedures {procsOk}/{procs.length} deliverable
         </p>
       )}
@@ -123,7 +123,7 @@ export function HealthSupportBreakdown({ tierId }: Props) {
             {procs.map((i) => <Item key={i.id} item={i} />)}
           </Section>
 
-          <p className="mono text-[9px] text-ink-3 mt-1">Sources → research/2026-05-28_health_support_sourcing.md</p>
+          <p className="mono text-[11px] text-ink-3 mt-1">Sources → research/2026-05-28_health_support_sourcing.md</p>
         </div>
       )}
     </div>

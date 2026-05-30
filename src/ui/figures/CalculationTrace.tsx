@@ -43,7 +43,7 @@ function TraceStepCard({ step, last }: { step: TraceStep; last: boolean }) {
         <div className="flex items-baseline gap-3 mb-4">
           <span
             className="inline-flex items-center justify-center w-7 h-7 rounded-full
-              border border-signal text-signal mono text-[11px] shrink-0"
+              border border-signal text-signal mono text-[13px] shrink-0"
           >
             {step.n}
           </span>
@@ -52,14 +52,14 @@ function TraceStepCard({ step, last }: { step: TraceStep; last: boolean }) {
 
         {/* EQUATION — scientific notation, monospace */}
         <div
-          className="mono text-[13px] text-ink-0 bg-bg-2 border border-line/60
+          className="mono text-[15px] text-ink-0 bg-bg-2 border border-line/60
             rounded-md px-4 py-3 mb-3 tabular-nums overflow-x-auto"
         >
           {step.equation}
         </div>
 
         {/* CONCRETE — actual numbers from this candidate */}
-        <div className="mono text-[11px] text-signal/90 mb-4 tabular-nums">
+        <div className="mono text-[13px] text-signal/90 mb-4 tabular-nums">
           <span className="text-ink-3 mr-2 uppercase tracking-cap">applied here</span>
           {step.concrete}
         </div>
@@ -67,18 +67,18 @@ function TraceStepCard({ step, last }: { step: TraceStep; last: boolean }) {
         {/* ARROW + LAY */}
         <div className="flex items-start gap-3 border-l-2 border-signal/40 pl-3 py-1">
           <span
-            className="mono text-[10px] uppercase tracking-cap text-signal shrink-0
+            className="mono text-[12px] uppercase tracking-cap text-signal shrink-0
               flex items-center gap-1.5 pt-0.5"
             aria-hidden
           >
-            <span className="text-signal text-[14px] leading-none">↓</span>
+            <span className="text-signal text-[16px] leading-none">↓</span>
             in plain English
           </span>
         </div>
         <p className="text-sm text-ink-1 leading-relaxed pl-3 mt-1">{step.lay}</p>
 
         {/* CITATION */}
-        <div className="mt-4 pt-3 border-t border-line/40 mono text-[10px] text-ink-3">
+        <div className="mt-4 pt-3 border-t border-line/40 mono text-[12px] text-ink-3">
           <span className="uppercase tracking-cap mr-2">source</span>
           <span className="text-ink-2">{step.citation.label}</span>
           <span className="ml-2 text-ink-3">[{step.citation.id}]</span>
@@ -98,13 +98,13 @@ function TraceStepCard({ step, last }: { step: TraceStep; last: boolean }) {
 // ─── MCDA mode ─────────────────────────────────────────────────────────────
 
 const sub = (s: string) => (
-  <sub className="text-[9px]" style={{ verticalAlign: "sub" }}>
+  <sub className="text-[11px]" style={{ verticalAlign: "sub" }}>
     {s}
   </sub>
 );
 
 const sup = (s: string) => (
-  <sup className="text-[9px]" style={{ verticalAlign: "super" }}>
+  <sup className="text-[11px]" style={{ verticalAlign: "super" }}>
     {s}
   </sup>
 );
@@ -314,10 +314,10 @@ export function MCDACalculationTrace(props: {
       title={<>How we scored <span className="text-signal">{props.alias}</span></>}
       badges={
         <>
-          <span className="mono text-[10px] uppercase tracking-cap text-signal border border-signal/40 rounded px-2 py-0.5">
+          <span className="mono text-[12px] uppercase tracking-cap text-signal border border-signal/40 rounded px-2 py-0.5">
             tier · {TIER_LABEL[props.accessTier]}
           </span>
-          <span className="mono text-[10px] uppercase tracking-cap text-ink-2">
+          <span className="mono text-[12px] uppercase tracking-cap text-ink-2">
             stage a · bayesian mcda
           </span>
         </>
@@ -520,10 +520,10 @@ export function IMMCalculationTrace(props: {
       title={<>How we projected <span className="text-signal">{props.mission.id}</span></>}
       badges={
         <>
-          <span className="mono text-[10px] uppercase tracking-cap text-signal border border-signal/40 rounded px-2 py-0.5">
+          <span className="mono text-[12px] uppercase tracking-cap text-signal border border-signal/40 rounded px-2 py-0.5">
             tier · {TIER_LABEL[props.accessTier]}
           </span>
-          <span className="mono text-[10px] uppercase tracking-cap text-ink-2">
+          <span className="mono text-[12px] uppercase tracking-cap text-ink-2">
             stage b · imm forward monte-carlo
           </span>
         </>

@@ -81,12 +81,12 @@ export function App() {
               >
                 SELECTRON
               </h1>
-              <span className="mono text-[11px] uppercase tracking-cap text-ink-1">
+              <span className="mono text-[13px] uppercase tracking-cap text-ink-1">
                 by <span className="text-ink-0">Diego Malpica MD</span>
               </span>
               <span className="label text-signal">iter 03 · phase 3f</span>
             </div>
-            <div className="mono flex items-center gap-4 text-[11px] text-ink-2">
+            <div className="mono flex items-center gap-4 text-[13px] text-ink-2">
               {/* Nav links */}
               <button
                 className={`uppercase tracking-cap transition-colors ${
@@ -197,10 +197,10 @@ export function App() {
         {/* FOOTER ──────────────────────────────────────────────────────────────── */}
         <footer className="mt-10 border-t border-line">
           <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-4 px-8 py-5">
-            <div className="mono text-[10px] uppercase tracking-cap text-ink-3">
+            <div className="mono text-[12px] uppercase tracking-cap text-ink-3">
               selectron · iter 03 · bayesian mcda + mission-risk monte carlo
             </div>
-            <div className="mono text-[10px] uppercase tracking-cap text-ink-3">
+            <div className="mono text-[12px] uppercase tracking-cap text-ink-3">
               <a
                 href="https://github.com/strikerdlm/selectron"
                 className="hover:text-signal transition-colors"

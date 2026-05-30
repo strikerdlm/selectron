@@ -47,12 +47,12 @@ export function AttachmentList({ entry }: { entry: CriterionEntry }) {
         multiple
         accept="application/pdf,image/png,image/jpeg"
         onChange={(e) => e.target.files && handleFiles(e.target.files)}
-        className="mt-1 mono block w-full text-[11px] text-ink-2 file:mr-3 file:rounded-md file:border file:border-line file:bg-bg-1 file:px-3 file:py-1.5 file:text-[11px] file:text-ink-1 file:hover:bg-bg-2"
+        className="mt-1 mono block w-full text-[13px] text-ink-2 file:mr-3 file:rounded-md file:border file:border-line file:bg-bg-1 file:px-3 file:py-1.5 file:text-[13px] file:text-ink-1 file:hover:bg-bg-2"
       />
-      <p className="mono mt-1 text-[10px] text-ink-3">
+      <p className="mono mt-1 text-[12px] text-ink-3">
         max 5MB · PDF / PNG / JPG only
       </p>
-      <ul className="mono mt-3 space-y-1 text-[11px]">
+      <ul className="mono mt-3 space-y-1 text-[13px]">
         {items.map((a) => (
           <li key={a.id} className="flex items-baseline justify-between">
             <span className="text-ink-1">

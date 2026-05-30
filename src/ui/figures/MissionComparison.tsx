@@ -411,7 +411,7 @@ export function MissionComparison({ candidateId, accessTier, gate }: MissionComp
             style={{ width: `${(progress / ANALOG_MISSIONS.length) * 100}%` }}
           />
         </div>
-        <div className="mono text-[11px] text-ink-2">
+        <div className="mono text-[13px] text-ink-2">
           {progress} / {ANALOG_MISSIONS.length} done
         </div>
       </div>
@@ -448,12 +448,12 @@ export function MissionComparison({ candidateId, accessTier, gate }: MissionComp
     <div className="flex flex-col gap-4">
       {/* Header row */}
       <div className="flex items-center justify-between">
-        <span className="mono text-[11px] uppercase tracking-widest text-ink-2">
+        <span className="mono text-[13px] uppercase tracking-widest text-ink-2">
           mission comparison — ranked by cumulative crew-days lost
         </span>
         <button
           onClick={() => void runComparison()}
-          className="rounded border border-line/40 px-3 py-1 mono text-[11px] text-ink-2 hover:text-ink hover:border-signal/40 transition-colors"
+          className="rounded border border-line/40 px-3 py-1 mono text-[13px] text-ink-2 hover:text-ink hover:border-signal/40 transition-colors"
         >
           Re-run
         </button>
@@ -472,7 +472,7 @@ export function MissionComparison({ candidateId, accessTier, gate }: MissionComp
             >
               {/* Panel title */}
               <div
-                className="mono text-[10px] uppercase tracking-wide text-ink-2 mb-1 truncate"
+                className="mono text-[12px] uppercase tracking-wide text-ink-2 mb-1 truncate"
                 title={missionLabel}
               >
                 {missionLabel}
@@ -492,14 +492,14 @@ export function MissionComparison({ candidateId, accessTier, gate }: MissionComp
                   notMerge
                 />
               ) : (
-                <div className="grid h-[120px] place-items-center mono text-[10px] text-ink-2">
+                <div className="grid h-[120px] place-items-center mono text-[12px] text-ink-2">
                   no samples
                 </div>
               )}
 
               {/* Stats footer — cumulative crew-days lost (the ranking key) +
                   the per-time CHI mean for context. */}
-              <div className="mono text-[10px] text-ink-2 mt-1 flex justify-between">
+              <div className="mono text-[12px] text-ink-2 mt-1 flex justify-between">
                 <span title="total expected crew-days lost over the whole mission (the ranking key)">
                   Σ lost {row.posterior.expectedLostCrewDays.mean.toFixed(1)} crew-days
                 </span>
@@ -519,12 +519,12 @@ export function MissionComparison({ candidateId, accessTier, gate }: MissionComp
                 return (
                   <div className="mt-2 pt-2 border-t border-line/40 flex flex-col gap-1">
                     <div className="flex items-center justify-between gap-2">
-                      <span className="mono text-[9px] uppercase tracking-cap text-ink-3">
+                      <span className="mono text-[11px] uppercase tracking-cap text-ink-3">
                         cumulative risk
                       </span>
                       <span
                         className={
-                          "mono text-[10px] tabular-nums uppercase tracking-cap font-semibold px-2 py-1 rounded-sm border " +
+                          "mono text-[12px] tabular-nums uppercase tracking-cap font-semibold px-2 py-1 rounded-sm border " +
                           NASA_CHIP_FILL[band.color]
                         }
                         title={`Total expected crew-days lost over the mission: ${lostCrewDays.toFixed(1)} (= ${(lostCrewDays / (ANALOG_MISSIONS.find((m) => m.id === row.missionId)?.crewSize ?? 1)).toFixed(1)} per crew member). Bands: <8 low · 8–25 moderate · ≥25 high.`}
@@ -533,12 +533,12 @@ export function MissionComparison({ candidateId, accessTier, gate }: MissionComp
                       </span>
                     </div>
                     <div className="flex items-center justify-between gap-2">
-                      <span className="mono text-[9px] uppercase tracking-cap text-ink-3">
+                      <span className="mono text-[11px] uppercase tracking-cap text-ink-3">
                         per-time · HSRB JSC-66705
                       </span>
                       <span
                         className={
-                          "mono text-[9px] tabular-nums uppercase tracking-cap px-1.5 py-0.5 rounded-sm border " +
+                          "mono text-[11px] tabular-nums uppercase tracking-cap px-1.5 py-0.5 rounded-sm border " +
                           NASA_CHIP_FILL[lxc.color]
                         }
                         title={`L${lxc.likelihood} (${lxc.likelihoodLabel}) — ${lxc.likelihoodDefinition}\n\nC${lxc.consequence} (${lxc.consequenceLabel}) — ${lxc.consequenceDefinition}\n\nLxC score ${lxc.score} → ${lxc.color}\n\nNote: CHI is a per-time fraction; short missions can look worse here than on cumulative risk.`}

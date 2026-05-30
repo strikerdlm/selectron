@@ -86,7 +86,7 @@ export function Sim({
             <span className="absolute inset-0 rounded-full border-2 border-signal border-t-transparent animate-spin" />
           </span>
         </div>
-        <p className="mono text-[11px] uppercase tracking-cap text-ink-2">
+        <p className="mono text-[13px] uppercase tracking-cap text-ink-2">
           loading simulation results…
         </p>
       </div>
@@ -178,7 +178,7 @@ export function Sim({
 
       <button
         onClick={onBackToReview}
-        className="mono uppercase tracking-cap text-[11px] px-3 py-2 text-ink-2 hover:text-ink-0"
+        className="mono uppercase tracking-cap text-[13px] px-3 py-2 text-ink-2 hover:text-ink-0"
       >
         ← back to Review
       </button>

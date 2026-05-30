@@ -57,7 +57,7 @@ export function ConditionCombobox({ value, onChange }: ConditionComboboxProps) {
         }}
         onFocus={() => setOpen(true)}
         placeholder="All fittable conditions"
-        className="w-full mono text-[11px] bg-bg-1 border border-line text-ink-1 px-2 py-1.5 rounded-sm focus:outline-none focus:border-signal placeholder:text-ink-3"
+        className="w-full mono text-[13px] bg-bg-1 border border-line text-ink-1 px-2 py-1.5 rounded-sm focus:outline-none focus:border-signal placeholder:text-ink-3"
       />
       {open && (
         <div className="absolute z-10 mt-1 w-full bg-bg-1 border border-line rounded-sm shadow-lg max-h-64 overflow-y-auto">
@@ -66,7 +66,7 @@ export function ConditionCombobox({ value, onChange }: ConditionComboboxProps) {
             onClick={() => handleSelect(null)}
             className="w-full text-left px-3 py-2 hover:bg-bg-2/50 transition-colors border-b border-line/50"
           >
-            <span className="mono text-[11px] text-signal">All fittable</span>
+            <span className="mono text-[13px] text-signal">All fittable</span>
           </button>
           {filtered.map((c) => {
             const fittable = isFittable(c);
@@ -82,13 +82,13 @@ export function ConditionCombobox({ value, onChange }: ConditionComboboxProps) {
                     : "opacity-40 cursor-not-allowed"
                 }`}
               >
-                <div className="mono text-[11px] text-ink-0">{c.label}</div>
-                <div className="mono text-[10px] text-ink-3">{c.id}</div>
+                <div className="mono text-[13px] text-ink-0">{c.label}</div>
+                <div className="mono text-[12px] text-ink-3">{c.id}</div>
               </button>
             );
           })}
           {filtered.length === 0 && (
-            <div className="px-3 py-2 mono text-[10px] text-ink-3">no matches</div>
+            <div className="px-3 py-2 mono text-[12px] text-ink-3">no matches</div>
           )}
         </div>
       )}

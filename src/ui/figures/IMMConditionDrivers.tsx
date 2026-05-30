@@ -256,8 +256,8 @@ export function IMMConditionDrivers({
   return (
     <div>
       {/* Metric toggle */}
-      <div className="mono mb-3 flex flex-row items-center gap-2 text-[11px]">
-        <span className="label text-[10px] uppercase tracking-cap text-ink-2">
+      <div className="mono mb-3 flex flex-row items-center gap-2 text-[13px]">
+        <span className="label text-[12px] uppercase tracking-cap text-ink-2">
           metric
         </span>
         <div className="flex flex-row gap-1">
@@ -266,7 +266,7 @@ export function IMMConditionDrivers({
               key={m}
               type="button"
               aria-pressed={metric === m}
-              className="mono rounded border px-3 py-1 text-[11px] transition-colors"
+              className="mono rounded border px-3 py-1 text-[13px] transition-colors"
               style={{
                 borderColor: metric === m ? "var(--signal)" : "var(--line)",
                 color: metric === m ? "var(--signal)" : "var(--ink-2)",

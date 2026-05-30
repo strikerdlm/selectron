@@ -33,7 +33,7 @@ export function IMMConvergencePlot({ outcome, trials, chiStar }: IMMConvergenceP
   if (sigmaChi.length === 0) {
     return (
       <div className="panel flex flex-col gap-3">
-        <div className="mono text-[11px] text-ink-3 text-center py-8">
+        <div className="mono text-[13px] text-ink-3 text-center py-8">
           Convergence diagnostics require T ≥ 1 000 trials.
           Current: T = {trials.toLocaleString()}.
         </div>

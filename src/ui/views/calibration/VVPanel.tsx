@@ -17,9 +17,9 @@ function fmtDuration(ms: number): string {
 
 function StatusBadge({ pass }: { pass: boolean }) {
   return pass ? (
-    <span className="mono text-[10px] uppercase tracking-cap text-go">pass</span>
+    <span className="mono text-[12px] uppercase tracking-cap text-go">pass</span>
   ) : (
-    <span className="mono text-[10px] uppercase tracking-cap text-warn">fail</span>
+    <span className="mono text-[12px] uppercase tracking-cap text-warn">fail</span>
   );
 }
 
@@ -77,7 +77,7 @@ function ValidationSection() {
                 key={t}
                 type="button"
                 onClick={() => setTrials(t)}
-                className={`mono text-[10px] px-2 py-1 border rounded-sm transition-colors ${
+                className={`mono text-[12px] px-2 py-1 border rounded-sm transition-colors ${
                   trials === t
                     ? "border-signal text-signal bg-signal/10"
                     : "border-line text-ink-2 hover:text-ink-0"
@@ -94,14 +94,14 @@ function ValidationSection() {
             type="number"
             value={seed}
             onChange={(e) => setSeed(Number(e.target.value))}
-            className="mono text-[11px] bg-bg-1 border border-line text-ink-1 px-2 py-1.5 rounded-sm focus:outline-none focus:border-signal w-28"
+            className="mono text-[13px] bg-bg-1 border border-line text-ink-1 px-2 py-1.5 rounded-sm focus:outline-none focus:border-signal w-28"
           />
         </div>
         <button
           type="button"
           disabled={running}
           onClick={handleRun}
-          className={`mono uppercase tracking-cap text-[11px] px-4 py-2 border rounded-sm transition-colors ${
+          className={`mono uppercase tracking-cap text-[13px] px-4 py-2 border rounded-sm transition-colors ${
             running
               ? "border-line text-ink-3 cursor-not-allowed"
               : "border-signal text-signal hover:bg-signal/10"
@@ -112,14 +112,14 @@ function ValidationSection() {
         {running && (
           <span className="flex items-center gap-2">
             <span className="signal-dot" />
-            <span className="mono text-[11px] text-ink-2">{fmtDuration(elapsed)}</span>
+            <span className="mono text-[13px] text-ink-2">{fmtDuration(elapsed)}</span>
           </span>
         )}
       </div>
 
       {error && (
         <div className="panel p-4 border-warn/50">
-          <p className="mono text-[11px] text-warn">{error}</p>
+          <p className="mono text-[13px] text-warn">{error}</p>
         </div>
       )}
 
@@ -128,7 +128,7 @@ function ValidationSection() {
           <div className="flex items-baseline gap-x-3">
             <h4 className="display text-lg text-ink-0 tracking-tight">Results</h4>
             <SummaryBadge n={result.n_within_ci95} total={result.n_total} />
-            <span className="mono text-[10px] text-ink-3 ml-auto">
+            <span className="mono text-[12px] text-ink-3 ml-auto">
               T={result.trials.toLocaleString()} · {fmtDuration(elapsed)}
             </span>
           </div>
@@ -148,19 +148,19 @@ function ValidationSection() {
                   if (!metrics) return null;
                   return [
                     <tr key={`h-${scenario}`} className="border-b border-line bg-bg-2/30">
-                      <td colSpan={6} className="px-3 py-1.5 mono text-[10px] uppercase tracking-cap text-ink-2">
+                      <td colSpan={6} className="px-3 py-1.5 mono text-[12px] uppercase tracking-cap text-ink-2">
                         {scenario}
                       </td>
                     </tr>,
                     ...metrics.map((m) => (
                       <tr key={`${scenario}-${m.metric}`} className="border-b border-line/50 hover:bg-bg-2/50 transition-colors">
-                        <td className="px-3 py-2 mono text-[11px] text-ink-0">{m.metric}</td>
-                        <td className="px-3 py-2 mono text-[11px] text-ink-1">{m.observed.toFixed(2)}</td>
-                        <td className="px-3 py-2 mono text-[11px] text-ink-1">{m.reference.toFixed(2)}</td>
-                        <td className="px-3 py-2 mono text-[11px] text-ink-2">
+                        <td className="px-3 py-2 mono text-[13px] text-ink-0">{m.metric}</td>
+                        <td className="px-3 py-2 mono text-[13px] text-ink-1">{m.observed.toFixed(2)}</td>
+                        <td className="px-3 py-2 mono text-[13px] text-ink-1">{m.reference.toFixed(2)}</td>
+                        <td className="px-3 py-2 mono text-[13px] text-ink-2">
                           [{m.ci95_low.toFixed(2)}, {m.ci95_high.toFixed(2)}]
                         </td>
-                        <td className="px-3 py-2 mono text-[11px] text-ink-1">{m.delta >= 0 ? "+" : ""}{m.delta.toFixed(2)}</td>
+                        <td className="px-3 py-2 mono text-[13px] text-ink-1">{m.delta >= 0 ? "+" : ""}{m.delta.toFixed(2)}</td>
                         <td className="px-3 py-2"><StatusBadge pass={m.within_ci95} /></td>
                       </tr>
                     )),
@@ -228,7 +228,7 @@ function SensitivitySection() {
                   setMethod(m);
                   setNSamples(m === "morris" ? 10 : 64);
                 }}
-                className={`mono text-[10px] px-2 py-1 border rounded-sm transition-colors ${
+                className={`mono text-[12px] px-2 py-1 border rounded-sm transition-colors ${
                   method === m
                     ? "border-signal text-signal bg-signal/10"
                     : "border-line text-ink-2 hover:text-ink-0"
@@ -252,7 +252,7 @@ function SensitivitySection() {
               max={f.max}
               value={f.value}
               onChange={(e) => f.onChange(Number(e.target.value))}
-              className="mono text-[11px] bg-bg-1 border border-line text-ink-1 px-2 py-1.5 rounded-sm focus:outline-none focus:border-signal w-24"
+              className="mono text-[13px] bg-bg-1 border border-line text-ink-1 px-2 py-1.5 rounded-sm focus:outline-none focus:border-signal w-24"
             />
           </div>
         ))}
@@ -261,7 +261,7 @@ function SensitivitySection() {
           <select
             value={topN}
             onChange={(e) => setTopN(Number(e.target.value))}
-            className="mono text-[11px] bg-bg-1 border border-line text-ink-1 px-2 py-1.5 rounded-sm focus:outline-none focus:border-signal cursor-pointer"
+            className="mono text-[13px] bg-bg-1 border border-line text-ink-1 px-2 py-1.5 rounded-sm focus:outline-none focus:border-signal cursor-pointer"
           >
             {TOP_N_OPTIONS.map((n) => (
               <option key={n} value={n}>{n}</option>
@@ -272,7 +272,7 @@ function SensitivitySection() {
           type="button"
           disabled={running}
           onClick={handleRun}
-          className={`mono uppercase tracking-cap text-[11px] px-4 py-2 border rounded-sm transition-colors ${
+          className={`mono uppercase tracking-cap text-[13px] px-4 py-2 border rounded-sm transition-colors ${
             running
               ? "border-line text-ink-3 cursor-not-allowed"
               : "border-signal text-signal hover:bg-signal/10"
@@ -283,14 +283,14 @@ function SensitivitySection() {
         {running && (
           <span className="flex items-center gap-2">
             <span className="signal-dot" />
-            <span className="mono text-[11px] text-ink-2">{fmtDuration(elapsed)}</span>
+            <span className="mono text-[13px] text-ink-2">{fmtDuration(elapsed)}</span>
           </span>
         )}
       </div>
 
       {error && (
         <div className="panel p-4 border-warn/50">
-          <p className="mono text-[11px] text-warn">{error}</p>
+          <p className="mono text-[13px] text-warn">{error}</p>
         </div>
       )}
 
@@ -308,7 +308,7 @@ function SensitivitySection() {
           <SensitivityTornado indices={result.indices} method={resultMethod} topN={topN} />
 
           <details>
-            <summary className="mono text-[10px] uppercase tracking-cap text-ink-2 cursor-pointer hover:text-ink-0 transition-colors">
+            <summary className="mono text-[12px] uppercase tracking-cap text-ink-2 cursor-pointer hover:text-ink-0 transition-colors">
               numeric indices
             </summary>
             <div className="overflow-x-auto mt-3">
@@ -326,18 +326,18 @@ function SensitivitySection() {
                 <tbody>
                   {result.indices.map((d) => (
                     <tr key={d.condition_id} className="border-b border-line/50 hover:bg-bg-2/50 transition-colors">
-                      <td className="px-3 py-2 mono text-[11px] text-ink-0">{d.condition_label}</td>
+                      <td className="px-3 py-2 mono text-[13px] text-ink-0">{d.condition_label}</td>
                       {resultMethod === "sobol" ? (
                         <>
-                          <td className="px-3 py-2 mono text-[11px] text-ink-1">{(d.s1 ?? 0).toFixed(4)}</td>
-                          <td className="px-3 py-2 mono text-[11px] text-ink-2">{(d.s1_conf ?? 0).toFixed(4)}</td>
-                          <td className="px-3 py-2 mono text-[11px] text-ink-1">{(d.st ?? 0).toFixed(4)}</td>
-                          <td className="px-3 py-2 mono text-[11px] text-ink-2">{(d.st_conf ?? 0).toFixed(4)}</td>
+                          <td className="px-3 py-2 mono text-[13px] text-ink-1">{(d.s1 ?? 0).toFixed(4)}</td>
+                          <td className="px-3 py-2 mono text-[13px] text-ink-2">{(d.s1_conf ?? 0).toFixed(4)}</td>
+                          <td className="px-3 py-2 mono text-[13px] text-ink-1">{(d.st ?? 0).toFixed(4)}</td>
+                          <td className="px-3 py-2 mono text-[13px] text-ink-2">{(d.st_conf ?? 0).toFixed(4)}</td>
                         </>
                       ) : (
                         <>
-                          <td className="px-3 py-2 mono text-[11px] text-ink-1">{(d.mu_star ?? 0).toFixed(4)}</td>
-                          <td className="px-3 py-2 mono text-[11px] text-ink-2">{(d.sigma ?? 0).toFixed(4)}</td>
+                          <td className="px-3 py-2 mono text-[13px] text-ink-1">{(d.mu_star ?? 0).toFixed(4)}</td>
+                          <td className="px-3 py-2 mono text-[13px] text-ink-2">{(d.sigma ?? 0).toFixed(4)}</td>
                         </>
                       )}
                     </tr>

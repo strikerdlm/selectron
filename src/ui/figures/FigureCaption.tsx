@@ -13,7 +13,7 @@ export type CaptionBlock = {
 export function FigureCaption({ block }: { block: CaptionBlock }) {
   const [expanded, setExpanded] = useState(false);
   return (
-    <div className="mono mt-3 border-t border-line/40 pt-3 text-[10px] text-ink-2">
+    <div className="mono mt-3 border-t border-line/40 pt-3 text-[12px] text-ink-2">
       <div className="flex items-baseline justify-between gap-3">
         <p>
           <span className="uppercase tracking-cap text-ink-0">Figure {block.figureId}</span>{" "}

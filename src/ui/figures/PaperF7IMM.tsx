@@ -85,7 +85,7 @@ export function PaperF7IMM() {
               <tr key={row.missionId} className="border-t border-gray-200 hover:bg-gray-50">
                 <td className="p-2">
                   <div className="font-semibold text-gray-900">{row.missionId}</div>
-                  <div className="text-[11px] text-gray-500">{row.missionLabel}</div>
+                  <div className="text-[13px] text-gray-500">{row.missionLabel}</div>
                 </td>
                 <td className="p-2 text-right text-gray-800">{row.durationDays}</td>
                 <td className="p-2 text-right text-gray-800">{row.crewSize}</td>
@@ -136,7 +136,7 @@ export function PaperF7IMM() {
         </div>
       </div>
 
-      <p className="mono text-[10px] text-gray-500 mt-6 max-w-5xl">
+      <p className="mono text-[12px] text-gray-500 mt-6 max-w-5xl">
         Note: this is an inter-model agreement comparison across analog +
         LEO-ISS missions using the IMM Calculator's per-condition prior set;
         it is NOT a validation against in-flight observed analog-mission

@@ -28,7 +28,7 @@ export function ScoreCard({ posterior, alias }: Props) {
         <span className="display mono text-5xl text-ink-0 leading-none">{pct(mean)}</span>
         <span className="mono text-xs text-ink-2">μ</span>
       </div>
-      <div className="mono mt-1 text-[10px] text-ink-3">posterior mean over total score</div>
+      <div className="mono mt-1 text-[12px] text-ink-3">posterior mean over total score</div>
 
       <div className="hairline my-5" />
 
@@ -53,7 +53,7 @@ export function ScoreCard({ posterior, alias }: Props) {
       </dl>
 
       <div className="mt-6">
-        <div className="mono mb-1 flex items-center justify-between text-[10px] text-ink-2">
+        <div className="mono mb-1 flex items-center justify-between text-[12px] text-ink-2">
           <span
             className="inline-flex items-center gap-1 cursor-help border-b border-dotted border-ink-3/50"
             title="Estimate precision — how tightly the 90% credible interval is pinned (1 − CI₉₀width/0.30). This is the certainty of the score estimate, NOT a measure of candidate quality: a low-scoring candidate can be estimated just as precisely as a high-scoring one."

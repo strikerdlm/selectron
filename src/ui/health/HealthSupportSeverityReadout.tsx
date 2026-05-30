@@ -19,15 +19,15 @@ export function HealthSupportSeverityReadout({
   const sign = delta >= 0 ? "+" : "−";
   return (
     <div className="panel flex flex-col gap-2">
-      <h4 className="label text-[10px] text-ink-2 uppercase tracking-cap">Severity · {tierLabel}</h4>
+      <h4 className="label text-[12px] text-ink-2 uppercase tracking-cap">Severity · {tierLabel}</h4>
       <div className="flex items-baseline gap-3">
         <span className="display text-2xl text-ink-0 tabular-nums">{chiMean.toFixed(1)}</span>
-        <span className="mono text-[11px] text-ink-2">CHI %</span>
-        <span className="mono text-[11px] text-ink-3">
+        <span className="mono text-[13px] text-ink-2">CHI %</span>
+        <span className="mono text-[13px] text-ink-3">
           {sign}{Math.abs(delta).toFixed(1)} vs ISS
         </span>
       </div>
-      <div className={"mono text-[10px] inline-block self-start px-1.5 py-0.5 border rounded-sm uppercase tracking-cap " + CHIP[verdictColor]}>
+      <div className={"mono text-[12px] inline-block self-start px-1.5 py-0.5 border rounded-sm uppercase tracking-cap " + CHIP[verdictColor]}>
         HSRB {verdictColor} · score {verdictScore}
       </div>
     </div>

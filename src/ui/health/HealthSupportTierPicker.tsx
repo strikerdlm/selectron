@@ -31,11 +31,11 @@ export function HealthSupportTierPicker({ selectedId, onSelect }: Props) {
                 : "hover:border-line-2 hover:bg-bg-2")
             }
           >
-            <div className="mono text-[9px] uppercase tracking-cap text-ink-3 mb-1">
+            <div className="mono text-[11px] uppercase tracking-cap text-ink-3 mb-1">
               Level of Care {t.levelOfCare}
             </div>
             <div className="display text-sm text-ink-0 leading-tight">{t.label}</div>
-            <div className="mono text-[10px] text-ink-2 mt-1 flex flex-wrap gap-x-2">
+            <div className="mono text-[12px] text-ink-2 mt-1 flex flex-wrap gap-x-2">
               <span>{TELE_LABEL[t.capabilities.telemedicine]}</span>
               <span>·</span>
               <span>{PROV_LABEL[t.capabilities.provider]}</span>

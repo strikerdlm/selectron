@@ -30,13 +30,13 @@ export function Calibration() {
             <button
               key={t}
               onClick={() => setTab(t)}
-              className={`relative px-3 py-2 mono text-[11px] uppercase tracking-cap transition-colors ${
+              className={`relative px-3 py-2 mono text-[13px] uppercase tracking-cap transition-colors ${
                 active ? "text-signal" : "text-ink-2 hover:text-ink-0"
               }`}
             >
               {TAB_LABELS[t].label}
               <span
-                className={`ml-1.5 text-[9px] ${
+                className={`ml-1.5 text-[11px] ${
                   active ? "text-signal-bright" : "text-ink-3"
                 }`}
               >

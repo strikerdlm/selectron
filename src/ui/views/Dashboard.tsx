@@ -98,7 +98,7 @@ export function Dashboard(props: {
           <button
             type="button"
             onClick={props.onNewCandidate}
-            className="mono uppercase tracking-cap text-[11px] px-4 py-2 border border-signal
+            className="mono uppercase tracking-cap text-[13px] px-4 py-2 border border-signal
               text-signal hover:bg-signal/10 transition-colors rounded-sm"
           >
             + New candidate
@@ -106,7 +106,7 @@ export function Dashboard(props: {
           <button
             type="button"
             onClick={handleGenerateSynthetic}
-            className="mono uppercase tracking-cap text-[11px] px-4 py-2 border border-signal
+            className="mono uppercase tracking-cap text-[13px] px-4 py-2 border border-signal
               text-signal hover:bg-signal/10 transition-colors rounded-sm"
           >
             Generate synthetic
@@ -114,13 +114,13 @@ export function Dashboard(props: {
           <button
             type="button"
             onClick={handleExport}
-            className="mono uppercase tracking-cap text-[11px] px-4 py-2 border border-line
+            className="mono uppercase tracking-cap text-[13px] px-4 py-2 border border-line
               text-ink-2 hover:border-ink-2 hover:bg-line/20 transition-colors rounded-sm"
           >
             Export
           </button>
           <label
-            className="mono uppercase tracking-cap text-[11px] px-4 py-2 border border-line
+            className="mono uppercase tracking-cap text-[13px] px-4 py-2 border border-line
               text-ink-2 hover:border-ink-2 hover:bg-line/20 transition-colors rounded-sm cursor-pointer"
           >
             Import
@@ -139,7 +139,7 @@ export function Dashboard(props: {
         {/* FILTER + STATS */}
         <div className="flex items-center gap-4">
           {/* Status counts */}
-          <div className="mono hidden sm:flex items-center gap-3 text-[10px]">
+          <div className="mono hidden sm:flex items-center gap-3 text-[12px]">
             <span className="text-ink-3">
               total <span className="text-ink-1">{candidates.length}</span>
             </span>
@@ -159,7 +159,7 @@ export function Dashboard(props: {
             <select
               value={statusFilter}
               onChange={(e) => setStatusFilter(e.target.value as StatusFilter)}
-              className="mono text-[11px] bg-bg-1 border border-line text-ink-1 px-2 py-1.5
+              className="mono text-[13px] bg-bg-1 border border-line text-ink-1 px-2 py-1.5
                 rounded-sm focus:outline-none focus:border-signal cursor-pointer"
             >
               <option value="all">All</option>
@@ -175,7 +175,7 @@ export function Dashboard(props: {
         /* EMPTY STATE */
         <div className="panel p-12 fadein">
           <div className="flex flex-col items-center justify-center text-center gap-4">
-            <div className="mono text-[10px] uppercase tracking-cap text-ink-3">
+            <div className="mono text-[12px] uppercase tracking-cap text-ink-3">
               {statusFilter !== "all"
                 ? `no ${statusFilter} candidates`
                 : "no candidates yet"}
@@ -189,7 +189,7 @@ export function Dashboard(props: {
               <button
                 type="button"
                 onClick={props.onNewCandidate}
-                className="mono uppercase tracking-cap text-[11px] px-5 py-2 border border-signal
+                className="mono uppercase tracking-cap text-[13px] px-5 py-2 border border-signal
                   text-signal hover:bg-signal/10 transition-colors rounded-sm mt-2"
               >
                 + New candidate
@@ -217,7 +217,7 @@ export function Dashboard(props: {
 
       {/* SORT note */}
       {filtered.length > 0 && (
-        <div className="mono text-[9px] uppercase tracking-cap text-ink-3 mt-4 text-right">
+        <div className="mono text-[11px] uppercase tracking-cap text-ink-3 mt-4 text-right">
           sorted by updated · desc
         </div>
       )}

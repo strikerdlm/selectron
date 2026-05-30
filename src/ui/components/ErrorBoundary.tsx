@@ -43,13 +43,13 @@ export class ErrorBoundary extends Component<Props, State> {
             this time — the error boundary caught it. Details below; please copy
             them into a bug report.
           </p>
-          <pre className="mono text-[11px] text-amber-300 bg-bg-2 border border-line p-3 rounded-md overflow-x-auto whitespace-pre-wrap mb-3">
+          <pre className="mono text-[13px] text-amber-300 bg-bg-2 border border-line p-3 rounded-md overflow-x-auto whitespace-pre-wrap mb-3">
             {this.state.error.message}
             {"\n\n"}
             {this.state.error.stack ?? "(no stack)"}
           </pre>
           {this.state.info?.componentStack && (
-            <details className="mono text-[10px] text-ink-2">
+            <details className="mono text-[12px] text-ink-2">
               <summary className="cursor-pointer hover:text-ink-0">
                 component stack
               </summary>
@@ -60,7 +60,7 @@ export class ErrorBoundary extends Component<Props, State> {
           )}
           <button
             onClick={this.reset}
-            className="mt-4 mono uppercase tracking-cap text-[11px] px-3 py-2 border border-signal text-signal hover:bg-signal/10 rounded-md"
+            className="mt-4 mono uppercase tracking-cap text-[13px] px-3 py-2 border border-signal text-signal hover:bg-signal/10 rounded-md"
           >
             try again
           </button>

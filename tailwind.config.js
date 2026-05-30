@@ -31,6 +31,15 @@ export default {
         sans: ["Recursive", "system-ui", "sans-serif"],
         mono: ["JetBrains Mono", "ui-monospace", "monospace"],
       },
+      fontSize: {
+        xs:   ["0.875rem", { lineHeight: "1.25rem" }],  // 14px (was 12)
+        sm:   ["1rem",     { lineHeight: "1.5rem" }],    // 16px (was 14)
+        base: ["1.125rem", { lineHeight: "1.75rem" }],   // 18px (was 16)
+        lg:   ["1.25rem",  { lineHeight: "1.875rem" }],  // 20px (was 18)
+        xl:   ["1.375rem", { lineHeight: "2rem" }],      // 22px (was 20)
+        "2xl":["1.625rem", { lineHeight: "2.125rem" }],  // 26px (was 24)
+        "3xl":["1.875rem", { lineHeight: "2.25rem" }],   // 30px (was 30 → keep generous)
+      },
       letterSpacing: {
         cap: "0.14em",
         tight: "-0.015em",

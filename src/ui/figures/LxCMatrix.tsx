@@ -41,7 +41,7 @@ export function LxCMatrix({ assessment }: { assessment: LxCAssessment }) {
         {Ccols.map((C) => (
           <div
             key={`hdr-${C}`}
-            className="mono text-[10px] text-ink-3 uppercase tracking-cap text-center pb-1"
+            className="mono text-[12px] text-ink-3 uppercase tracking-cap text-center pb-1"
           >
             C{C}
           </div>
@@ -59,7 +59,7 @@ export function LxCMatrix({ assessment }: { assessment: LxCAssessment }) {
           return (
             <div
               key={`foot-${C}`}
-              className="mono text-[9px] text-ink-3 text-center pt-1 leading-tight"
+              className="mono text-[11px] text-ink-3 text-center pt-1 leading-tight"
             >
               {band.label}
             </div>
@@ -68,7 +68,7 @@ export function LxCMatrix({ assessment }: { assessment: LxCAssessment }) {
       </div>
 
       {/* Axis captions */}
-      <div className="grid grid-cols-2 gap-3 mono text-[10px] uppercase tracking-cap text-ink-3">
+      <div className="grid grid-cols-2 gap-3 mono text-[12px] uppercase tracking-cap text-ink-3">
         <div>
           ← consequence (severity) →
         </div>
@@ -76,7 +76,7 @@ export function LxCMatrix({ assessment }: { assessment: LxCAssessment }) {
       </div>
 
       {/* Legend */}
-      <div className="flex flex-wrap gap-x-4 gap-y-1 mono text-[10px] text-ink-2">
+      <div className="flex flex-wrap gap-x-4 gap-y-1 mono text-[12px] text-ink-2">
         <span className="flex items-center gap-1.5">
           <span
             className="inline-block w-3 h-3 rounded-sm border border-line"
@@ -119,9 +119,9 @@ function Row({
   const Lband = LIKELIHOOD_BANDS_IN_MISSION[L - 1];
   return (
     <>
-      <div className="mono text-[10px] text-ink-3 uppercase tracking-cap pr-2 text-right leading-tight">
+      <div className="mono text-[12px] text-ink-3 uppercase tracking-cap pr-2 text-right leading-tight">
         <div>L{L}</div>
-        <div className="text-[8px] normal-case tracking-normal text-ink-3">
+        <div className="text-[10px] normal-case tracking-normal text-ink-3">
           {Lband.label}
         </div>
       </div>
@@ -163,7 +163,7 @@ function Cell({
       {score}
       {isCurrent && (
         <span
-          className="absolute -top-1 -right-1 mono text-[8px] uppercase tracking-cap text-signal bg-bg-0 border border-signal px-1 rounded-sm"
+          className="absolute -top-1 -right-1 mono text-[10px] uppercase tracking-cap text-signal bg-bg-0 border border-signal px-1 rounded-sm"
           aria-hidden="true"
         >
           ●

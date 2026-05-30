@@ -56,7 +56,7 @@ function Whisker({ ci95, mean, fmt, color }: WhiskerProps) {
 
   return (
     <div className="mt-3" data-testid="imm-headline-whisker">
-      <div className="mono mb-1 flex items-baseline justify-between text-[10px] text-ink-3">
+      <div className="mono mb-1 flex items-baseline justify-between text-[12px] text-ink-3">
         <span>CI₉₅</span>
         <span className="tabular-nums text-ink-2">
           {fmt(lo)} <span className="text-ink-3">→</span> {fmt(hi)}
@@ -92,7 +92,7 @@ function StatCard({ label, unit, summary, fmt, color }: StatCardProps) {
     <div className="panel p-5 flex flex-col">
       <div className="flex items-baseline justify-between">
         <span className="label" style={{ color }}>{label}</span>
-        <span className="mono text-[10px] text-ink-3 uppercase tracking-cap">{unit}</span>
+        <span className="mono text-[12px] text-ink-3 uppercase tracking-cap">{unit}</span>
       </div>
       <div className="mt-3 flex items-baseline gap-2">
         <span
@@ -116,7 +116,7 @@ function MSPRow({ msp }: { msp: PosteriorSummary }) {
     <div className="panel p-4 flex items-center justify-between gap-4">
       <div className="flex items-baseline gap-3">
         <span className="label" style={{ color }}>MSP</span>
-        <span className="mono text-[10px] text-ink-3 uppercase tracking-cap">
+        <span className="mono text-[12px] text-ink-3 uppercase tracking-cap">
           mission success probability
         </span>
       </div>
@@ -127,7 +127,7 @@ function MSPRow({ msp }: { msp: PosteriorSummary }) {
         >
           {fmtPct(msp.mean)}
         </span>
-        <span className="mono text-[10px] text-ink-3">
+        <span className="mono text-[12px] text-ink-3">
           CI₉₅{" "}
           <span className="tabular-nums text-ink-2">
             {fmtPct(msp.ci95[0])} <span className="text-ink-3">→</span> {fmtPct(msp.ci95[1])}
@@ -150,8 +150,8 @@ function ConvergenceSparkline({ trialCheckpoints, sigmaChi }: SparklineProps) {
   if (sigmaChi.length === 0) {
     return (
       <div className="panel px-3 py-2 flex items-center justify-between gap-3" data-testid="imm-headline-sparkline-placeholder">
-        <span className="mono text-[10px] text-ink-3 uppercase tracking-cap">σ(CHI) convergence</span>
-        <span className="mono text-[10px] text-ink-3">
+        <span className="mono text-[12px] text-ink-3 uppercase tracking-cap">σ(CHI) convergence</span>
+        <span className="mono text-[12px] text-ink-3">
           T &lt; 1 000 — no diagnostic
         </span>
       </div>
@@ -206,7 +206,7 @@ function ConvergenceSparkline({ trialCheckpoints, sigmaChi }: SparklineProps) {
 
   return (
     <div className="panel px-3 py-2 flex items-center gap-3" data-testid="imm-headline-sparkline">
-      <span className="mono text-[10px] text-ink-3 uppercase tracking-cap whitespace-nowrap">
+      <span className="mono text-[12px] text-ink-3 uppercase tracking-cap whitespace-nowrap">
         σ(CHI) trajectory
       </span>
       <div style={{ flex: 1, height: 40, minWidth: 120 }}>
@@ -218,7 +218,7 @@ function ConvergenceSparkline({ trialCheckpoints, sigmaChi }: SparklineProps) {
           notMerge
         />
       </div>
-      <span className="mono text-[10px] tabular-nums text-ink-2 whitespace-nowrap">
+      <span className="mono text-[12px] tabular-nums text-ink-2 whitespace-nowrap">
         final σ = {sigmaChi[sigmaChi.length - 1]?.toFixed(2) ?? "—"}%
       </span>
     </div>

@@ -70,7 +70,7 @@ export function BatchFitPanel() {
                 max={f.max}
                 value={f.value}
                 onChange={(e) => f.onChange(Number(e.target.value))}
-                className="mono text-[11px] bg-bg-1 border border-line text-ink-1 px-2 py-1.5 rounded-sm focus:outline-none focus:border-signal"
+                className="mono text-[13px] bg-bg-1 border border-line text-ink-1 px-2 py-1.5 rounded-sm focus:outline-none focus:border-signal"
               />
             </div>
           ))}
@@ -85,7 +85,7 @@ export function BatchFitPanel() {
             type="button"
             disabled={running}
             onClick={handleStart}
-            className={`mono uppercase tracking-cap text-[11px] px-4 py-2 border rounded-sm transition-colors ${
+            className={`mono uppercase tracking-cap text-[13px] px-4 py-2 border rounded-sm transition-colors ${
               running
                 ? "border-line text-ink-3 cursor-not-allowed"
                 : "border-signal text-signal hover:bg-signal/10"
@@ -96,7 +96,7 @@ export function BatchFitPanel() {
           {running && (
             <span className="flex items-center gap-2">
               <span className="signal-dot" />
-              <span className="mono text-[11px] text-ink-2">
+              <span className="mono text-[13px] text-ink-2">
                 {fit.status} · {fmtDuration(elapsed)}
               </span>
             </span>
@@ -107,8 +107,8 @@ export function BatchFitPanel() {
       {/* Error */}
       {error && (
         <div className="panel p-6 border-warn/50">
-          <p className="mono text-[11px] uppercase tracking-cap text-warn mb-1">API Error</p>
-          <p className="mono text-[11px] text-ink-1">{error}</p>
+          <p className="mono text-[13px] uppercase tracking-cap text-warn mb-1">API Error</p>
+          <p className="mono text-[13px] text-ink-1">{error}</p>
         </div>
       )}
 
@@ -120,7 +120,7 @@ export function BatchFitPanel() {
             <span className="label text-go">
               {fit.result?.n_fitted} fitted · {fit.result?.n_failed} failed
             </span>
-            <span className="mono text-[10px] text-ink-3 ml-auto">
+            <span className="mono text-[12px] text-ink-3 ml-auto">
               elapsed {fmtDuration(elapsed)}
             </span>
           </div>
@@ -155,24 +155,24 @@ export function BatchFitPanel() {
                       className="border-b border-line/50 hover:bg-bg-2/50 transition-colors"
                     >
                       <td className="px-3 py-2">
-                        <div className="mono text-[11px] text-ink-0">{cid}</div>
+                        <div className="mono text-[13px] text-ink-0">{cid}</div>
                       </td>
-                      <td className="px-3 py-2 mono text-[11px] text-ink-1">
+                      <td className="px-3 py-2 mono text-[13px] text-ink-1">
                         {r.posterior_lambda_mean.toExponential(3)}
                       </td>
-                      <td className="px-3 py-2 mono text-[11px] text-ink-1">
+                      <td className="px-3 py-2 mono text-[13px] text-ink-1">
                         {r.posterior_alpha.toFixed(2)}
                       </td>
-                      <td className="px-3 py-2 mono text-[11px] text-ink-1">
+                      <td className="px-3 py-2 mono text-[13px] text-ink-1">
                         {r.posterior_beta.toFixed(2)}
                       </td>
-                      <td className={`px-3 py-2 mono text-[11px] ${classForRhat(r.r_hat)}`}>
+                      <td className={`px-3 py-2 mono text-[13px] ${classForRhat(r.r_hat)}`}>
                         {r.r_hat.toFixed(4)}
                       </td>
-                      <td className="px-3 py-2 mono text-[11px] text-ink-1">
+                      <td className="px-3 py-2 mono text-[13px] text-ink-1">
                         {Math.round(r.ess_bulk)}
                       </td>
-                      <td className={`px-3 py-2 mono text-[11px] ${classForDivs(r.divergences)}`}>
+                      <td className={`px-3 py-2 mono text-[13px] ${classForDivs(r.divergences)}`}>
                         {r.divergences}
                       </td>
                     </tr>
@@ -186,8 +186,8 @@ export function BatchFitPanel() {
 
       {fit.status === "failed" && (
         <div className="panel p-6 border-warn/50 fadein">
-          <p className="mono text-[11px] uppercase tracking-cap text-warn mb-1">Job Failed</p>
-          <p className="mono text-[11px] text-ink-1">{fit.error ?? "Unknown error"}</p>
+          <p className="mono text-[13px] uppercase tracking-cap text-warn mb-1">Job Failed</p>
+          <p className="mono text-[13px] text-ink-1">{fit.error ?? "Unknown error"}</p>
         </div>
       )}
     </div>

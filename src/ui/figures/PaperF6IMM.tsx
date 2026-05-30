@@ -83,7 +83,7 @@ export function PaperF6IMM() {
           <dt className="text-gray-700">Consequence</dt>
           <dd>C{C} · {f6.assessment.consequenceLabel} · fractionLost = {(100 * f6.assessment.fractionLost).toFixed(2)}%</dd>
         </dl>
-        <p className="mono text-[10px] text-gray-600 mt-3 border-t border-current/30 pt-2">
+        <p className="mono text-[12px] text-gray-600 mt-3 border-t border-current/30 pt-2">
           pFailure = 1 − MSP (MSP = P[no EVAC ∧ no LOCL ∧ CHI ≥ χ*=0.7]).
           fractionLost = 1 − CHI/100. NASA JSC-66705 Rev A §3.2.4.
         </p>

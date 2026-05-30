@@ -142,7 +142,7 @@ export function CHIExplainer({ posterior, chiStar, missionId, gate }: Props) {
         <h2 className="display text-lg text-ink-0">
           Reading this result · NASA Risk Posture for the mission
         </h2>
-        <span className={`mono text-[10px] uppercase tracking-cap ${nasaTone}`}>
+        <span className={`mono text-[12px] uppercase tracking-cap ${nasaTone}`}>
           NASA verdict · {lxc.color.toUpperCase()} · LxC = {lxc.score}
         </span>
       </header>
@@ -153,7 +153,7 @@ export function CHIExplainer({ posterior, chiStar, missionId, gate }: Props) {
           <h3 className="display text-base text-ink-0">
             NASA HSRB Likelihood × Consequence matrix
           </h3>
-          <span className="mono text-[10px] uppercase tracking-cap text-ink-3">
+          <span className="mono text-[12px] uppercase tracking-cap text-ink-3">
             JSC-66705 Rev A · Fig. 4
           </span>
         </div>
@@ -175,7 +175,7 @@ export function CHIExplainer({ posterior, chiStar, missionId, gate }: Props) {
 
           <div className="space-y-3 text-sm text-ink-1 leading-relaxed">
             <div>
-              <span className="mono text-[10px] uppercase tracking-cap text-ink-3">
+              <span className="mono text-[12px] uppercase tracking-cap text-ink-3">
                 likelihood · L{lxc.likelihood} ({lxc.likelihoodLabel})
               </span>
               <p className="mt-1">
@@ -186,7 +186,7 @@ export function CHIExplainer({ posterior, chiStar, missionId, gate }: Props) {
               </p>
             </div>
             <div>
-              <span className="mono text-[10px] uppercase tracking-cap text-ink-3">
+              <span className="mono text-[12px] uppercase tracking-cap text-ink-3">
                 consequence · C{lxc.consequence} ({lxc.consequenceLabel})
               </span>
               <p className="mt-1">
@@ -197,7 +197,7 @@ export function CHIExplainer({ posterior, chiStar, missionId, gate }: Props) {
               </p>
             </div>
             <div>
-              <span className="mono text-[10px] uppercase tracking-cap text-ink-3">
+              <span className="mono text-[12px] uppercase tracking-cap text-ink-3">
                 LxC score · color
               </span>
               <p className="mt-1">
@@ -212,7 +212,7 @@ export function CHIExplainer({ posterior, chiStar, missionId, gate }: Props) {
               </p>
             </div>
             <div className={`border-t ${nasaBorder} pt-3 mt-3`}>
-              <span className="mono text-[10px] uppercase tracking-cap text-ink-3">
+              <span className="mono text-[12px] uppercase tracking-cap text-ink-3">
                 HSRB disposition guidance
               </span>
               <p className="mt-1">{NASA_COLOR_GUIDANCE[lxc.color]}</p>
@@ -220,7 +220,7 @@ export function CHIExplainer({ posterior, chiStar, missionId, gate }: Props) {
           </div>
         </div>
 
-        <p className="mono mt-4 pt-3 border-t border-line/40 text-[10px] text-ink-3 leading-relaxed">
+        <p className="mono mt-4 pt-3 border-t border-line/40 text-[12px] text-ink-3 leading-relaxed">
           Likelihood thresholds verbatim from JSC-66705 Rev A Figure 4 p. 28
           "LIKELIHOOD RATING · In-Mission" (P ≤ 0.01 %, 0.01–0.1 %, 0.1–1 %, 1–10 %,
           &gt; 10 %). Consequence categories verbatim from Figure 4 "IN MISSION ·
@@ -238,7 +238,7 @@ export function CHIExplainer({ posterior, chiStar, missionId, gate }: Props) {
         <h3 className="display text-base text-ink-0">
           Plain-language lay layer · what the underlying CHI numbers mean
         </h3>
-        <span className={`mono text-[10px] uppercase tracking-cap ${severity.tone}`}>
+        <span className={`mono text-[12px] uppercase tracking-cap ${severity.tone}`}>
           lay verdict · {severity.label}
         </span>
       </header>
@@ -246,7 +246,7 @@ export function CHIExplainer({ posterior, chiStar, missionId, gate }: Props) {
       {/* ── DEFINITIONS ────────────────────────────────────────────────── */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-5">
         <div>
-          <div className="mono text-[10px] uppercase tracking-cap text-ink-3 mb-1">
+          <div className="mono text-[12px] uppercase tracking-cap text-ink-3 mb-1">
             CHI — Crew Health Index
           </div>
           <p className="text-sm text-ink-1 leading-relaxed">
@@ -260,7 +260,7 @@ export function CHIExplainer({ posterior, chiStar, missionId, gate }: Props) {
           </p>
         </div>
         <div>
-          <div className="mono text-[10px] uppercase tracking-cap text-ink-3 mb-1">
+          <div className="mono text-[12px] uppercase tracking-cap text-ink-3 mb-1">
             χ* — Operational Floor
           </div>
           <p className="text-sm text-ink-1 leading-relaxed">
@@ -276,7 +276,7 @@ export function CHIExplainer({ posterior, chiStar, missionId, gate }: Props) {
 
       {/* ── THIS RUN ────────────────────────────────────────────────────── */}
       <div className="border-t border-line pt-4 mb-4">
-        <div className="mono text-[10px] uppercase tracking-cap text-ink-3 mb-3">
+        <div className="mono text-[12px] uppercase tracking-cap text-ink-3 mb-3">
           this run · mission · {missionId}
         </div>
         <ul className="space-y-3 text-sm text-ink-1 leading-relaxed">
@@ -292,7 +292,7 @@ export function CHIExplainer({ posterior, chiStar, missionId, gate }: Props) {
             <span className="mono text-ink-3">
               [90 % CI {(pETLo * 100).toFixed(1)} – {(pETHi * 100).toFixed(1)} %]
             </span>{" "}
-            · <span className={`mono uppercase tracking-cap text-[10px] ${etBucket.tone}`}>
+            · <span className={`mono uppercase tracking-cap text-[12px] ${etBucket.tone}`}>
               {etBucket.label}
             </span>{" "}
             — fraction of Monte-Carlo trials in which the crew fell below the operational
@@ -313,7 +313,7 @@ export function CHIExplainer({ posterior, chiStar, missionId, gate }: Props) {
 
       {/* ── DECISION HOOK ──────────────────────────────────────────────── */}
       <div className="border-t border-line pt-4">
-        <div className="mono text-[10px] uppercase tracking-cap text-ink-3 mb-2">
+        <div className="mono text-[12px] uppercase tracking-cap text-ink-3 mb-2">
           what to do with this number
         </div>
         <p className="text-sm text-ink-1 leading-relaxed">

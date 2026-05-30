@@ -133,7 +133,7 @@ export function StepMissionSim({ onRunComplete }: { onRunComplete: (sessionId: s
               </span>
             </div>
             <h3 className="display text-xl text-ink-0 mb-2">Running Monte-Carlo simulation</h3>
-            <p className="mono text-[12px] text-ink-1 mb-3 tabular-nums">
+            <p className="mono text-[14px] text-ink-1 mb-3 tabular-nums">
               {trials.toLocaleString()} trials ·{" "}
               {mission ? `${mission.crewSize} crew × ${ANALOG_CONDITIONS.length} conditions` : "?"}
               {estSeconds ? ` · ~${estSeconds}s` : ""}
@@ -142,10 +142,10 @@ export function StepMissionSim({ onRunComplete }: { onRunComplete: (sessionId: s
               The browser main thread is locked for the duration — this is expected
               and the page may not respond to clicks until the run finishes.
             </p>
-            <p className="mono mt-4 text-[10px] text-ink-3 uppercase tracking-cap">
+            <p className="mono mt-4 text-[12px] text-ink-3 uppercase tracking-cap">
               NASA canonical T = 100,000 per M18 / A22 · see iter3 audit doc
             </p>
-            <p className="mono mt-2 text-[10px] text-ink-3 leading-relaxed">
+            <p className="mono mt-2 text-[12px] text-ink-3 leading-relaxed">
               Tip: dial trials down to 25,000 in the dropdown for a faster preview
               run if you don't need the full NASA-canonical precision.
             </p>
@@ -157,7 +157,7 @@ export function StepMissionSim({ onRunComplete }: { onRunComplete: (sessionId: s
         <h2 className="display text-lg">Step 4 — Mission &amp; sim</h2>
         <MissionPicker missions={ANALOG_MISSIONS as AnalogMission[]} selected={mission} onChange={setMission} />
         {mission && (
-          <div className="mono grid grid-cols-2 gap-y-1 text-[11px] text-ink-2 sm:grid-cols-4">
+          <div className="mono grid grid-cols-2 gap-y-1 text-[13px] text-ink-2 sm:grid-cols-4">
             <div>duration · <span className="text-ink-0">{mission.durationDays} d</span></div>
             <div>crew · <span className="text-ink-0">{mission.crewSize}</span></div>
             <div>EVAs · <span className="text-ink-0">{mission.evaCount}</span></div>
@@ -207,7 +207,7 @@ export function StepMissionSim({ onRunComplete }: { onRunComplete: (sessionId: s
           onClick={handleRun}
           disabled={!mission || running}
           className={
-            "mono uppercase tracking-cap text-[11px] px-4 py-2 border rounded-md transition-colors " +
+            "mono uppercase tracking-cap text-[13px] px-4 py-2 border rounded-md transition-colors " +
             (mission && !running
               ? "border-signal text-signal hover:bg-signal/10"
               : "border-line text-ink-3 cursor-not-allowed")

@@ -477,7 +477,7 @@ export function CrewComposition() {
           Crew Composition
         </h2>
         <span className="label text-signal">IMM · Stage A</span>
-        <span className="mono text-[11px] text-ink-3 hidden sm:inline">
+        <span className="mono text-[13px] text-ink-3 hidden sm:inline">
           {state.mission.label} · {state.members.length} members
         </span>
       </div>
@@ -518,7 +518,7 @@ export function CrewComposition() {
             <div className="flex flex-wrap items-center justify-between gap-x-8 gap-y-4">
               <div className="flex flex-wrap items-center gap-x-8 gap-y-3">
                 <div className="flex flex-col gap-0.5">
-                  <span className="label text-[10px] text-ink-2 uppercase tracking-cap">
+                  <span className="label text-[12px] text-ink-2 uppercase tracking-cap">
                     Mission severity
                     {readoutIsPreview ? " · live preview (T=5,000)" : readoutOutcome ? " · full run" : ""}
                   </span>
@@ -528,7 +528,7 @@ export function CrewComposition() {
                         {readoutOutcome.chi.mean.toFixed(1)}
                       </span>
                       <span className="mono text-xs text-ink-2">CHI %</span>
-                      <span className="mono text-[11px] text-ink-3 ml-1">
+                      <span className="mono text-[13px] text-ink-3 ml-1">
                         {delta >= 0 ? "+" : "−"}{Math.abs(delta).toFixed(1)} vs ISS
                       </span>
                     </div>
@@ -543,7 +543,7 @@ export function CrewComposition() {
                   )}
                 </div>
                 {readoutOutcome && (
-                  <dl className="mono text-[11px] text-ink-2 grid grid-cols-[auto_auto] gap-x-3 gap-y-0.5">
+                  <dl className="mono text-[13px] text-ink-2 grid grid-cols-[auto_auto] gap-x-3 gap-y-0.5">
                     <dt className="text-ink-3">mission success</dt>
                     <dd className="tabular-nums text-right text-ink-1">{readoutOutcome.missionSuccess.mean.toFixed(1)}%</dd>
                     <dt className="text-ink-3">p(evacuation)</dt>
@@ -577,9 +577,9 @@ export function CrewComposition() {
             <h3 className="label text-ink-1 uppercase tracking-cap">Mission</h3>
 
             <div className="flex flex-col gap-1.5">
-              <label className="label text-[10px] text-ink-2 uppercase tracking-cap">Profile</label>
+              <label className="label text-[12px] text-ink-2 uppercase tracking-cap">Profile</label>
               <select
-                className="mono text-[11px] bg-transparent border border-line rounded px-3 py-1.5
+                className="mono text-[13px] bg-transparent border border-line rounded px-3 py-1.5
                            text-ink-1 focus:border-signal focus:outline-none cursor-pointer"
                 value={state.mission.id}
                 onChange={(e) => {
@@ -603,7 +603,7 @@ export function CrewComposition() {
             </div>
 
             {/* Mission meta — editable duration / crew size / EVAs (recompute on change) */}
-            <dl className="mono text-[11px] grid grid-cols-[auto_1fr] items-center gap-x-3 gap-y-2">
+            <dl className="mono text-[13px] grid grid-cols-[auto_1fr] items-center gap-x-3 gap-y-2">
               <dt className="text-ink-3">duration</dt>
               <dd className="flex items-center gap-1">
                 <input
@@ -612,7 +612,7 @@ export function CrewComposition() {
                   max={1000}
                   value={state.mission.durationDays}
                   onChange={(e) => editMissionDuration(Number(e.target.value))}
-                  className="w-20 mono text-[11px] bg-transparent border border-line rounded px-1.5 py-0.5
+                  className="w-20 mono text-[13px] bg-transparent border border-line rounded px-1.5 py-0.5
                              text-ink-1 focus:border-signal focus:outline-none tabular-nums"
                   aria-label="mission duration in days"
                 />
@@ -623,7 +623,7 @@ export function CrewComposition() {
               <dd className="flex items-center gap-1.5">
                 <button
                   type="button"
-                  className="mono text-[12px] leading-none w-5 h-5 rounded border border-line/50
+                  className="mono text-[14px] leading-none w-5 h-5 rounded border border-line/50
                              text-ink-2 hover:text-ink-0 hover:border-signal disabled:opacity-30 disabled:cursor-not-allowed"
                   onClick={() => setCrewSize(state.members.length - 1)}
                   disabled={state.members.length <= 1}
@@ -632,19 +632,19 @@ export function CrewComposition() {
                 <span className="text-ink-1 tabular-nums w-5 text-center">{state.members.length}</span>
                 <button
                   type="button"
-                  className="mono text-[12px] leading-none w-5 h-5 rounded border border-line/50
+                  className="mono text-[14px] leading-none w-5 h-5 rounded border border-line/50
                              text-ink-2 hover:text-ink-0 hover:border-signal disabled:opacity-30 disabled:cursor-not-allowed"
                   onClick={() => setCrewSize(state.members.length + 1)}
                   disabled={state.members.length >= MAX_CREW}
                   aria-label="add one crew member"
                 >+</button>
-                <span className="text-ink-3 text-[10px]">(max {MAX_CREW})</span>
+                <span className="text-ink-3 text-[12px]">(max {MAX_CREW})</span>
               </dd>
 
               <dt className="text-ink-3">EVAs</dt>
               <dd className="text-ink-1 tabular-nums" title="Total EVAs = sum of per-member EVA counts (edit in each crew card)">
                 {totalEVAs}
-                <span className="text-ink-3 text-[10px] ml-1">Σ per-member</span>
+                <span className="text-ink-3 text-[12px] ml-1">Σ per-member</span>
               </dd>
             </dl>
 
@@ -652,7 +652,7 @@ export function CrewComposition() {
                 in the prominent Mission-severity dashboard at the top of the page;
                 the per-item Care-capability breakdown below is collapsed by default. */}
             <div className="flex flex-col gap-1.5">
-              <label className="label text-[10px] text-ink-2 uppercase tracking-cap">Health Support (scenario)</label>
+              <label className="label text-[12px] text-ink-2 uppercase tracking-cap">Health Support (scenario)</label>
               <HealthSupportTierPicker
                 selectedId={state.kit.scenarioId}
                 onSelect={(kit) => { setState((s) => ({ ...s, kit })); setOutcome(undefined); setSimState("idle"); }}
@@ -662,10 +662,10 @@ export function CrewComposition() {
 
             {/* Sim config (χ* + seed) */}
             <div className="border-t border-line pt-3 flex flex-col gap-3">
-              <h4 className="label text-[10px] text-ink-2 uppercase tracking-cap">Simulation</h4>
+              <h4 className="label text-[12px] text-ink-2 uppercase tracking-cap">Simulation</h4>
 
               <div className="flex flex-col gap-1">
-                <label className="mono text-[10px] text-ink-3">
+                <label className="mono text-[12px] text-ink-3">
                   χ* (mission success threshold): {state.chiStar.toFixed(2)}
                 </label>
                 <input
@@ -679,7 +679,7 @@ export function CrewComposition() {
               </div>
 
               <div className="flex flex-col gap-1">
-                <label className="mono text-[10px] text-ink-3">
+                <label className="mono text-[12px] text-ink-3">
                   trials: {state.trials.toLocaleString()}
                 </label>
                 <input
@@ -706,7 +706,7 @@ export function CrewComposition() {
               {/* Add member (manual cap MAX_CREW) */}
               <button
                 type="button"
-                className="mono text-[10px] uppercase tracking-cap text-ink-3 hover:text-ink-1
+                className="mono text-[12px] uppercase tracking-cap text-ink-3 hover:text-ink-1
                            border border-line rounded px-2 py-0.5 transition-colors
                            disabled:opacity-30 disabled:cursor-not-allowed"
                 onClick={addMember}
@@ -719,7 +719,7 @@ export function CrewComposition() {
               {/* Expand-all toggle */}
               <button
                 type="button"
-                className="mono text-[10px] uppercase tracking-cap text-ink-3 hover:text-ink-1
+                className="mono text-[12px] uppercase tracking-cap text-ink-3 hover:text-ink-1
                            border border-line rounded px-2 py-0.5 transition-colors"
                 onClick={() => {
                   const allIds = state.members.map((m) => m.id);
@@ -734,7 +734,7 @@ export function CrewComposition() {
 
           {state.members.length === 0 ? (
             <div className="panel flex items-center justify-center h-32">
-              <span className="mono text-[12px] text-ink-3 italic">
+              <span className="mono text-[14px] text-ink-3 italic">
                 no crew members — add at least one to run the simulation
               </span>
             </div>
@@ -858,7 +858,7 @@ export function CrewComposition() {
                   C{lxc.consequence} · {lxc.consequenceLabel} · fractionLost = {(100 * lxc.fractionLost).toFixed(2)}%
                 </dd>
               </dl>
-              <p className="mono text-[10px] text-ink-3 mt-3 border-t border-line/40 pt-2">
+              <p className="mono text-[12px] text-ink-3 mt-3 border-t border-line/40 pt-2">
                 pFailure = 1 − missionSuccess (failure ⇔ any of EVAC, LOCL, CHI &lt; χ*).
                 fractionLost = 1 − CHI/100 (NASA JSC-66705 §3.2.4).
               </p>
@@ -944,7 +944,7 @@ export function CrewComposition() {
         <h3 className="label uppercase tracking-cap text-ink-1 mr-2">
           Session
         </h3>
-        <span className="mono text-[10px] text-ink-3 mr-1" title="The working crew, mission, kit, and sim settings auto-save locally and restore on refresh.">
+        <span className="mono text-[12px] text-ink-3 mr-1" title="The working crew, mission, kit, and sim settings auto-save locally and restore on refresh.">
           autosaved{outcome ? "" : " · config only (no run yet)"}
         </span>
 
@@ -1186,20 +1186,20 @@ export function K15ValidationBadge({
               data-testid={`k15-badge-row-${r.label}`}
             >
               <div className="flex items-baseline gap-1.5">
-                <span className="label text-[10px] text-ink-2 uppercase tracking-cap">
+                <span className="label text-[12px] text-ink-2 uppercase tracking-cap">
                   {r.label}
                 </span>
-                <span className={"mono text-[12px] " + flagClass} aria-hidden="true">
+                <span className={"mono text-[14px] " + flagClass} aria-hidden="true">
                   {flagGlyph}
                 </span>
                 <span className="sr-only">
                   {within ? "within K15 CI₉₅" : "outside K15 CI₉₅"}
                 </span>
               </div>
-              <span className="mono text-[11px] text-ink-1 tabular-nums">
+              <span className="mono text-[13px] text-ink-1 tabular-nums">
                 {r.value.toFixed(r.decimals)}{r.unit}
               </span>
-              <span className="mono text-[10px] text-ink-3 tabular-nums">
+              <span className="mono text-[12px] text-ink-3 tabular-nums">
                 ref {r.ref.toFixed(r.decimals)}{r.unit} · Δ {deltaSign}{deltaAbs}{r.unit}
               </span>
             </div>

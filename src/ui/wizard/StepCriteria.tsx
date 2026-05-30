@@ -51,13 +51,13 @@ export function StepCriteria() {
       <div className="panel p-4">
         <div className="flex items-baseline justify-between gap-3">
           <h2 className="display text-lg">Step 2 — Criteria</h2>
-          <span className="mono text-[11px] text-ink-2">
+          <span className="mono text-[13px] text-ink-2">
             {counts.ok} ok · {counts.partial} partial · {counts.empty} empty
             <span className="text-ink-3"> · {visibleCriteria.length} of {PLACEHOLDER_CRITERIA.length} criteria</span>
           </span>
         </div>
         {hiddenCount > 0 && (
-          <p className="mono mt-2 text-[10px] text-ink-3 leading-relaxed">
+          <p className="mono mt-2 text-[12px] text-ink-3 leading-relaxed">
             tier <span className="text-signal">{TIER_LABEL[accessTier]}</span> shows{" "}
             {visibleCriteria.length} criteria. <span className="text-ink-2">{hiddenCount}</span> additional{" "}
             {hiddenCount === 1 ? "criterion is" : "criteria are"} available at higher tiers
@@ -73,7 +73,7 @@ export function StepCriteria() {
       <div className="flex justify-between gap-3">
         <button
           onClick={() => setStep(0)}
-          className="mono uppercase tracking-cap text-[11px] px-3 py-2 text-ink-2 hover:text-ink-0"
+          className="mono uppercase tracking-cap text-[13px] px-3 py-2 text-ink-2 hover:text-ink-0"
         >
           ← back
         </button>
@@ -87,7 +87,7 @@ export function StepCriteria() {
             setStep(2);
           }}
           className={
-            "mono uppercase tracking-cap text-[11px] px-4 py-2 border rounded-md transition-colors " +
+            "mono uppercase tracking-cap text-[13px] px-4 py-2 border rounded-md transition-colors " +
             (canAdvance
               ? "border-signal text-signal hover:bg-signal/10"
               : "border-line text-ink-3 cursor-not-allowed")

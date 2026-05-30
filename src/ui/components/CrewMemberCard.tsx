@@ -58,7 +58,7 @@ export function CrewMemberCard({
 
   // Compact boolean toggle used for the risk flags + EVA eligibility.
   const FlagToggle = ({ label, field, value }: { label: string; field: keyof IMMCrewMember; value: boolean }) => (
-    <label className="mono text-[11px] text-ink-2 inline-flex items-center gap-1.5 cursor-pointer">
+    <label className="mono text-[13px] text-ink-2 inline-flex items-center gap-1.5 cursor-pointer">
       <input
         type="checkbox"
         checked={value}
@@ -92,9 +92,9 @@ export function CrewMemberCard({
               title={qualified ? "gate passed" : `gate failed: ${failedGates.join(", ")}`}
             />
             {/* Member ID */}
-            <span className="mono text-[13px] text-ink-0 truncate">{member.id}</span>
+            <span className="mono text-[15px] text-ink-0 truncate">{member.id}</span>
             {/* Sex + EVA meta */}
-            <span className="mono text-[10px] text-ink-3 hidden sm:inline uppercase tracking-cap">
+            <span className="mono text-[12px] text-ink-3 hidden sm:inline uppercase tracking-cap">
               {member.sex} · {member.EVA_eligible ? `${member.EVA_count} EVA` : "no EVA"}
             </span>
           </div>
@@ -104,7 +104,7 @@ export function CrewMemberCard({
             {/* DQ badge */}
             {!qualified && (
               <span
-                className="mono text-[9px] uppercase tracking-cap px-1.5 py-0.5 rounded-full border"
+                className="mono text-[11px] uppercase tracking-cap px-1.5 py-0.5 rounded-full border"
                 style={{ color: "var(--warn)", borderColor: "var(--warn)", background: "rgba(255,107,94,0.08)" }}
               >
                 DQ
@@ -112,14 +112,14 @@ export function CrewMemberCard({
             )}
             {/* Composite score */}
             <span
-              className="mono text-[14px] tabular-nums font-medium"
+              className="mono text-[16px] tabular-nums font-medium"
               style={{ color: scoreColor }}
             >
               {pct}%
             </span>
             {/* Chevron */}
             <span
-              className="mono text-ink-3 text-[11px] transition-transform duration-200"
+              className="mono text-ink-3 text-[13px] transition-transform duration-200"
               style={{ transform: expanded ? "rotate(90deg)" : "rotate(0deg)" }}
             >
               ›
@@ -131,7 +131,7 @@ export function CrewMemberCard({
         {onRemove && (
           <button
             type="button"
-            className="shrink-0 mono text-ink-3 hover:text-warn text-[14px] leading-none px-1.5 py-1 rounded
+            className="shrink-0 mono text-ink-3 hover:text-warn text-[16px] leading-none px-1.5 py-1 rounded
                        border border-line/40 hover:border-warn/60 transition-colors"
             onClick={() => onRemove(member.id)}
             aria-label={`remove crew member ${member.id}`}
@@ -149,12 +149,12 @@ export function CrewMemberCard({
           {editable ? (
             <div className="mb-4 flex flex-col gap-2">
               <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
-                <label className="mono text-[11px] text-ink-2 inline-flex items-center gap-1.5">
+                <label className="mono text-[13px] text-ink-2 inline-flex items-center gap-1.5">
                   <span className="text-ink-3">sex</span>
                   <select
                     value={member.sex}
                     onChange={(e) => patch({ sex: e.target.value as IMMCrewMember["sex"] })}
-                    className="mono text-[11px] bg-transparent border border-line rounded px-1.5 py-0.5
+                    className="mono text-[13px] bg-transparent border border-line rounded px-1.5 py-0.5
                                text-ink-1 focus:border-signal focus:outline-none cursor-pointer"
                     aria-label={`${member.id} sex`}
                   >
@@ -168,7 +168,7 @@ export function CrewMemberCard({
                 <FlagToggle label="abd. surgery" field="abdominal_surgery_history" value={member.abdominal_surgery_history} />
               </div>
               <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
-                <label className="mono text-[11px] text-ink-2 inline-flex items-center gap-1.5 cursor-pointer">
+                <label className="mono text-[13px] text-ink-2 inline-flex items-center gap-1.5 cursor-pointer">
                   <input
                     type="checkbox"
                     checked={member.EVA_eligible}
@@ -185,7 +185,7 @@ export function CrewMemberCard({
                   EVA eligible
                 </label>
                 {member.EVA_eligible && (
-                  <label className="mono text-[11px] text-ink-2 inline-flex items-center gap-1.5">
+                  <label className="mono text-[13px] text-ink-2 inline-flex items-center gap-1.5">
                     <span className="text-ink-3">EVA count</span>
                     <input
                       type="number"
@@ -196,7 +196,7 @@ export function CrewMemberCard({
                         const n = Math.max(0, Math.min(30, Math.round(Number(e.target.value) || 0)));
                         patch({ EVA_count: n });
                       }}
-                      className="w-16 mono text-[11px] bg-transparent border border-line rounded px-1.5 py-0.5
+                      className="w-16 mono text-[13px] bg-transparent border border-line rounded px-1.5 py-0.5
                                  text-ink-1 focus:border-signal focus:outline-none tabular-nums"
                       aria-label={`${member.id} EVA count`}
                     />
@@ -205,7 +205,7 @@ export function CrewMemberCard({
               </div>
             </div>
           ) : (
-            <div className="mono text-[11px] text-ink-2 flex flex-wrap gap-x-6 gap-y-1 mb-4">
+            <div className="mono text-[13px] text-ink-2 flex flex-wrap gap-x-6 gap-y-1 mb-4">
               <span><span className="text-ink-3">sex </span>{member.sex}</span>
               <span><span className="text-ink-3">contacts </span>{member.contacts ? "yes" : "no"}</span>
               <span><span className="text-ink-3">crowns </span>{member.crowns ? "yes" : "no"}</span>
@@ -221,7 +221,7 @@ export function CrewMemberCard({
           {/* Gate failure notice */}
           {!qualified && failedGates.length > 0 && (
             <div
-              className="mono text-[11px] rounded border px-3 py-2 mb-4"
+              className="mono text-[13px] rounded border px-3 py-2 mb-4"
               style={{ borderColor: "var(--warn)", color: "var(--warn)", background: "rgba(255,107,94,0.06)" }}
             >
               Gate DQ · {failedGates.join(" · ")}

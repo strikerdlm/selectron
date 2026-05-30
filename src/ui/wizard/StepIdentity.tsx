@@ -32,7 +32,7 @@ export function StepIdentity() {
           placeholder="e.g. crew-alpha-2026"
         />
         {!aliasValid && (
-          <p className="mono mt-1 text-[10px] text-red-300">alias must be 2–40 chars</p>
+          <p className="mono mt-1 text-[12px] text-red-300">alias must be 2–40 chars</p>
         )}
       </div>
 
@@ -57,7 +57,7 @@ export function StepIdentity() {
         />
       </div>
 
-      <p className="mono text-[10px] text-ink-3">
+      <p className="mono text-[12px] text-ink-3">
         identity fields are stored client-side only · no data leaves your machine
       </p>
 
@@ -69,7 +69,7 @@ export function StepIdentity() {
             setStep(1);
           }}
           className={
-            "mono uppercase tracking-cap text-[11px] px-4 py-2 border rounded-md transition-colors " +
+            "mono uppercase tracking-cap text-[13px] px-4 py-2 border rounded-md transition-colors " +
             (aliasValid
               ? "border-signal text-signal hover:bg-signal/10"
               : "border-line text-ink-3 cursor-not-allowed")
