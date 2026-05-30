@@ -17,7 +17,7 @@
 import { useCallback, useEffect, useState } from "react";
 import ReactEChartsCore from "echarts-for-react/lib/core";
 import { echarts } from "./echarts-base";
-import { NATURE_THEME_NAME } from "./theme";
+import { useFigureTheme, type ChartTokens } from "./useFigureTheme";
 import { ANALOG_MISSIONS } from "@/data/analog-missions";
 import { ANALOG_CONDITIONS } from "@/risk/conditions";
 import { SYNTHETIC_PRIORS, synthesizeCrew } from "@/data/synthetic-iter3";
@@ -111,6 +111,7 @@ function miniHistogramOption(
   chiSamples: number[],
   chiMean: number,
   sharedXRange: [number, number],
+  tokens: ChartTokens,
 ) {
   if (chiSamples.length < 2) {
     return {};
@@ -157,7 +158,7 @@ function miniHistogramOption(
       axisLabel: {
         interval: Math.floor(N_BINS / 4),
         fontSize: 8,
-        color: "#475569",
+        color: tokens.label,
         formatter: (val: string) => parseFloat(val).toFixed(2),
       },
       splitLine: { show: false },
@@ -257,6 +258,8 @@ export type MissionComparisonProps = {
 };
 
 export function MissionComparison({ candidateId, accessTier, gate }: MissionComparisonProps) {
+  const { themeName, tokens } = useFigureTheme();
+
   // Three-valued state:
   //   undefined → not yet checked (waiting for first loadCache)
   //   SimSession[] → checked; may be empty array (no comparison data yet)
@@ -486,8 +489,9 @@ export function MissionComparison({ candidateId, accessTier, gate }: MissionComp
                     row.chiSamples,
                     row.posterior.chi.mean,
                     sharedXRange,
+                    tokens,
                   )}
-                  theme={NATURE_THEME_NAME}
+                  theme={themeName}
                   style={{ height: 120, width: "100%" }}
                   notMerge
                 />

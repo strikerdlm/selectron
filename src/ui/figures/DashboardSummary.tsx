@@ -17,7 +17,7 @@
 import ReactEChartsCore from "echarts-for-react/lib/core";
 import type { CustomSeriesRenderItemAPI } from "echarts";
 import { echarts } from "./echarts-base";
-import { NATURE_THEME_NAME } from "./theme";
+import { useFigureTheme } from "./useFigureTheme";
 import { FigureCaption } from "./FigureCaption";
 import { f4Caption } from "./captions/F4.captions";
 
@@ -78,6 +78,8 @@ function whiskerRenderItem(
 }
 
 export function DashboardSummary({ data }: Props) {
+  const { themeName } = useFigureTheme();
+
   // Empty state — short-circuit before building any ECharts option.
   if (data.length === 0) {
     return (
@@ -192,7 +194,7 @@ export function DashboardSummary({ data }: Props) {
       <ReactEChartsCore
         echarts={echarts}
         option={option}
-        theme={NATURE_THEME_NAME}
+        theme={themeName}
         style={{ height: 280, width: "100%" }}
         notMerge
       />
