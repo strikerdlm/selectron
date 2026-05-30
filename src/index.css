@@ -34,13 +34,13 @@
   --ink-0: 12 15 20;
   --ink-1: 43 50 60;
   --ink-2: 86 95 107;
-  --ink-3: 107 116 128;
-  --signal: 176 111 0;
-  --signal-bright: 217 138 19;
+  --ink-3: 100 108 119;
+  --signal: 165 104 0;
+  --signal-bright: 205 131 18;
   --go: 15 122 82;
   --warn: 194 56 31;
   --grid-dot: 12 15 20;
-  --signal-dim: rgb(176 111 0 / 0.13);
+  --signal-dim: rgb(165 104 0 / 0.13);
 
   color-scheme: light;
 }

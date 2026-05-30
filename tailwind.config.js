@@ -21,7 +21,7 @@ export default {
         },
         signal: {
           DEFAULT: "rgb(var(--signal) / <alpha-value>)",
-          dim: "var(--signal-dim)",
+          dim: "var(--signal-dim)", // full rgba value; do NOT use Tailwind opacity modifiers on this token
           bright: "rgb(var(--signal-bright) / <alpha-value>)",
         },
         go: "rgb(var(--go) / <alpha-value>)",

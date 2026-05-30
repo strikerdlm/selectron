@@ -12,7 +12,7 @@ export function ThemeToggle() {
       title={`Switch to ${isDark ? "light" : "dark"} theme`}
       className="mono uppercase tracking-cap text-ink-2 hover:text-ink-0 transition-colors inline-flex items-center gap-1"
     >
-      <span aria-hidden>{isDark ? "☀" : "☾"}</span>
+      <span aria-hidden="true">{isDark ? "☀" : "☾"}</span>
       <span className="hidden sm:inline">{isDark ? "light" : "dark"}</span>
     </button>
   );

@@ -5,7 +5,7 @@ import { echarts } from "./echarts-base";
 
 const OKABE_ITO = ["#0072B2","#E69F00","#009E73","#CC79A7","#56B4E9","#D55E00","#F0E442","#FFFFFF"];
 const MONO = "'JetBrains Mono','Fira Mono',monospace";
-const SANS = "'Inter',system-ui,-apple-system,sans-serif";
+const SANS = "'Recursive',system-ui,sans-serif";
 
 echarts.registerTheme("selectron-dark", {
   color: OKABE_ITO,
