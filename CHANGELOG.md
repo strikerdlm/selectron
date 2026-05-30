@@ -26,9 +26,13 @@ are byte-identical. Spec/plan: `docs/superpowers/{specs,plans}/2026-05-30-select
   plus the 4 phase3f-gated MCDA/Sim figures (`PosteriorPlot`, `RiskHistogram`,
   `EvidenceReference`, `ScoreBreakdownRadar`) render dark-on-dark crisply. The gated four
   keep **byte-identical light rendering** — verified by the `phase3f` `toHaveScreenshot`
-  gate (5/5), so the manuscript figures they generate are unaffected. The 3 coupled but
-  ungated figures (`DashboardSummary`, `LxCMatrix`, `MissionComparison`) stay light-native
-  by design.
+  gate (5/5), so the manuscript figures they generate are unaffected. The remaining coupled
+  figures are also themed: `DashboardSummary` is phase3f-gated (F4, byte-identical light,
+  verified); `MissionComparison` routes its one chrome literal through a token; `LxCMatrix`
+  was already theme-correct (it is an HTML L×C matrix using CSS-variable-backed Tailwind
+  classes, with only its semantic risk-cell colors hardcoded). **Every in-app figure now
+  follows the theme toggle**, and the `?testFigure=` manuscript/snapshot path stays light by
+  construction.
 - **Analysis tab** — a journal-grade gallery of five multivariate / correlation figures:
   **A1** parallel coordinates (candidates × criteria, score-colored), **A2** a
   multi-dimensional IMM risk bubble scatter (incidence λ × worst-case severity ×
