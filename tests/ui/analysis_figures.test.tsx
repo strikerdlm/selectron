@@ -62,3 +62,13 @@ describe("CriteriaSplom", () => {
     expect(container.textContent).toContain("need ≥3 candidates");
   });
 });
+
+import { CriterionCorrelationHeatmap } from "@/ui/figures/CriterionCorrelationHeatmap";
+
+describe("CriterionCorrelationHeatmap", () => {
+  it("renders the heatmap + caption", () => {
+    const { container, getByTestId } = wrap(<CriterionCorrelationHeatmap cohort={cohort} criteria={PLACEHOLDER_CRITERIA} isDemo />);
+    expect(getByTestId("echarts-mock")).toBeTruthy();
+    expect(container.textContent).toContain("Figure A4");
+  });
+});
