@@ -199,9 +199,11 @@ selectron/
 │   │   ├── lxc.ts             #   IMMOutcome → NASA HSRB LxC matrix verdict
 │   │   └── ...                #   incidence · severity · treatment · kits · calibration
 │   ├── ui/
-│   │   ├── App.tsx            #   view switcher (Dashboard / Wizard / Sim / CrewComposition / Calibration)
+│   │   ├── App.tsx            #   view switcher (Dashboard / Wizard / Sim / CrewComposition / Calibration / Analysis)
+│   │   ├── theme/            #   ThemeProvider / useTheme / ThemeToggle (persisted light/dark)
 │   │   ├── views/
 │   │   │   ├── CrewComposition.tsx  # N-member crew builder + IMM MC results
+│   │   │   ├── Analysis.tsx          # correlation/multivariate gallery (A1–A5; demo or live cohort)
 │   │   │   ├── Calibration.tsx      # 3-tab calibration view (Conditions / Batch Fit / V&V)
 │   │   │   └── calibration/
 │   │   │       ├── ConditionsPanel.tsx  # 100-condition browse table with provenance filter + sort
@@ -326,6 +328,12 @@ Three more figures are planned but engine-blocked: **I6 IMMSensitivityTornado** 
 **K15 validation (2026-05-27, post-pass-4):** **all 3 TME + the unlimited-resources CHI (95.3, Δ +0.3) within K15 CI₉₅**; the operational issHMS CHI (82.8, Δ −12.1) falls marginally below the CI₉₅ lower bound after the evidence-based community/military incidence recalibration; 8 metrics documented-divergent. The engine is mathematically complete per K15 §II.A.9 (cp1+cp2+cp3 sequential phases). 5 tier-B conditions replaced with source-cited Earth-analog rates (27 primary citations; see [`research/_priors_rev3c_synthesis.md`](research/_priors_rev3c_synthesis.md)). The IMM output feeds the NASA HSRB LxC matrix verdict via `src/imm/lxc.ts::assessIMMLxC`. Full delta tables in [`docs/iter5_priors_rev3_strategy.md`](docs/iter5_priors_rev3_strategy.md). Mars (TM21) and Artemis are out-of-scope by design — see [`docs/future_features.md`](docs/future_features.md).
 
 See [`docs/superpowers/specs/2026-05-20-selectron-imm-calculator-design.md`](docs/superpowers/specs/2026-05-20-selectron-imm-calculator-design.md) for the design spec and [`docs/superpowers/plans/2026-05-20-selectron-imm-calculator.md`](docs/superpowers/plans/2026-05-20-selectron-imm-calculator.md) for the 97-task implementation plan.
+
+## Analysis tab + light/dark theme
+
+The **Analysis** tab (top-nav, `view.kind === "analysis"`) is a journal-grade gallery of five multivariate / correlation figures built on Apache ECharts: **A1** parallel coordinates (candidates across all criteria, line-colored by total MCDA score), **A2** a multi-dimensional IMM risk bubble scatter (incidence λ × worst-case severity × body-system group × expected mission contribution — four variables in one plot), **A3** a criteria scatterplot matrix (SPLOM), **A4** a criterion-correlation heatmap over all 12 criteria, and **A5** a criterion × condition-family vulnerability-coupling heatmap that visualizes the Stage-A → λ β-modulation architecture (58/100 coupled conditions). When the live candidate pool has fewer than 8 well-scored candidates the figures render a seeded synthetic demonstration cohort (N=40, seed `0xc0ffee`, with an injected latent-factor covariance) — clearly labeled as demo data and never empty. The correlation/contribution math lives in `src/analysis/` (`correlation.ts`, `imm-bubbles.ts`, `coupling.ts`, `demo-cohort.ts`), each unit-tested before its UI consumer.
+
+A persisted **light/dark theme** toggle sits in the header (dark default). The palette is defined as RGB-channel CSS variables consumed by Tailwind as `rgb(var(--x) / <alpha-value>)`, so the entire UI — including the five Analysis figures (via a `selectron-dark` ECharts theme + `useFigureTheme` tokens) — re-colors on toggle; the light palette is contrast-checked to WCAG AA. The existing figure components (and the manuscript figure set they generate) are intentionally untouched by both the theme and the +2pt type-scale bump, so the in-submission manuscript figures remain reproducible at their original scale.
 
 ## Calibration view + Python Calibration API
 

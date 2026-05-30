@@ -5,6 +5,53 @@ All notable changes to Selectron are documented here. Format roughly follows
 references to the commits and STATUS.md audit-log entries that produced each
 entry.
 
+## [0.5.7] — 2026-05-30 — Light/dark theme, +2pt type scale, correlation Analysis tab
+
+Frontend feature pass (subagent-driven, two-stage reviewed per task). No engine
+math changed — `src/imm/`, `src/risk/`, and the priors are untouched (one `export`
+keyword added to `FAMILY_BETA`/`FAMILY_BETA_DEFAULT` in `src/imm/simulate.ts`,
+behavior-neutral). The committed manuscript figures and `paper/submission/manuscript.docx`
+are byte-identical. Spec/plan: `docs/superpowers/{specs,plans}/2026-05-30-selectron-light-theme-correlations*`.
+
+### Added
+- **Light/dark theme** with a persisted header toggle (dark default). The palette is
+  RGB-channel CSS variables (`--bg-0: 8 9 10` → `rgb(var(--bg-0) / <alpha-value>)`), so
+  every Tailwind utility — including the 77 opacity-modifier call-sites — re-colors on
+  toggle with no component edits. A no-FOUC inline script applies the stored theme
+  pre-mount. The light palette is contrast-checked to WCAG AA (≥4.5:1 on white; amber
+  `#f5b541`→`#a56800`, plus darkened go/warn for light backgrounds).
+- **Analysis tab** — a journal-grade gallery of five multivariate / correlation figures:
+  **A1** parallel coordinates (candidates × criteria, score-colored), **A2** a
+  multi-dimensional IMM risk bubble scatter (incidence λ × worst-case severity ×
+  body-system × expected mission contribution), **A3** a criteria scatterplot matrix
+  (SPLOM), **A4** a criterion-correlation heatmap (all 12 criteria), and **A5** a
+  criterion × condition-family vulnerability-coupling heatmap (the Stage-A→λ β-modulation
+  architecture). Sources a seeded synthetic demo cohort (N=40, seed `0xc0ffee`, injected
+  covariance) when the live pool has < 8 well-scored candidates, else the live pool. New
+  `selectron-dark` ECharts theme + `useFigureTheme` tokens; existing figures and the
+  manuscript figure set are untouched.
+- **`src/analysis/`** pure math layer (TDD, 22 tests): `correlation.ts`
+  (Pearson/Spearman/matrix), `imm-bubbles.ts` (rate/severity/contribution + body-system
+  grouping; honors `lambda_unit` so per-EVA/SPE conditions are excluded from the per-PY
+  axis — 96 of 100 conditions plottable), `coupling.ts` (criterion×family Σ|β| matrix),
+  `demo-cohort.ts`.
+
+### Changed
+- **Overall type scale +2pt** on the live-app chrome (Tailwind `fontSize` scale +2px;
+  hard-coded `text-[Npx]` literals bumped +2px). The figure components in
+  `src/ui/figures/` are deliberately excluded so the manuscript figures (F3/F4/F6/F7,
+  generated from those components) stay reproducible at their original scale.
+
+### Notes / caveat
+- The +2px scale is global to *named* Tailwind text classes, which the paper-figure
+  components use, so regenerating the manuscript figures via
+  `tests/e2e/paper-figures.spec.ts` would render them at +2pt. The committed
+  `paper/figures/*.png` and `manuscript.docx` are untouched, so the in-submission
+  manuscript is unaffected. To reproduce the exact submitted figures, regenerate at
+  commit ≤ `776e225` (pre-bump) or wrap the `?testFigure=` render path in an
+  original-scale reset (`.paper-figure-scope`). Open author decision: whether the
+  figures should also adopt the +2pt scale.
+
 ## [0.5.6] — 2026-05-29 — UI / UX hardening + interaction bug-fixes
 
 Frontend-only pass driven by Diego's live feedback. No engine math changed
