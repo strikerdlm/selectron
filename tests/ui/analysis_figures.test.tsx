@@ -72,3 +72,13 @@ describe("CriterionCorrelationHeatmap", () => {
     expect(container.textContent).toContain("Figure A4");
   });
 });
+
+import { VulnerabilityCouplingHeatmap } from "@/ui/figures/VulnerabilityCouplingHeatmap";
+
+describe("VulnerabilityCouplingHeatmap", () => {
+  it("renders the coupling heatmap + caption from the real catalog", () => {
+    const { container, getByTestId } = wrap(<VulnerabilityCouplingHeatmap criteria={PLACEHOLDER_CRITERIA} />);
+    expect(getByTestId("echarts-mock")).toBeTruthy();
+    expect(container.textContent).toContain("Figure A5");
+  });
+});
