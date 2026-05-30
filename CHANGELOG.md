@@ -20,6 +20,15 @@ are byte-identical. Spec/plan: `docs/superpowers/{specs,plans}/2026-05-30-select
   toggle with no component edits. A no-FOUC inline script applies the stored theme
   pre-mount. The light palette is contrast-checked to WCAG AA (≥4.5:1 on white; amber
   `#f5b541`→`#a56800`, plus darkened go/warn for light backgrounds).
+- **In-app working-view figures now follow the theme toggle.** A `FigureThemeContext`
+  (defaults to *light* so the provider-less `?testFigure=` manuscript/snapshot path is
+  unchanged) lets the 8 live-only IMM/analysis figures (Calibration V&V, Crew results)
+  plus the 4 phase3f-gated MCDA/Sim figures (`PosteriorPlot`, `RiskHistogram`,
+  `EvidenceReference`, `ScoreBreakdownRadar`) render dark-on-dark crisply. The gated four
+  keep **byte-identical light rendering** — verified by the `phase3f` `toHaveScreenshot`
+  gate (5/5), so the manuscript figures they generate are unaffected. The 3 coupled but
+  ungated figures (`DashboardSummary`, `LxCMatrix`, `MissionComparison`) stay light-native
+  by design.
 - **Analysis tab** — a journal-grade gallery of five multivariate / correlation figures:
   **A1** parallel coordinates (candidates × criteria, score-colored), **A2** a
   multi-dimensional IMM risk bubble scatter (incidence λ × worst-case severity ×
