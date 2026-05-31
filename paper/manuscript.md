@@ -372,7 +372,7 @@ Selectron closes two gaps in the analog-astronaut selection literature: the abse
 
 **Ethics declarations.** This is a methodology contribution exercised on synthetic data. No human or animal subjects were involved, no clinical or operational records were accessed, and no institutional review board approval was required.
 
-**Declaration of generative AI and AI-assisted technologies in the writing process.** During the preparation of this work the author used Claude (Anthropic) for coding assistance and automated test generation, figure-rendering code, bibliography-verification queries, and copy-editing of author-written prose for grammar and readability. After using this tool, the author reviewed and edited the content as needed and takes full responsibility for the content of the publication. No generative-AI tool was used to generate the scientific argument, choose statistical methods, interpret results, or select references.
+**Declaration of generative AI and AI-assisted technologies in the manuscript preparation process.** During the preparation of this work the author used Claude (Anthropic) for coding assistance and automated test generation, figure-rendering code, bibliography-verification queries, and copy-editing of author-written prose for grammar and readability. After using this tool, the author reviewed and edited the content as needed and takes full responsibility for the content of the publication. No generative-AI tool was used to generate the scientific argument, choose statistical methods, interpret results, or select references.
 
 ## References
 
