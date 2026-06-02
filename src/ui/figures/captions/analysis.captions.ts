@@ -23,10 +23,10 @@ export const analysisCaptions = {
   }),
   splom: ({ n, isDemo, ids, k }: { n: number; isDemo: boolean; ids: string[]; k: number }): CaptionBlock => ({
     figureId: "A3",
-    oneLine: `Scatterplot matrix of ${ids.length} representative criteria over ${n} candidates.`,
-    methods: `Pairwise raw-score scatter for the criteria [${ids.join(", ")}]; diagonal labels the variable. Capped to ${ids.length} criteria for legibility — the full ${k}×${k} relationships appear in the correlation heatmap (A4).`,
+    oneLine: `Corrgram of ${ids.length} representative criteria over ${n} candidates: scatter + trend below the diagonal, quantified Pearson r with significance above.`,
+    methods: `Criteria [${ids.join(", ")}]. Lower triangle: raw-score scatter with an OLS trend line. Upper triangle: Pearson r (glyph size ∝ |r|, blue positive / orange-red negative) annotated with two-tailed significance (*** p<.001, ** p<.01, * p<.05, ns otherwise). p-values from t = r·√((n−2)/(1−r²)), df = n−2 (exact incomplete-beta tail). The highlights table ranks pairs by |r|. Capped to ${ids.length} criteria for legibility — the full ${k}×${k} matrix is A4.`,
     source: demoNote(isDemo, n),
-    reproducibility: "Deterministic given the cohort.",
+    reproducibility: "Deterministic given the cohort; p-values are a closed-form function of (r, n).",
   }),
   correlation: ({ n, isDemo, k }: { n: number; isDemo: boolean; k: number }): CaptionBlock => ({
     figureId: "A4",
