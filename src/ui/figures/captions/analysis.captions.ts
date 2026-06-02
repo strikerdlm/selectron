@@ -10,7 +10,7 @@ export const analysisCaptions = {
   profiles: ({ n, isDemo, k, top, best }: { n: number; isDemo: boolean; k: number; top: string; best: string }): CaptionBlock => ({
     figureId: "A1",
     oneLine: `Candidate-profile matrix: ${n} candidates × ${k} criteria, rows sorted by total MCDA score (top candidate ${best}), columns by discrimination (most-separating ${top}).`,
-    methods: "Each row is one candidate's full profile; each column a criterion. Cell color = orientation-corrected goodness [0→1] (min–max normalized, higher = better regardless of native polarity, so low BDI/MMPI maps to high goodness). Rows are sorted by total MCDA score (mean goodness across criteria), shown in the leading Σ-total column; columns are ordered by discrimination = SD of goodness. The table reports mean ± SD and range in native instrument units, plus discrimination and adjusted Fisher-Pearson skewness (Excel SKEW).",
+    methods: "Each row is one candidate's full profile; each column a criterion. Rows are sorted by total MCDA score (mean goodness across criteria), shown in the leading Σ-total column; columns are ordered by discrimination = SD of goodness. Two color modes (toggle): absolute goodness [0→1] (min–max normalized, higher = better regardless of native polarity, so low BDI/MMPI maps to high goodness), or within-criterion z (each column standardized to its own mean/SD, diverging, ±2.5σ clipped — reveals relative strength per criterion independent of its overall level). The table reports mean ± SD and range in native instrument units, plus discrimination and adjusted Fisher-Pearson skewness (Excel SKEW).",
     source: demoNote(isDemo, n),
     reproducibility: "Deterministic given the cohort; demo cohort is seeded (0xc0ffee).",
   }),

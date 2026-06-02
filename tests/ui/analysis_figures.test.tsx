@@ -35,6 +35,11 @@ describe("CriteriaHeatmap", () => {
     expect(container.textContent).toContain("Descriptive statistics");
     expect(container.textContent).toContain("discrimination");
   });
+  it("offers absolute / within-criterion color-mode toggles", () => {
+    const { container } = wrap(<CriteriaHeatmap cohort={cohort} criteria={PLACEHOLDER_CRITERIA} isDemo />);
+    expect(container.textContent).toContain("absolute goodness");
+    expect(container.textContent).toContain("within-criterion");
+  });
   it("shows an empty state with <2 candidates", () => {
     const { container } = wrap(<CriteriaHeatmap cohort={cohort.slice(0, 1)} criteria={PLACEHOLDER_CRITERIA} isDemo />);
     expect(container.textContent).toContain("need ≥2 candidates");

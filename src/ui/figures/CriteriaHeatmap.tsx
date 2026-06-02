@@ -6,6 +6,7 @@
 // orientation-corrected goodness [0→1] (higher = better, native polarity
 // removed). The descriptive-statistics table below carries the per-criterion
 // numbers — same engine as before.
+import { useState } from "react";
 import ReactEChartsCore from "echarts-for-react/lib/core";
 import { echarts } from "./echarts-base";
 import { useFigureTheme } from "./useFigureTheme";
@@ -28,6 +29,10 @@ function fmt(x: number): string {
 
 export function CriteriaHeatmap({ cohort, criteria, isDemo }: Props) {
   const { themeName, tokens } = useFigureTheme();
+  // Color mode: absolute goodness vs within-criterion z (each column standardized
+  // to its own mean/SD) — relative coloring pops who's strong/weak per criterion
+  // regardless of that criterion's overall level.
+  const [mode, setMode] = useState<"absolute" | "relative">("absolute");
   if (cohort.length < 2 || criteria.length < 2) {
     return <div className="grid h-[360px] place-items-center text-sm text-ink-2 mono">need ≥2 candidates and ≥2 criteria</div>;
   }
@@ -57,24 +62,39 @@ export function CriteriaHeatmap({ cohort, criteria, isDemo }: Props) {
   const xCats = ["Σ total", ...colOrder.map((s) => s.short)];
   const yCats = rowOrder.map((r) => r.alias);
 
-  type Cell = { value: [number, number, number]; cand: string; col: string; raw: number | null };
+  // Per-column mean/SD of goodness (and of totals) for within-criterion z-scoring.
+  const colGoodMean = criteria.map((_, ci) => mean(norm[ci]));
+  const colGoodSd = criteria.map((_, ci) => sampleStdDev(norm[ci]));
+  const totMean = mean(totals), totSd = sampleStdDev(totals);
+  const Z_CAP = 2.5;
+  const zOf = (val: number, m: number, sd: number) => sd === 0 ? 0 : clamp((val - m) / sd, -Z_CAP, Z_CAP);
+  const relative = mode === "relative";
+
+  type Cell = { value: [number, number, number]; cand: string; col: string; raw: number | null; goodness: number; z: number };
   const cells: Cell[] = [];
   rowOrder.forEach((r, y) => {
-    cells.push({ value: [0, y, r.total], cand: r.alias, col: "Σ total", raw: null });
+    const tz = zOf(r.total, totMean, totSd);
+    cells.push({ value: [0, y, relative ? tz : r.total], cand: r.alias, col: "Σ total", raw: null, goodness: r.total, z: tz });
     colOrder.forEach((s, ci) => {
-      cells.push({ value: [ci + 1, y, norm[s.ci][r.k]], cand: r.alias, col: s.short, raw: raw[s.ci][r.k] });
+      const g = norm[s.ci][r.k];
+      const z = zOf(g, colGoodMean[s.ci], colGoodSd[s.ci]);
+      cells.push({ value: [ci + 1, y, relative ? z : g], cand: r.alias, col: s.short, raw: raw[s.ci][r.k], goodness: g, z });
     });
   });
 
   const rowPx = Math.max(11, Math.min(18, Math.round(520 / n)));
   const chartH = Math.max(360, n * rowPx + 120);
 
-  // Scale the color ramp to the observed goodness range, not the full [0,1] —
-  // demo/real goodness clusters mid-range, so absolute [0,1] washes out the
-  // structure. The legend shows the actual min/max, so the mapping stays honest.
-  const gVals = cells.map((c) => c.value[2]);
+  // Absolute mode: scale the ramp to the observed goodness range (not full [0,1] —
+  // scores cluster mid-range and [0,1] washes out the structure); legend shows the
+  // real min/max. Relative mode: diverging scale centered at 0, reversed so above-
+  // average (z>0) reads blue/good and below-average reads warm.
+  const gVals = cells.map((c) => c.goodness);
   const gMin = Math.floor(Math.min(...gVals) * 20) / 20;
   const gMax = Math.ceil(Math.max(...gVals) * 20) / 20;
+  const visualMapMode = relative
+    ? { min: -Z_CAP, max: Z_CAP, inRange: { color: [...tokens.diverging].reverse() }, text: ["+σ\nabove", "−σ\nbelow"], precision: 1 }
+    : { min: gMin, max: gMax, inRange: { color: tokens.sequential }, text: ["better", "worse"], precision: 2 };
 
   const option = {
     animation: false,
@@ -85,9 +105,9 @@ export function CriteriaHeatmap({ cohort, criteria, isDemo }: Props) {
       textStyle: { color: tokens.tooltipText, fontSize: 12 },
       formatter: (p: { data: Cell }) => {
         const d = p.data;
-        const g = d.value[2];
-        if (d.raw == null) return `${d.cand}<br/>total MCDA score = ${g.toFixed(3)}`;
-        return `${d.cand}<br/>${d.col}<br/>raw = ${fmt(d.raw)} · goodness = ${g.toFixed(2)}`;
+        const ztxt = `z = ${d.z >= 0 ? "+" : ""}${d.z.toFixed(2)}σ`;
+        if (d.raw == null) return `${d.cand}<br/>total MCDA score = ${d.goodness.toFixed(3)}${relative ? `<br/>${ztxt} vs cohort` : ""}`;
+        return `${d.cand}<br/>${d.col}<br/>raw = ${fmt(d.raw)} · goodness = ${d.goodness.toFixed(2)}${relative ? `<br/>${ztxt} vs column` : ""}`;
       },
     },
     xAxis: {
@@ -101,9 +121,9 @@ export function CriteriaHeatmap({ cohort, criteria, isDemo }: Props) {
       axisLine: { lineStyle: { color: tokens.axisLine } }, axisTick: { show: false }, splitArea: { show: true },
     },
     visualMap: {
-      type: "continuous", min: gMin, max: gMax, calculable: true, orient: "vertical", right: 8, top: "center",
-      inRange: { color: tokens.sequential }, textStyle: { color: tokens.label, fontSize: 10 },
-      text: ["better", "worse"], precision: 2, itemWidth: 12, itemHeight: 150,
+      type: "continuous", calculable: true, orient: "vertical", right: 8, top: "center",
+      textStyle: { color: tokens.label, fontSize: 10 }, itemWidth: 12, itemHeight: 150,
+      ...visualMapMode,
     },
     series: [{
       type: "heatmap", data: cells,
@@ -114,6 +134,20 @@ export function CriteriaHeatmap({ cohort, criteria, isDemo }: Props) {
 
   return (
     <>
+      <div className="flex items-center justify-end gap-2 mb-1">
+        <span className="mono text-[10px] uppercase tracking-cap text-ink-3">color</span>
+        <div className="inline-flex rounded-sm border border-line overflow-hidden">
+          {([["absolute", "absolute goodness"], ["relative", "within-criterion (z)"]] as const).map(([m, label]) => (
+            <button
+              key={m} type="button" onClick={() => setMode(m)}
+              aria-pressed={mode === m}
+              className={`mono text-[11px] px-2.5 py-1 transition-colors ${mode === m ? "bg-signal/15 text-signal" : "text-ink-3 hover:text-ink-1"}`}
+            >
+              {label}
+            </button>
+          ))}
+        </div>
+      </div>
       <ReactEChartsCore echarts={echarts} option={option} theme={themeName} style={{ height: chartH, width: "100%" }} notMerge />
 
       <div className="mt-2 rounded-md border border-line bg-bg-1/40 p-4">
@@ -155,10 +189,13 @@ export function CriteriaHeatmap({ cohort, criteria, isDemo }: Props) {
 
         <p className="mono text-[10px] text-ink-3 mt-3 leading-relaxed">
           Each row is one candidate (sorted by total MCDA score, best on top); each column a criterion (ordered by
-          discrimination, most-separating left). Cell color = orientation-corrected goodness [0→1] — brighter = better,
-          native polarity removed (so low BDI/MMPI reads as high goodness). The leading <span className="text-ink-2">Σ total</span> column
-          is the mean goodness across criteria. <span className="text-ink-2">Discrimination</span> = SD of goodness (how
-          strongly a criterion separates the cohort); mean ± SD and range are native units; skew is adjusted Fisher-Pearson.
+          discrimination, most-separating left). <span className="text-ink-2">Absolute goodness</span> colors each cell by
+          orientation-corrected goodness [0→1] (brighter = better, native polarity removed, so low BDI/MMPI reads as high);
+          the leading <span className="text-ink-2">Σ total</span> column is the mean goodness across criteria.
+          <span className="text-ink-2"> Within-criterion (z)</span> instead standardizes each column to its own mean/SD
+          (diverging scale: blue = above the column average, warm = below; ±2.5σ clipped) — this pops who is relatively
+          strong/weak per criterion regardless of that criterion's overall level. <span className="text-ink-2">Discrimination</span> = SD
+          of goodness; mean ± SD and range are native units; skew is adjusted Fisher-Pearson.
         </p>
       </div>
 
