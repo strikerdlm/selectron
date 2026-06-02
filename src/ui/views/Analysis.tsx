@@ -7,7 +7,7 @@ import { makeDemoCohort } from "@/analysis/demo-cohort";
 import { buildBubbleData } from "@/analysis/imm-bubbles";
 import { IMM_CONDITIONS } from "@/imm/conditions";
 import { loadIMMPriors } from "@/imm/priors";
-import { ParallelCriteria } from "@/ui/figures/ParallelCriteria";
+import { CriteriaDistribution } from "@/ui/figures/CriteriaDistribution";
 import { RiskBubbleScatter } from "@/ui/figures/RiskBubbleScatter";
 import { CriteriaSplom } from "@/ui/figures/CriteriaSplom";
 import { CriterionCorrelationHeatmap } from "@/ui/figures/CriterionCorrelationHeatmap";
@@ -66,8 +66,8 @@ export function Analysis() {
         </span>
       </div>
       <div className="grid grid-cols-1 gap-6">
-        <Panel title="A1 · Candidate profiles (parallel coordinates)">
-          <ParallelCriteria cohort={cohort} criteria={criteria} isDemo={isDemo} />
+        <Panel title="A1 · Cohort distribution by criterion">
+          <CriteriaDistribution cohort={cohort} criteria={criteria} isDemo={isDemo} />
         </Panel>
         <Panel title="A2 · IMM risk landscape (multi-dimensional)">
           <RiskBubbleScatter points={points} excluded={excluded.length} missionDays={MISSION_DAYS} />

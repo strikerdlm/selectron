@@ -7,12 +7,12 @@ const demoNote = (isDemo: boolean, n: number) =>
     : `Live candidate pool (N=${n}).`;
 
 export const analysisCaptions = {
-  parallel: ({ n, isDemo, k }: { n: number; isDemo: boolean; k: number }): CaptionBlock => ({
+  distribution: ({ n, isDemo, k, top }: { n: number; isDemo: boolean; k: number; top: string }): CaptionBlock => ({
     figureId: "A1",
-    oneLine: `Parallel-coordinates profile of ${n} candidates across ${k} selection criteria.`,
-    methods: "Each polyline is one candidate; each vertical axis is one criterion on its native instrument scale. Line color encodes the total MCDA score (mean of min–max-normalized, orientation-corrected criterion scores; closed-form Dirichlet(1,…,1) weight mean = 1/K).",
+    oneLine: `Per-criterion distribution of ${n} candidates across ${k} criteria, ordered by discrimination (most-separating on top: ${top}).`,
+    methods: "Each row is one criterion on a shared orientation-corrected goodness axis [0→1] (min–max normalized, higher = better regardless of native polarity). Box = IQR + median; whiskers span the cohort min–max; dots are individual candidates with deterministic (van der Corput) jitter, colored by total MCDA score (mean goodness across criteria). Rows are sorted by discrimination = SD of goodness scores. The table reports mean ± SD and range in native instrument units, plus discrimination and adjusted Fisher-Pearson skewness (Excel SKEW).",
     source: demoNote(isDemo, n),
-    reproducibility: "Deterministic given the cohort; demo cohort is seeded (0xc0ffee).",
+    reproducibility: "Deterministic given the cohort (jitter is index-based, not random); demo cohort is seeded (0xc0ffee).",
   }),
   bubble: ({ n, excluded, missionDays }: { n: number; excluded: number; missionDays: number }): CaptionBlock => ({
     figureId: "A2",
