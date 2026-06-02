@@ -7,12 +7,12 @@ const demoNote = (isDemo: boolean, n: number) =>
     : `Live candidate pool (N=${n}).`;
 
 export const analysisCaptions = {
-  distribution: ({ n, isDemo, k, top }: { n: number; isDemo: boolean; k: number; top: string }): CaptionBlock => ({
+  profiles: ({ n, isDemo, k, top, best }: { n: number; isDemo: boolean; k: number; top: string; best: string }): CaptionBlock => ({
     figureId: "A1",
-    oneLine: `Per-criterion distribution of ${n} candidates across ${k} criteria, ordered by discrimination (most-separating on top: ${top}).`,
-    methods: "Each row is one criterion on a shared orientation-corrected goodness axis [0→1] (min–max normalized, higher = better regardless of native polarity). Box = IQR + median; whiskers span the cohort min–max; dots are individual candidates with deterministic (van der Corput) jitter, colored by total MCDA score (mean goodness across criteria). Rows are sorted by discrimination = SD of goodness scores. The table reports mean ± SD and range in native instrument units, plus discrimination and adjusted Fisher-Pearson skewness (Excel SKEW).",
+    oneLine: `Candidate-profile matrix: ${n} candidates × ${k} criteria, rows sorted by total MCDA score (top candidate ${best}), columns by discrimination (most-separating ${top}).`,
+    methods: "Each row is one candidate's full profile; each column a criterion. Cell color = orientation-corrected goodness [0→1] (min–max normalized, higher = better regardless of native polarity, so low BDI/MMPI maps to high goodness). Rows are sorted by total MCDA score (mean goodness across criteria), shown in the leading Σ-total column; columns are ordered by discrimination = SD of goodness. The table reports mean ± SD and range in native instrument units, plus discrimination and adjusted Fisher-Pearson skewness (Excel SKEW).",
     source: demoNote(isDemo, n),
-    reproducibility: "Deterministic given the cohort (jitter is index-based, not random); demo cohort is seeded (0xc0ffee).",
+    reproducibility: "Deterministic given the cohort; demo cohort is seeded (0xc0ffee).",
   }),
   bubble: ({ n, excluded, missionDays }: { n: number; excluded: number; missionDays: number }): CaptionBlock => ({
     figureId: "A2",

@@ -4,7 +4,7 @@ import { type ReactNode } from "react";
 import { describe, it, expect, afterEach, vi } from "vitest";
 import { render, cleanup } from "@testing-library/react";
 import { ThemeProvider } from "@/ui/theme/ThemeContext";
-import { CriteriaDistribution } from "@/ui/figures/CriteriaDistribution";
+import { CriteriaHeatmap } from "@/ui/figures/CriteriaHeatmap";
 import { Analysis } from "@/ui/views/Analysis";
 import { PLACEHOLDER_CRITERIA } from "@/data/placeholder-criteria";
 import { makeDemoCohort } from "@/analysis/demo-cohort";
@@ -24,19 +24,19 @@ afterEach(cleanup);
 const wrap = (ui: ReactNode) => render(<ThemeProvider>{ui}</ThemeProvider>);
 const cohort = makeDemoCohort(PLACEHOLDER_CRITERIA);
 
-describe("CriteriaDistribution", () => {
+describe("CriteriaHeatmap", () => {
   it("renders a chart + caption with the cohort", () => {
-    const { container, getByTestId } = wrap(<CriteriaDistribution cohort={cohort} criteria={PLACEHOLDER_CRITERIA} isDemo />);
+    const { container, getByTestId } = wrap(<CriteriaHeatmap cohort={cohort} criteria={PLACEHOLDER_CRITERIA} isDemo />);
     expect(getByTestId("echarts-mock")).toBeTruthy();
     expect(container.textContent).toContain("Figure A1");
   });
   it("renders a per-criterion descriptive-statistics table", () => {
-    const { container } = wrap(<CriteriaDistribution cohort={cohort} criteria={PLACEHOLDER_CRITERIA} isDemo />);
+    const { container } = wrap(<CriteriaHeatmap cohort={cohort} criteria={PLACEHOLDER_CRITERIA} isDemo />);
     expect(container.textContent).toContain("Descriptive statistics");
     expect(container.textContent).toContain("discrimination");
   });
   it("shows an empty state with <2 candidates", () => {
-    const { container } = wrap(<CriteriaDistribution cohort={cohort.slice(0, 1)} criteria={PLACEHOLDER_CRITERIA} isDemo />);
+    const { container } = wrap(<CriteriaHeatmap cohort={cohort.slice(0, 1)} criteria={PLACEHOLDER_CRITERIA} isDemo />);
     expect(container.textContent).toContain("need ≥2 candidates");
   });
   it("does not throw when a score exceeds the criterion scale", () => {
@@ -44,7 +44,7 @@ describe("CriteriaDistribution", () => {
       { id: "oor", alias: "OOR", scores: Object.fromEntries(PLACEHOLDER_CRITERIA.map((c) => [c.id, c.scale.max + 999])) },
       ...cohort.slice(0, 2),
     ];
-    expect(() => wrap(<CriteriaDistribution cohort={bad} criteria={PLACEHOLDER_CRITERIA} isDemo />)).not.toThrow();
+    expect(() => wrap(<CriteriaHeatmap cohort={bad} criteria={PLACEHOLDER_CRITERIA} isDemo />)).not.toThrow();
   });
 });
 
