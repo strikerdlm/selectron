@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import type { ConditionsListResponse, Provenance } from "@/api/calibration";
+import type { ConditionSummary, ConditionsListResponse, Provenance } from "@/api/calibration";
 import { listConditions } from "@/api/calibration";
 
 const PROVENANCE_META: Record<Provenance, { label: string; color: string }> = {
@@ -15,6 +15,51 @@ function provenanceBadge(p: Provenance) {
   return (
     <span className={`mono text-[12px] uppercase tracking-cap ${meta.color}`}>
       {meta.label}
+    </span>
+  );
+}
+
+// The Status column reflects HOW a condition's prior was produced, not its quality.
+// tier-A NASA values are authoritative and intentionally not refit, so they must
+// read as "NASA-sourced" rather than a bare "—" (which looks like missing data).
+function statusCell(c: ConditionSummary) {
+  if (c.fitted) {
+    return (
+      <span
+        className="flex items-center gap-1.5"
+        title="Posterior fitted via PyMC NUTS from terrestrial epidemiological base rates."
+      >
+        <span className="w-2 h-2 rounded-full bg-sky-400" />
+        <span className="mono text-[12px] uppercase tracking-cap text-sky-400">Fitted</span>
+      </span>
+    );
+  }
+  if (c.fittable) {
+    return (
+      <span
+        className="flex items-center gap-1.5"
+        title="Tier-B literature prior eligible for PyMC fitting; not yet fitted."
+      >
+        <span className="w-2 h-2 rounded-full bg-go" />
+        <span className="mono text-[12px] uppercase tracking-cap text-go">Fittable</span>
+      </span>
+    );
+  }
+  if (c.provenance === "tierA-nasa") {
+    return (
+      <span
+        className="flex items-center gap-1.5"
+        title="Authoritative NASA Integrated Medical Model value — no PyMC fit required (tier A is above tier B)."
+      >
+        <span className="w-2 h-2 rounded-full bg-sky-400/60" />
+        <span className="mono text-[12px] uppercase tracking-cap text-sky-400/80">NASA-sourced</span>
+      </span>
+    );
+  }
+  return (
+    <span className="flex items-center gap-1.5">
+      <span className="w-2 h-2 rounded-full bg-line-2" />
+      <span className="mono text-[12px] uppercase tracking-cap text-ink-3">—</span>
     </span>
   );
 }
@@ -86,7 +131,7 @@ export function ConditionsPanel() {
         <div className="flex items-baseline gap-x-3">
           <h3 className="display text-xl text-ink-0 tracking-tight">Conditions</h3>
           <span className="label text-ink-3">
-            {data?.n_total} total · {data?.n_fitted ?? 0} fitted · {data?.n_fittable} fittable
+            {data?.n_total} total · {data?.n_fitted ?? 0} fitted · {provCounts["tierA-nasa"] ?? 0} NASA-sourced · {data?.n_fittable} fittable
           </span>
         </div>
         <div className="flex items-center gap-3">
@@ -152,24 +197,7 @@ export function ConditionsPanel() {
                 <td className="px-4 py-2.5">
                   <span className="mono text-[13px] text-ink-2">{c.distribution}</span>
                 </td>
-                <td className="px-4 py-2.5">
-                  {c.fitted ? (
-                    <span className="flex items-center gap-1.5">
-                      <span className="w-2 h-2 rounded-full bg-sky-400" />
-                      <span className="mono text-[12px] uppercase tracking-cap text-sky-400">Fitted</span>
-                    </span>
-                  ) : c.fittable ? (
-                    <span className="flex items-center gap-1.5">
-                      <span className="w-2 h-2 rounded-full bg-go" />
-                      <span className="mono text-[12px] uppercase tracking-cap text-go">Fittable</span>
-                    </span>
-                  ) : (
-                    <span className="flex items-center gap-1.5">
-                      <span className="w-2 h-2 rounded-full bg-line-2" />
-                      <span className="mono text-[12px] uppercase tracking-cap text-ink-3">—</span>
-                    </span>
-                  )}
-                </td>
+                <td className="px-4 py-2.5">{statusCell(c)}</td>
               </tr>
             ))}
           </tbody>
