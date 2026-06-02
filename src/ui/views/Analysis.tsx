@@ -65,7 +65,7 @@ export function Analysis() {
           {isDemo ? `demo cohort · N=${cohort.length}` : `live pool · N=${cohort.length}`}
         </span>
       </div>
-      <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+      <div className="grid grid-cols-1 gap-6">
         <Panel title="A1 · Candidate profiles (parallel coordinates)">
           <ParallelCriteria cohort={cohort} criteria={criteria} isDemo={isDemo} />
         </Panel>

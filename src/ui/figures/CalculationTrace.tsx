@@ -72,7 +72,7 @@ function TraceStepCard({ step, last }: { step: TraceStep; last: boolean }) {
             aria-hidden
           >
             <span className="text-signal text-[14px] leading-none">↓</span>
-            in plain English
+            Explanation
           </span>
         </div>
         <p className="text-[14px] text-ink-1 leading-relaxed pl-3 mt-1">{step.lay}</p>
