@@ -28,6 +28,7 @@ import { IMMPosteriorHist } from "../figures/IMMPosteriorHist";
 import { IMMConditionDrivers } from "../figures/IMMConditionDrivers";
 import { IMMConvergencePlot } from "../figures/IMMConvergencePlot";
 import { IMMValidationCompare } from "../figures/IMMValidationCompare";
+import { LxCMatrix } from "../figures/LxCMatrix";
 import { assessIMMLxC } from "../../imm/lxc";
 import { notify } from "../components/Toast";
 import { createIMMSession, recentIMMSessionsFor } from "../../db/repository";
@@ -818,9 +819,14 @@ export function CrewComposition() {
               role="status"
               aria-label={`HSRB risk verdict ${lxc.color} L${lxc.likelihood} times C${lxc.consequence} score ${lxc.score}`}
             >
-              <h3 className="label text-ink-1 uppercase tracking-cap mb-4">
-                NASA HSRB · LxC verdict (JSC-66705 Rev A)
-              </h3>
+              <div className="flex items-baseline justify-between flex-wrap gap-2 mb-4">
+                <h3 className="label text-ink-1 uppercase tracking-cap">
+                  NASA HSRB · LxC verdict (JSC-66705 Rev A)
+                </h3>
+                <span className="mono text-[10px] uppercase tracking-cap text-ink-3">
+                  JSC-66705 Rev A · Fig. 4
+                </span>
+              </div>
               <div className="flex items-baseline gap-6 flex-wrap">
                 <span
                   className={
@@ -848,17 +854,39 @@ export function CrewComposition() {
                   </span>
                 )}
               </div>
-              <dl className="mono text-xs text-ink-2 mt-4 grid grid-cols-2 gap-x-6 gap-y-1">
-                <dt className="text-ink-3 uppercase tracking-cap">likelihood</dt>
-                <dd>
-                  L{lxc.likelihood} · {lxc.likelihoodLabel} · pFailure = {(100 * lxc.pMissionFailure).toFixed(2)}%
-                </dd>
-                <dt className="text-ink-3 uppercase tracking-cap">consequence</dt>
-                <dd>
-                  C{lxc.consequence} · {lxc.consequenceLabel} · fractionLost = {(100 * lxc.fractionLost).toFixed(2)}%
-                </dd>
-              </dl>
-              <p className="mono text-[12px] text-ink-3 mt-3 border-t border-line/40 pt-2">
+
+              {/* 5×5 Likelihood × Consequence matrix — same visualization as the
+                  Stage-B Sim page (CHIExplainer): matrix left, drivers right. */}
+              <div className="grid grid-cols-1 md:grid-cols-[minmax(260px,360px)_1fr] gap-5 items-start mt-5">
+                <LxCMatrix assessment={lxc} />
+
+                <div className="space-y-3 text-sm text-ink-1 leading-relaxed">
+                  <div>
+                    <span className="mono text-[10px] uppercase tracking-cap text-ink-3">
+                      likelihood · L{lxc.likelihood} ({lxc.likelihoodLabel})
+                    </span>
+                    <p className="mt-1">
+                      <span className="mono text-ink-0">
+                        pFailure = {(100 * lxc.pMissionFailure).toFixed(2)} %
+                      </span>{" "}
+                      — {lxc.likelihoodDefinition}
+                    </p>
+                  </div>
+                  <div>
+                    <span className="mono text-[10px] uppercase tracking-cap text-ink-3">
+                      consequence · C{lxc.consequence} ({lxc.consequenceLabel})
+                    </span>
+                    <p className="mt-1">
+                      <span className="mono text-ink-0">
+                        fraction crew-days lost = {(100 * lxc.fractionLost).toFixed(2)} %
+                      </span>{" "}
+                      — {lxc.consequenceDefinition}
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              <p className="mono text-[12px] text-ink-3 mt-4 border-t border-line/40 pt-2">
                 pFailure = 1 − missionSuccess (failure ⇔ any of EVAC, LOCL, CHI &lt; χ*).
                 fractionLost = 1 − CHI/100 (NASA JSC-66705 §3.2.4).
               </p>

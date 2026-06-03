@@ -3,13 +3,22 @@
 // highlighted. Pure HTML/CSS — the matrix is discrete and categorical,
 // which makes a CSS grid cleaner than ECharts heatmap for this use case.
 
-import type { LxCAssessment } from "@/risk/lxc";
 import {
   LXC_PRIORITY_SCORES,
   LIKELIHOOD_BANDS_IN_MISSION,
   CONSEQUENCE_BANDS_MISSION_OBJ,
   lxcColor,
+  type LikelihoodLevel,
+  type ConsequenceLevel,
 } from "@/risk/lxc-definitions";
+
+// Minimal structural prop — both the Stage-B `LxCAssessment` (risk/lxc) and
+// the crew-level `IMMLxCAssessment` (imm/lxc) satisfy it, keeping this figure
+// pipeline-agnostic like the band definitions it renders.
+export type LxCMatrixAssessment = {
+  likelihood: LikelihoodLevel;
+  consequence: ConsequenceLevel;
+};
 
 // NASA-style cell fill palette. JSC-66705 Figure 4 uses the standard
 // green/yellow/red traffic-light scheme; we use slightly darker tones so
@@ -28,7 +37,7 @@ const CELL_TEXT = {
   gray: "#e5e7eb",
 } as const;
 
-export function LxCMatrix({ assessment }: { assessment: LxCAssessment }) {
+export function LxCMatrix({ assessment }: { assessment: LxCMatrixAssessment }) {
   // Render likelihood top-to-bottom L=5..1 (matches the published figure).
   const Lrows = [5, 4, 3, 2, 1] as const;
   const Ccols = [1, 2, 3, 4, 5] as const;
@@ -114,7 +123,7 @@ function Row({
 }: {
   L: 1 | 2 | 3 | 4 | 5;
   Ccols: readonly (1 | 2 | 3 | 4 | 5)[];
-  assessment: LxCAssessment;
+  assessment: LxCMatrixAssessment;
 }) {
   const Lband = LIKELIHOOD_BANDS_IN_MISSION[L - 1];
   return (
@@ -139,7 +148,7 @@ function Cell({
 }: {
   L: 1 | 2 | 3 | 4 | 5;
   C: 1 | 2 | 3 | 4 | 5;
-  assessment: LxCAssessment;
+  assessment: LxCMatrixAssessment;
 }) {
   const score = LXC_PRIORITY_SCORES[L - 1][C - 1];
   const color = lxcColor(score);
