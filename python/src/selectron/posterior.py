@@ -1,6 +1,7 @@
 """Bayesian posterior draws for the IMM incidence priors."""
 from __future__ import annotations
 
+import zlib
 from dataclasses import dataclass, field
 from typing import Any, Mapping
 
@@ -28,6 +29,10 @@ def sample_posterior(
       - Lognormal-Poisson (analytic LogNormal(μ_log_λ, σ_log_λ) posterior)
       - Fixed (no posterior — every draw equals lambda_fixed)
       - Beta-Bernoulli / other: skipped (caller falls back to point prior)
+
+    The seed is combined with a stable CRC32 hash of each condition id so draws
+    are bit-reproducible across processes and condition-list reorderings
+    (builtin hash() is randomized per process and must not be used here).
     """
     if n_draws <= 0:
         raise ValueError(f"n_draws must be > 0; got {n_draws}")
@@ -39,7 +44,7 @@ def sample_posterior(
             continue
         inc = cond.get("incidence", {})
         dist = inc.get("distribution", "")
-        cond_seed = (seed ^ hash(cid)) & 0xFFFFFFFF
+        cond_seed = (seed ^ zlib.crc32(cid.encode("utf-8"))) & 0xFFFFFFFF
         rng = np.random.default_rng(cond_seed)
         if dist == "Gamma-Poisson":
             alpha = float(inc["alpha"]); beta = float(inc["beta"])
