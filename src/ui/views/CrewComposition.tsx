@@ -109,6 +109,23 @@ const INITIAL_CREW: IMMCrewMember[] = [
   },
 ];
 
+/**
+ * 2026-06-04 mission-kind context label. Surfaces the active prior-calibration
+ * context so the user knows whether the engine is running ISS-K15 priors,
+ * controlled-habitat priors, or Antarctic winter-over priors. Each label maps
+ * 1-to-1 to a key in `imm-priors.json::global_calibration.kind_multipliers`.
+ */
+function missionKindContextLabel(kind: import("../../imm/types").IMMMissionKind): string {
+  switch (kind) {
+    case "leo-iss":         return "Context: ISS-calibrated priors (K15 reference)";
+    case "analog-controlled": return "Context: Controlled-habitat priors";
+    case "antarctic-station": return "Context: Antarctic winter-over priors (Bhatia/Palinkas anchored)";
+    case "analog-isolation":  return "Context: legacy analog (no kind multiplier; 1.0 fallthrough)";
+    case "lunar-artemis-future": return "Context: future (not yet supported)";
+    case "interplanetary-mars-future": return "Context: future (not yet supported)";
+  }
+}
+
 interface CrewState {
   members: IMMCrewMember[];
   mission: IMMMission;
@@ -601,6 +618,17 @@ export function CrewComposition() {
                   <option key={m.id} value={m.id}>{m.label}</option>
                 ))}
               </select>
+              {/* 2026-06-04 mission-kind context badge. Tells the user which
+                  prior calibration context is active for this mission. The
+                  "context" drives a per-(kind, condition) multiplier in the
+                  engine (see imm-priors.json::global_calibration.kind_multipliers
+                  and src/imm/simulate.ts::IMMTrialOpts.kindMultipliers). */}
+              <p
+                className="mono text-[11px] text-ink-3 mt-0.5"
+                data-testid="mission-kind-context"
+              >
+                {missionKindContextLabel(state.mission.kind)}
+              </p>
             </div>
 
             {/* Mission meta — editable duration / crew size / EVAs (recompute on change) */}

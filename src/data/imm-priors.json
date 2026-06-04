@@ -9382,6 +9382,40 @@
     "fit_residuals_within_CI95": false,
     "tierA_multiplier": 1.0,
     "tierB_multiplier": 1.0,
-    "tierC_multiplier": 1.0
+    "tierC_multiplier": 1.0,
+    "kind_multipliers": {
+      "antarctic-station": {
+        "_doc_": "2026-06-04 Antarctic vs controlled-habitat context modulation. Anchored on research/analog_incidence_antarctic.md (Bhatia 2012 Maitri 26-PY; Palinkas 2004 313 US winter-overs; Pattarini 2016 USAP 3 stations; Hong 2022 Korean 88 winter-overs; Pe\u0159ina 2024 multi-station dental; Nirwan 2022 SP altitude). Multiplier of 1.0 = no change. Applied AFTER tier multiplier, BEFORE risk-factor / Stage-A multipliers. Source_ref: research/evidence_extracted/antarctic_kind_multipliers.md (forthcoming).",
+        "depression": 0.5,
+        "anxiety": 1.5,
+        "respiratory-infection": 0.2,
+        "gastroenteritis": 0.1,
+        "skin-rash": 0.33,
+        "late-insomnia": 1.5,
+        "frostbite": 5.0,
+        "altitude-sickness": 4.0,
+        "hypoxia-related-headache": 2.0,
+        "seasonal-affective-disorder": 2.0,
+        "headache-co2-induced": 0.0,
+        "decompression-sickness-secondary-to-extravehicular-activity": 0.0,
+        "visual-impairment-and-intracranial-pressure-viip-space-adaptation": 0.0,
+        "barotrauma-ear-sinus-block": 0.0,
+        "insomnia-space-adaptation": 0.0
+      },
+      "analog-controlled": {
+        "_doc_": "2026-06-04 controlled-habitat context modulation. Heated, climate-stable, real-time medical support. Most conditions at base-rate; URTI / depression modestly suppressed (no McMurdo Crud reservoir, shorter durations). Space-adaptation / ECLSS-specific conditions set to 0 (no microgravity, no CO2 scrubber failure modes).",
+        "respiratory-infection": 0.5,
+        "depression": 0.5,
+        "frostbite": 0.0,
+        "altitude-sickness": 0.0,
+        "hypoxia-related-headache": 0.0,
+        "seasonal-affective-disorder": 0.0,
+        "decompression-sickness-secondary-to-extravehicular-activity": 0.0,
+        "visual-impairment-and-intracranial-pressure-viip-space-adaptation": 0.0,
+        "insomnia-space-adaptation": 0.0,
+        "headache-co2-induced": 0.0,
+        "barotrauma-ear-sinus-block": 0.0
+      }
+    }
   }
 }

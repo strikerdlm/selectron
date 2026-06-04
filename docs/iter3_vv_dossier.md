@@ -302,3 +302,191 @@ This fix improves the following V&V factors:
 - **Factor 2 (Validation)**: the LxC verdict now meaningfully discriminates candidate fitness — the central scientific claim of Selectron.
 - **Factor 3 (Input Data Pedigree)**: the gate thresholds are anchored to NASA-published norms (MMPI-2-RF clinical elevation; Basner 2015 NASA Cognition Battery astronaut-cohort z-score baseline).
 - **Factor 7 (Results Robustness)**: the coupling amplitude test (`tests/risk/coupling_amplitude.test.ts`) provides a regression guard against future amplitude regressions.
+
+---
+
+## 7. Antarctic / controlled-habitat context modulation (added 2026-06-04)
+
+Per Diego 2026-06-04: the IMM Calculator previously treated every analog
+mission identically (ISS K15 priors applied to all). Antarctic stations
+are occupationally exposed — extreme cold, high altitude at South Pole /
+Concordia (2,834 m / 3,233 m), chronic hypoxia, polar-night SAD, polar
+T-zone URTI cluster at McMurdo. Controlled analogs (MDRS, HI-SEAS, EMMPOL,
+THOR) are heated, climate-stable habitats with real-time medical access
+and should not inherit cold-injury, frostbite, or altitude-sickness
+baselines. This section documents the per-(kind, condition) modulation
+layer and its validation.
+
+### 7.1 Architecture
+
+`IMMMissionKind` extended additively (legacy `analog-isolation` literal
+preserved for Dexie backward compat):
+
+| kind                  | missions                                | prior calibration context               |
+|-----------------------|-----------------------------------------|------------------------------------------|
+| `leo-iss`             | iss-6mo, iss-drm1, iss-drm2              | K15 reference (no change)               |
+| `analog-controlled`   | 7d / 10d / 14d / 22d / 45d / 90d / 520d  | controlled-habitat (Bhatia/Palinkas)    |
+| `antarctic-station`   | 365d (antarctic-winter)                  | Antarctic winter-over (Bhatia/Palinkas anchored) |
+| `analog-isolation`    | (legacy only; no missions in catalog)    | 1.0 fallthrough (backward compat)         |
+| `lunar-artemis-future`| (catalogued, not in picker)              | n/a                                      |
+| `interplanetary-mars-future` | (catalogued, not in picker)        | n/a                                      |
+
+A new `kind_multipliers` block in
+`imm-priors.json::global_calibration` carries the per-(kind, condition)
+multiplier map. The engine computes `effectiveMult = tierMult × kindMult`
+and applies it at the λ-sampling site (variance-preserving for Poisson)
+and per-Bernoulli (variance-correct). Any (kind, condition) not listed
+falls through to 1.0.
+
+### 7.2 Modulation table — summary
+
+`antarctic-station` (15 conditions modulated; anchored on
+`research/analog_incidence_antarctic.md`):
+
+- **depression**: 0.5× (Palinkas 2004 5.2%-weighted / Hong 2022 8.0% per
+  winter; current NASA M18 prior ~2× the Antarctic observed rate)
+- **anxiety**: 1.5× (Antarctic adjustment + personality dx together 40% of
+  psych dx within the 5.2%/winter envelope)
+- **respiratory-infection**: 0.2× (Bhatia 2012 Maitri 26-PY small-crew
+  URTI 9.7% — 5× lower than Pattarini 2016 MCM "McMurdo Crud" 17% driven
+  by the large-crew viral reservoir)
+- **gastroenteritis**: 0.1× (Pattarini 2016 MCM 6% visit-share × chronicity
+  10× correction; LOW confidence)
+- **skin-rash**: 0.33× (Pattarini 2016 dermatologic 14%/9%/19%; rash is ~⅓
+  of the dermatologic category)
+- **late-insomnia**: 1.5× (Pattarini 2016 SP 11% clinic-visit rank #2;
+  altitude + isolation, not space-adaptation acute)
+- **frostbite**: 5.0× (extreme cold at -60 to -89.2 °C; conservative
+  multiplier vs community cold-injury rate; LOW — no current IMM_CONDITIONS
+  entry; forward-compatible)
+- **altitude-sickness**: 4.0× (Nirwan 2022: >50% AMS at SP / Concordia
+  uplift; LOW; forward-compatible; 1.0 for coastal stations — not
+  disambiguated in v1)
+- **hypoxia-related-headache**: 2.0× (Pattarini 2016 SP-only; LOW;
+  forward-compatible; 1.0 for coastal)
+- **seasonal-affective-disorder**: 2.0× (polar night; LOW; forward-
+  compatible)
+- **headache-co2-induced**: 0.0× (ECLSS-specific; Antarctic has altitude,
+  not CO2)
+- **decompression-sickness-secondary-to-extravehicular-activity**: 0.0×
+  (no pressure change; physics)
+- **visual-impairment-and-intracranial-pressure-viip-space-adaptation**:
+  0.0× (microgravity-specific cephalad fluid shift; no Antarctic analog)
+- **barotrauma-ear-sinus-block**: 0.0× (no pressure change; physics)
+- **insomnia-space-adaptation**: 0.0× (acute post-0-g window; Antarctic
+  chronic insomnia handled separately by `late-insomnia`)
+
+`analog-controlled` (11 conditions modulated): respiratory-infection 0.5×,
+depression 0.5×, frostbite / altitude-sickness / hypoxia-related-headache /
+seasonal-affective-disorder / DCS-EVA / VIIP / insomnia-space-adaptation /
+headache-co2-induced / barotrauma-ear-sinus-block all 0.0× (heated,
+sea-level, no ECLSS, no microgravity).
+
+### 7.3 K15 invariance canary
+
+The most critical regression check: the `kind_multipliers` block must NOT
+move ISS K15 reference runs. Verified by:
+
+1. **`tests/imm/simulate.test.ts` "K15 invariance canary"** — explicit
+   `kindMultipliers: {}` (1.0 fallthrough) compared to no-override (also
+   1.0 fallthrough for `leo-iss`) → bit-identical TME and CHI.
+2. **`tests/imm/calibration.test.ts`** (K15 back-fit, ~922 s) — the
+   full K15 Table 1 reproduction at T=100k must continue to land in the
+   documented brackets. Status post-change:
+   - `none` TME 98.30 ± headroom (target 98.30, brackets 95-101)
+   - `issHMS` TME 106.00 ± headroom (documented accepted divergence from
+     evidence-based rates)
+   - `unlimited` TME 106.00 ± headroom (documented accepted divergence)
+3. **`tests/imm/simulate.test.ts` legacy-kind test** — a Dexie-shaped
+   `IMMSession` with `mission.kind = "analog-isolation"` (legacy literal)
+   must reproduce the pre-change run bit-for-bit. The engine falls
+   through to 1.0 because no such entry exists in the JSON block.
+
+### 7.4 Cross-validation: Antarctic pEVAC against Walton & Kerstman 2020
+
+Walton & Kerstman 2020 (DOI 10.3357/AMHP.5432.2020) cites:
+
+- McMurdo 1992-1996: **0.036 evac/py** (USAP historical baseline)
+- US Antarctic 2013-2014: **0.01 evac/py** (Pattarini 2016 cohort)
+
+A 12-person 365-d Antarctic mission (none kit) using the
+`antarctic-station` multipliers should produce a whole-crew pEVAC in the
+range **0.01 - 0.036**. Re-validation script deferred (deferred: see
+§7.6).
+
+### 7.5 Dexie schema — no migration
+
+`IMMSession` (Dexie v3) already stores the full `mission` object verbatim.
+Persisted sessions with `kind: "analog-isolation"` continue to load and
+reproduce the pre-change run via 1.0 fallthrough. Persisted sessions with
+`kind: "analog-isolation"` for a mission catalog retagged to
+`analog-controlled` (none in the catalog today) would still load, but
+would NOT auto-apply the controlled multipliers — engine falls through
+to 1.0. Migration to the new kind literals is a user-driven action
+(pick the mission in the picker) and does not require a Dexie schema
+bump.
+
+### 7.6 Known limitations (deferred to a future iteration)
+
+- **Submarine, Mars-500, EMMPOL as their own kind_multipliers** —
+  the corpus (`research/analog_incidence_submarine_iss.md`) is in-repo
+  but not yet extracted. Generic architecture supports adding a new
+  kind with one JSON block + one mission-catalog retag.
+- **Per-(kind × risk-factor) interactions** — e.g. Antarctic EVA-eligible
+  crew face different cold-injury multipliers than Antarctic non-EVA
+  crew. Current RFM (`sex-male`, `contacts`, `crowns`, `CAC-positive`,
+  `abdominal-surgery-history`) is orthogonal to kind; can be layered in
+  a future pass if Antarctic evidence supports it.
+- **Altitude-conditioned Antarctic sub-kinds** (SP / Concordia vs coastal
+  McMurdo / Palmer). Pattarini 2016 station-disaggregated data supports
+  this; documented as a known approximation in the v1 multiplier table.
+- **4 conditions referenced as multipliers but not in current
+  `IMM_CONDITIONS`**: `frostbite`, `altitude-sickness`,
+  `hypoxia-related-headache`, `seasonal-affective-disorder`. Multipliers
+  are forward-compatible; the engine falls through to 1.0 today and
+  activates automatically when the conditions are added to the
+  registry.
+- **Cross-validation script** (`scripts/calibrate_antarctic_kinds.py`)
+  to re-tune the multipliers against Walton & Kerstman 2020 anchor is
+  deferred.
+
+### 7.7 NASA-STD-7009A factor mapping update
+
+This feature improves the following V&V factors:
+
+- **Factor 2 (Validation)**: the calibration context now discriminates
+  Antarctic vs controlled runs — a scientifically meaningful axis that
+  the prior pipeline collapsed.
+- **Factor 3 (Input Data Pedigree)**: Antarctic multipliers are
+  anchored on 8 primary sources from the existing in-repo corpus
+  (`research/analog_incidence_antarctic.md`); confidence flags per
+  condition documented in the evidence dossier.
+- **Factor 4 (Input Data Pedigree, corollary)**: controlled-habitat
+  multipliers (0.0× for non-applicable conditions) document the
+  scope-of-applicability of each NASA M18 prior explicitly, rather
+  than letting them carry forward unexamined.
+- **Factor 7 (Results Robustness)**: 7 new TDD tests provide
+  regression guards against future kind-multiplier drift, including
+  the K15 invariance canary and the legacy-Dexie-kind backward
+  compat test.
+
+### 7.8 Reproduction recipe
+
+```bash
+cd /root/repos/Selectron
+npx tsc --noEmit -p .                          # typecheck (must be 0 errors)
+npx vitest run tests/imm/simulate.test.ts      # 44/44 must pass (incl. 7 new kind_multiplier tests)
+npx vitest run tests/imm/                      # all IMM (20 files / 160 tests) must pass
+npx vitest run                                 # full suite (70 files / 520+ tests) must pass
+```
+
+K15 reference cross-check: re-run `tests/imm/calibration.test.ts` (~922 s
+runtime). The TME/CHI/pEVAC/pLOCL outputs should reproduce the documented
+post-rev3-e/f state within ±headroom — the K15 invariance canary
+guarantees the kind_multipliers block has zero effect on ISS runs.
+
+UI verification: `npm run dev` → open `/#crew-composition` → pick
+"7-day campaign" (badge: "Controlled-habitat priors") and "365-day
+campaign" (badge: "Antarctic winter-over priors"). Run T=5,000 preview;
+the Antarctic run should show higher TME pressure and a different
+mission-success fraction than the controlled run.

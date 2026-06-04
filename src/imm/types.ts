@@ -74,11 +74,19 @@ export type IMMCrewMember = {
 };
 
 /**
- * Mission taxonomy. Selectron v1 supports only "analog-isolation" and
- * "leo-iss" — these are the operational scope for which the IMM Calculator
- * is calibrated and validated.
+ * Mission taxonomy. Selectron v1 supports analog-isolation / analog-controlled /
+ * antarctic-station / leo-iss — these are the operational scope for which the
+ * IMM Calculator is calibrated and validated.
  *
- * "lunar-artemis-future" and "interplanetary-mars-future" are catalogued for
+ * v2026-06-04 — split `analog-isolation` into `analog-controlled` (heated,
+ * climate-stable habitats: MDRS, HI-SEAS, EMMPOL, THOR) and `antarctic-station`
+ * (occupationally exposed: extreme cold, high altitude at South Pole / Concordia,
+ * chronic hypoxia, polar-night SAD). The legacy literal `analog-isolation` is
+ * preserved for backward compatibility with persisted Dexie `IMMSession` rows
+ * and the analog-missions analogue-catalog; the engine falls through to a 1.0
+ * multiplier for the legacy kind, reproducing pre-2026-06-04 outputs.
+ *
+ * `lunar-artemis-future` and `interplanetary-mars-future` are catalogued for
  * forward compatibility but are FILTERED OUT of the active mission picker
  * because the engine does not yet model the structural risk drivers required
  * for those destinations (comms-delay treatment degradation, cumulative-dose
@@ -86,7 +94,9 @@ export type IMMCrewMember = {
  * for the implementation roadmap.
  */
 export type IMMMissionKind =
-  | "analog-isolation"            // MDRS, HI-SEAS, Mars-500, Antarctic winter-over, etc.
+  | "analog-isolation"            // LEGACY: heated-habitat + Antarctic (kept for Dexie backward compat)
+  | "analog-controlled"           // Heated, climate-stable habitat (MDRS, HI-SEAS, EMMPOL, THOR)
+  | "antarctic-station"           // Cold/altitude-exposed Antarctic winter-over
   | "leo-iss"                     // ISS expeditions and reference DRMs
   | "lunar-artemis-future"        // Artemis I/II/III/IV — planned future feature
   | "interplanetary-mars-future"; // TM21 AMM/SMM — planned future feature

@@ -112,6 +112,19 @@ export type IMMTrialOpts = {
    * leaving only evidence-based (tier-A + source-cited tier-B) priors active.
    */
   conditionFilter?: (c: import("./types").IMMCondition) => boolean;
+  /**
+   * 2026-06-04: Per-(kind, condition) incidence multiplier for Antarctic /
+   * controlled-habitat context modulation. Multiplier of 1.0 = no change vs.
+   * base prior. >1 = elevated rate, <1 = reduced, 0 = no events. Default 1.0
+   * for missing entries. Applied AFTER the tier multiplier (tierA/B/C) and
+   * BEFORE risk-factor and Stage-A multipliers, so the variance-preserving
+   * λ-site multiply holds.
+   *
+   * Sourced by `simulateIMM` from
+   * `imm-priors.json::global_calibration.kind_multipliers[mission.kind]` when
+   * the caller does not thread an explicit map. Tests can override directly.
+   */
+  kindMultipliers?: Record<string, number>;
 };
 
 /**
@@ -281,6 +294,15 @@ export function runIMMTrial(
       if (prior.provenance === "tierC-synth")     tierMult = tierCMult;
       else if (prior.provenance === "tierA-nasa") tierMult = tierAMult;
       else if (prior.provenance === "tierB-pymc") tierMult = tierBMult;
+      // 2026-06-04: kind-level modulation. Multiplied into the λ-site (and per-
+      // Bernoulli) path so variance-preserving Poisson scaling holds. Skip
+      // non-numeric / sentinel keys (e.g. `_doc_` documentation string in
+      // imm-priors.json — present as a kind-mission-keyed entry, not a real
+      // multiplier; we only index by conditionId so this is a non-issue, but
+      // guard the lookup with a typeof check for forward-compat).
+      const rawKindMult = opts.kindMultipliers?.[cond.id];
+      const kindMult = (typeof rawKindMult === "number" && Number.isFinite(rawKindMult)) ? rawKindMult : 1.0;
+      const effectiveMult = tierMult * kindMult;
 
       let count = 0;
       if (cond.processType === "general-Poisson") {
@@ -288,14 +310,15 @@ export function runIMMTrial(
           // Fixed: lambda_fixed is a per-person-day rate; scale by duration, then apply RFM.
           // IC-5: apply Stage A vulnerability multiplier on top of RFM.
           // rev3-b-followup: tierMult applied to λ directly (variance-preserving).
+          // 2026-06-04: kindMult threaded into effectiveMult.
           const baseLambdaPerDay = prior.incidence.lambda_fixed!;
           const rfmLambdaPerDay = applyRiskFactorMultiplier(baseLambdaPerDay, member, prior);
           const modLambdaPerDay = applyStageAVulnerabilityMultiplier(rfmLambdaPerDay, member, cond.family, cond.vulnerabilityCriteria, criteriaIndex);
-          count = samplePoisson(rng, modLambdaPerDay * mission.durationDays * tierMult);
+          count = samplePoisson(rng, modLambdaPerDay * mission.durationDays * effectiveMult);
         } else {
           // Gamma-Poisson / Lognormal-Poisson: draw λ/day from hierarchical prior, apply RFM,
           // IC-5 Stage A multiplier, then scale by mission duration before Poisson sampling.
-          count = sampleGeneralPoissonCount(rng, prior, member, mission.durationDays, cond.family, cond.vulnerabilityCriteria, criteriaIndex, tierMult);
+          count = sampleGeneralPoissonCount(rng, prior, member, mission.durationDays, cond.family, cond.vulnerabilityCriteria, criteriaIndex, effectiveMult);
         }
       } else if (cond.processType === "space-adaptation-once") {
         // T24: once-per-mission cap — skip if this crew member already had this condition.
@@ -305,7 +328,7 @@ export function runIMMTrial(
           count = 0;
         } else {
           const occ = sampleIncidence(rng, prior);
-          if (occ > 0 && (tierMult === 1.0 || rng() < tierMult)) {
+          if (occ > 0 && (effectiveMult === 1.0 || rng() < effectiveMult)) {
             processedSAOnce[cIdx].add(cond.id);
             count = 1;
           }
@@ -314,12 +337,18 @@ export function runIMMTrial(
         // rev3-b-followup: tierMult applied per-Bernoulli inside the per-EVA loop.
         // Sum of independent Bernoulli(p·mult) is Binomial(n, p·mult) — variance-correct.
         for (let e = 0; e < member.EVA_count; e++) {
-          if (sampleIncidence(rng, prior) > 0 && (tierMult === 1.0 || rng() < tierMult)) count++;
+          if (sampleIncidence(rng, prior) > 0 && (effectiveMult === 1.0 || rng() < effectiveMult)) count++;
         }
       } else if (cond.processType === "SPE-coupled") {
         // T23: Per-SPE-event Bernoulli via ARS prior (Beta-Bernoulli per event).
         // speEventTimes pre-sampled once per trial so all crew share the same solar timeline.
         // Occurrences created directly here to preserve timeDays = spe event time.
+        // 2026-06-04: SPE-coupled path does NOT apply kind_mult. SPE timelines are
+        // physical infrastructure (Keenan 2015 λ_SPE_PER_DAY), not per-mission
+        // context. Per-event ARS Bernoulli still uses effectiveMult in the
+        // tier-only path (effectiveMult = tierMult × kindMult, kindMult=1 for
+        // non-mapped conditions, which is all conditions in the SPE-coupled
+        // set today).
         const arsAlpha = prior.incidence.alpha ?? 2;
         const arsBeta  = prior.incidence.beta  ?? 18;
         for (const speTime of speEventTimes) {
@@ -351,7 +380,8 @@ export function runIMMTrial(
         count = 0; // SPE occurrences created directly above; skip the generic loop
       } else if (cond.processType === "SA-VIIP-late") {
         // rev3-b-followup: tierMult applied per-Bernoulli (single Bernoulli; variance-correct).
-        if (sampleIncidence(rng, prior) > 0 && (tierMult === 1.0 || rng() < tierMult)) count = 1;
+        // 2026-06-04: effectiveMult = tierMult × kindMult (kind modulation layered in).
+        if (sampleIncidence(rng, prior) > 0 && (effectiveMult === 1.0 || rng() < effectiveMult)) count = 1;
       }
 
       // rev3-b-followup (2026-05-22): the post-count stochastic-rounding block that
@@ -555,11 +585,25 @@ export function simulateIMM(opts: {
    * Threaded into runIMMTrial as conditionFilter.
    */
   conditionFilter?: (c: import("./types").IMMCondition) => boolean;
+  /**
+   * 2026-06-04: Optional explicit per-(kind, condition) multiplier map.
+   * When provided, takes precedence over the auto-loaded
+   * `global_calibration.kind_multipliers[mission.kind]` block. When omitted,
+   * the wrapper auto-loads the per-kind map from imm-priors.json; for any
+   * kind without an entry (e.g. leo-iss), the engine falls through to 1.0.
+   */
+  kindMultipliers?: Record<string, number>;
 }): IMMOutcome {
   const { crew, mission, kit, trials, seed } = opts;
   const chiStar = opts.chiStar ?? 0.7;
   // priors-rev3-b: read global_calibration defaults for tier multipliers.
   const globalCal = loadIMMPriors().global_calibration;
+  // 2026-06-04: kind_multipliers auto-load. Caller's explicit override wins;
+  // otherwise look up the per-kind map from JSON. Any (kind, condition) pair
+  // not in the map falls through to 1.0 in the engine, so absence of a kind
+  // entry is safe (leo-iss / analog-isolation etc. all get the 1.0 baseline).
+  const kindMultAuto = globalCal.kind_multipliers?.[mission.kind] ?? {};
+  const effectiveKindMults = opts.kindMultipliers ?? kindMultAuto;
   // IC-5: build criteria index once, pass to each trial.
   const criteriaIndex: ReadonlyMap<string, Criterion> = opts.criteria
     ? new Map(opts.criteria.map(c => [c.id, c]))
@@ -586,6 +630,9 @@ export function simulateIMM(opts: {
       tierAMultiplier: opts.tierAMultiplier ?? globalCal.tierA_multiplier ?? 1.0,
       tierBMultiplier: opts.tierBMultiplier ?? globalCal.tierB_multiplier ?? 1.0,
       tierCMultiplier: opts.tierCMultiplier ?? globalCal.tierC_multiplier ?? 1.0,
+      // 2026-06-04: thread the resolved per-(kind, condition) multiplier map.
+      // Empty object / missing keys → 1.0 fallthrough in runIMMTrial.
+      kindMultipliers: effectiveKindMults,
       criteriaIndex,
       conditionFilter: opts.conditionFilter,
     });
