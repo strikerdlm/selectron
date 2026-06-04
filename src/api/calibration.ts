@@ -211,3 +211,39 @@ export function startSensitivity(request: SensitivityRequest): Promise<Sensitivi
 export function getSensitivityStatus(jobId: string): Promise<JobStatusResponse> {
   return _fetch<JobStatusResponse>(`/sensitivity/${encodeURIComponent(jobId)}`);
 }
+
+// ── Posterior draws (analog MCMC posterior, 2026-06-04) ──────────────────────
+
+/** One condition's posterior λ samples, wire-faithful to the FastAPI response. */
+export interface PosteriorDrawWire {
+  condition_id: string;
+  /** Strictly positive posterior λ values, length === n_draws. */
+  lambdas: number[];
+}
+
+export interface PosteriorDrawsResponse {
+  draws: PosteriorDrawWire[];
+  n_draws: number;
+  seed: number;
+  kind: string | null;
+}
+
+/**
+ * Fetch per-condition Bayesian posterior λ samples for an analog mission
+ * context. `kind` filters to conditions in the priors' kind_multipliers
+ * block; omit for all Gamma/Lognormal-Poisson conditions.
+ */
+export function getPosteriorDraws(opts: {
+  kind?: string | null;
+  nDraws?: number;
+  seed?: number;
+  signal?: AbortSignal;
+}): Promise<PosteriorDrawsResponse> {
+  const params = new URLSearchParams();
+  if (opts.kind) params.set("kind", opts.kind);
+  if (opts.nDraws !== undefined) params.set("n_draws", String(opts.nDraws));
+  if (opts.seed !== undefined) params.set("seed", String(opts.seed));
+  return _fetch<PosteriorDrawsResponse>(`/posterior/draws?${params.toString()}`, {
+    signal: opts.signal,
+  });
+}
