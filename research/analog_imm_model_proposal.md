@@ -65,12 +65,35 @@ Musculoskeletal sprains/strains/fractures, GI, ENT, ophthalmologic, dermatologic
 
 *(`frostbite`, `hypoxia-related-headache`, `seasonal-affective-disorder` are referenced in the multiplier block but are not yet in `IMM_CONDITIONS` — they are forward-compat; adding them as real conditions is a sub-task.)*
 
-## 4. pEVAC literature anchors (to research after triage is ratified)
-Validation targets for the emergent analog pEVAC (research-and-propose):
-- **Antarctic medevac rates** — USAP winter-over medical evacuation frequency (per station-season / per person-year).
-- **Submarine / deployed-military** medical evacuation rates (closest sealed-habitat analog).
-- **Analog-mission medical incident → termination** rates (MDRS/HI-SEAS/Mars500 logs).
-These become an **analog validation gate** paralleling K15-for-ISS (manuscript "extend" scope).
+## 4. Analog validation methodology — research → posteriors → risk matrices
+**The analog phase is a validation step** (Diego direction, 2026-06-04). For every
+analog prior (fire rates, the new conditions, evacuation/pEVAC anchors), follow this
+pipeline — do **not** rely on the in-repo corpus alone:
+
+1. **Research the priors from scientific literature AND the internet.** Start from
+   the corpus (`research/…`), then extend with fresh evidence from the research MCP
+   tools (Consensus / Scite / PubMed / paper-search / bioRxiv) **and** web search
+   (Brave / Tavily / Firecrawl / Perplexity). Source defensible base rates for
+   terrestrial isolation-&-confinement / analog / Antarctic / submarine / deployed-
+   military populations. Record every value + source (DOI/URL) under
+   `research/evidence_extracted/`.
+2. **Calculate the posteriors.** Feed the researched priors through the PyMC offline
+   calibration pipeline (NUTS; check R-hat ≈ 1, ESS). Never hand-edit fitted incidence
+   priors — re-run `npm run calibrate:imm` and commit the JSON.
+3. **Apply all the risk matrices.** Run the posterior-updated analog model through the
+   full stack: IMM Monte-Carlo → pEVAC / pLOCL / TME / CHI → **NASA HSRB L×C matrix**
+   → the **K15-style analog validation gate** (`npm run validate:imm`).
+
+**Validation anchors.**
+- **Antarctic medevac (starting set, already in-corpus):** McMurdo 0.036 evac/py,
+  USAP 2013-14 0.01 evac/py (Walton & Kerstman 2020 / Pattarini 2016).
+- **Extend (lit + web):** submarine / deployed-military medical evacuation rates;
+  analog-mission (MDRS / HI-SEAS / Mars500) medical-incident → mission-termination rates.
+
+The analog model is **validated** only when the emergent analog pEVAC/pLOCL (researched
+priors → posteriors) fall within these literature-anchored bounds with all risk matrices
+applied, and `leo-iss`/K15 stays byte-identical. This is the analog parallel to K15-for-ISS
+(the "extend the manuscript" deliverable).
 
 ## 5. pLOCL ≈ 0 — the one place multipliers aren't enough
 pLOCL is emergent from **severity × treatment-availability × evacuation given an event** — an axis the incidence multipliers (§2) do **not** touch. Zeroing the space-only conditions removes ARS, but the kept terrestrial catastrophes (`sudden-cardiac-arrest`, `sepsis`, `anaphylaxis`, `angina-myocardial-infarction`, `traumatic-hypovolemic-shock`) keep firing at population rates with their LOCL outcome probabilities intact. So `kind_multipliers` **alone will not** make analog pLOCL ≈ 0. Three ways to get there — pick one:
@@ -83,7 +106,7 @@ This is the single design fork that decides whether the build stays "multipliers
 
 ## 6. Phased plan
 1. **Triage ratification** (this doc) — you confirm/adjust §3 (esp. Groups C/D and the pLOCL question).
-2. **Research** — pEVAC anchors (§4) + any I&C incidence refinements; evidence written to `research/evidence_extracted/`.
+2. **Research (validation step — §4)** — scientific literature + internet → priors for fire rates / new conditions / pEVAC anchors; fit posteriors (PyMC); apply all risk matrices. Evidence + sources (DOI/URL) written to `research/evidence_extracted/`.
 3. **Priors** — extend `kind_multipliers` (zero Groups A/B [+C], complete both kinds); recalibrate kept conditions via the PyMC pipeline where evidence warrants. Re-run `npm run calibrate:imm`; never hand-edit priors.
 4. **Engine/validation** — add the analog validation reference + test; assert `leo-iss` byte-identical (K15 canary) + analog pEVAC within anchor bounds. `npm run validate:imm`.
 5. **UI** — the legacy-chrome cleanup (done); migrate stale `analog-isolation` sessions → `analog-controlled`; I3 now genuinely analog-specific.

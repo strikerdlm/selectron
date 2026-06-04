@@ -116,3 +116,15 @@ This protocol is the disconnection-recovery contract: if the controller session 
 **V&V dossier**: `docs/iter3_vv_dossier.md` §5 (IMM Calculator validation) and §6 (gate-then-modulate architecture). Re-read on every architectural change.
 
 **Reproducer**: `scripts/reproducer_bad_candidate.ts` and `scripts/reproducer_imm_composite.ts` demonstrate worst-vs-best candidate discrimination and the disqualified-crew path. Re-run after any priors or engine change.
+
+## Analog-IMM model — validation methodology (active, branch `iter1-phase0-analog-imm`)
+
+The analog-habitat kinds (`analog-controlled`, `antarctic-station`) are being extended into a manuscript-grade, literature-validated model so analog missions run the terrestrial **isolation-&-confinement (I&C) condition set only** (not the ISS space conditions). **`leo-iss`/K15 stays byte-identical** — the invariance canary in `tests/imm/simulate.test.ts` is the hard guardrail. Full plan + ratified condition triage: `research/analog_imm_model_proposal.md`.
+
+**The analog phase is a validation step.** For every analog prior (fire rates, the new conditions, evacuation/pEVAC anchors) the agent MUST follow this pipeline — do not shortcut it:
+
+1. **Research the priors from scientific literature AND the internet** — not the in-repo corpus alone. Start from `research/`, then extend with fresh evidence from the research MCP tools (Consensus, Scite, PubMed, paper-search, bioRxiv) **and** web search (Brave, Tavily, Firecrawl, Perplexity). Source defensible base rates for terrestrial isolation-&-confinement / analog / Antarctic / submarine populations. Record every value with its source (DOI/URL) under `research/evidence_extracted/`.
+2. **Calculate the posteriors** — feed the researched priors through the PyMC offline calibration pipeline (`cd python && python -m selectron`, or `npm run calibrate:imm`) to produce NUTS-fitted posteriors (check R-hat ≈ 1, ESS). Never hand-edit fitted incidence priors — re-run the script and commit the JSON. (The hand-curated `kind_multipliers` block is the one exception — it is dossier-anchored, not PyMC-fit.)
+3. **Apply all the risk matrices** — run the posterior-updated analog model through the full stack: IMM Monte-Carlo → pEVAC / pLOCL / TME / CHI → NASA HSRB L×C matrix → the K15-style analog validation gate (`npm run validate:imm`).
+
+The analog model is **validated** only when its emergent pEVAC/pLOCL (researched priors → posteriors) fall within the literature-anchored bounds (starting set, already in-corpus: McMurdo 0.036 evac/py, USAP 2013-14 0.01 evac/py — Walton & Kerstman 2020 / Pattarini 2016) with all risk matrices applied, and `leo-iss`/K15 is unchanged.
