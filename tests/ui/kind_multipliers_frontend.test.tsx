@@ -6,9 +6,9 @@
 //   1. missionKindContextLabel — returns the expected string for every kind.
 //   2. KindMultipliersTable — antarctic-station renders the 15 modulated
 //      conditions sorted by |mult − 1| desc, with frostbite at the top.
-//   3. KindMultipliersTable — leo-iss shows the empty state.
-//   4. KindMultipliersTable — analog-isolation shows the empty state
-//      (Dexie backward-compat).
+//   3. KindMultipliersTable — leo-iss renders nothing (no per-kind multipliers).
+//   4. KindMultipliersTable — analog-isolation renders nothing
+//      (Dexie backward-compat, legacy kind).
 //   5. IMMConditionDrivers — when `kindMultipliers` is set, multiplier-bearing
 //      rows are grouped to the top of the top-N and each y-axis label carries
 //      the multiplier value as a suffix.
@@ -89,29 +89,31 @@ function makeOutcome(drivers: DriverInput[]): IMMOutcome {
 // the helper from a small inlined copy. If the helper ever diverges, the
 // CrewComposition smoke test will catch it.
 //
-// For now we assert on the KindMultipliersTable empty-state message that
-// the same prior source renders, plus the antarctic table content (which
+// For now we assert that the KindMultipliersTable renders nothing for kinds
+// with no per-condition multipliers (the apologetic "base priors apply" empty
+// state was removed 2026-06-04 — the CrewComposition panel is gated on the
+// same has-multipliers condition), plus the antarctic table content (which
 // is the user-visible evidence of the labels being correct). See tests 2–4.
-describe("missionKindContextLabel (via KindMultipliersTable empty states)", () => {
-  it("leo-iss renders the empty state (no per-kind multipliers)", () => {
+describe("KindMultipliersTable empty kinds (no per-kind multipliers)", () => {
+  it("leo-iss renders nothing (no per-kind multipliers)", () => {
     const { container } = render(<KindMultipliersTable kind={"leo-iss" satisfies IMMMissionKind} />);
-    expect(container.querySelector("[data-testid='kind-multipliers-empty']")?.textContent)
-      .toMatch(/no per-condition multipliers for this kind/i);
+    expect(container.querySelector("[data-testid='kind-multipliers-empty']")).toBeNull();
+    expect(container.querySelectorAll("[data-testid='kind-mult-row']").length).toBe(0);
   });
 
-  it("analog-isolation renders the empty state (Dexie backward compat)", () => {
+  it("analog-isolation renders nothing (Dexie backward compat, legacy kind)", () => {
     const { container } = render(<KindMultipliersTable kind={"analog-isolation" satisfies IMMMissionKind} />);
-    expect(container.querySelector("[data-testid='kind-multipliers-empty']")?.textContent)
-      .toMatch(/no per-condition multipliers for this kind/i);
+    expect(container.querySelector("[data-testid='kind-multipliers-empty']")).toBeNull();
+    expect(container.querySelectorAll("[data-testid='kind-mult-row']").length).toBe(0);
   });
 
-  it("future kinds render the empty state (no engine support yet)", () => {
+  it("future kinds render nothing (no engine support yet)", () => {
     const { container: c1 } = render(<KindMultipliersTable kind={"lunar-artemis-future" satisfies IMMMissionKind} />);
-    expect(c1.querySelector("[data-testid='kind-multipliers-empty']")?.textContent)
-      .toMatch(/no per-condition multipliers/i);
+    expect(c1.querySelector("[data-testid='kind-multipliers-empty']")).toBeNull();
+    expect(c1.querySelectorAll("[data-testid='kind-mult-row']").length).toBe(0);
     const { container: c2 } = render(<KindMultipliersTable kind={"interplanetary-mars-future" satisfies IMMMissionKind} />);
-    expect(c2.querySelector("[data-testid='kind-multipliers-empty']")?.textContent)
-      .toMatch(/no per-condition multipliers/i);
+    expect(c2.querySelector("[data-testid='kind-multipliers-empty']")).toBeNull();
+    expect(c2.querySelectorAll("[data-testid='kind-mult-row']").length).toBe(0);
   });
 });
 
@@ -124,9 +126,10 @@ describe("KindMultipliersTable (antarctic-station)", () => {
       <KindMultipliersTable kind={"antarctic-station" satisfies IMMMissionKind} />,
     );
     const rows = container.querySelectorAll("[data-testid='kind-mult-row']");
-    // 15 conditions modulated for antarctic-station per
-    // research/evidence_extracted/antarctic_kind_multipliers.md
-    expect(rows.length).toBe(15);
+    // 26 conditions modulated for antarctic-station after the 2026-06-04b
+    // analog-imm completion pass (research/analog_imm_model_proposal.md):
+    // 10 non-zero + 16 zeroed (all 10 space-adaptation + ARS + ammonia + 2 EVA-suit).
+    expect(rows.length).toBe(26);
 
     // Frostbite has the largest |Δ| (5.00 − 1.00 = 4.00). It is not in
     // IMM_CONDITIONS (forward-compatible multiplier only; see dossier
@@ -152,17 +155,23 @@ describe("KindMultipliersTable (antarctic-station)", () => {
       <KindMultipliersTable kind={"antarctic-station" satisfies IMMMissionKind} />,
     );
     const zeroRows = container.querySelectorAll("[data-kind-mult='0.00']");
-    // Per the JSON block: headache-co2-induced, DCS-EVA, VIIP, barotrauma-ear-sinus-block,
-    // insomnia-space-adaptation — all 0.00 for antarctic.
-    expect(zeroRows.length).toBe(5);
+    // After the 2026-06-04b analog-imm pass: 16 conditions zeroed for antarctic
+    // (all 10 space-adaptation + acute-radiation-syndrome + toxic-exposure-ammonia
+    // + the 2 EVA-suit injuries + headache-co2-induced; barotrauma UN-zeroed).
+    expect(zeroRows.length).toBe(16);
     const condIds = Array.from(zeroRows).map((r) => r.getAttribute("data-condition-id"));
     expect(condIds).toEqual(expect.arrayContaining([
       "headache-co2-induced",
       "decompression-sickness-secondary-to-extravehicular-activity",
       "visual-impairment-and-intracranial-pressure-viip-space-adaptation",
-      "barotrauma-ear-sinus-block",
       "insomnia-space-adaptation",
+      "space-motion-sickness-space-adaptation",
+      "acute-radiation-syndrome",
+      "toxic-exposure-ammonia",
+      "fingernail-delamination",
     ]));
+    // barotrauma-ear-sinus-block is NO LONGER zeroed (un-zeroed to terrestrial rate).
+    expect(condIds).not.toContain("barotrauma-ear-sinus-block");
   });
 
   it("table body excludes the 1.0 multiplier and `_doc_` documentation sentinel", () => {

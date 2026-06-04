@@ -9399,8 +9399,19 @@
         "headache-co2-induced": 0.0,
         "decompression-sickness-secondary-to-extravehicular-activity": 0.0,
         "visual-impairment-and-intracranial-pressure-viip-space-adaptation": 0.0,
-        "barotrauma-ear-sinus-block": 0.0,
-        "insomnia-space-adaptation": 0.0
+        "insomnia-space-adaptation": 0.0,
+        "back-pain-space-adaptation": 0.0,
+        "constipation-space-adaptation": 0.0,
+        "headache-space-adaptation": 0.0,
+        "nasal-congestion-space-adaptation": 0.0,
+        "nose-bleed-space-adaptation": 0.0,
+        "space-motion-sickness-space-adaptation": 0.0,
+        "urinary-incontinence-space-adaptation": 0.0,
+        "urinary-retention-space-adaptation": 0.0,
+        "acute-radiation-syndrome": 0.0,
+        "toxic-exposure-ammonia": 0.0,
+        "fingernail-delamination": 0.0,
+        "paresthesias": 0.0
       },
       "analog-controlled": {
         "_doc_": "2026-06-04 controlled-habitat context modulation. Heated, climate-stable, real-time medical support. Most conditions at base-rate; URTI / depression modestly suppressed (no McMurdo Crud reservoir, shorter durations). Space-adaptation / ECLSS-specific conditions set to 0 (no microgravity, no CO2 scrubber failure modes).",
@@ -9414,7 +9425,18 @@
         "visual-impairment-and-intracranial-pressure-viip-space-adaptation": 0.0,
         "insomnia-space-adaptation": 0.0,
         "headache-co2-induced": 0.0,
-        "barotrauma-ear-sinus-block": 0.0
+        "back-pain-space-adaptation": 0.0,
+        "constipation-space-adaptation": 0.0,
+        "headache-space-adaptation": 0.0,
+        "nasal-congestion-space-adaptation": 0.0,
+        "nose-bleed-space-adaptation": 0.0,
+        "space-motion-sickness-space-adaptation": 0.0,
+        "urinary-incontinence-space-adaptation": 0.0,
+        "urinary-retention-space-adaptation": 0.0,
+        "acute-radiation-syndrome": 0.0,
+        "toxic-exposure-ammonia": 0.0,
+        "fingernail-delamination": 0.0,
+        "paresthesias": 0.0
       }
     }
   }

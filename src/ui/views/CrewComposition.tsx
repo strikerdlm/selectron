@@ -365,6 +365,21 @@ export function CrewComposition() {
   //   - the KindMultipliersTable mounted in the verdict area
   const kindMultipliers = useKindMultipliers(state.mission.kind);
 
+  // True iff the active kind carries ≥1 non-trivial (≠1.0) per-condition
+  // multiplier. Drives whether the kind-context badge, the kind-delta badge,
+  // and the per-condition multiplier panel render at all. Kinds with no kind
+  // delta (leo-iss, the legacy analog-isolation literal, future kinds) show
+  // none of that chrome rather than an apologetic "no multipliers / base
+  // priors apply" empty state. Matches KindMultipliersTable's own row filter.
+  const hasKindMultipliers = useMemo(
+    () =>
+      Object.entries(kindMultipliers).some(
+        ([k, v]) =>
+          !k.startsWith("_") && typeof v === "number" && Number.isFinite(v) && v !== 1.0,
+      ),
+    [kindMultipliers],
+  );
+
   // The severity readout prefers the authoritative full-sim outcome; otherwise the preview.
   const readoutOutcome = outcome ?? previewOutcome;
   const readoutLxc = outcome ? lxc : previewLxc;
@@ -701,7 +716,10 @@ export function CrewComposition() {
                   `<details>` so the user can expand to read the multiplier
                   explanation + the per-condition table below the verdict.
                   data-testid="mission-kind-context" is preserved from the
-                  earlier commit so existing tests still find it. */}
+                  earlier commit so existing tests still find it. Rendered
+                  only for kinds that carry a kind delta. */}
+              {hasKindMultipliers && (
+                <>
               <button
                 type="button"
                 className="mono text-[11px] text-ink-3 mt-0.5 text-left
@@ -755,6 +773,8 @@ export function CrewComposition() {
                   View per-condition multipliers ↓
                 </a>
               </details>
+                </>
+              )}
             </div>
 
             {/* Mission meta — editable duration / crew size / EVAs (recompute on change) */}
@@ -981,15 +1001,18 @@ export function CrewComposition() {
                   {/* 2026-06-04: kind-delta badge. Informational; the L×C cells
                       remain the published NASA HSRB values. The badge tells
                       the user how many conditions the kind multiplier has
-                      elevated / suppressed / zeroed for this mission. */}
-                  <span
-                    className="mono text-[10px] uppercase tracking-cap text-ink-3
-                               border border-line/60 rounded px-2 py-0.5"
-                    data-testid="kind-delta-badge"
-                    title="informational only — the L×C matrix cells remain the published NASA HSRB values"
-                  >
-                    {kindDeltaSummary(state.mission.kind, kindMultipliers)}
-                  </span>
+                      elevated / suppressed / zeroed for this mission. Hidden
+                      for kinds with no kind delta (leo-iss / legacy / future). */}
+                  {hasKindMultipliers && (
+                    <span
+                      className="mono text-[10px] uppercase tracking-cap text-ink-3
+                                 border border-line/60 rounded px-2 py-0.5"
+                      data-testid="kind-delta-badge"
+                      title="informational only — the L×C matrix cells remain the published NASA HSRB values"
+                    >
+                      {kindDeltaSummary(state.mission.kind, kindMultipliers)}
+                    </span>
+                  )}
                   <span className="mono text-[10px] uppercase tracking-cap text-ink-3">
                     JSC-66705 Rev A · Fig. 4
                   </span>
@@ -1061,21 +1084,25 @@ export function CrewComposition() {
             </div>
           )}
 
-          {/* 2026-06-04: per-(kind, condition) multiplier table. Mounted
-              always (not gated on outcome) so the user can read the active
-              multiplier context before running a sim. The mount point
-              carries a data-testid for the badge's "view per-condition
-              multipliers ↓" anchor to scroll to. */}
-          <div
-            className="panel"
-            data-testid="kind-multipliers-mount"
-            id="kind-multipliers-mount"
-          >
-            <h3 className="label text-ink-1 uppercase tracking-cap mb-3">
-              Kind multipliers · {missionKindContextLabel(state.mission.kind)}
-            </h3>
-            <KindMultipliersTable kind={state.mission.kind} />
-          </div>
+          {/* 2026-06-04: per-(kind, condition) multiplier table. Rendered only
+              for kinds that actually carry a kind delta (analog-controlled /
+              antarctic-station). Kinds with no per-condition multipliers
+              (leo-iss, the legacy analog-isolation literal, future kinds) show
+              nothing here rather than an empty "base priors apply" panel. The
+              mount point carries a data-testid for the badge's "view
+              per-condition multipliers ↓" anchor to scroll to. */}
+          {hasKindMultipliers && (
+            <div
+              className="panel"
+              data-testid="kind-multipliers-mount"
+              id="kind-multipliers-mount"
+            >
+              <h3 className="label text-ink-1 uppercase tracking-cap mb-3">
+                Kind multipliers · {missionKindContextLabel(state.mission.kind)}
+              </h3>
+              <KindMultipliersTable kind={state.mission.kind} />
+            </div>
+          )}
 
           <div className="panel">
             <h3 className="label text-ink-1 uppercase tracking-cap mb-4">

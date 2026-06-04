@@ -89,16 +89,12 @@ export function KindMultipliersTable({ kind }: { kind: IMMMissionKind }) {
   }
   rows.sort((a, b) => b.delta - a.delta);
 
-  if (rows.length === 0) {
-    return (
-      <div
-        className="mono text-[12px] text-ink-3 italic"
-        data-testid="kind-multipliers-empty"
-      >
-        no per-condition multipliers for this kind — base priors apply.
-      </div>
-    );
-  }
+  // No non-trivial multipliers for this kind (leo-iss, the legacy
+  // analog-isolation literal, future kinds): render nothing. The CrewComposition
+  // panel is gated on the same condition, so in practice the component is not
+  // mounted for these kinds — this null return is a defensive no-op that also
+  // keeps the component safe to drop anywhere without an apologetic empty state.
+  if (rows.length === 0) return null;
 
   return (
     <div data-testid="kind-multipliers-table">

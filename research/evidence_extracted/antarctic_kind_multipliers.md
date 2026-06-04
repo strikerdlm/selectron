@@ -71,6 +71,51 @@ zero; space-adaptation conditions set to zero). Smaller absolute TME than
 an Antarctic mission at the same crew size × duration, but higher than a
 K15 ISS run because the controlled mission lacks ISS-grade medical kit.
 
+## 2026-06-04b — analog-imm completion pass (branch `iter1-phase0-analog-imm`)
+
+Ratified by Diego 2026-06-04 (`research/analog_imm_model_proposal.md`). Completes
+the spaceflight-only zero-out for BOTH analog kinds so analog missions run the
+isolation-&-confinement (I&C) condition set only. **`leo-iss` untouched** (no
+entry → 1.0 fallthrough → K15 byte-identical).
+
+Added `mult = 0` to both `antarctic-station` and `analog-controlled`:
+
+| conditionId | group | rationale |
+|---|---|---|
+| `back-pain-space-adaptation` | space-adaptation | microgravity-only; impossible in 1 g |
+| `constipation-space-adaptation` | space-adaptation | microgravity GI transit; 1-g none |
+| `headache-space-adaptation` | space-adaptation | cephalad fluid shift; 1-g none |
+| `nasal-congestion-space-adaptation` | space-adaptation | cephalad fluid shift; 1-g none |
+| `nose-bleed-space-adaptation` | space-adaptation | cephalad fluid shift; 1-g none |
+| `space-motion-sickness-space-adaptation` | space-adaptation | 0-g vestibular; none in analog |
+| `urinary-incontinence-space-adaptation` | space-adaptation | 0-g bladder; none |
+| `urinary-retention-space-adaptation` | space-adaptation | 0-g bladder; none |
+| `acute-radiation-syndrome` | space hazard | SPE radiation; atmosphere + magnetosphere shield analogs |
+| `toxic-exposure-ammonia` | space hazard | ISS external ammonia coolant loop; no analog equivalent |
+| `fingernail-delamination` | EVA-suit | EVA-glove onycholysis; analog surface walks far milder |
+| `paresthesias` | EVA-suit | EVA suit-fit ischemia; not in 1-atm analog ops |
+
+(VIIP + `insomnia-space-adaptation` were already 0; `headache-co2-induced` +
+DCS-EVA already 0. With the above, all 10 space-adaptation conditions are now 0
+for both analog kinds.)
+
+**Un-zeroed** (entry removed → 1.0 terrestrial base rate) for both kinds:
+
+| conditionId | was | now | rationale |
+|---|---|---|---|
+| `barotrauma-ear-sinus-block` | 0.0 | removed → 1.0 | ordinary terrestrial ENT condition (congestion in confinement); the prior 0.0 was an over-zero inherited from the v1 "no pressure change" rationale |
+
+Resulting counts: `antarctic-station` **26** modulated (10 non-zero + 16 zero);
+`analog-controlled` **22** modulated (2 non-zero + 20 zero). Mirrored in
+`tests/ui/kind_multipliers_frontend.test.tsx`.
+
+**Deferred to later phases (still pending):** fire recalibration
+(`burns-secondary-to-fire`, `smoke-inhalation` → terrestrial rate, ratified
+"recalibrate"); adding `frostbite` / `hypoxia-related-headache` /
+`seasonal-affective-disorder` as real `IMM_CONDITIONS` (currently still
+forward-compat no-ops); analog pEVAC validation gate (anchor: McMurdo 0.036,
+USAP 0.01 evac/py — already in this dossier §"Cross-validation").
+
 ## Calibration: K15 invariance canary
 
 ISS K15 6mo/6-crew runs at T=100k seed 0xc0ffee must continue to produce:
