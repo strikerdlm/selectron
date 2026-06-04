@@ -81,4 +81,36 @@ test.describe("Crew Composition view", () => {
     await select.selectOption("mean");
     await expect(select).toHaveValue("mean");
   });
+
+  // CC-6: 2026-06-04 — mission-kind context badge snapshot.
+  //
+  // Switches the mission picker to the 365-day campaign (Antarctic) and
+  // captures the [data-testid="mission-kind-context"] region. The badge
+  // is now a `<button>` (was a `<p>`); the snapshot includes the closed
+  // state of the explanation <details> so the layout (label + chevron)
+  // is what the test guards against. Light theme is the manuscript /
+  // snapshot generation path (FigureThemeContext default is light).
+  test("crew mission-kind-context badge snapshot (Antarctic)", async ({ page }) => {
+    await page.goto("/");
+    await page.getByRole("button", { name: /crew/i }).click();
+    await page.waitForTimeout(500);
+    // The mission picker is the first <select> on the page (the page
+    // has 3 selects: mission, IMM-49 preset crew, aggregator). Select
+    // by the option's `value` attribute (the mission id is
+    // `antarctic-winter`). Playwright's selectOption does not accept
+    // regex for the label.
+    const missionSelect = page.locator("select").first();
+    await expect(missionSelect).toBeVisible();
+    await missionSelect.selectOption("antarctic-winter");
+    // Wait for the badge text to flip to the Antarctic context.
+    const badge = page.locator("[data-testid='mission-kind-context']");
+    await expect(badge).toBeVisible();
+    await expect(badge).toContainText(/Antarctic winter-over priors/i);
+    // Snapshot the badge + its sibling <details> container. The
+    // <details> starts closed by default — that's the canonical state.
+    const region = page.locator("[data-testid='mission-kind-context']")
+      .locator("xpath=.."); // parent <div>
+    await page.waitForTimeout(300); // allow font fallback settle
+    await expect(region).toHaveScreenshot("mission-kind-context.png", { maxDiffPixels: 100 });
+  });
 });

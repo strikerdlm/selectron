@@ -30,6 +30,8 @@ import { IMMConvergencePlot } from "../figures/IMMConvergencePlot";
 import { IMMValidationCompare } from "../figures/IMMValidationCompare";
 import { LxCMatrix } from "../figures/LxCMatrix";
 import { assessIMMLxC } from "../../imm/lxc";
+import { loadIMMPriors } from "../../imm/priors";
+import { KindMultipliersTable } from "../components/KindMultipliersTable";
 import { notify } from "../components/Toast";
 import { createIMMSession, recentIMMSessionsFor } from "../../db/repository";
 import type { IMMSession } from "../../imm/types";
@@ -124,6 +126,68 @@ function missionKindContextLabel(kind: import("../../imm/types").IMMMissionKind)
     case "lunar-artemis-future": return "Context: future (not yet supported)";
     case "interplanetary-mars-future": return "Context: future (not yet supported)";
   }
+}
+
+/**
+ * 2026-06-04 short label for the kind suffix appended to mission options
+ * in the picker. Returns null for the default `leo-iss` kind (no suffix).
+ * Mirrors the `kind_multipliers` keys in `imm-priors.json`.
+ */
+function kindShortLabel(kind: import("../../imm/types").IMMMissionKind): string | null {
+  switch (kind) {
+    case "leo-iss":         return null;
+    case "analog-controlled": return "controlled";
+    case "antarctic-station": return "Antarctic";
+    case "analog-isolation":  return "legacy";
+    case "lunar-artemis-future": return "future";
+    case "interplanetary-mars-future": return "future";
+  }
+}
+
+/**
+ * 2026-06-04: per-(mission-kind, condition) multiplier map resolved from
+ * `imm-priors.json::global_calibration.kind_multipliers[mission.kind]`.
+ * Falls through to an empty object for kinds without an entry (leo-iss,
+ * analog-isolation, future kinds) so the engine default of 1.0 applies.
+ */
+function useKindMultipliers(kind: import("../../imm/types").IMMMissionKind): Record<string, number> {
+  return useMemo(
+    () => loadIMMPriors().global_calibration.kind_multipliers?.[kind] ?? {},
+    [kind],
+  );
+}
+
+/**
+ * 2026-06-04: short summary of the kind multiplier effect for the active
+ * mission kind, rendered as a small badge beside the L×C matrix. Counts
+ * rows in three buckets (elevated, suppressed, zeroed) and returns a
+ * one-line string. The L×C cells themselves remain the published NASA
+ * HSRB values — the delta badge is informational, not a verdict change.
+ */
+function kindDeltaSummary(
+  kind: import("../../imm/types").IMMMissionKind,
+  map: Record<string, number>,
+): string {
+  if (kind === "leo-iss") return "K15 reference (no kind delta)";
+  if (kind === "analog-isolation") return "legacy kind — no kind delta applied";
+  if (kind === "lunar-artemis-future" || kind === "interplanetary-mars-future") {
+    return "future kind — not yet modeled";
+  }
+  let elevated = 0;
+  let suppressed = 0;
+  let zeroed = 0;
+  for (const [k, v] of Object.entries(map)) {
+    if (k.startsWith("_")) continue;
+    if (typeof v !== "number" || !Number.isFinite(v)) continue;
+    if (v === 0) zeroed++;
+    else if (v > 1) elevated++;
+    else if (v < 1) suppressed++;
+  }
+  const parts: string[] = [];
+  if (elevated > 0) parts.push(`${elevated} elevated`);
+  if (suppressed > 0) parts.push(`${suppressed} suppressed`);
+  if (zeroed > 0) parts.push(`${zeroed} ECLSS-specific zeroed`);
+  return `Kind delta: ${parts.length === 0 ? "no effect" : parts.join(" · ")}`;
 }
 
 interface CrewState {
@@ -293,6 +357,13 @@ export function CrewComposition() {
     () => (previewOutcome ? assessIMMLxC(previewOutcome, gateResult) : undefined),
     [previewOutcome, gateResult],
   );
+
+  // 2026-06-04: per-(mission-kind, condition) multiplier map for the active
+  // mission. Read once per mission change. Used by:
+  //   - the I3 `IMMConditionDrivers` chart (per-row kind pill + sort bias)
+  //   - the L×C panel "kind delta" badge
+  //   - the KindMultipliersTable mounted in the verdict area
+  const kindMultipliers = useKindMultipliers(state.mission.kind);
 
   // The severity readout prefers the authoritative full-sim outcome; otherwise the preview.
   const readoutOutcome = outcome ?? previewOutcome;
@@ -614,21 +685,76 @@ export function CrewComposition() {
                 {!ACTIVE_MISSIONS.some((m) => m.id === state.mission.id) && (
                   <option value={state.mission.id}>{state.mission.label}</option>
                 )}
-                {ACTIVE_MISSIONS.map((m) => (
-                  <option key={m.id} value={m.id}>{m.label}</option>
-                ))}
+                {ACTIVE_MISSIONS.map((m) => {
+                  // 2026-06-04: append a `[kind]` suffix to non-default kinds
+                  // so the user can tell at a glance which missions share
+                  // the same kind-multiplier context (Antarctic vs controlled
+                  // vs ISS). `leo-iss` is the default — no suffix.
+                  const suffix = kindShortLabel(m.kind);
+                  const label = suffix ? `${m.label} [${suffix}]` : m.label;
+                  return (
+                    <option key={m.id} value={m.id}>{label}</option>
+                  );
+                })}
               </select>
-              {/* 2026-06-04 mission-kind context badge. Tells the user which
-                  prior calibration context is active for this mission. The
-                  "context" drives a per-(kind, condition) multiplier in the
-                  engine (see imm-priors.json::global_calibration.kind_multipliers
-                  and src/imm/simulate.ts::IMMTrialOpts.kindMultipliers). */}
-              <p
-                className="mono text-[11px] text-ink-3 mt-0.5"
+              {/* 2026-06-04 mission-kind context badge. A `<button>` toggling a
+                  `<details>` so the user can expand to read the multiplier
+                  explanation + the per-condition table below the verdict.
+                  data-testid="mission-kind-context" is preserved from the
+                  earlier commit so existing tests still find it. */}
+              <button
+                type="button"
+                className="mono text-[11px] text-ink-3 mt-0.5 text-left
+                           cursor-pointer hover:text-ink-1 focus:outline-none
+                           focus:text-ink-1"
                 data-testid="mission-kind-context"
+                onClick={(e) => {
+                  // Toggle the sibling <details> by ID; the button is
+                  // colocated with it inside the same wrapper.
+                  const root = e.currentTarget.parentElement;
+                  if (!root) return;
+                  const det = root.querySelector<HTMLDetailsElement>(
+                    "details[data-kind-explanation]",
+                  );
+                  if (det) det.open = !det.open;
+                }}
+                aria-expanded={false}
               >
-                {missionKindContextLabel(state.mission.kind)}
-              </p>
+                {missionKindContextLabel(state.mission.kind)} <span aria-hidden>▾</span>
+              </button>
+              <details
+                data-kind-explanation
+                data-testid="mission-kind-explanation"
+                className="mono text-[11px] text-ink-2 mt-1"
+              >
+                <summary className="sr-only">kind multiplier explanation</summary>
+                <p className="leading-relaxed">
+                  Per-(mission-kind, condition) multipliers from Bhatia 2012,
+                  Palinkas 2004, Pattarini 2016, Hong 2022, Peřina 2024, and
+                  Nirwan 2022 modulate the base prior <em>after</em> the
+                  tier-A/B/C multiplier and <em>before</em> risk-factor and
+                  Stage-A multipliers. The label above names the active
+                  prior-calibration context; the table below the L×C
+                  verdict lists the per-condition multipliers with citations
+                  and confidence.
+                </p>
+                <p className="mt-1 text-ink-3">
+                  See <code>research/evidence_extracted/antarctic_kind_multipliers.md</code>{" "}
+                  for the full derivation table.
+                </p>
+                <a
+                  href="#kind-multipliers-mount"
+                  className="block mt-1 text-signal hover:underline"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    document
+                      .querySelector("[data-testid='kind-multipliers-mount']")
+                      ?.scrollIntoView({ behavior: "smooth", block: "start" });
+                  }}
+                >
+                  View per-condition multipliers ↓
+                </a>
+              </details>
             </div>
 
             {/* Mission meta — editable duration / crew size / EVAs (recompute on change) */}
@@ -851,9 +977,23 @@ export function CrewComposition() {
                 <h3 className="label text-ink-1 uppercase tracking-cap">
                   NASA HSRB · LxC verdict (JSC-66705 Rev A)
                 </h3>
-                <span className="mono text-[10px] uppercase tracking-cap text-ink-3">
-                  JSC-66705 Rev A · Fig. 4
-                </span>
+                <div className="flex items-baseline gap-3 flex-wrap">
+                  {/* 2026-06-04: kind-delta badge. Informational; the L×C cells
+                      remain the published NASA HSRB values. The badge tells
+                      the user how many conditions the kind multiplier has
+                      elevated / suppressed / zeroed for this mission. */}
+                  <span
+                    className="mono text-[10px] uppercase tracking-cap text-ink-3
+                               border border-line/60 rounded px-2 py-0.5"
+                    data-testid="kind-delta-badge"
+                    title="informational only — the L×C matrix cells remain the published NASA HSRB values"
+                  >
+                    {kindDeltaSummary(state.mission.kind, kindMultipliers)}
+                  </span>
+                  <span className="mono text-[10px] uppercase tracking-cap text-ink-3">
+                    JSC-66705 Rev A · Fig. 4
+                  </span>
+                </div>
               </div>
               <div className="flex items-baseline gap-6 flex-wrap">
                 <span
@@ -921,6 +1061,22 @@ export function CrewComposition() {
             </div>
           )}
 
+          {/* 2026-06-04: per-(kind, condition) multiplier table. Mounted
+              always (not gated on outcome) so the user can read the active
+              multiplier context before running a sim. The mount point
+              carries a data-testid for the badge's "view per-condition
+              multipliers ↓" anchor to scroll to. */}
+          <div
+            className="panel"
+            data-testid="kind-multipliers-mount"
+            id="kind-multipliers-mount"
+          >
+            <h3 className="label text-ink-1 uppercase tracking-cap mb-3">
+              Kind multipliers · {missionKindContextLabel(state.mission.kind)}
+            </h3>
+            <KindMultipliersTable kind={state.mission.kind} />
+          </div>
+
           <div className="panel">
             <h3 className="label text-ink-1 uppercase tracking-cap mb-4">
               I1 · Headline
@@ -954,6 +1110,7 @@ export function CrewComposition() {
               trials={state.trials}
               seed={state.seed}
               mission={{ id: state.mission.id, label: state.mission.label }}
+              kindMultipliers={kindMultipliers}
             />
           </div>
 
