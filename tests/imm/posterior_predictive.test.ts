@@ -10,6 +10,7 @@
 
 import { describe, it, expect } from "vitest";
 import { posteriorPredictiveSimulateIMM } from "../../src/imm/posterior-predictive";
+import { simulateIMM } from "../../src/imm/simulate";
 import { IMM_KITS } from "../../src/imm/kits";
 import { IMM_MISSIONS } from "../../src/data/imm-missions";
 import { loadIMMPriors } from "../../src/imm/priors";
@@ -209,5 +210,83 @@ describe("posteriorPredictiveSimulateIMM", () => {
         nDraws: 8, trialsPerDraw: 100, seed: 0,
       }),
     ).toThrow(/non-negative finite/);
+  });
+});
+
+// ── K15 unbiasedness ──────────────────────────────────────────────────────────
+//
+// Because every per-condition posterior here is constructed so that E[draws] = m
+// (the prior point mean) EXACTLY — a symmetric ±40% perturbation set whose length
+// (8) divides nDraws (64) — the moment-matching composite multiplier λ_d / E[λ]
+// has unit mean by construction. The posterior-predictive GRAND mean over draws
+// should therefore agree with the point-prior simulateIMM mean up to (a) a small
+// positive Jensen gap — pEvac is a nonlinear, saturating function of cumulative
+// TME, and within each draw λ is re-sampled scaled, so E[f(λ)] ≠ f(E[λ]) — and
+// (b) Monte-Carlo noise at these sample sizes.
+//
+// MEASURED on the K15 reference config (iss-6mo / issHMS / file crew fixture /
+// seed 0xc0ffee), nDraws=64, trialsPerDraw=500, point trials=16000, all 99
+// Gamma/Lognormal-Poisson conditions perturbed:
+//   posterior-predictive grand mean pEvac = 2.5438 %
+//   point-prior            mean pEvac      = 2.4312 %
+//   absolute delta = 0.1125 pp   relative delta = 4.63 %
+//   pEvacPost ci90 = [1.400, 4.000]  →  width 2.60 pp  (cited in V&V §7.9)
+// Runtime ~10 s (pp ~6.5 s + point ~3 s) — well under the 60 s budget.
+//
+// TOLERANCE: 15 % relative (≈ 3.2× headroom over the measured 4.63 %). The gate
+// is an UNBIASEDNESS check (the two pipelines share a central estimate), NOT a
+// propagation check — propagation is proven by the load-bearing 5×→>2× test
+// above. Agreement here does not prove the posterior is consumed; the widened
+// ci90 (here 2.60 pp around a 2.5 % mean) is the actual feature.
+describe("K15 unbiasedness", () => {
+  it("posterior-predictive grand mean agrees with point-prior mean within 15%", () => {
+    const PERTURB = [0.6, 0.7, 0.8, 0.9, 1.1, 1.2, 1.3, 1.4]; // length 8, mean exactly 1.0
+    const nDraws = 64; // 64 / 8 = 8 → E[draws] = m EXACTLY for every condition
+    const trialsPerDraw = 500;
+    const seed = 0xc0ffee;
+
+    const priors = loadIMMPriors();
+    const conds = Object.entries(priors.conditions)
+      .filter(([, c]) =>
+        c.incidence.distribution === "Gamma-Poisson" ||
+        c.incidence.distribution === "Lognormal-Poisson",
+      )
+      .map(([cid]) => cid);
+
+    const posterior: Record<string, number[]> = {};
+    for (const cid of conds) {
+      const m = priorMeanLambda(cid);
+      posterior[cid] = Array.from({ length: nDraws }, (_, i) => m * PERTURB[i % PERTURB.length]);
+      // Guard the "E[draws] = m by construction" claim numerically.
+      const drawMean = posterior[cid].reduce((a, b) => a + b, 0) / nDraws;
+      expect(Math.abs(drawMean / m - 1)).toBeLessThan(1e-12);
+    }
+
+    const pp = posteriorPredictiveSimulateIMM({
+      crew: CREW, mission: ISS_6MO, kit: IMM_KITS.issHMS,
+      posterior, nDraws, trialsPerDraw, seed,
+    });
+    const point = simulateIMM({
+      crew: CREW, mission: ISS_6MO, kit: IMM_KITS.issHMS,
+      trials: 16000, seed,
+    });
+
+    const ppMean = pp.pEvacPost.mean;
+    const ptMean = point.pEvac.mean;
+    const relDelta = Math.abs(ppMean - ptMean) / ptMean;
+    const ci90Width = pp.pEvacPost.ci90[1] - pp.pEvacPost.ci90[0];
+
+    // Record the feature (widened posterior-predictive interval) for §7.9.
+    // eslint-disable-next-line no-console
+    console.log(
+      `[K15 unbiasedness] pp pEvac mean=${ppMean.toFixed(4)}% point mean=${ptMean.toFixed(4)}% ` +
+        `relDelta=${(relDelta * 100).toFixed(2)}% pEvacPost ci90=[${pp.pEvacPost.ci90[0].toFixed(3)}, ` +
+        `${pp.pEvacPost.ci90[1].toFixed(3)}] width=${ci90Width.toFixed(3)}pp`,
+    );
+
+    // Unbiasedness gate (15% relative, ~3.2× headroom over the measured 4.63%).
+    expect(relDelta).toBeLessThan(0.15);
+    // The widened interval is the feature: it must be a real, non-degenerate band.
+    expect(ci90Width).toBeGreaterThan(0);
   });
 });
