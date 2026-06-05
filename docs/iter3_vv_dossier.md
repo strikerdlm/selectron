@@ -491,6 +491,115 @@ campaign" (badge: "Antarctic winter-over priors"). Run T=5,000 preview;
 the Antarctic run should show higher TME pressure and a different
 mission-success fraction than the controlled run.
 
+---
+
+## 8. Terrestrial analog guard (added 2026-06-05)
+
+### 8.1 Defect that triggered this revision
+
+Diego reported (2026-06-05): when running a 45-day analog mission in the
+IMM Calculator (CrewComposition view), `acute-radiation-syndrome` appeared
+as a contributor to pEVAC. This is physically impossible: ground-based
+analog habitats are shielded by Earth's atmosphere and magnetosphere, have
+no ECLSS installed, and run no pressurised EVA suit operations.
+
+Root cause: `simulateIMM()` ran all 100 IMM conditions regardless of
+`mission.kind`. The `kindMultipliers` approach could not suppress SPE-
+coupled conditions because that branch **explicitly bypasses the multiplier
+map** (design decision, lines 346-350 of `simulate.ts`). Furthermore,
+several `space-adaptation-once` conditions were not listed in the
+`kind_multipliers` JSON block for analog missions (multiplier defaulted to
+1.0), so microgravity adaptation syndromes were being simulated in a 1-atm
+controlled habitat.
+
+### 8.2 Fix — hard-filter in `runIMMTrial` and `simulateIMM`
+
+Two new filter sites in `src/imm/simulate.ts`:
+
+**Site 1 — `runIMMTrial` (lines ~294-308):** `activeConditions` now
+auto-excludes space-only conditions when `TERRESTRIAL_MISSION_KINDS.has(mission.kind)`:
+
+```
+TERRESTRIAL_MISSION_KINDS = { "analog-controlled", "antarctic-station", "analog-isolation" }
+
+Excluded by processType:
+  space-adaptation-once (9 conditions) — microgravity fluid-shift adaptations
+  EVA-coupled (3)  — pressurised-suit EVA (DCS, fingernail, paresthesias)
+  SPE-coupled (1)  — acute-radiation-syndrome (solar particle events; blocked by atmosphere)
+  SA-VIIP-late (1) — VIIP (long-duration microgravity)
+
+Excluded by explicit ID (general-Poisson, ECLSS/ISS infrastructure):
+  headache-co2-induced       — ECLSS CO2 scrubber failure
+  toxic-exposure-ammonia     — ISS ammonia coolant loop
+  barotrauma-ear-sinus-block — EVA suit pressurisation
+```
+
+Total: 17 conditions hard-excluded for terrestrial analog missions.
+
+**Site 2 — `simulateIMM` (lines ~712-718):** `perConditionDrivers` is
+built from the same terrestrial-filtered condition list so that excluded
+conditions do not appear as zero-contribution rows in the UI.
+
+An exported helper `isTerrestrialAnalog(kind: IMMMissionKind): boolean` is
+available for downstream code (e.g. UI hints, tests).
+
+### 8.3 Why hard filter, not kind_multipliers
+
+Two reasons make the multiplier approach insufficient:
+
+1. **SPE-coupled bypass**: the SPE-coupled branch of `runIMMTrial` (ARS)
+   uses `speEventTimes` pre-sampled outside the condition loop and
+   **explicitly skips kindMultipliers**. A zero-multiplier would have
+   no effect. The filter is the only way to reach this path.
+
+2. **perConditionDrivers integrity**: a zero-multiplier still allows
+   the condition to appear in the `perConditionDrivers` output with
+   zero contributions — a misleading data artefact. A filter-level
+   exclusion removes it cleanly.
+
+The `kind_multipliers = 0` entries for `headache-co2-induced`,
+`decompression-sickness-*`, `VIIP`, `barotrauma-ear-sinus-block`, and
+`insomnia-space-adaptation` in `imm-priors.json` are now redundant for
+analog missions (the hard filter takes precedence) but are retained as
+documentation of the design intent.
+
+### 8.4 K15 invariance
+
+The hard filter fires ONLY when `TERRESTRIAL_MISSION_KINDS.has(mission.kind)`.
+`leo-iss` is NOT in that set. K15 reference runs (`iss-6mo` / `iss-drm1` /
+`iss-drm2`) are bit-identical to the pre-change state. Verified by
+`tests/imm/validate_k15.test.ts` and `tests/imm/simulate.test.ts` (44/44).
+
+### 8.5 Test coverage
+
+Three new tests in `tests/imm/conditions.test.ts` (group "terrestrial analog guard"):
+
+1. `analog-controlled 45d`: none of the 17 space-only condition IDs appear
+   in `perConditionDrivers` after 500 trials.
+2. `antarctic-station 365d`: same assertion.
+3. `leo-iss 180d` negative control: `acute-radiation-syndrome` IS present
+   in `perConditionDrivers` — confirms the filter does not affect space missions.
+
+### 8.6 Impact on screened vs unscreened gap
+
+14 of the 17 excluded conditions carry `vulnerabilityCriteria` (mostly
+`physical.vo2max` + `psych.emotional_stability`). Removing them slightly
+reduces the TME gap between screened and unscreened crews for analog
+missions. However, the gap is dominated by psychiatric conditions (11× ratio)
+which are unaffected. Existing analog crew tests (`analog_45d_unscreened_crew.test.ts`,
+`analog_90d_crew_archetypes.test.ts`) continue to pass with existing margins.
+
+### 8.7 NASA-STD-7009A factor mapping update
+
+- **Factor 1 (Verification)**: 3 new regression tests prevent future
+  re-introduction of the ARS false-positive for analog missions.
+- **Factor 2 (Validation)**: analog mission outputs are now physically
+  credible — conditions impossible in the modelled environment no longer
+  contribute to pEVAC or perConditionDrivers.
+- **Factor 3 (Input Data Pedigree)**: `SPACE_ONLY_PROCESS_TYPES` and
+  `ECLSS_CONDITION_IDS` sets in `simulate.ts` document the physical
+  rationale for each exclusion inline.
+
 ### 7.9 Posterior-predictive validation (2026-06-05)
 
 > Numbering note: this subsection is appended at the END of §7. The
