@@ -5,31 +5,40 @@ export default {
     extend: {
       colors: {
         bg: {
-          0: "#08090a",
-          1: "#0c0d0f",
-          2: "#131517",
+          0: "rgb(var(--bg-0) / <alpha-value>)",
+          1: "rgb(var(--bg-1) / <alpha-value>)",
+          2: "rgb(var(--bg-2) / <alpha-value>)",
         },
         line: {
-          DEFAULT: "#1f2226",
-          2: "#2a2e34",
+          DEFAULT: "rgb(var(--line) / <alpha-value>)",
+          2: "rgb(var(--line-2) / <alpha-value>)",
         },
         ink: {
-          0: "#f0f4fa",
-          1: "#d8dde4",
-          2: "#b0b6bd",
-          3: "#8a8f96",
+          0: "rgb(var(--ink-0) / <alpha-value>)",
+          1: "rgb(var(--ink-1) / <alpha-value>)",
+          2: "rgb(var(--ink-2) / <alpha-value>)",
+          3: "rgb(var(--ink-3) / <alpha-value>)",
         },
         signal: {
-          DEFAULT: "#f5b541",
-          dim: "#f5b54122",
-          bright: "#ffd479",
+          DEFAULT: "rgb(var(--signal) / <alpha-value>)",
+          dim: "var(--signal-dim)", // full rgba value; do NOT use Tailwind opacity modifiers on this token
+          bright: "rgb(var(--signal-bright) / <alpha-value>)",
         },
-        go: "#56d6a0",
-        warn: "#ff6b5e",
+        go: "rgb(var(--go) / <alpha-value>)",
+        warn: "rgb(var(--warn) / <alpha-value>)",
       },
       fontFamily: {
         sans: ["Recursive", "system-ui", "sans-serif"],
         mono: ["JetBrains Mono", "ui-monospace", "monospace"],
+      },
+      fontSize: {
+        xs:   ["0.875rem", { lineHeight: "1.25rem" }],  // 14px (was 12)
+        sm:   ["1rem",     { lineHeight: "1.5rem" }],    // 16px (was 14)
+        base: ["1.125rem", { lineHeight: "1.75rem" }],   // 18px (was 16)
+        lg:   ["1.25rem",  { lineHeight: "1.875rem" }],  // 20px (was 18)
+        xl:   ["1.375rem", { lineHeight: "2rem" }],      // 22px (was 20)
+        "2xl":["1.625rem", { lineHeight: "2.125rem" }],  // 26px (was 24)
+        "3xl":["1.875rem", { lineHeight: "2.25rem" }],   // 30px (was 30 → keep generous)
       },
       letterSpacing: {
         cap: "0.14em",

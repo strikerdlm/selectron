@@ -12,7 +12,7 @@
 
 import ReactEChartsCore from "echarts-for-react/lib/core";
 import { echarts } from "./echarts-base";
-import { NATURE_THEME_NAME } from "./theme";
+import { useFigureTheme } from "./useFigureTheme";
 import { FigureCaption } from "./FigureCaption";
 import type { IMMOutcome, PosteriorSummary } from "../../imm/types";
 
@@ -170,6 +170,7 @@ export function IMMPosteriorHist({
   seed,
   mission,
 }: IMMPosteriorHistProps) {
+  const { themeName } = useFigureTheme();
   const metrics: Array<{
     key: keyof Pick<IMMOutcome, "tme" | "chi" | "pEvac" | "pLocl">;
     label: string;
@@ -227,7 +228,7 @@ export function IMMPosteriorHist({
       <ReactEChartsCore
         echarts={echarts}
         option={option}
-        theme={NATURE_THEME_NAME}
+        theme={themeName}
         style={{ height: 480, width: "100%" }}
         notMerge
       />

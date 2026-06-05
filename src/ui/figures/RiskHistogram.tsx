@@ -17,7 +17,7 @@
 
 import ReactEChartsCore from "echarts-for-react/lib/core";
 import { echarts } from "./echarts-base";
-import { NATURE_THEME_NAME } from "./theme";
+import { useFigureTheme } from "./useFigureTheme";
 import { FigureCaption } from "./FigureCaption";
 import { f2Caption } from "./captions/F2.captions";
 import type { AccessTier } from "@/types";
@@ -97,6 +97,7 @@ export function RiskHistogram({
   priorsVersion = "synthetic-iter3-ui-scaffold",
   accessTier = "minimum",
 }: RiskHistogramProps) {
+  const { themeName } = useFigureTheme();
   // Empty-state guard: fewer than 10 samples → no meaningful histogram.
   if (chiSamples.length < 10) {
     return (
@@ -239,7 +240,7 @@ export function RiskHistogram({
       <ReactEChartsCore
         echarts={echarts}
         option={option}
-        theme={NATURE_THEME_NAME}
+        theme={themeName}
         style={{ height: 360, width: "100%" }}
         notMerge
       />

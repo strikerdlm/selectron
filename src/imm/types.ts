@@ -38,7 +38,7 @@ export type IMMConditionOutcomes = {
 
 export type IMMPrior = {
   conditionId: string;
-  provenance: "tierA-nasa" | "tierB-lit" | "tierC-synth" | "user-custom";
+  provenance: "tierA-nasa" | "tierB-lit" | "tierB-pymc" | "tierC-synth" | "user-custom";
   source_ref: string;
   incidence: {
     distribution: "Lognormal-Poisson" | "Gamma-Poisson" | "Beta-Bernoulli" | "Fixed";
@@ -74,11 +74,19 @@ export type IMMCrewMember = {
 };
 
 /**
- * Mission taxonomy. Selectron v1 supports only "analog-isolation" and
- * "leo-iss" — these are the operational scope for which the IMM Calculator
- * is calibrated and validated.
+ * Mission taxonomy. Selectron v1 supports analog-isolation / analog-controlled /
+ * antarctic-station / leo-iss — these are the operational scope for which the
+ * IMM Calculator is calibrated and validated.
  *
- * "lunar-artemis-future" and "interplanetary-mars-future" are catalogued for
+ * v2026-06-04 — split `analog-isolation` into `analog-controlled` (heated,
+ * climate-stable habitats: MDRS, HI-SEAS, EMMPOL, THOR) and `antarctic-station`
+ * (occupationally exposed: extreme cold, high altitude at South Pole / Concordia,
+ * chronic hypoxia, polar-night SAD). The legacy literal `analog-isolation` is
+ * preserved for backward compatibility with persisted Dexie `IMMSession` rows
+ * and the analog-missions analogue-catalog; the engine falls through to a 1.0
+ * multiplier for the legacy kind, reproducing pre-2026-06-04 outputs.
+ *
+ * `lunar-artemis-future` and `interplanetary-mars-future` are catalogued for
  * forward compatibility but are FILTERED OUT of the active mission picker
  * because the engine does not yet model the structural risk drivers required
  * for those destinations (comms-delay treatment degradation, cumulative-dose
@@ -86,7 +94,9 @@ export type IMMCrewMember = {
  * for the implementation roadmap.
  */
 export type IMMMissionKind =
-  | "analog-isolation"            // MDRS, HI-SEAS, Mars-500, Antarctic winter-over, etc.
+  | "analog-isolation"            // LEGACY: heated-habitat + Antarctic (kept for Dexie backward compat)
+  | "analog-controlled"           // Heated, climate-stable habitat (MDRS, HI-SEAS, EMMPOL, THOR)
+  | "antarctic-station"           // Cold/altitude-exposed Antarctic winter-over
   | "leo-iss"                     // ISS expeditions and reference DRMs
   | "lunar-artemis-future"        // Artemis I/II/III/IV — planned future feature
   | "interplanetary-mars-future"; // TM21 AMM/SMM — planned future feature
@@ -102,10 +112,20 @@ export type IMMMission = {
   evaSchedule: number[];
 };
 
+export type Telemedicine = "none" | "audio" | "video";
+export type CareProvider = "none" | "cmo" | "physician";
+
 export type IMMKitScenario = {
-  scenarioId: "none" | "issHMS" | "unlimited" | "custom";
+  scenarioId: "none" | "medium" | "issHMS" | "unlimited" | "custom";
   label: string;
   resources: Record<string, number>;
+  /**
+   * Health-support care capabilities (Health-Support feature, 2026-05-28).
+   * Optional for backward-compat; absent → treated as full capability (identity).
+   * UI-descriptive metadata only: the delivery-class gating in
+   * src/imm/health-support.ts::gateAvailable keys off scenarioId/tierId, not this field.
+   */
+  capabilities?: { telemedicine: Telemedicine; provider: CareProvider };
 };
 
 export type PosteriorSummary = {
@@ -131,6 +151,35 @@ export type IMMOutcome = {
     trialCheckpoints: number[];
     sigmaChi: number[]; sigmaPevac: number[];
   };
+  /**
+   * Raw per-trial CHI samples (percent scale, 0–100).
+   * Only populated when `diagnostics: true` is passed to `simulateIMM`.
+   * Used by R-hat convergence tests (tests/imm/rhat_convergence.test.ts).
+   */
+  diagnostics?: { chiSamples: number[] };
+};
+
+// ── Bayesian posterior-predictive types (analog MCMC, 2026-06-04) ─────────────
+
+/**
+ * Output of `posteriorPredictiveSimulateIMM`. Each summary is a posterior
+ * distribution over the metric (one value per posterior draw, not per trial).
+ * Reuses IMMOutcome's PosteriorSummary per metric so the UI renders point + interval
+ * estimates without extra aggregation.
+ */
+export type PosteriorPredictiveOutcome = {
+  /** Posterior distribution of pEVAC (% scale, 0..100) over the N draws. */
+  pEvacPost: PosteriorSummary;
+  /** Posterior distribution of pLOCL (% scale, 0..100). */
+  pLoclPost: PosteriorSummary;
+  /** Posterior distribution of CHI (% scale, 0..100). */
+  chiPost: PosteriorSummary;
+  /** Per-condition posterior of expected TME contribution (per-draw mean tmeContrib, events per trial). */
+  perConditionTmeContribPost: Record<string, PosteriorSummary>;
+  /** Number of posterior draws used. */
+  nDraws: number;
+  /** Monte Carlo trials run per posterior draw. */
+  trialsPerDraw: number;
 };
 
 // ── Crew-composite types (IMM Composite-Crew extension) ───────────────────────
@@ -188,7 +237,12 @@ export type IMMSession = {
   overrides: Record<string, Partial<IMMPrior>>;
   vulnerabilityMode: "boolean-flags" | "selectron-stage-a-ml";
   engine: "monte-carlo" | "surrogate-ml";
-  outcomes: IMMOutcome;
+  /**
+   * Monte Carlo result. `null` for a config-only session saved before a run
+   * completes (Diego 2026-05-29 — "session saving for running simulations").
+   * Loading such a session restores the setup; the user then runs it.
+   */
+  outcomes: IMMOutcome | null;
   validation: {
     vsK15Table1: {
       delta_tme: number; delta_chi: number;

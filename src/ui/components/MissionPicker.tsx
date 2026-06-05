@@ -17,7 +17,7 @@ function durationBand(days: number): string {
   if (days <= 45) return "Medium (≤6 wk)";
   if (days <= 90) return "Extended (≤3 mo)";
   if (days <= 365) return "Long (≤1 yr)";
-  return "Mars-class (>1 yr)";
+  return "Extended-duration (>1 yr)";
 }
 
 function durationBandColor(days: number): string {
@@ -65,12 +65,12 @@ export function MissionPicker({ missions, selected, onChange }: Props) {
               />
 
               {/* Duration band chip */}
-              <div className={"mono inline-block text-[9px] uppercase tracking-cap px-1.5 py-0.5 border rounded-sm mb-2 " + bandClass}>
+              <div className={"mono inline-block text-[11px] uppercase tracking-cap px-1.5 py-0.5 border rounded-sm mb-2 " + bandClass}>
                 {band}
               </div>
 
               {/* Mission id (the canonical key the user picks by) */}
-              <div className="mono text-[11px] text-ink-3 leading-tight">{m.id}</div>
+              <div className="mono text-[13px] text-ink-3 leading-tight">{m.id}</div>
 
               {/* Label — wrapped, 2-line clamp */}
               <h4
@@ -86,7 +86,7 @@ export function MissionPicker({ missions, selected, onChange }: Props) {
               </h4>
 
               {/* Stats grid: duration / crew / EVAs / comms */}
-              <div className="grid grid-cols-2 gap-x-2 gap-y-1 mono text-[10px] text-ink-2 tabular-nums">
+              <div className="grid grid-cols-2 gap-x-2 gap-y-1 mono text-[12px] text-ink-2 tabular-nums">
                 <div>
                   <span className="text-ink-3">dur · </span>
                   <span className="text-ink-1">{m.durationDays} d</span>
@@ -112,7 +112,7 @@ export function MissionPicker({ missions, selected, onChange }: Props) {
       </div>
 
       {selected && (
-        <p className="mono text-[10px] text-ink-2 px-1">
+        <p className="mono text-[12px] text-ink-2 px-1">
           selected · <span className="text-signal">{selected.id}</span>
         </p>
       )}

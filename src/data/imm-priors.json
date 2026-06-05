@@ -474,12 +474,12 @@
     },
     "ankle-sprain-strain": {
       "conditionId": "ankle-sprain-strain",
-      "provenance": "tierA-nasa",
-      "source_ref": "research/imm_sources/methods/M18_myers_2018_imm_validation.md#ankle-sprain-strain; rev3-e (2026-05-22): treated.fi_cp3 = untreated.fi_cp3 = 0 \u2014 condition fully resolves over 180d analog/LEO timeframe regardless of treatment (clinically defensible per K15 \u00a7II.A.5 'permanent impairment for remainder of mission' definition: acute self-limiting condition leaves no persistent impairment)",
+      "provenance": "tierB-pymc",
+      "source_ref": "research/evidence_extracted/incidence_rates.proposals_p-l.md (Cameron 2010 + Goodrich 2022: 40/1000/PY military; PyMC Gamma-Poisson, R-hat=1.000, ESS=3636)",
       "incidence": {
         "distribution": "Gamma-Poisson",
-        "alpha": 2,
-        "beta": 2500,
+        "alpha": 40.4174,
+        "beta": 354557.117,
         "lambda_unit": "events-per-person-day"
       },
       "severity": {
@@ -951,7 +951,7 @@
     "atrial-fibrillation-atrial-flutter": {
       "conditionId": "atrial-fibrillation-atrial-flutter",
       "provenance": "tierA-nasa",
-      "source_ref": "research/imm_sources/methods/G12_gilkey_2012_bayesian_imm.md#atrial-fibrillation-atrial-flutter",
+      "source_ref": "research/imm_sources/methods/G12_gilkey_2012_bayesian_imm.md#atrial-fibrillation-atrial-flutter; rev3-f (2026-05-26T15:22:15Z): severity tuned against persistent-impairment literature \u2014 treated mean=0.42, n_treated=2, n_untreated=1",
       "incidence": {
         "distribution": "Lognormal-Poisson",
         "mu_log_lambda": -13.5442,
@@ -984,9 +984,9 @@
           "max": 720
         },
         "fi_cp3": {
-          "min": 0,
-          "mode": 0.01,
-          "max": 0.05
+          "min": 0.29,
+          "mode": 0.415,
+          "max": 0.5
         },
         "p_evac": {
           "min": 5e-05,
@@ -1021,9 +1021,9 @@
           "max": 2160
         },
         "fi_cp3": {
-          "min": 0,
-          "mode": 0.05,
-          "max": 0.3
+          "min": 0.54,
+          "mode": 0.55,
+          "max": 0.56
         },
         "p_evac": {
           "min": 0.009,
@@ -1047,13 +1047,13 @@
     },
     "nephrolithiasis": {
       "conditionId": "nephrolithiasis",
-      "provenance": "tierA-nasa",
-      "source_ref": "research/imm_sources/methods/G12_gilkey_2012_bayesian_imm.md#nephrolithiasis; research/imm_sources/validation/S20_walton_kerstman_2020_iss_quantification.md#nephrolithiasis; rev3-e (2026-05-22): treated.fi_cp3 = untreated.fi_cp3 = 0 \u2014 condition fully resolves over 180d analog/LEO timeframe regardless of treatment (clinically defensible per K15 \u00a7II.A.5 'permanent impairment for remainder of mission' definition: acute self-limiting condition leaves no persistent impairment)",
+      "provenance": "tierB-pymc",
+      "source_ref": "research/evidence_extracted/incidence_rates.proposals_p-k.md (Goodenow-Messman 2022 PMC8799707: 7 post-flight stones/358 PY; PyMC Gamma-Poisson, R-hat=1.000, ESS=3317)",
       "incidence": {
-        "distribution": "Lognormal-Poisson",
-        "mu_log_lambda": -11.5,
-        "sigma_log_lambda": 0.116,
-        "lambda_unit": "events-per-person-day"
+        "distribution": "Gamma-Poisson",
+        "lambda_unit": "events-per-person-day",
+        "alpha": 8.6527,
+        "beta": 316958.777
       },
       "severity": {
         "worst_case_prob_alpha": 1.5,
@@ -1145,7 +1145,7 @@
     "seizures": {
       "conditionId": "seizures",
       "provenance": "tierA-nasa",
-      "source_ref": "research/imm_sources/methods/G12_gilkey_2012_bayesian_imm.md#seizures",
+      "source_ref": "research/imm_sources/methods/G12_gilkey_2012_bayesian_imm.md#seizures; rev3-f (2026-05-26T15:22:15Z): severity tuned against persistent-impairment literature \u2014 treated mean=0.59, n_treated=2, n_untreated=1",
       "incidence": {
         "distribution": "Lognormal-Poisson",
         "mu_log_lambda": -14.1233,
@@ -1178,9 +1178,9 @@
           "max": 720
         },
         "fi_cp3": {
-          "min": 0,
-          "mode": 0.01,
-          "max": 0.05
+          "min": 0.39,
+          "mode": 0.595,
+          "max": 0.8
         },
         "p_evac": {
           "min": 5e-05,
@@ -1215,9 +1215,9 @@
           "max": 2160
         },
         "fi_cp3": {
-          "min": 0,
-          "mode": 0.05,
-          "max": 0.3
+          "min": 0.84,
+          "mode": 0.85,
+          "max": 0.86
         },
         "p_evac": {
           "min": 0.009,
@@ -1238,12 +1238,12 @@
     },
     "herpes-zoster-reactivation-shingles": {
       "conditionId": "herpes-zoster-reactivation-shingles",
-      "provenance": "tierA-nasa",
-      "source_ref": "research/imm_sources/zotero_imm/antonsen-2021-comparison-of-health-and-performance.md#table-4; rev3-e (2026-05-22): treated.fi_cp3 = untreated.fi_cp3 = 0 \u2014 condition fully resolves over 180d analog/LEO timeframe regardless of treatment (clinically defensible per K15 \u00a7II.A.5 'permanent impairment for remainder of mission' definition: acute self-limiting condition leaves no persistent impairment)",
+      "provenance": "tierB-pymc",
+      "source_ref": "research/evidence_extracted/incidence_rates.proposals_p-k.md (Zhang 2026 PMC13149593: Antarctic HZ 33.3/1000/PY; PyMC Gamma-Poisson, R-hat=1.000, ESS=3157)",
       "incidence": {
         "distribution": "Gamma-Poisson",
-        "alpha": 2,
-        "beta": 176056,
+        "alpha": 3.8963,
+        "beta": 191790.0644,
         "lambda_unit": "events-per-person-day"
       },
       "severity": {
@@ -1331,12 +1331,12 @@
     },
     "dental-abscess": {
       "conditionId": "dental-abscess",
-      "provenance": "tierA-nasa",
-      "source_ref": "research/imm_sources/zotero_imm/antonsen-2021-comparison-of-health-and-performance.md#table-4; research/imm_sources/methods/G12_gilkey_2012_bayesian_imm.md#table-22 (Bayesian-updated dental abscess submarine + LSAH posterior; tier-A confirmation); rev3-e (2026-05-22): treated.fi_cp3 = untreated.fi_cp3 = 0 \u2014 condition fully resolves over 180d analog/LEO timeframe regardless of treatment (clinically defensible per K15 \u00a7II.A.5 'permanent impairment for remainder of mission' definition: acute self-limiting condition leaves no persistent impairment)",
+      "provenance": "tierB-pymc",
+      "source_ref": "research/evidence_extracted/incidence_rates.proposals_p-l.md (AFHTA 2018 military screened 3-5/1000/PY + Tissot 2023 Antarctic; PyMC Gamma-Poisson, R-hat=1.000, ESS=3057)",
       "incidence": {
         "distribution": "Gamma-Poisson",
-        "alpha": 2,
-        "beta": 595059,
+        "alpha": 10.7974,
+        "beta": 950727.6151,
         "lambda_unit": "events-per-person-day"
       },
       "severity": {
@@ -1425,12 +1425,12 @@
     },
     "urinary-tract-infection": {
       "conditionId": "urinary-tract-infection",
-      "provenance": "tierA-nasa",
-      "source_ref": "research/imm_sources/zotero_imm/antonsen-2021-comparison-of-health-and-performance.md#table-4; rev3-e (2026-05-22): treated.fi_cp3 = untreated.fi_cp3 = 0 \u2014 condition fully resolves over 180d analog/LEO timeframe regardless of treatment (clinically defensible per K15 \u00a7II.A.5 'permanent impairment for remainder of mission' definition: acute self-limiting condition leaves no persistent impairment)",
+      "provenance": "tierB-pymc",
+      "source_ref": "research/evidence_extracted/incidence_rates.proposals_p-l.md (DHA 2019 mixed-gender 8-15/1000/PY; SIVIGILA 2023 Colombia 15.2/1000/PY; PyMC Gamma-Poisson, R-hat=1.000, ESS=3897)",
       "incidence": {
         "distribution": "Gamma-Poisson",
-        "alpha": 2,
-        "beta": 252525,
+        "alpha": 16.5492,
+        "beta": 600308.2294,
         "lambda_unit": "events-per-person-day"
       },
       "severity": {
@@ -1519,7 +1519,7 @@
     "sepsis": {
       "conditionId": "sepsis",
       "provenance": "tierA-nasa",
-      "source_ref": "research/imm_sources/zotero_imm/antonsen-2021-comparison-of-health-and-performance.md#table-4",
+      "source_ref": "research/imm_sources/zotero_imm/antonsen-2021-comparison-of-health-and-performance.md#table-4; rev3-f (2026-05-26): severity tuned against persistent-impairment literature \u2014 treated mean=0.314, n_treated=3, n_untreated=0",
       "incidence": {
         "distribution": "Gamma-Poisson",
         "alpha": 2,
@@ -1527,8 +1527,8 @@
         "lambda_unit": "events-per-person-day"
       },
       "severity": {
-        "worst_case_prob_alpha": 1.5,
-        "worst_case_prob_beta": 3.5
+        "worst_case_prob_alpha": 3.14,
+        "worst_case_prob_beta": 6.86
       },
       "treated": {
         "fi_cp1": {
@@ -1552,9 +1552,9 @@
           "max": 1440
         },
         "fi_cp3": {
-          "min": 0,
-          "mode": 0.02,
-          "max": 0.1
+          "min": 0.027,
+          "mode": 0.314,
+          "max": 0.748
         },
         "p_evac": {
           "min": 0.005,
@@ -1589,9 +1589,9 @@
           "max": 4320
         },
         "fi_cp3": {
-          "min": 0,
-          "mode": 0.2,
-          "max": 0.8
+          "min": 0.415,
+          "mode": 0.565,
+          "max": 0.665
         },
         "p_evac": {
           "min": 0.18,
@@ -1709,7 +1709,7 @@
     "stroke-cerebrovascular-accident": {
       "conditionId": "stroke-cerebrovascular-accident",
       "provenance": "tierA-nasa",
-      "source_ref": "research/imm_sources/zotero_imm/antonsen-2021-comparison-of-health-and-performance.md#table-4",
+      "source_ref": "research/imm_sources/zotero_imm/antonsen-2021-comparison-of-health-and-performance.md#table-4; rev3-f (2026-05-26): severity tuned against persistent-impairment literature \u2014 treated mean=0.53, n_treated=3, n_untreated=3",
       "incidence": {
         "distribution": "Gamma-Poisson",
         "alpha": 2,
@@ -1717,8 +1717,8 @@
         "lambda_unit": "events-per-person-day"
       },
       "severity": {
-        "worst_case_prob_alpha": 1.5,
-        "worst_case_prob_beta": 3.5
+        "worst_case_prob_alpha": 5.3,
+        "worst_case_prob_beta": 4.7
       },
       "treated": {
         "fi_cp1": {
@@ -1742,9 +1742,9 @@
           "max": 1440
         },
         "fi_cp3": {
-          "min": 0,
-          "mode": 0.02,
-          "max": 0.1
+          "min": 0.371,
+          "mode": 0.53,
+          "max": 0.64
         },
         "p_evac": {
           "min": 0.005,
@@ -1779,9 +1779,9 @@
           "max": 4320
         },
         "fi_cp3": {
-          "min": 0,
-          "mode": 0.2,
-          "max": 0.8
+          "min": 0.27,
+          "mode": 0.517,
+          "max": 0.67
         },
         "p_evac": {
           "min": 0.18,
@@ -1991,7 +1991,7 @@
     "angina-myocardial-infarction": {
       "conditionId": "angina-myocardial-infarction",
       "provenance": "tierA-nasa",
-      "source_ref": "research/imm_sources/zotero_imm/antonsen-2021-comparison-of-health-and-performance.md#table-4",
+      "source_ref": "research/imm_sources/zotero_imm/antonsen-2021-comparison-of-health-and-performance.md#table-4; rev3-f (2026-05-26T15:22:15Z): severity tuned against persistent-impairment literature \u2014 treated mean=0.56, n_treated=2, n_untreated=1",
       "incidence": {
         "distribution": "Gamma-Poisson",
         "alpha": 2,
@@ -2024,9 +2024,9 @@
           "max": 720
         },
         "fi_cp3": {
-          "min": 0,
-          "mode": 0.01,
-          "max": 0.05
+          "min": 0.395,
+          "mode": 0.565,
+          "max": 0.677
         },
         "p_evac": {
           "min": 5e-05,
@@ -2061,9 +2061,9 @@
           "max": 2160
         },
         "fi_cp3": {
-          "min": 0,
-          "mode": 0.05,
-          "max": 0.3
+          "min": 0.74,
+          "mode": 0.75,
+          "max": 0.76
         },
         "p_evac": {
           "min": 0.009,
@@ -2086,7 +2086,7 @@
     "decompression-sickness-secondary-to-extravehicular-activity": {
       "conditionId": "decompression-sickness-secondary-to-extravehicular-activity",
       "provenance": "tierA-nasa",
-      "source_ref": "research/imm_sources/zotero_imm/antonsen-2021-comparison-of-health-and-performance.md#table-4",
+      "source_ref": "research/imm_sources/zotero_imm/antonsen-2021-comparison-of-health-and-performance.md#table-4; rev3-f (2026-05-26T15:22:15Z): severity tuned against persistent-impairment literature \u2014 treated mean=0.31, n_treated=3, n_untreated=0",
       "incidence": {
         "distribution": "Gamma-Poisson",
         "alpha": 2,
@@ -2119,9 +2119,9 @@
           "max": 720
         },
         "fi_cp3": {
-          "min": 0,
-          "mode": 0.01,
-          "max": 0.05
+          "min": 0.197,
+          "mode": 0.306,
+          "max": 0.387
         },
         "p_evac": {
           "min": 5e-05,
@@ -2156,9 +2156,9 @@
           "max": 2160
         },
         "fi_cp3": {
-          "min": 0,
-          "mode": 0.05,
-          "max": 0.3
+          "min": 0.4,
+          "mode": 0.55,
+          "max": 0.65
         },
         "p_evac": {
           "min": 0.009,
@@ -2275,7 +2275,7 @@
     "neck-injury": {
       "conditionId": "neck-injury",
       "provenance": "tierA-nasa",
-      "source_ref": "research/imm_sources/zotero_imm/antonsen-2021-comparison-of-health-and-performance.md#table-4",
+      "source_ref": "research/imm_sources/zotero_imm/antonsen-2021-comparison-of-health-and-performance.md#table-4; rev3-f (2026-05-26T15:22:15Z): severity tuned against persistent-impairment literature \u2014 treated mean=0.34, n_treated=3, n_untreated=1",
       "incidence": {
         "distribution": "Gamma-Poisson",
         "alpha": 2,
@@ -2308,9 +2308,9 @@
           "max": 720
         },
         "fi_cp3": {
-          "min": 0,
-          "mode": 0.01,
-          "max": 0.05
+          "min": 0.24,
+          "mode": 0.343,
+          "max": 0.43
         },
         "p_evac": {
           "min": 5e-05,
@@ -2345,9 +2345,9 @@
           "max": 2160
         },
         "fi_cp3": {
-          "min": 0,
-          "mode": 0.05,
-          "max": 0.3
+          "min": 0.79,
+          "mode": 0.8,
+          "max": 0.81
         },
         "p_evac": {
           "min": 0.009,
@@ -2369,7 +2369,7 @@
     "traumatic-hypovolemic-shock": {
       "conditionId": "traumatic-hypovolemic-shock",
       "provenance": "tierA-nasa",
-      "source_ref": "research/imm_sources/zotero_imm/antonsen-2021-comparison-of-health-and-performance.md#table-4",
+      "source_ref": "research/imm_sources/zotero_imm/antonsen-2021-comparison-of-health-and-performance.md#table-4; rev3-f (2026-05-26): severity tuned against persistent-impairment literature \u2014 treated mean=0.237, n_treated=3, n_untreated=2",
       "incidence": {
         "distribution": "Gamma-Poisson",
         "alpha": 2,
@@ -2377,8 +2377,8 @@
         "lambda_unit": "events-per-person-day"
       },
       "severity": {
-        "worst_case_prob_alpha": 1.5,
-        "worst_case_prob_beta": 3.5
+        "worst_case_prob_alpha": 2.37,
+        "worst_case_prob_beta": 7.63
       },
       "treated": {
         "fi_cp1": {
@@ -2402,9 +2402,9 @@
           "max": 1440
         },
         "fi_cp3": {
-          "min": 0,
-          "mode": 0.02,
-          "max": 0.1
+          "min": 0.06,
+          "mode": 0.237,
+          "max": 0.36
         },
         "p_evac": {
           "min": 0.005,
@@ -2439,9 +2439,9 @@
           "max": 4320
         },
         "fi_cp3": {
-          "min": 0,
-          "mode": 0.2,
-          "max": 0.8
+          "min": 0.2,
+          "mode": 0.325,
+          "max": 0.45
         },
         "p_evac": {
           "min": 0.18,
@@ -2559,7 +2559,7 @@
     "sudden-cardiac-arrest": {
       "conditionId": "sudden-cardiac-arrest",
       "provenance": "tierA-nasa",
-      "source_ref": "research/imm_sources/zotero_imm/antonsen-2021-comparison-of-health-and-performance.md#table-6",
+      "source_ref": "research/imm_sources/zotero_imm/antonsen-2021-comparison-of-health-and-performance.md#table-6; rev3-f (2026-05-26): severity tuned against persistent-impairment literature \u2014 treated mean=0.11, n_treated=6, n_untreated=1",
       "incidence": {
         "distribution": "Gamma-Poisson",
         "alpha": 2,
@@ -2567,8 +2567,8 @@
         "lambda_unit": "events-per-person-day"
       },
       "severity": {
-        "worst_case_prob_alpha": 1.5,
-        "worst_case_prob_beta": 3.5
+        "worst_case_prob_alpha": 1.09,
+        "worst_case_prob_beta": 8.9
       },
       "treated": {
         "fi_cp1": {
@@ -2592,9 +2592,9 @@
           "max": 1440
         },
         "fi_cp3": {
-          "min": 0,
-          "mode": 0.02,
-          "max": 0.1
+          "min": 0.033,
+          "mode": 0.11,
+          "max": 0.195
         },
         "p_evac": {
           "min": 0.005,
@@ -2629,9 +2629,9 @@
           "max": 4320
         },
         "fi_cp3": {
-          "min": 0,
-          "mode": 0.2,
-          "max": 0.8
+          "min": 0.223,
+          "mode": 0.233,
+          "max": 0.243
         },
         "p_evac": {
           "min": 0.18,
@@ -2653,7 +2653,7 @@
     "burns-secondary-to-fire": {
       "conditionId": "burns-secondary-to-fire",
       "provenance": "tierA-nasa",
-      "source_ref": "research/imm_sources/zotero_imm/antonsen-2021-comparison-of-health-and-performance.md#table-6",
+      "source_ref": "research/imm_sources/zotero_imm/antonsen-2021-comparison-of-health-and-performance.md#table-6; rev3-f (2026-05-26): severity tuned against persistent-impairment literature \u2014 treated mean=0.33, n_treated=5, n_untreated=1",
       "incidence": {
         "distribution": "Gamma-Poisson",
         "alpha": 2,
@@ -2661,8 +2661,8 @@
         "lambda_unit": "events-per-person-day"
       },
       "severity": {
-        "worst_case_prob_alpha": 1.5,
-        "worst_case_prob_beta": 3.5
+        "worst_case_prob_alpha": 3.3,
+        "worst_case_prob_beta": 6.7
       },
       "treated": {
         "fi_cp1": {
@@ -2686,9 +2686,9 @@
           "max": 1440
         },
         "fi_cp3": {
-          "min": 0,
-          "mode": 0.02,
-          "max": 0.1
+          "min": 0.231,
+          "mode": 0.33,
+          "max": 0.429
         },
         "p_evac": {
           "min": 0.005,
@@ -2723,9 +2723,9 @@
           "max": 4320
         },
         "fi_cp3": {
-          "min": 0,
-          "mode": 0.2,
-          "max": 0.8
+          "min": 0.81,
+          "mode": 0.82,
+          "max": 0.83
         },
         "p_evac": {
           "min": 0.18,
@@ -2748,7 +2748,7 @@
     "toxic-exposure-ammonia": {
       "conditionId": "toxic-exposure-ammonia",
       "provenance": "tierA-nasa",
-      "source_ref": "research/imm_sources/zotero_imm/antonsen-2021-comparison-of-health-and-performance.md#table-6",
+      "source_ref": "research/imm_sources/zotero_imm/antonsen-2021-comparison-of-health-and-performance.md#table-6; rev3-f (2026-05-26): severity tuned against persistent-impairment literature \u2014 treated mean=0.702, n_treated=3, n_untreated=0",
       "incidence": {
         "distribution": "Gamma-Poisson",
         "alpha": 2,
@@ -2756,8 +2756,8 @@
         "lambda_unit": "events-per-person-day"
       },
       "severity": {
-        "worst_case_prob_alpha": 1.5,
-        "worst_case_prob_beta": 3.5
+        "worst_case_prob_alpha": 7.02,
+        "worst_case_prob_beta": 2.98
       },
       "treated": {
         "fi_cp1": {
@@ -2781,9 +2781,9 @@
           "max": 1440
         },
         "fi_cp3": {
-          "min": 0,
-          "mode": 0.02,
-          "max": 0.1
+          "min": 0.105,
+          "mode": 0.702,
+          "max": 1.0
         },
         "p_evac": {
           "min": 0.005,
@@ -2818,9 +2818,9 @@
           "max": 4320
         },
         "fi_cp3": {
-          "min": 0,
-          "mode": 0.2,
-          "max": 0.8
+          "min": 0.83,
+          "mode": 0.98,
+          "max": 1.0
         },
         "p_evac": {
           "min": 0.18,
@@ -2842,7 +2842,7 @@
     "head-injury": {
       "conditionId": "head-injury",
       "provenance": "tierA-nasa",
-      "source_ref": "research/imm_sources/zotero_imm/antonsen-2021-comparison-of-health-and-performance.md#table-6",
+      "source_ref": "research/imm_sources/zotero_imm/antonsen-2021-comparison-of-health-and-performance.md#table-6; rev3-f (2026-05-26T15:22:15Z): severity tuned against persistent-impairment literature \u2014 treated mean=0.70, n_treated=3, n_untreated=1",
       "incidence": {
         "distribution": "Gamma-Poisson",
         "alpha": 2,
@@ -2875,9 +2875,9 @@
           "max": 720
         },
         "fi_cp3": {
-          "min": 0,
-          "mode": 0.01,
-          "max": 0.05
+          "min": 0.49,
+          "mode": 0.7,
+          "max": 0.84
         },
         "p_evac": {
           "min": 5e-05,
@@ -2912,9 +2912,9 @@
           "max": 2160
         },
         "fi_cp3": {
-          "min": 0,
-          "mode": 0.05,
-          "max": 0.3
+          "min": 0.94,
+          "mode": 0.95,
+          "max": 0.96
         },
         "p_evac": {
           "min": 0.009,
@@ -3034,7 +3034,7 @@
     "back-injury": {
       "conditionId": "back-injury",
       "provenance": "tierA-nasa",
-      "source_ref": "research/imm_sources/zotero_imm/antonsen-2021-comparison-of-health-and-performance.md#table-4",
+      "source_ref": "research/imm_sources/zotero_imm/antonsen-2021-comparison-of-health-and-performance.md#table-4; rev3-f (2026-05-26T15:22:15Z): severity tuned against persistent-impairment literature \u2014 treated mean=0.27, n_treated=3, n_untreated=0",
       "incidence": {
         "distribution": "Gamma-Poisson",
         "alpha": 2,
@@ -3067,9 +3067,9 @@
           "max": 720
         },
         "fi_cp3": {
-          "min": 0,
-          "mode": 0.01,
-          "max": 0.05
+          "min": 0.11,
+          "mode": 0.27,
+          "max": 0.55
         },
         "p_evac": {
           "min": 5e-05,
@@ -3104,9 +3104,9 @@
           "max": 2160
         },
         "fi_cp3": {
-          "min": 0,
-          "mode": 0.05,
-          "max": 0.3
+          "min": 0.336,
+          "mode": 0.486,
+          "max": 0.586
         },
         "p_evac": {
           "min": 0.009,
@@ -3222,7 +3222,7 @@
     "behavioral-emergency": {
       "conditionId": "behavioral-emergency",
       "provenance": "tierA-nasa",
-      "source_ref": "research/imm_sources/validation/S20_walton_kerstman_2020_iss_quantification.md#behavioral-emergency",
+      "source_ref": "research/imm_sources/validation/S20_walton_kerstman_2020_iss_quantification.md#behavioral-emergency; rev3-f (2026-05-26T15:22:15Z): severity tuned against persistent-impairment literature \u2014 treated mean=0.65, n_treated=2, n_untreated=1",
       "incidence": {
         "distribution": "Gamma-Poisson",
         "alpha": 2,
@@ -3255,9 +3255,9 @@
           "max": 720
         },
         "fi_cp3": {
-          "min": 0,
-          "mode": 0.01,
-          "max": 0.05
+          "min": 0.454,
+          "mode": 0.648,
+          "max": 0.778
         },
         "p_evac": {
           "min": 5e-05,
@@ -3292,9 +3292,9 @@
           "max": 2160
         },
         "fi_cp3": {
-          "min": 0,
-          "mode": 0.05,
-          "max": 0.3
+          "min": 0.79,
+          "mode": 0.8,
+          "max": 0.81
         },
         "p_evac": {
           "min": 0.009,
@@ -3315,12 +3315,12 @@
     },
     "anxiety": {
       "conditionId": "anxiety",
-      "provenance": "tierA-nasa",
-      "source_ref": "research/imm_sources/validation/S20_walton_kerstman_2020_iss_quantification.md#anxiety; rev3-e (2026-05-22): treated.fi_cp3 = untreated.fi_cp3 = 0 \u2014 condition fully resolves over 180d analog/LEO timeframe regardless of treatment (clinically defensible per K15 \u00a7II.A.5 'permanent impairment for remainder of mission' definition: acute self-limiting condition leaves no persistent impairment)",
+      "provenance": "tierB-pymc",
+      "source_ref": "research/evidence_extracted/incidence_rates.proposals_p-j.md (Kang 2022: 7 diagnosed mental disorders in 88 Korean Antarctic winterers over 1 year; PyMC Gamma-Poisson posterior, R-hat=1.000, ESS=3520)",
       "incidence": {
         "distribution": "Gamma-Poisson",
-        "alpha": 2,
-        "beta": 25000,
+        "alpha": 8.8379,
+        "beta": 56067.9853,
         "lambda_unit": "events-per-person-day"
       },
       "severity": {
@@ -3689,7 +3689,7 @@
     "visual-impairment-and-intracranial-pressure-viip-space-adaptation": {
       "conditionId": "visual-impairment-and-intracranial-pressure-viip-space-adaptation",
       "provenance": "tierA-nasa",
-      "source_ref": "research/imm_sources/validation/S20_walton_kerstman_2020_iss_quantification.md#viip",
+      "source_ref": "research/imm_sources/validation/S20_walton_kerstman_2020_iss_quantification.md#viip; rev3-f (2026-05-26T15:22:15Z): severity tuned against persistent-impairment literature \u2014 treated mean=0.79, n_treated=5, n_untreated=0",
       "incidence": {
         "distribution": "Gamma-Poisson",
         "alpha": 2,
@@ -3722,9 +3722,9 @@
           "max": 336
         },
         "fi_cp3": {
-          "min": 0,
-          "mode": 0,
-          "max": 0.01
+          "min": 0.33,
+          "mode": 0.786,
+          "max": 1.0
         },
         "p_evac": {
           "min": 2.5e-06,
@@ -3759,9 +3759,9 @@
           "max": 1080
         },
         "fi_cp3": {
-          "min": 0,
-          "mode": 0.02,
-          "max": 0.1
+          "min": 0.83,
+          "mode": 0.98,
+          "max": 1.0
         },
         "p_evac": {
           "min": 0.00042,
@@ -3782,12 +3782,12 @@
     },
     "back-pain-space-adaptation": {
       "conditionId": "back-pain-space-adaptation",
-      "provenance": "tierB-lit",
-      "source_ref": "research/evidence/pagel-chouker-2016-effects-isolation-confinement.md; rev3-c note: KERS12 (n=772 flights, 52% SABP / 6mo) is the CHRONIC SABP rate, mechanistically distinct from the acute first-10-days space-adaptation window this prior models. The two are NOT the same condition; do not conflate.; rev3-e (2026-05-22): treated.fi_cp3 = untreated.fi_cp3 = 0 \u2014 condition fully resolves over 180d analog/LEO timeframe regardless of treatment (clinically defensible per K15 \u00a7II.A.5 'permanent impairment for remainder of mission' definition: acute self-limiting condition leaves no persistent impairment)",
+      "provenance": "tierB-pymc",
+      "source_ref": "python/outputs/fitted_priors_run1/back-pain-space-adaptation/back-pain-space-adaptation.json",
       "incidence": {
-        "distribution": "Beta-Bernoulli",
-        "alpha": 7,
-        "beta": 3,
+        "distribution": "Gamma-Poisson",
+        "alpha": 3698.5582403373623,
+        "beta": 36727707.13197764,
         "lambda_unit": "events-per-person-day"
       },
       "severity": {
@@ -3875,12 +3875,12 @@
     },
     "constipation-space-adaptation": {
       "conditionId": "constipation-space-adaptation",
-      "provenance": "tierB-lit",
-      "source_ref": "research/evidence/shved-2022-isolation-crowding-countermeasures.md; rev3-e (2026-05-22): treated.fi_cp3 = untreated.fi_cp3 = 0 \u2014 condition fully resolves over 180d analog/LEO timeframe regardless of treatment (clinically defensible per K15 \u00a7II.A.5 'permanent impairment for remainder of mission' definition: acute self-limiting condition leaves no persistent impairment)",
+      "provenance": "tierB-pymc",
+      "source_ref": "python/outputs/fitted_priors_run1/constipation-space-adaptation/constipation-space-adaptation.json",
       "incidence": {
-        "distribution": "Beta-Bernoulli",
-        "alpha": 5,
-        "beta": 5,
+        "distribution": "Gamma-Poisson",
+        "alpha": 1507.7566697635148,
+        "beta": 37678298.98890207,
         "lambda_unit": "events-per-person-day"
       },
       "severity": {
@@ -3968,12 +3968,12 @@
     },
     "headache-space-adaptation": {
       "conditionId": "headache-space-adaptation",
-      "provenance": "tierB-lit",
-      "source_ref": "research/evidence/pagel-chouker-2016-effects-isolation-confinement.md; rev3-e (2026-05-22): treated.fi_cp3 = untreated.fi_cp3 = 0 \u2014 condition fully resolves over 180d analog/LEO timeframe regardless of treatment (clinically defensible per K15 \u00a7II.A.5 'permanent impairment for remainder of mission' definition: acute self-limiting condition leaves no persistent impairment)",
+      "provenance": "tierB-pymc",
+      "source_ref": "python/outputs/fitted_priors_run1/headache-space-adaptation/headache-space-adaptation.json",
       "incidence": {
-        "distribution": "Beta-Bernoulli",
-        "alpha": 6,
-        "beta": 4,
+        "distribution": "Gamma-Poisson",
+        "alpha": 1491.900661926783,
+        "beta": 38352658.7959623,
         "lambda_unit": "events-per-person-day"
       },
       "severity": {
@@ -4061,12 +4061,12 @@
     },
     "insomnia-space-adaptation": {
       "conditionId": "insomnia-space-adaptation",
-      "provenance": "tierB-lit",
-      "source_ref": "research/evidence/palinkas-2004-antarctic-psychiatric-disorders.md; rev3-e (2026-05-22): treated.fi_cp3 = untreated.fi_cp3 = 0 \u2014 condition fully resolves over 180d analog/LEO timeframe regardless of treatment (clinically defensible per K15 \u00a7II.A.5 'permanent impairment for remainder of mission' definition: acute self-limiting condition leaves no persistent impairment)",
+      "provenance": "tierB-pymc",
+      "source_ref": "python/outputs/fitted_priors_run1/insomnia-space-adaptation/insomnia-space-adaptation.json",
       "incidence": {
-        "distribution": "Beta-Bernoulli",
-        "alpha": 7,
-        "beta": 3,
+        "distribution": "Gamma-Poisson",
+        "alpha": 3880.749943144337,
+        "beta": 36347949.47651529,
         "lambda_unit": "events-per-person-day"
       },
       "severity": {
@@ -4156,12 +4156,12 @@
     },
     "nasal-congestion-space-adaptation": {
       "conditionId": "nasal-congestion-space-adaptation",
-      "provenance": "tierB-lit",
-      "source_ref": "research/evidence/pagel-chouker-2016-effects-isolation-confinement.md; rev3-e (2026-05-22): treated.fi_cp3 = untreated.fi_cp3 = 0 \u2014 condition fully resolves over 180d analog/LEO timeframe regardless of treatment (clinically defensible per K15 \u00a7II.A.5 'permanent impairment for remainder of mission' definition: acute self-limiting condition leaves no persistent impairment)",
+      "provenance": "tierB-pymc",
+      "source_ref": "python/outputs/fitted_priors_run1/nasal-congestion-space-adaptation/nasal-congestion-space-adaptation.json",
       "incidence": {
-        "distribution": "Beta-Bernoulli",
-        "alpha": 8,
-        "beta": 2,
+        "distribution": "Gamma-Poisson",
+        "alpha": 2623.973376882056,
+        "beta": 38348107.88745039,
         "lambda_unit": "events-per-person-day"
       },
       "severity": {
@@ -4249,12 +4249,12 @@
     },
     "nose-bleed-space-adaptation": {
       "conditionId": "nose-bleed-space-adaptation",
-      "provenance": "tierB-lit",
-      "source_ref": "research/evidence/pagel-chouker-2016-effects-isolation-confinement.md; rev3-e (2026-05-22): treated.fi_cp3 = untreated.fi_cp3 = 0 \u2014 condition fully resolves over 180d analog/LEO timeframe regardless of treatment (clinically defensible per K15 \u00a7II.A.5 'permanent impairment for remainder of mission' definition: acute self-limiting condition leaves no persistent impairment)",
+      "provenance": "tierB-pymc",
+      "source_ref": "python/outputs/fitted_priors_run1/nose-bleed-space-adaptation/nose-bleed-space-adaptation.json",
       "incidence": {
-        "distribution": "Beta-Bernoulli",
-        "alpha": 4,
-        "beta": 6,
+        "distribution": "Gamma-Poisson",
+        "alpha": 167.81817525637524,
+        "beta": 36038933.10803841,
         "lambda_unit": "events-per-person-day"
       },
       "severity": {
@@ -4342,12 +4342,12 @@
     },
     "space-motion-sickness-space-adaptation": {
       "conditionId": "space-motion-sickness-space-adaptation",
-      "provenance": "tierB-lit",
-      "source_ref": "research/evidence/pagel-chouker-2016-effects-isolation-confinement.md; rev3-e (2026-05-22): treated.fi_cp3 = untreated.fi_cp3 = 0 \u2014 condition fully resolves over 180d analog/LEO timeframe regardless of treatment (clinically defensible per K15 \u00a7II.A.5 'permanent impairment for remainder of mission' definition: acute self-limiting condition leaves no persistent impairment)",
+      "provenance": "tierB-pymc",
+      "source_ref": "python/outputs/fitted_priors_run1/space-motion-sickness-space-adaptation/space-motion-sickness-space-adaptation.json",
       "incidence": {
-        "distribution": "Beta-Bernoulli",
-        "alpha": 7,
-        "beta": 3,
+        "distribution": "Gamma-Poisson",
+        "alpha": 375.10954779884696,
+        "beta": 37542850.540006876,
         "lambda_unit": "events-per-person-day"
       },
       "severity": {
@@ -4436,12 +4436,12 @@
     },
     "urinary-incontinence-space-adaptation": {
       "conditionId": "urinary-incontinence-space-adaptation",
-      "provenance": "tierB-lit",
-      "source_ref": "research/evidence/pagel-chouker-2016-effects-isolation-confinement.md; rev3-e (2026-05-22): treated.fi_cp3 = untreated.fi_cp3 = 0 \u2014 condition fully resolves over 180d analog/LEO timeframe regardless of treatment (clinically defensible per K15 \u00a7II.A.5 'permanent impairment for remainder of mission' definition: acute self-limiting condition leaves no persistent impairment)",
+      "provenance": "tierB-pymc",
+      "source_ref": "python/outputs/fitted_priors_run1/urinary-incontinence-space-adaptation/urinary-incontinence-space-adaptation.json",
       "incidence": {
-        "distribution": "Beta-Bernoulli",
-        "alpha": 3,
-        "beta": 7,
+        "distribution": "Gamma-Poisson",
+        "alpha": 188.43694060019882,
+        "beta": 37170689.50263092,
         "lambda_unit": "events-per-person-day"
       },
       "severity": {
@@ -4531,12 +4531,12 @@
     },
     "urinary-retention-space-adaptation": {
       "conditionId": "urinary-retention-space-adaptation",
-      "provenance": "tierB-lit",
-      "source_ref": "research/evidence/pagel-chouker-2016-effects-isolation-confinement.md; rev3-e (2026-05-22): treated.fi_cp3 = untreated.fi_cp3 = 0 \u2014 condition fully resolves over 180d analog/LEO timeframe regardless of treatment (clinically defensible per K15 \u00a7II.A.5 'permanent impairment for remainder of mission' definition: acute self-limiting condition leaves no persistent impairment)",
+      "provenance": "tierB-pymc",
+      "source_ref": "python/outputs/fitted_priors_run1/urinary-retention-space-adaptation/urinary-retention-space-adaptation.json",
       "incidence": {
-        "distribution": "Beta-Bernoulli",
-        "alpha": 2,
-        "beta": 8,
+        "distribution": "Gamma-Poisson",
+        "alpha": 52.41938266320178,
+        "beta": 38321882.31978439,
         "lambda_unit": "events-per-person-day"
       },
       "severity": {
@@ -4626,12 +4626,12 @@
     },
     "depression": {
       "conditionId": "depression",
-      "provenance": "tierB-lit",
-      "source_ref": "research/evidence/palinkas-2004-antarctic-psychiatric-disorders.md; research/evidence/palinkas-2004-antarctic-psychiatric-disorders.md (5.2%/winter weighted = 1.93e-4/day); Hong 2022 (8.0%/winter, Korean Antarctic); Bhatia 2012 (3 psychiatric / 26 py Maitri = 3.16e-4/day); see research/_priors_rev3c_synthesis.md#2.3; rev3-e (2026-05-22): treated.fi_cp3 = untreated.fi_cp3 = 0 \u2014 condition fully resolves over 180d analog/LEO timeframe regardless of treatment (clinically defensible per K15 \u00a7II.A.5 'permanent impairment for remainder of mission' definition: acute self-limiting condition leaves no persistent impairment)",
+      "provenance": "tierB-pymc",
+      "source_ref": "python/outputs/fitted_priors_run1/depression/depression.json",
       "incidence": {
         "distribution": "Gamma-Poisson",
-        "alpha": 2.0,
-        "beta": 10000.0,
+        "alpha": 29.66947447414847,
+        "beta": 200779.6830070527,
         "lambda_unit": "events-per-person-day"
       },
       "severity": {
@@ -4722,12 +4722,12 @@
     },
     "gastroenteritis": {
       "conditionId": "gastroenteritis",
-      "provenance": "tierB-lit",
-      "source_ref": "research/evidence/ponomarev-2021-immunological-aspects-isolation-confinement.md; rev3-e (2026-05-22): treated.fi_cp3 = untreated.fi_cp3 = 0 \u2014 condition fully resolves over 180d analog/LEO timeframe regardless of treatment (clinically defensible per K15 \u00a7II.A.5 'permanent impairment for remainder of mission' definition: acute self-limiting condition leaves no persistent impairment)",
+      "provenance": "tierB-pymc",
+      "source_ref": "python/outputs/fitted_priors_run1/gastroenteritis/gastroenteritis.json",
       "incidence": {
         "distribution": "Gamma-Poisson",
-        "alpha": 2,
-        "beta": 370,
+        "alpha": 5.21403800000842,
+        "beta": 10142.961056400218,
         "lambda_unit": "events-per-person-day"
       },
       "severity": {
@@ -4816,12 +4816,12 @@
     },
     "respiratory-infection": {
       "conditionId": "respiratory-infection",
-      "provenance": "tierB-lit",
-      "source_ref": "research/evidence/ponomarev-2021-immunological-aspects-isolation-confinement.md; Bhatia 2012 Maitri Antarctic (9.7% URTI \u00d7 3.58 events/py / 365 = 9.5e-4/day, small-crew analog); Pattarini 2016 McMurdo (large-crew 'polar T-zone' upper bound 1.7e-3/day); 1.43e-3/day = small-crew anchor midpoint; see research/_priors_rev3c_synthesis.md#2.4; rev3-e (2026-05-22): treated.fi_cp3 = untreated.fi_cp3 = 0 \u2014 condition fully resolves over 180d analog/LEO timeframe regardless of treatment (clinically defensible per K15 \u00a7II.A.5 'permanent impairment for remainder of mission' definition: acute self-limiting condition leaves no persistent impairment)",
+      "provenance": "tierB-pymc",
+      "source_ref": "python/outputs/fitted_priors_run1/respiratory-infection/respiratory-infection.json",
       "incidence": {
         "distribution": "Gamma-Poisson",
-        "alpha": 2.0,
-        "beta": 1400.0,
+        "alpha": 21.336445173706235,
+        "beta": 15479.17341380057,
         "lambda_unit": "events-per-person-day"
       },
       "severity": {
@@ -4910,12 +4910,12 @@
     },
     "pharyngitis": {
       "conditionId": "pharyngitis",
-      "provenance": "tierB-lit",
-      "source_ref": "research/evidence/ponomarev-2021-immunological-aspects-isolation-confinement.md; rev3-e (2026-05-22): treated.fi_cp3 = untreated.fi_cp3 = 0 \u2014 condition fully resolves over 180d analog/LEO timeframe regardless of treatment (clinically defensible per K15 \u00a7II.A.5 'permanent impairment for remainder of mission' definition: acute self-limiting condition leaves no persistent impairment)",
+      "provenance": "tierB-pymc",
+      "source_ref": "python/outputs/fitted_priors_run1/pharyngitis/pharyngitis.json",
       "incidence": {
         "distribution": "Gamma-Poisson",
-        "alpha": 2,
-        "beta": 400,
+        "alpha": 2.9880634944726863,
+        "beta": 7396.741464216063,
         "lambda_unit": "events-per-person-day"
       },
       "severity": {
@@ -5004,12 +5004,12 @@
     },
     "otitis-externa": {
       "conditionId": "otitis-externa",
-      "provenance": "tierB-lit",
-      "source_ref": "research/evidence/malpica-2024-thor-isolation-confinement-responses.md; rev3-e (2026-05-22): treated.fi_cp3 = untreated.fi_cp3 = 0 \u2014 condition fully resolves over 180d analog/LEO timeframe regardless of treatment (clinically defensible per K15 \u00a7II.A.5 'permanent impairment for remainder of mission' definition: acute self-limiting condition leaves no persistent impairment)",
+      "provenance": "tierB-pymc",
+      "source_ref": "python/outputs/fitted_priors_run1/otitis-externa/otitis-externa.json",
       "incidence": {
         "distribution": "Gamma-Poisson",
-        "alpha": 2,
-        "beta": 1000,
+        "alpha": 5.179763438051346,
+        "beta": 10937.50461101561,
         "lambda_unit": "events-per-person-day"
       },
       "severity": {
@@ -5097,12 +5097,12 @@
     },
     "otitis-media": {
       "conditionId": "otitis-media",
-      "provenance": "tierB-lit",
-      "source_ref": "research/evidence/malpica-2024-thor-isolation-confinement-responses.md; rev3-e (2026-05-22): treated.fi_cp3 = untreated.fi_cp3 = 0 \u2014 condition fully resolves over 180d analog/LEO timeframe regardless of treatment (clinically defensible per K15 \u00a7II.A.5 'permanent impairment for remainder of mission' definition: acute self-limiting condition leaves no persistent impairment)",
+      "provenance": "tierB-pymc",
+      "source_ref": "python/outputs/fitted_priors_run1/otitis-media/otitis-media.json",
       "incidence": {
         "distribution": "Gamma-Poisson",
-        "alpha": 2,
-        "beta": 1500,
+        "alpha": 8.218742709493075,
+        "beta": 8850.826050391519,
         "lambda_unit": "events-per-person-day"
       },
       "severity": {
@@ -5191,12 +5191,12 @@
     },
     "skin-rash": {
       "conditionId": "skin-rash",
-      "provenance": "tierB-lit",
-      "source_ref": "research/evidence/ponomarev-2021-immunological-aspects-isolation-confinement.md; Pattarini 2016 McMurdo (dermatologic 14% \u00d7 3.58/py / 365 = 1.37e-3/day); Whitmire 2015 WOTR15 ISS (25% crew required rash medication / 6mo \u2248 1.37e-3/day) \u2014 independent anchors converge; see research/_priors_rev3c_synthesis.md#2.5; rev3-e (2026-05-22): treated.fi_cp3 = untreated.fi_cp3 = 0 \u2014 condition fully resolves over 180d analog/LEO timeframe regardless of treatment (clinically defensible per K15 \u00a7II.A.5 'permanent impairment for remainder of mission' definition: acute self-limiting condition leaves no persistent impairment)",
+      "provenance": "tierB-pymc",
+      "source_ref": "python/outputs/fitted_priors_run1/skin-rash/skin-rash.json",
       "incidence": {
         "distribution": "Gamma-Poisson",
-        "alpha": 2.0,
-        "beta": 1460.0,
+        "alpha": 24.29993058064271,
+        "beta": 122988.65809962837,
         "lambda_unit": "events-per-person-day"
       },
       "severity": {
@@ -5285,12 +5285,12 @@
     },
     "eye-infection": {
       "conditionId": "eye-infection",
-      "provenance": "tierB-lit",
-      "source_ref": "research/evidence/ponomarev-2021-immunological-aspects-isolation-confinement.md; rev3-e (2026-05-22): treated.fi_cp3 = untreated.fi_cp3 = 0 \u2014 condition fully resolves over 180d analog/LEO timeframe regardless of treatment (clinically defensible per K15 \u00a7II.A.5 'permanent impairment for remainder of mission' definition: acute self-limiting condition leaves no persistent impairment)",
+      "provenance": "tierB-pymc",
+      "source_ref": "python/outputs/fitted_priors_run1/eye-infection/eye-infection.json",
       "incidence": {
         "distribution": "Gamma-Poisson",
-        "alpha": 2,
-        "beta": 1000,
+        "alpha": 7.067125345885786,
+        "beta": 17275.590137766416,
         "lambda_unit": "events-per-person-day"
       },
       "severity": {
@@ -5378,12 +5378,12 @@
     },
     "mouth-ulcer": {
       "conditionId": "mouth-ulcer",
-      "provenance": "tierB-lit",
-      "source_ref": "research/evidence/shved-2022-isolation-crowding-countermeasures.md; rev3-e (2026-05-22): treated.fi_cp3 = untreated.fi_cp3 = 0 \u2014 condition fully resolves over 180d analog/LEO timeframe regardless of treatment (clinically defensible per K15 \u00a7II.A.5 'permanent impairment for remainder of mission' definition: acute self-limiting condition leaves no persistent impairment)",
+      "provenance": "tierB-pymc",
+      "source_ref": "python/outputs/fitted_priors_run1/mouth-ulcer/mouth-ulcer.json",
       "incidence": {
         "distribution": "Gamma-Poisson",
-        "alpha": 2,
-        "beta": 500,
+        "alpha": 9.809009900010249,
+        "beta": 9899.30449588674,
         "lambda_unit": "events-per-person-day"
       },
       "severity": {
@@ -5471,12 +5471,12 @@
     },
     "hemorrhoids": {
       "conditionId": "hemorrhoids",
-      "provenance": "tierB-lit",
-      "source_ref": "research/evidence/shved-2022-isolation-crowding-countermeasures.md; rev3-e (2026-05-22): treated.fi_cp3 = untreated.fi_cp3 = 0 \u2014 condition fully resolves over 180d analog/LEO timeframe regardless of treatment (clinically defensible per K15 \u00a7II.A.5 'permanent impairment for remainder of mission' definition: acute self-limiting condition leaves no persistent impairment)",
+      "provenance": "tierB-pymc",
+      "source_ref": "python/outputs/fitted_priors_run1/hemorrhoids/hemorrhoids.json",
       "incidence": {
         "distribution": "Gamma-Poisson",
-        "alpha": 2,
-        "beta": 1000,
+        "alpha": 45.23010764512622,
+        "beta": 35766486.74063609,
         "lambda_unit": "events-per-person-day"
       },
       "severity": {
@@ -5564,12 +5564,12 @@
     },
     "barotrauma-ear-sinus-block": {
       "conditionId": "barotrauma-ear-sinus-block",
-      "provenance": "tierB-lit",
-      "source_ref": "research/evidence/malpica-2024-thor-isolation-confinement-responses.md; rev3-e (2026-05-22): treated.fi_cp3 = untreated.fi_cp3 = 0 \u2014 condition fully resolves over 180d analog/LEO timeframe regardless of treatment (clinically defensible per K15 \u00a7II.A.5 'permanent impairment for remainder of mission' definition: acute self-limiting condition leaves no persistent impairment)",
+      "provenance": "tierB-pymc",
+      "source_ref": "python/outputs/fitted_priors/barotrauma-ear-sinus-block/barotrauma-ear-sinus-block.json",
       "incidence": {
         "distribution": "Gamma-Poisson",
-        "alpha": 2,
-        "beta": 1000,
+        "alpha": 4625.528323084417,
+        "beta": 136762.84271796313,
         "lambda_unit": "events-per-person-day"
       },
       "severity": {
@@ -5657,12 +5657,12 @@
     },
     "headache-late": {
       "conditionId": "headache-late",
-      "provenance": "tierB-lit",
-      "source_ref": "research/evidence/basner-2014-mars500-psychological-behavioral-changes.md; rev3-e (2026-05-22): treated.fi_cp3 = untreated.fi_cp3 = 0 \u2014 condition fully resolves over 180d analog/LEO timeframe regardless of treatment (clinically defensible per K15 \u00a7II.A.5 'permanent impairment for remainder of mission' definition: acute self-limiting condition leaves no persistent impairment)",
+      "provenance": "tierB-pymc",
+      "source_ref": "python/outputs/fitted_priors_run1/headache-late/headache-late.json",
       "incidence": {
         "distribution": "Gamma-Poisson",
-        "alpha": 2,
-        "beta": 700,
+        "alpha": 14.892493526006227,
+        "beta": 5046.594149891465,
         "lambda_unit": "events-per-person-day"
       },
       "severity": {
@@ -5750,12 +5750,12 @@
     },
     "hearing-loss": {
       "conditionId": "hearing-loss",
-      "provenance": "tierB-lit",
-      "source_ref": "research/evidence/pagel-chouker-2016-effects-isolation-confinement.md",
+      "provenance": "tierB-pymc",
+      "source_ref": "python/outputs/fitted_priors_run1/hearing-loss/hearing-loss.json; rev3-f (2026-05-26T15:22:15Z): severity tuned against persistent-impairment literature \u2014 treated mean=0.46, n_treated=2, n_untreated=0",
       "incidence": {
         "distribution": "Gamma-Poisson",
-        "alpha": 2,
-        "beta": 3600,
+        "alpha": 7408.175563755155,
+        "beta": 171081369.58969125,
         "lambda_unit": "events-per-person-day"
       },
       "severity": {
@@ -5784,9 +5784,9 @@
           "max": 336
         },
         "fi_cp3": {
-          "min": 0,
-          "mode": 0,
-          "max": 0.01
+          "min": 0.323,
+          "mode": 0.462,
+          "max": 0.561
         },
         "p_evac": {
           "min": 2.5e-06,
@@ -5821,9 +5821,9 @@
           "max": 1080
         },
         "fi_cp3": {
-          "min": 0,
-          "mode": 0.02,
-          "max": 0.1
+          "min": 0.681,
+          "mode": 0.831,
+          "max": 0.931
         },
         "p_evac": {
           "min": 0.00042,
@@ -5843,12 +5843,12 @@
     },
     "paresthesias": {
       "conditionId": "paresthesias",
-      "provenance": "tierB-lit",
-      "source_ref": "research/evidence/malpica-2024-thor-isolation-confinement-responses.md; rev3-e (2026-05-22): treated.fi_cp3 = untreated.fi_cp3 = 0 \u2014 condition fully resolves over 180d analog/LEO timeframe regardless of treatment (clinically defensible per K15 \u00a7II.A.5 'permanent impairment for remainder of mission' definition: acute self-limiting condition leaves no persistent impairment)",
+      "provenance": "tierB-pymc",
+      "source_ref": "python/outputs/fitted_priors_run1/paresthesias/paresthesias.json",
       "incidence": {
-        "distribution": "Beta-Bernoulli",
-        "alpha": 3,
-        "beta": 17,
+        "distribution": "Gamma-Poisson",
+        "alpha": 253.22545322320374,
+        "beta": 36940847.967681915,
         "lambda_unit": "events-per-EVA"
       },
       "severity": {
@@ -5936,12 +5936,12 @@
     },
     "fingernail-delamination": {
       "conditionId": "fingernail-delamination",
-      "provenance": "tierB-lit",
-      "source_ref": "research/evidence/malpica-2024-thor-isolation-confinement-responses.md; rev3-e (2026-05-22): treated.fi_cp3 = untreated.fi_cp3 = 0 \u2014 condition fully resolves over 180d analog/LEO timeframe regardless of treatment (clinically defensible per K15 \u00a7II.A.5 'permanent impairment for remainder of mission' definition: acute self-limiting condition leaves no persistent impairment)",
+      "provenance": "tierB-pymc",
+      "source_ref": "python/outputs/fitted_priors_run1/fingernail-delamination/fingernail-delamination.json",
       "incidence": {
-        "distribution": "Beta-Bernoulli",
-        "alpha": 2,
-        "beta": 18,
+        "distribution": "Gamma-Poisson",
+        "alpha": 72.64062810475374,
+        "beta": 36480250.89322691,
         "lambda_unit": "events-per-EVA"
       },
       "severity": {
@@ -6029,12 +6029,12 @@
     },
     "vaginal-yeast-infection": {
       "conditionId": "vaginal-yeast-infection",
-      "provenance": "tierB-lit",
-      "source_ref": "research/evidence/ponomarev-2021-immunological-aspects-isolation-confinement.md; rev3-e (2026-05-22): treated.fi_cp3 = untreated.fi_cp3 = 0 \u2014 condition fully resolves over 180d analog/LEO timeframe regardless of treatment (clinically defensible per K15 \u00a7II.A.5 'permanent impairment for remainder of mission' definition: acute self-limiting condition leaves no persistent impairment)",
+      "provenance": "tierB-pymc",
+      "source_ref": "python/outputs/fitted_priors_run1/vaginal-yeast-infection/vaginal-yeast-infection.json",
       "incidence": {
         "distribution": "Gamma-Poisson",
-        "alpha": 2,
-        "beta": 700,
+        "alpha": 941.4213692178286,
+        "beta": 18791256.42257833,
         "lambda_unit": "events-per-person-day"
       },
       "severity": {
@@ -6125,12 +6125,12 @@
     },
     "hypertension": {
       "conditionId": "hypertension",
-      "provenance": "tierB-lit",
-      "source_ref": "research/evidence_tables/medical.md; rev3-e (2026-05-22): treated.fi_cp3 = untreated.fi_cp3 = 0 \u2014 condition fully resolves over 180d analog/LEO timeframe regardless of treatment (clinically defensible per K15 \u00a7II.A.5 'permanent impairment for remainder of mission' definition: acute self-limiting condition leaves no persistent impairment)",
+      "provenance": "tierB-pymc",
+      "source_ref": "python/outputs/fitted_priors_run1/hypertension/hypertension.json",
       "incidence": {
         "distribution": "Gamma-Poisson",
-        "alpha": 2,
-        "beta": 2000,
+        "alpha": 1461.1829737814512,
+        "beta": 36523857.69558891,
         "lambda_unit": "events-per-person-day"
       },
       "severity": {
@@ -6218,17 +6218,17 @@
     },
     "cardiogenic-shock-secondary-to-myocardial-infarction": {
       "conditionId": "cardiogenic-shock-secondary-to-myocardial-infarction",
-      "provenance": "tierB-lit",
-      "source_ref": "research/evidence_tables/medical.md",
+      "provenance": "tierB-pymc",
+      "source_ref": "python/outputs/fitted_priors_run1/cardiogenic-shock-secondary-to-myocardial-infarction/cardiogenic-shock-secondary-to-myocardial-infarction.json; rev3-f (2026-05-26): severity tuned against persistent-impairment literature \u2014 treated mean=0.323, n_treated=4, n_untreated=3",
       "incidence": {
         "distribution": "Gamma-Poisson",
-        "alpha": 2,
-        "beta": 50000,
+        "alpha": 5.018982852576258,
+        "beta": 36367593.15759711,
         "lambda_unit": "events-per-person-day"
       },
       "severity": {
-        "worst_case_prob_alpha": 3,
-        "worst_case_prob_beta": 7
+        "worst_case_prob_alpha": 3.23,
+        "worst_case_prob_beta": 6.78
       },
       "treated": {
         "fi_cp1": {
@@ -6252,9 +6252,9 @@
           "max": 1440
         },
         "fi_cp3": {
-          "min": 0,
-          "mode": 0.02,
-          "max": 0.1
+          "min": 0.13,
+          "mode": 0.323,
+          "max": 0.53
         },
         "p_evac": {
           "min": 0.005,
@@ -6289,9 +6289,9 @@
           "max": 4320
         },
         "fi_cp3": {
-          "min": 0,
-          "mode": 0.2,
-          "max": 0.8
+          "min": 0.34,
+          "mode": 0.519,
+          "max": 0.7
         },
         "p_evac": {
           "min": 0.18,
@@ -6316,12 +6316,12 @@
     },
     "wrist-sprain-strain": {
       "conditionId": "wrist-sprain-strain",
-      "provenance": "tierB-lit",
-      "source_ref": "research/evidence_tables/medical.md; rev3-e (2026-05-22): treated.fi_cp3 = untreated.fi_cp3 = 0 \u2014 condition fully resolves over 180d analog/LEO timeframe regardless of treatment (clinically defensible per K15 \u00a7II.A.5 'permanent impairment for remainder of mission' definition: acute self-limiting condition leaves no persistent impairment)",
+      "provenance": "tierB-pymc",
+      "source_ref": "python/outputs/fitted_priors/wrist-sprain-strain/wrist-sprain-strain.json",
       "incidence": {
         "distribution": "Gamma-Poisson",
-        "alpha": 2,
-        "beta": 1000,
+        "alpha": 665829.2417192154,
+        "beta": 1167604507592.9907,
         "lambda_unit": "events-per-person-day"
       },
       "severity": {
@@ -6410,12 +6410,12 @@
     },
     "shoulder-sprain-strain": {
       "conditionId": "shoulder-sprain-strain",
-      "provenance": "tierB-lit",
-      "source_ref": "research/evidence_tables/medical.md; rev3-e (2026-05-22): treated.fi_cp3 = untreated.fi_cp3 = 0 \u2014 condition fully resolves over 180d analog/LEO timeframe regardless of treatment (clinically defensible per K15 \u00a7II.A.5 'permanent impairment for remainder of mission' definition: acute self-limiting condition leaves no persistent impairment)",
+      "provenance": "tierB-pymc",
+      "source_ref": "python/outputs/fitted_priors/shoulder-sprain-strain/shoulder-sprain-strain.json",
       "incidence": {
         "distribution": "Gamma-Poisson",
-        "alpha": 2,
-        "beta": 700,
+        "alpha": 41534.51681817961,
+        "beta": 117821112440.93942,
         "lambda_unit": "events-per-person-day"
       },
       "severity": {
@@ -6504,12 +6504,12 @@
     },
     "hip-sprain-strain": {
       "conditionId": "hip-sprain-strain",
-      "provenance": "tierB-lit",
-      "source_ref": "research/evidence_tables/medical.md; rev3-e (2026-05-22): treated.fi_cp3 = untreated.fi_cp3 = 0 \u2014 condition fully resolves over 180d analog/LEO timeframe regardless of treatment (clinically defensible per K15 \u00a7II.A.5 'permanent impairment for remainder of mission' definition: acute self-limiting condition leaves no persistent impairment)",
+      "provenance": "tierB-pymc",
+      "source_ref": "python/outputs/fitted_priors/hip-sprain-strain/hip-sprain-strain.json",
       "incidence": {
         "distribution": "Gamma-Poisson",
-        "alpha": 2,
-        "beta": 1500,
+        "alpha": 12963.9356076169,
+        "beta": 22144614.339921903,
         "lambda_unit": "events-per-person-day"
       },
       "severity": {
@@ -6597,12 +6597,12 @@
     },
     "knee-sprain-strain": {
       "conditionId": "knee-sprain-strain",
-      "provenance": "tierB-lit",
-      "source_ref": "research/evidence_tables/medical.md; rev3-e (2026-05-22): treated.fi_cp3 = untreated.fi_cp3 = 0 \u2014 condition fully resolves over 180d analog/LEO timeframe regardless of treatment (clinically defensible per K15 \u00a7II.A.5 'permanent impairment for remainder of mission' definition: acute self-limiting condition leaves no persistent impairment)",
+      "provenance": "tierB-pymc",
+      "source_ref": "python/outputs/fitted_priors_run1/knee-sprain-strain/knee-sprain-strain.json",
       "incidence": {
         "distribution": "Gamma-Poisson",
-        "alpha": 2,
-        "beta": 700,
+        "alpha": 14338.20560054963,
+        "beta": 168567666.99325466,
         "lambda_unit": "events-per-person-day"
       },
       "severity": {
@@ -6690,12 +6690,12 @@
     },
     "elbow-sprain-strain": {
       "conditionId": "elbow-sprain-strain",
-      "provenance": "tierB-lit",
-      "source_ref": "research/evidence_tables/medical.md; rev3-e (2026-05-22): treated.fi_cp3 = untreated.fi_cp3 = 0 \u2014 condition fully resolves over 180d analog/LEO timeframe regardless of treatment (clinically defensible per K15 \u00a7II.A.5 'permanent impairment for remainder of mission' definition: acute self-limiting condition leaves no persistent impairment)",
+      "provenance": "tierB-pymc",
+      "source_ref": "python/outputs/fitted_priors/elbow-sprain-strain/elbow-sprain-strain.json",
       "incidence": {
         "distribution": "Gamma-Poisson",
-        "alpha": 2,
-        "beta": 1000,
+        "alpha": 3612.7909389510155,
+        "beta": 201952624.30822262,
         "lambda_unit": "events-per-person-day"
       },
       "severity": {
@@ -6783,12 +6783,12 @@
     },
     "dental-caries": {
       "conditionId": "dental-caries",
-      "provenance": "tierA-nasa",
-      "source_ref": "research/evidence_tables/medical.md; research/imm_sources/methods/G12_gilkey_2012_bayesian_imm.md#table-26 (Bayesian update: 240 USN SSBN patrols / 5946.9 py + LSAH posterior; rate 9.41e-3/py = 2.58e-5/day); see research/_priors_rev3c_synthesis.md#2.1; rev3-e (2026-05-22): treated.fi_cp3 = untreated.fi_cp3 = 0 \u2014 condition fully resolves over 180d analog/LEO timeframe regardless of treatment (clinically defensible per K15 \u00a7II.A.5 'permanent impairment for remainder of mission' definition: acute self-limiting condition leaves no persistent impairment)",
+      "provenance": "tierB-pymc",
+      "source_ref": "research/evidence_extracted/incidence_rates.proposals_p-j.md (Deutsch 2008: 53 caries/endodontic events in 2,180,000 submarine person-days; PyMC Gamma-Poisson posterior, R-hat=1.000, ESS=3695)",
       "incidence": {
         "distribution": "Gamma-Poisson",
-        "alpha": 2.0,
-        "beta": 77519.0,
+        "alpha": 54.9568,
+        "beta": 2257559.5858,
         "lambda_unit": "events-per-person-day"
       },
       "severity": {
@@ -6877,12 +6877,12 @@
     },
     "dental-exposed-pulp": {
       "conditionId": "dental-exposed-pulp",
-      "provenance": "tierB-lit",
-      "source_ref": "research/evidence_tables/medical.md; rev3-e (2026-05-22): treated.fi_cp3 = untreated.fi_cp3 = 0 \u2014 condition fully resolves over 180d analog/LEO timeframe regardless of treatment (clinically defensible per K15 \u00a7II.A.5 'permanent impairment for remainder of mission' definition: acute self-limiting condition leaves no persistent impairment)",
+      "provenance": "tierB-pymc",
+      "source_ref": "python/outputs/fitted_priors_run1/dental-exposed-pulp/dental-exposed-pulp.json",
       "incidence": {
         "distribution": "Gamma-Poisson",
-        "alpha": 2,
-        "beta": 3000,
+        "alpha": 22.467570129682983,
+        "beta": 2136714.0968340044,
         "lambda_unit": "events-per-person-day"
       },
       "severity": {
@@ -6972,12 +6972,12 @@
     },
     "dental-avulsion-tooth-loss": {
       "conditionId": "dental-avulsion-tooth-loss",
-      "provenance": "tierB-lit",
-      "source_ref": "research/evidence_tables/medical.md; rev3-e (2026-05-22): treated.fi_cp3 = untreated.fi_cp3 = 0 \u2014 condition fully resolves over 180d analog/LEO timeframe regardless of treatment (clinically defensible per K15 \u00a7II.A.5 'permanent impairment for remainder of mission' definition: acute self-limiting condition leaves no persistent impairment)",
+      "provenance": "tierB-pymc",
+      "source_ref": "python/outputs/fitted_priors_run1/dental-avulsion-tooth-loss/dental-avulsion-tooth-loss.json",
       "incidence": {
         "distribution": "Gamma-Poisson",
-        "alpha": 2,
-        "beta": 5000,
+        "alpha": 1.8999594031690834,
+        "beta": 15854.3729449996,
         "lambda_unit": "events-per-person-day"
       },
       "severity": {
@@ -7066,12 +7066,12 @@
     },
     "dental-crown-loss": {
       "conditionId": "dental-crown-loss",
-      "provenance": "tierB-lit",
-      "source_ref": "research/evidence_tables/medical.md; rev3-e (2026-05-22): treated.fi_cp3 = untreated.fi_cp3 = 0 \u2014 condition fully resolves over 180d analog/LEO timeframe regardless of treatment (clinically defensible per K15 \u00a7II.A.5 'permanent impairment for remainder of mission' definition: acute self-limiting condition leaves no persistent impairment)",
+      "provenance": "tierB-pymc",
+      "source_ref": "python/outputs/fitted_priors_run1/dental-crown-loss/dental-crown-loss.json",
       "incidence": {
         "distribution": "Gamma-Poisson",
-        "alpha": 2,
-        "beta": 2000,
+        "alpha": 1.953374157684736,
+        "beta": 13521.98906545486,
         "lambda_unit": "events-per-person-day"
       },
       "severity": {
@@ -7162,12 +7162,12 @@
     },
     "dental-filling-loss": {
       "conditionId": "dental-filling-loss",
-      "provenance": "tierB-lit",
-      "source_ref": "research/evidence_tables/medical.md; rev3-e (2026-05-22): treated.fi_cp3 = untreated.fi_cp3 = 0 \u2014 condition fully resolves over 180d analog/LEO timeframe regardless of treatment (clinically defensible per K15 \u00a7II.A.5 'permanent impairment for remainder of mission' definition: acute self-limiting condition leaves no persistent impairment)",
+      "provenance": "tierB-pymc",
+      "source_ref": "python/outputs/fitted_priors_run1/dental-filling-loss/dental-filling-loss.json",
       "incidence": {
         "distribution": "Gamma-Poisson",
-        "alpha": 2,
-        "beta": 1500,
+        "alpha": 2.0330637589356226,
+        "beta": 13236.48802285682,
         "lambda_unit": "events-per-person-day"
       },
       "severity": {
@@ -7255,12 +7255,12 @@
     },
     "abnormal-uterine-bleeding": {
       "conditionId": "abnormal-uterine-bleeding",
-      "provenance": "tierB-lit",
-      "source_ref": "research/evidence_tables/medical.md; rev3-e (2026-05-22): treated.fi_cp3 = untreated.fi_cp3 = 0 \u2014 condition fully resolves over 180d analog/LEO timeframe regardless of treatment (clinically defensible per K15 \u00a7II.A.5 'permanent impairment for remainder of mission' definition: acute self-limiting condition leaves no persistent impairment)",
+      "provenance": "tierB-pymc",
+      "source_ref": "python/outputs/fitted_priors_run1/abnormal-uterine-bleeding/abnormal-uterine-bleeding.json",
       "incidence": {
         "distribution": "Gamma-Poisson",
-        "alpha": 2,
-        "beta": 1000,
+        "alpha": 1461.182973781275,
+        "beta": 18261928.847792253,
         "lambda_unit": "events-per-person-day"
       },
       "severity": {
@@ -7352,12 +7352,12 @@
     },
     "eye-corneal-ulcer": {
       "conditionId": "eye-corneal-ulcer",
-      "provenance": "tierB-lit",
-      "source_ref": "research/evidence_tables/medical.md",
+      "provenance": "tierB-pymc",
+      "source_ref": "python/outputs/fitted_priors_run1/eye-corneal-ulcer/eye-corneal-ulcer.json; rev3-f (2026-05-26T15:22:15Z): severity tuned against persistent-impairment literature \u2014 treated mean=0.28, n_treated=2, n_untreated=0",
       "incidence": {
         "distribution": "Gamma-Poisson",
-        "alpha": 2,
-        "beta": 5000,
+        "alpha": 3.106119270765471,
+        "beta": 21799.853029649967,
         "lambda_unit": "events-per-person-day"
       },
       "severity": {
@@ -7386,9 +7386,9 @@
           "max": 336
         },
         "fi_cp3": {
-          "min": 0,
-          "mode": 0,
-          "max": 0.01
+          "min": 0.196,
+          "mode": 0.28,
+          "max": 0.336
         },
         "p_evac": {
           "min": 2.5e-06,
@@ -7423,9 +7423,9 @@
           "max": 1080
         },
         "fi_cp3": {
-          "min": 0,
-          "mode": 0.02,
-          "max": 0.1
+          "min": 0.354,
+          "mode": 0.504,
+          "max": 0.604
         },
         "p_evac": {
           "min": 0.00042,
@@ -7448,12 +7448,12 @@
     },
     "eye-penetration-foreign-body": {
       "conditionId": "eye-penetration-foreign-body",
-      "provenance": "tierB-lit",
-      "source_ref": "research/evidence_tables/medical.md",
+      "provenance": "tierB-pymc",
+      "source_ref": "python/outputs/fitted_priors/eye-penetration-foreign-body/eye-penetration-foreign-body.json; rev3-f (2026-05-26T15:22:15Z): severity tuned against persistent-impairment literature \u2014 treated mean=0.52, n_treated=2, n_untreated=0",
       "incidence": {
         "distribution": "Gamma-Poisson",
-        "alpha": 2,
-        "beta": 10000,
+        "alpha": 14585942.094105283,
+        "beta": 5849985621451.226,
         "lambda_unit": "events-per-person-day"
       },
       "severity": {
@@ -7482,9 +7482,9 @@
           "max": 720
         },
         "fi_cp3": {
-          "min": 0,
-          "mode": 0.01,
-          "max": 0.05
+          "min": 0.364,
+          "mode": 0.519,
+          "max": 0.623
         },
         "p_evac": {
           "min": 5e-05,
@@ -7519,9 +7519,9 @@
           "max": 2160
         },
         "fi_cp3": {
-          "min": 0,
-          "mode": 0.05,
-          "max": 0.3
+          "min": 0.785,
+          "mode": 0.935,
+          "max": 1.0
         },
         "p_evac": {
           "min": 0.009,
@@ -7545,12 +7545,12 @@
     },
     "retinal-detachment": {
       "conditionId": "retinal-detachment",
-      "provenance": "tierB-lit",
-      "source_ref": "research/evidence_tables/medical.md",
+      "provenance": "tierB-pymc",
+      "source_ref": "python/outputs/fitted_priors_run1/retinal-detachment/retinal-detachment.json; rev3-f (2026-05-26T15:22:15Z): severity tuned against persistent-impairment literature \u2014 treated mean=0.54, n_treated=2, n_untreated=0",
       "incidence": {
         "distribution": "Gamma-Poisson",
-        "alpha": 2,
-        "beta": 50000,
+        "alpha": 78.59124298931681,
+        "beta": 157378041.75010127,
         "lambda_unit": "events-per-person-day"
       },
       "severity": {
@@ -7579,9 +7579,9 @@
           "max": 720
         },
         "fi_cp3": {
-          "min": 0,
-          "mode": 0.01,
-          "max": 0.05
+          "min": 0.375,
+          "mode": 0.536,
+          "max": 0.643
         },
         "p_evac": {
           "min": 5e-05,
@@ -7616,9 +7616,9 @@
           "max": 2160
         },
         "fi_cp3": {
-          "min": 0,
-          "mode": 0.05,
-          "max": 0.3
+          "min": 0.815,
+          "mode": 0.965,
+          "max": 1.0
         },
         "p_evac": {
           "min": 0.009,
@@ -7640,12 +7640,12 @@
     },
     "acute-glaucoma": {
       "conditionId": "acute-glaucoma",
-      "provenance": "tierB-lit",
-      "source_ref": "research/evidence_tables/medical.md",
+      "provenance": "tierB-pymc",
+      "source_ref": "python/outputs/fitted_priors_run1/acute-glaucoma/acute-glaucoma.json; rev3-f (2026-05-26T15:22:15Z): severity tuned against persistent-impairment literature \u2014 treated mean=0.15, n_treated=2, n_untreated=0",
       "incidence": {
         "distribution": "Gamma-Poisson",
-        "alpha": 2,
-        "beta": 50000,
+        "alpha": 39.4701472185684,
+        "beta": 36097492.10036485,
         "lambda_unit": "events-per-person-day"
       },
       "severity": {
@@ -7674,9 +7674,9 @@
           "max": 720
         },
         "fi_cp3": {
-          "min": 0,
-          "mode": 0.01,
-          "max": 0.05
+          "min": 0.108,
+          "mode": 0.155,
+          "max": 0.205
         },
         "p_evac": {
           "min": 5e-05,
@@ -7711,9 +7711,9 @@
           "max": 2160
         },
         "fi_cp3": {
-          "min": 0,
-          "mode": 0.05,
-          "max": 0.3
+          "min": 0.129,
+          "mode": 0.279,
+          "max": 0.379
         },
         "p_evac": {
           "min": 0.009,
@@ -7737,12 +7737,12 @@
     },
     "abdominal-injury": {
       "conditionId": "abdominal-injury",
-      "provenance": "tierC-synth",
-      "source_ref": "back-fit placeholder; calibrated to K15 Table 1 in Task 31",
+      "provenance": "tierB-pymc",
+      "source_ref": "python/outputs/fitted_priors/abdominal-injury/abdominal-injury.json; rev3-f (2026-05-26T15:22:15Z): severity tuned against persistent-impairment literature \u2014 treated mean=0.57, n_treated=2, n_untreated=1",
       "incidence": {
         "distribution": "Gamma-Poisson",
-        "alpha": 2,
-        "beta": 10000,
+        "alpha": 6975.584221495469,
+        "beta": 17467039354.512356,
         "lambda_unit": "events-per-person-day"
       },
       "severity": {
@@ -7771,9 +7771,9 @@
           "max": 720
         },
         "fi_cp3": {
-          "min": 0,
-          "mode": 0.01,
-          "max": 0.05
+          "min": 0.402,
+          "mode": 0.575,
+          "max": 0.69
         },
         "p_evac": {
           "min": 5e-05,
@@ -7808,9 +7808,9 @@
           "max": 2160
         },
         "fi_cp3": {
-          "min": 0,
-          "mode": 0.05,
-          "max": 0.3
+          "min": 0.74,
+          "mode": 0.75,
+          "max": 0.76
         },
         "p_evac": {
           "min": 0.009,
@@ -7828,12 +7828,12 @@
     },
     "abdominal-wall-hernia": {
       "conditionId": "abdominal-wall-hernia",
-      "provenance": "tierC-synth",
-      "source_ref": "back-fit placeholder; calibrated to K15 Table 1 in Task 31; rev3-e (2026-05-22): treated.fi_cp3 = untreated.fi_cp3 = 0 \u2014 condition fully resolves over 180d analog/LEO timeframe regardless of treatment (clinically defensible per K15 \u00a7II.A.5 'permanent impairment for remainder of mission' definition: acute self-limiting condition leaves no persistent impairment)",
+      "provenance": "tierB-pymc",
+      "source_ref": "python/outputs/fitted_priors/abdominal-wall-hernia/abdominal-wall-hernia.json",
       "incidence": {
         "distribution": "Gamma-Poisson",
-        "alpha": 10,
-        "beta": 6666.6667,
+        "alpha": 177.99083586544796,
+        "beta": 37622747.44903821,
         "lambda_unit": "events-per-person-day"
       },
       "severity": {
@@ -7919,12 +7919,12 @@
     },
     "acute-arthritis": {
       "conditionId": "acute-arthritis",
-      "provenance": "tierC-synth",
-      "source_ref": "back-fit placeholder; calibrated to K15 Table 1 in Task 31; rev3-e (2026-05-22): treated.fi_cp3 = untreated.fi_cp3 = 0 \u2014 condition fully resolves over 180d analog/LEO timeframe regardless of treatment (clinically defensible per K15 \u00a7II.A.5 'permanent impairment for remainder of mission' definition: acute self-limiting condition leaves no persistent impairment)",
+      "provenance": "tierB-pymc",
+      "source_ref": "python/outputs/fitted_priors/acute-arthritis/acute-arthritis.json",
       "incidence": {
         "distribution": "Gamma-Poisson",
-        "alpha": 10,
-        "beta": 6666.6667,
+        "alpha": 13.893476915100296,
+        "beta": 36389143.83712418,
         "lambda_unit": "events-per-person-day"
       },
       "severity": {
@@ -8010,12 +8010,12 @@
     },
     "acute-compartment-syndrome": {
       "conditionId": "acute-compartment-syndrome",
-      "provenance": "tierC-synth",
-      "source_ref": "back-fit placeholder; calibrated to K15 Table 1 in Task 31",
+      "provenance": "tierB-pymc",
+      "source_ref": "python/outputs/fitted_priors/acute-compartment-syndrome/acute-compartment-syndrome.json; rev3-f (2026-05-26T15:22:15Z): severity tuned against persistent-impairment literature \u2014 treated mean=0.48, n_treated=1, n_untreated=1",
       "incidence": {
         "distribution": "Gamma-Poisson",
-        "alpha": 2,
-        "beta": 10000,
+        "alpha": 13718.404969304154,
+        "beta": 250237861522.53812,
         "lambda_unit": "events-per-person-day"
       },
       "severity": {
@@ -8044,9 +8044,9 @@
           "max": 720
         },
         "fi_cp3": {
-          "min": 0,
-          "mode": 0.01,
-          "max": 0.05
+          "min": 0.336,
+          "mode": 0.48,
+          "max": 0.576
         },
         "p_evac": {
           "min": 5e-05,
@@ -8081,9 +8081,9 @@
           "max": 2160
         },
         "fi_cp3": {
-          "min": 0,
-          "mode": 0.05,
-          "max": 0.3
+          "min": 0.89,
+          "mode": 0.9,
+          "max": 0.91
         },
         "p_evac": {
           "min": 0.009,
@@ -8101,12 +8101,12 @@
     },
     "acute-pancreatitis": {
       "conditionId": "acute-pancreatitis",
-      "provenance": "tierC-synth",
-      "source_ref": "back-fit placeholder; calibrated to K15 Table 1 in Task 31",
+      "provenance": "tierB-pymc",
+      "source_ref": "python/outputs/fitted_priors/acute-pancreatitis/acute-pancreatitis.json; rev3-f (2026-05-26T15:22:15Z): severity tuned against persistent-impairment literature \u2014 treated mean=0.25, n_treated=6, n_untreated=0",
       "incidence": {
         "distribution": "Gamma-Poisson",
-        "alpha": 2,
-        "beta": 10000,
+        "alpha": 35.72114692388644,
+        "beta": 36396901.06411481,
         "lambda_unit": "events-per-person-day"
       },
       "severity": {
@@ -8135,9 +8135,9 @@
           "max": 720
         },
         "fi_cp3": {
-          "min": 0,
-          "mode": 0.01,
-          "max": 0.05
+          "min": 0.13,
+          "mode": 0.245,
+          "max": 0.35
         },
         "p_evac": {
           "min": 5e-05,
@@ -8172,9 +8172,9 @@
           "max": 2160
         },
         "fi_cp3": {
-          "min": 0,
-          "mode": 0.05,
-          "max": 0.3
+          "min": 0.291,
+          "mode": 0.441,
+          "max": 0.541
         },
         "p_evac": {
           "min": 0.009,
@@ -8192,12 +8192,12 @@
     },
     "acute-prostatitis": {
       "conditionId": "acute-prostatitis",
-      "provenance": "tierC-synth",
-      "source_ref": "back-fit placeholder; calibrated to K15 Table 1 in Task 31; rev3-e (2026-05-22): treated.fi_cp3 = untreated.fi_cp3 = 0 \u2014 condition fully resolves over 180d analog/LEO timeframe regardless of treatment (clinically defensible per K15 \u00a7II.A.5 'permanent impairment for remainder of mission' definition: acute self-limiting condition leaves no persistent impairment)",
+      "provenance": "tierB-pymc",
+      "source_ref": "python/outputs/fitted_priors/acute-prostatitis/acute-prostatitis.json",
       "incidence": {
         "distribution": "Gamma-Poisson",
-        "alpha": 10,
-        "beta": 6666.6667,
+        "alpha": 17.87364045986011,
+        "beta": 731720.8191312419,
         "lambda_unit": "events-per-person-day"
       },
       "severity": {
@@ -8283,8 +8283,8 @@
     },
     "acute-radiation-syndrome": {
       "conditionId": "acute-radiation-syndrome",
-      "provenance": "tierC-synth",
-      "source_ref": "back-fit placeholder; calibrated to K15 Table 1 in Task 31",
+      "provenance": "tierB-pymc",
+      "source_ref": "literature-validated (2026-05-26): Kim & Cucinotta 2009 (Health Phys 97(1):68-81) ~90% SPEs medically inconsequential \u2192 supports Beta-Bernoulli p\u22480.10; Carnell 2016 NASA/TM-20160003870 ARS risk assessment; Hu 2020 Life Sci Space Res biomathematical models; Kennedy 2014 NSBRI CARR; Cliver 2016 Carrington return period ~90 yrs. Beta-Bernoulli \u03b1=2,\u03b2=18 retained \u2014 consistent with IMM architecture (K15) and literature. ISS zero-ARS (Crucian 2016, 20.57 flight-years) applies only to LEO magnetosphere-protected missions; deep-space risk per SPE is ~10% for E>30 MeV events. rev3-f (2026-05-26): severity tuned against persistent-impairment literature \u2014 treated mean=0.495, n_treated=6, n_untreated=1",
       "incidence": {
         "distribution": "Beta-Bernoulli",
         "alpha": 2,
@@ -8292,8 +8292,8 @@
         "lambda_unit": "events-per-SPE"
       },
       "severity": {
-        "worst_case_prob_alpha": 1.2,
-        "worst_case_prob_beta": 4.8
+        "worst_case_prob_alpha": 4.95,
+        "worst_case_prob_beta": 5.05
       },
       "treated": {
         "fi_cp1": {
@@ -8317,9 +8317,9 @@
           "max": 1440
         },
         "fi_cp3": {
-          "min": 0,
-          "mode": 0.02,
-          "max": 0.1
+          "min": 0.25,
+          "mode": 0.554,
+          "max": 1.0
         },
         "p_evac": {
           "min": 0.005,
@@ -8354,9 +8354,9 @@
           "max": 4320
         },
         "fi_cp3": {
-          "min": 0,
-          "mode": 0.2,
-          "max": 0.8
+          "min": 0.34,
+          "mode": 0.35,
+          "max": 0.36
         },
         "p_evac": {
           "min": 0.18,
@@ -8374,12 +8374,12 @@
     },
     "altitude-sickness": {
       "conditionId": "altitude-sickness",
-      "provenance": "tierC-synth",
-      "source_ref": "back-fit placeholder; calibrated to K15 Table 1 in Task 31; rev3-e (2026-05-22): treated.fi_cp3 = untreated.fi_cp3 = 0 \u2014 condition fully resolves over 180d analog/LEO timeframe regardless of treatment (clinically defensible per K15 \u00a7II.A.5 'permanent impairment for remainder of mission' definition: acute self-limiting condition leaves no persistent impairment)",
+      "provenance": "tierB-pymc",
+      "source_ref": "python/outputs/fitted_priors/altitude-sickness/altitude-sickness.json",
       "incidence": {
         "distribution": "Gamma-Poisson",
-        "alpha": 10,
-        "beta": 6666.6667,
+        "alpha": 182.04323366018033,
+        "beta": 16973.558759227708,
         "lambda_unit": "events-per-person-day"
       },
       "severity": {
@@ -8465,17 +8465,17 @@
     },
     "anaphylaxis": {
       "conditionId": "anaphylaxis",
-      "provenance": "tierC-synth",
-      "source_ref": "back-fit placeholder; calibrated to K15 Table 1 in Task 31",
+      "provenance": "tierB-pymc",
+      "source_ref": "python/outputs/fitted_priors/anaphylaxis/anaphylaxis.json; rev3-f (2026-05-26): severity tuned against persistent-impairment literature \u2014 treated mean=0.176, n_treated=4, n_untreated=2",
       "incidence": {
         "distribution": "Gamma-Poisson",
-        "alpha": 2,
-        "beta": 500000,
+        "alpha": 503.98518082065084,
+        "beta": 437896904.85866547,
         "lambda_unit": "events-per-person-day"
       },
       "severity": {
-        "worst_case_prob_alpha": 1.2,
-        "worst_case_prob_beta": 4.8
+        "worst_case_prob_alpha": 1.76,
+        "worst_case_prob_beta": 8.24
       },
       "treated": {
         "fi_cp1": {
@@ -8499,9 +8499,9 @@
           "max": 1440
         },
         "fi_cp3": {
-          "min": 0,
-          "mode": 0.02,
-          "max": 0.1
+          "min": 0.12,
+          "mode": 0.231,
+          "max": 0.414
         },
         "p_evac": {
           "min": 0.005,
@@ -8536,9 +8536,9 @@
           "max": 4320
         },
         "fi_cp3": {
-          "min": 0,
-          "mode": 0.2,
-          "max": 0.8
+          "min": 0.05,
+          "mode": 0.403,
+          "max": 0.755
         },
         "p_evac": {
           "min": 0.18,
@@ -8556,17 +8556,17 @@
     },
     "choking-obstructed-airway": {
       "conditionId": "choking-obstructed-airway",
-      "provenance": "tierC-synth",
-      "source_ref": "back-fit placeholder; calibrated to K15 Table 1 in Task 31",
+      "provenance": "tierB-pymc",
+      "source_ref": "python/outputs/fitted_priors/choking-obstructed-airway/choking-obstructed-airway.json; rev3-f (2026-05-26): severity tuned against persistent-impairment literature \u2014 treated mean=0.387, n_treated=1, n_untreated=1",
       "incidence": {
         "distribution": "Gamma-Poisson",
-        "alpha": 2,
-        "beta": 500000,
+        "alpha": 1625.9532171815733,
+        "beta": 123859049352.52509,
         "lambda_unit": "events-per-person-day"
       },
       "severity": {
-        "worst_case_prob_alpha": 1.2,
-        "worst_case_prob_beta": 4.8
+        "worst_case_prob_alpha": 3.87,
+        "worst_case_prob_beta": 6.13
       },
       "treated": {
         "fi_cp1": {
@@ -8590,9 +8590,9 @@
           "max": 1440
         },
         "fi_cp3": {
-          "min": 0,
-          "mode": 0.02,
-          "max": 0.1
+          "min": 0.271,
+          "mode": 0.387,
+          "max": 0.464
         },
         "p_evac": {
           "min": 0.005,
@@ -8627,9 +8627,9 @@
           "max": 4320
         },
         "fi_cp3": {
-          "min": 0,
-          "mode": 0.2,
-          "max": 0.8
+          "min": 0.547,
+          "mode": 0.697,
+          "max": 0.797
         },
         "p_evac": {
           "min": 0.18,
@@ -8647,12 +8647,12 @@
     },
     "elbow-dislocation": {
       "conditionId": "elbow-dislocation",
-      "provenance": "tierC-synth",
-      "source_ref": "back-fit placeholder; calibrated to K15 Table 1 in Task 31; rev3-e (2026-05-22): treated.fi_cp3 = untreated.fi_cp3 = 0 \u2014 condition fully resolves over 180d analog/LEO timeframe regardless of treatment (clinically defensible per K15 \u00a7II.A.5 'permanent impairment for remainder of mission' definition: acute self-limiting condition leaves no persistent impairment)",
+      "provenance": "tierB-pymc",
+      "source_ref": "python/outputs/fitted_priors/elbow-dislocation/elbow-dislocation.json",
       "incidence": {
         "distribution": "Gamma-Poisson",
-        "alpha": 2,
-        "beta": 10000,
+        "alpha": 36211.4454642718,
+        "beta": 253814905846.31882,
         "lambda_unit": "events-per-person-day"
       },
       "severity": {
@@ -8738,12 +8738,12 @@
     },
     "finger-dislocation": {
       "conditionId": "finger-dislocation",
-      "provenance": "tierC-synth",
-      "source_ref": "back-fit placeholder; calibrated to K15 Table 1 in Task 31; rev3-e (2026-05-22): treated.fi_cp3 = untreated.fi_cp3 = 0 \u2014 condition fully resolves over 180d analog/LEO timeframe regardless of treatment (clinically defensible per K15 \u00a7II.A.5 'permanent impairment for remainder of mission' definition: acute self-limiting condition leaves no persistent impairment)",
+      "provenance": "tierB-pymc",
+      "source_ref": "python/outputs/fitted_priors/finger-dislocation/finger-dislocation.json",
       "incidence": {
         "distribution": "Gamma-Poisson",
-        "alpha": 10,
-        "beta": 6666.6667,
+        "alpha": 158288.34409076892,
+        "beta": 520353802727.0379,
         "lambda_unit": "events-per-person-day"
       },
       "severity": {
@@ -8829,12 +8829,12 @@
     },
     "hip-proximal-femur-fracture": {
       "conditionId": "hip-proximal-femur-fracture",
-      "provenance": "tierC-synth",
-      "source_ref": "back-fit placeholder; calibrated to K15 Table 1 in Task 31",
+      "provenance": "tierB-pymc",
+      "source_ref": "python/outputs/fitted_priors/hip-proximal-femur-fracture/hip-proximal-femur-fracture.json; rev3-f (2026-05-26T15:22:15Z): severity tuned against persistent-impairment literature \u2014 treated mean=0.53, n_treated=2, n_untreated=1",
       "incidence": {
         "distribution": "Gamma-Poisson",
-        "alpha": 2,
-        "beta": 10000,
+        "alpha": 68.98317882365284,
+        "beta": 39262917.56952739,
         "lambda_unit": "events-per-person-day"
       },
       "severity": {
@@ -8863,9 +8863,9 @@
           "max": 720
         },
         "fi_cp3": {
-          "min": 0,
-          "mode": 0.01,
-          "max": 0.05
+          "min": 0.367,
+          "mode": 0.525,
+          "max": 0.63
         },
         "p_evac": {
           "min": 5e-05,
@@ -8900,9 +8900,9 @@
           "max": 2160
         },
         "fi_cp3": {
-          "min": 0,
-          "mode": 0.05,
-          "max": 0.3
+          "min": 0.84,
+          "mode": 0.85,
+          "max": 0.86
         },
         "p_evac": {
           "min": 0.009,
@@ -8920,12 +8920,12 @@
     },
     "lower-extremity-le-stress-fracture": {
       "conditionId": "lower-extremity-le-stress-fracture",
-      "provenance": "tierC-synth",
-      "source_ref": "back-fit placeholder; calibrated to K15 Table 1 in Task 31; rev3-e (2026-05-22): treated.fi_cp3 = untreated.fi_cp3 = 0 \u2014 condition fully resolves over 180d analog/LEO timeframe regardless of treatment (clinically defensible per K15 \u00a7II.A.5 'permanent impairment for remainder of mission' definition: acute self-limiting condition leaves no persistent impairment)",
+      "provenance": "tierB-pymc",
+      "source_ref": "python/outputs/fitted_priors/lower-extremity-le-stress-fracture/lower-extremity-le-stress-fracture.json",
       "incidence": {
         "distribution": "Gamma-Poisson",
-        "alpha": 10,
-        "beta": 6666.6667,
+        "alpha": 50962.23723035741,
+        "beta": 2122764664.373885,
         "lambda_unit": "events-per-person-day"
       },
       "severity": {
@@ -9011,12 +9011,12 @@
     },
     "lumbar-spine-fracture": {
       "conditionId": "lumbar-spine-fracture",
-      "provenance": "tierC-synth",
-      "source_ref": "back-fit placeholder; calibrated to K15 Table 1 in Task 31",
+      "provenance": "tierB-pymc",
+      "source_ref": "python/outputs/fitted_priors/lumbar-spine-fracture/lumbar-spine-fracture.json; rev3-f (2026-05-26T15:22:15Z): severity tuned against persistent-impairment literature \u2014 treated mean=0.33, n_treated=3, n_untreated=1",
       "incidence": {
         "distribution": "Gamma-Poisson",
-        "alpha": 2,
-        "beta": 10000,
+        "alpha": 46.48655772826392,
+        "beta": 38192725.228864595,
         "lambda_unit": "events-per-person-day"
       },
       "severity": {
@@ -9045,9 +9045,9 @@
           "max": 720
         },
         "fi_cp3": {
-          "min": 0,
-          "mode": 0.01,
-          "max": 0.05
+          "min": 0.231,
+          "mode": 0.33,
+          "max": 0.4
         },
         "p_evac": {
           "min": 5e-05,
@@ -9082,9 +9082,9 @@
           "max": 2160
         },
         "fi_cp3": {
-          "min": 0,
-          "mode": 0.05,
-          "max": 0.3
+          "min": 0.69,
+          "mode": 0.7,
+          "max": 0.71
         },
         "p_evac": {
           "min": 0.009,
@@ -9102,17 +9102,17 @@
     },
     "neurogenic-shock": {
       "conditionId": "neurogenic-shock",
-      "provenance": "tierC-synth",
-      "source_ref": "back-fit placeholder; calibrated to K15 Table 1 in Task 31",
+      "provenance": "tierB-pymc",
+      "source_ref": "python/outputs/fitted_priors/neurogenic-shock/neurogenic-shock.json; rev3-f (2026-05-26): severity tuned against persistent-impairment literature \u2014 treated mean=0.809, n_treated=4, n_untreated=2",
       "incidence": {
         "distribution": "Gamma-Poisson",
-        "alpha": 2,
-        "beta": 500000,
+        "alpha": 3191.035698854475,
+        "beta": 278740282829.5636,
         "lambda_unit": "events-per-person-day"
       },
       "severity": {
-        "worst_case_prob_alpha": 1.2,
-        "worst_case_prob_beta": 4.8
+        "worst_case_prob_alpha": 8.1,
+        "worst_case_prob_beta": 1.91
       },
       "treated": {
         "fi_cp1": {
@@ -9136,9 +9136,9 @@
           "max": 1440
         },
         "fi_cp3": {
-          "min": 0,
-          "mode": 0.02,
-          "max": 0.1
+          "min": 0.567,
+          "mode": 0.809,
+          "max": 0.971
         },
         "p_evac": {
           "min": 0.005,
@@ -9173,9 +9173,9 @@
           "max": 4320
         },
         "fi_cp3": {
-          "min": 0,
-          "mode": 0.2,
-          "max": 0.8
+          "min": 0.95,
+          "mode": 0.965,
+          "max": 0.98
         },
         "p_evac": {
           "min": 0.18,
@@ -9193,12 +9193,12 @@
     },
     "shoulder-dislocation": {
       "conditionId": "shoulder-dislocation",
-      "provenance": "tierC-synth",
-      "source_ref": "back-fit placeholder; calibrated to K15 Table 1 in Task 31",
+      "provenance": "tierB-pymc",
+      "source_ref": "python/outputs/fitted_priors/shoulder-dislocation/shoulder-dislocation.json; rev3-f (2026-05-26T15:22:15Z): severity tuned against persistent-impairment literature \u2014 treated mean=0.34, n_treated=2, n_untreated=1",
       "incidence": {
         "distribution": "Gamma-Poisson",
-        "alpha": 2,
-        "beta": 10000,
+        "alpha": 8971.674088379228,
+        "beta": 13697783238.911798,
         "lambda_unit": "events-per-person-day"
       },
       "severity": {
@@ -9227,9 +9227,9 @@
           "max": 720
         },
         "fi_cp3": {
-          "min": 0,
-          "mode": 0.01,
-          "max": 0.05
+          "min": 0.13,
+          "mode": 0.344,
+          "max": 0.557
         },
         "p_evac": {
           "min": 5e-05,
@@ -9264,9 +9264,9 @@
           "max": 2160
         },
         "fi_cp3": {
-          "min": 0,
-          "mode": 0.05,
-          "max": 0.3
+          "min": 0.79,
+          "mode": 0.8,
+          "max": 0.81
         },
         "p_evac": {
           "min": 0.009,
@@ -9284,17 +9284,17 @@
     },
     "smoke-inhalation": {
       "conditionId": "smoke-inhalation",
-      "provenance": "tierC-synth",
-      "source_ref": "back-fit placeholder; calibrated to K15 Table 1 in Task 31",
+      "provenance": "tierB-pymc",
+      "source_ref": "PyMC NUTS posterior fit (2026-05-26) against Guibaud 2022 (Acta Astronautica) spacecraft fire incident catalog: 6 events / 74164 person-days (Mir 1997 only medically significant event in ~60 yrs crewed flight; ISS era 0/54750). Prior Gamma(2,500k) updated to posterior Gamma(7.76,557369), mean \u03bb=1.39e-5. R-hat=1.000, ESS=3765. rev3-f (2026-05-26): severity tuned against persistent-impairment literature \u2014 treated mean=0.514, n_treated=5, n_untreated=1",
       "incidence": {
         "distribution": "Gamma-Poisson",
-        "alpha": 2,
-        "beta": 500000,
+        "alpha": 7.7611,
+        "beta": 557369,
         "lambda_unit": "events-per-person-day"
       },
       "severity": {
-        "worst_case_prob_alpha": 1.2,
-        "worst_case_prob_beta": 4.8
+        "worst_case_prob_alpha": 5.14,
+        "worst_case_prob_beta": 4.86
       },
       "treated": {
         "fi_cp1": {
@@ -9318,9 +9318,9 @@
           "max": 1440
         },
         "fi_cp3": {
-          "min": 0,
-          "mode": 0.02,
-          "max": 0.1
+          "min": 0.17,
+          "mode": 0.542,
+          "max": 1.0
         },
         "p_evac": {
           "min": 0.005,
@@ -9355,9 +9355,9 @@
           "max": 4320
         },
         "fi_cp3": {
-          "min": 0,
-          "mode": 0.2,
-          "max": 0.8
+          "min": 0.32,
+          "mode": 0.33,
+          "max": 0.34
         },
         "p_evac": {
           "min": 0.18,
@@ -9381,7 +9381,41 @@
     "fit_against": "K15 Table 1 (ISS 6mo/6crew); A22 4-step trial verbatim; M18 \u03c3<5% convergence; TM21 AMM/SMM",
     "fit_residuals_within_CI95": false,
     "tierA_multiplier": 1.0,
-    "tierB_multiplier": 0.55,
-    "tierC_multiplier": 1.0
+    "tierB_multiplier": 1.0,
+    "tierC_multiplier": 1.0,
+    "kind_multipliers": {
+      "antarctic-station": {
+        "_doc_": "2026-06-04 Antarctic vs controlled-habitat context modulation. Anchored on research/analog_incidence_antarctic.md (Bhatia 2012 Maitri 26-PY; Palinkas 2004 313 US winter-overs; Pattarini 2016 USAP 3 stations; Hong 2022 Korean 88 winter-overs; Pe\u0159ina 2024 multi-station dental; Nirwan 2022 SP altitude). Multiplier of 1.0 = no change. Applied AFTER tier multiplier, BEFORE risk-factor / Stage-A multipliers. Source_ref: research/evidence_extracted/antarctic_kind_multipliers.md (forthcoming).",
+        "depression": 0.5,
+        "anxiety": 1.5,
+        "respiratory-infection": 0.2,
+        "gastroenteritis": 0.1,
+        "skin-rash": 0.33,
+        "late-insomnia": 1.5,
+        "frostbite": 5.0,
+        "altitude-sickness": 4.0,
+        "hypoxia-related-headache": 2.0,
+        "seasonal-affective-disorder": 2.0,
+        "headache-co2-induced": 0.0,
+        "decompression-sickness-secondary-to-extravehicular-activity": 0.0,
+        "visual-impairment-and-intracranial-pressure-viip-space-adaptation": 0.0,
+        "barotrauma-ear-sinus-block": 0.0,
+        "insomnia-space-adaptation": 0.0
+      },
+      "analog-controlled": {
+        "_doc_": "2026-06-04 controlled-habitat context modulation. Heated, climate-stable, real-time medical support. Most conditions at base-rate; URTI / depression modestly suppressed (no McMurdo Crud reservoir, shorter durations). Space-adaptation / ECLSS-specific conditions set to 0 (no microgravity, no CO2 scrubber failure modes).",
+        "respiratory-infection": 0.5,
+        "depression": 0.5,
+        "frostbite": 0.0,
+        "altitude-sickness": 0.0,
+        "hypoxia-related-headache": 0.0,
+        "seasonal-affective-disorder": 0.0,
+        "decompression-sickness-secondary-to-extravehicular-activity": 0.0,
+        "visual-impairment-and-intracranial-pressure-viip-space-adaptation": 0.0,
+        "insomnia-space-adaptation": 0.0,
+        "headache-co2-induced": 0.0,
+        "barotrauma-ear-sinus-block": 0.0
+      }
+    }
   }
 }

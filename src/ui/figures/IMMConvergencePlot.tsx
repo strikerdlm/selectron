@@ -11,7 +11,7 @@
 
 import ReactEChartsCore from "echarts-for-react/lib/core";
 import { echarts } from "./echarts-base";
-import { NATURE_THEME_NAME } from "./theme";
+import { useFigureTheme } from "./useFigureTheme";
 import { FigureCaption } from "./FigureCaption";
 import type { IMMOutcome } from "../../imm/types";
 
@@ -27,6 +27,7 @@ export type IMMConvergencePlotProps = {
 };
 
 export function IMMConvergencePlot({ outcome, trials, chiStar }: IMMConvergencePlotProps) {
+  const { themeName } = useFigureTheme();
   const { trialCheckpoints, sigmaChi, sigmaPevac } = outcome.convergence;
 
   // Insufficient trials — no checkpoints available
@@ -161,7 +162,7 @@ export function IMMConvergencePlot({ outcome, trials, chiStar }: IMMConvergenceP
       <ReactEChartsCore
         echarts={echarts}
         option={option}
-        theme={NATURE_THEME_NAME}
+        theme={themeName}
         style={{ height: 320, width: "100%" }}
         notMerge
       />

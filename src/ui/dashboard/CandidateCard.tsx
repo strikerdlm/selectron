@@ -58,12 +58,12 @@ export function CandidateCard({ candidate, lastChi, onEdit, onSim, onDelete }: P
         <div className="min-w-0 flex-1">
           <div className="display text-sm text-ink-0 truncate leading-tight">{candidate.alias}</div>
           {candidate.fullName && (
-            <div className="mono text-[9px] text-ink-3 mt-0.5 truncate">{candidate.fullName}</div>
+            <div className="mono text-[11px] text-ink-3 mt-0.5 truncate">{candidate.fullName}</div>
           )}
         </div>
         <span
           className={
-            "mono uppercase tracking-cap text-[8px] shrink-0 px-1.5 py-0.5 border rounded-sm leading-none " +
+            "mono uppercase tracking-cap text-[10px] shrink-0 px-1.5 py-0.5 border rounded-sm leading-none " +
             (isDraft ? "border-ink-3 text-ink-3" : "border-go/60 text-go")
           }
         >
@@ -76,16 +76,16 @@ export function CandidateCard({ candidate, lastChi, onEdit, onSim, onDelete }: P
       {/* METRICS — CHI + relative-time in one compact row */}
       <div className="flex items-center justify-between px-3 py-2 gap-3">
         <div className="min-w-0">
-          <div className="mono text-[9px] text-ink-3 leading-none">CHI</div>
+          <div className="mono text-[11px] text-ink-3 leading-none">CHI</div>
           {pct !== null ? (
-            <div className="mono text-[13px] text-signal tabular-nums leading-tight">{pct}%</div>
+            <div className="mono text-[15px] text-signal tabular-nums leading-tight">{pct}%</div>
           ) : (
-            <div className="mono text-[11px] text-ink-3 leading-tight">—</div>
+            <div className="mono text-[13px] text-ink-3 leading-tight">—</div>
           )}
         </div>
         <div className="text-right">
-          <div className="mono text-[9px] text-ink-3 leading-none">updated</div>
-          <div className="mono text-[11px] text-ink-2 leading-tight">{relativeTime(candidate.updatedAt)}</div>
+          <div className="mono text-[11px] text-ink-3 leading-none">updated</div>
+          <div className="mono text-[13px] text-ink-2 leading-tight">{relativeTime(candidate.updatedAt)}</div>
         </div>
       </div>
 
@@ -94,7 +94,7 @@ export function CandidateCard({ candidate, lastChi, onEdit, onSim, onDelete }: P
         className="flex items-center justify-between gap-1 px-3 pb-3 pt-1"
         onClick={(e) => e.stopPropagation()}
       >
-        <span className="mono text-[8px] text-ink-3 truncate flex-1">{candidate.id.slice(0, 6)}…</span>
+        <span className="mono text-[10px] text-ink-3 truncate flex-1">{candidate.id.slice(0, 6)}…</span>
 
         <div className="flex items-center gap-1 shrink-0">
           <button
@@ -103,7 +103,7 @@ export function CandidateCard({ candidate, lastChi, onEdit, onSim, onDelete }: P
               e.stopPropagation();
               onSim(candidate.id);
             }}
-            className="mono uppercase tracking-cap text-[9px] px-2 py-0.5 border border-line
+            className="mono uppercase tracking-cap text-[11px] px-2 py-0.5 border border-line
               text-ink-2 hover:border-signal hover:text-signal transition-colors rounded-sm"
           >
             sim
@@ -116,7 +116,7 @@ export function CandidateCard({ candidate, lastChi, onEdit, onSim, onDelete }: P
                 e.stopPropagation();
                 setMenuOpen((v) => !v);
               }}
-              className="mono text-[11px] px-1.5 py-0.5 border border-line text-ink-3
+              className="mono text-[13px] px-1.5 py-0.5 border border-line text-ink-3
                 hover:border-ink-2 hover:text-ink-1 transition-colors rounded-sm leading-none"
               aria-label="More options"
             >
@@ -135,7 +135,7 @@ export function CandidateCard({ candidate, lastChi, onEdit, onSim, onDelete }: P
                     setMenuOpen(false);
                     onDelete(candidate.id);
                   }}
-                  className="w-full text-left px-3 py-1.5 mono text-[10px] text-warn
+                  className="w-full text-left px-3 py-1.5 mono text-[12px] text-warn
                     hover:bg-warn/10 transition-colors"
                 >
                   Delete

@@ -140,7 +140,7 @@ export function CHIExplainer({ posterior, chiStar, missionId, gate }: Props) {
 
       <header className="flex items-baseline justify-between mb-4 flex-wrap gap-2">
         <h2 className="display text-lg text-ink-0">
-          Reading this result · NASA Risk Posture for the mission
+          NASA Risk analysis framework
         </h2>
         <span className={`mono text-[10px] uppercase tracking-cap ${nasaTone}`}>
           NASA verdict · {lxc.color.toUpperCase()} · LxC = {lxc.score}
@@ -236,7 +236,7 @@ export function CHIExplainer({ posterior, chiStar, missionId, gate }: Props) {
 
       <header className="flex items-baseline justify-between mb-4 flex-wrap gap-2">
         <h3 className="display text-base text-ink-0">
-          Plain-language lay layer · what the underlying CHI numbers mean
+          Crew Health Index
         </h3>
         <span className={`mono text-[10px] uppercase tracking-cap ${severity.tone}`}>
           lay verdict · {severity.label}
@@ -313,9 +313,6 @@ export function CHIExplainer({ posterior, chiStar, missionId, gate }: Props) {
 
       {/* ── DECISION HOOK ──────────────────────────────────────────────── */}
       <div className="border-t border-line pt-4">
-        <div className="mono text-[10px] uppercase tracking-cap text-ink-3 mb-2">
-          what to do with this number
-        </div>
         <p className="text-sm text-ink-1 leading-relaxed">
           Selectron is a <em>decision-support</em> tool, not an autonomous selector. The CHI
           and its early-termination probability are inputs to a human review board. A

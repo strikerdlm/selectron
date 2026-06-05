@@ -31,31 +31,30 @@ test.describe("CrewComposition smoke", () => {
     expect(realErrors, `unexpected console errors: ${realErrors.join("\n")}`).toEqual([]);
   });
 
-  test("preset crew dropdown loads K15 reference crew", async ({ page }) => {
+  test("crew size stepper removes members (manual configuration, presets eliminated)", async ({ page }) => {
     await page.goto("/");
     await page.getByRole("button", { name: /^Crew$/i }).click();
     await expect(page.getByRole("heading", { name: /^Crew Composition$/i })).toBeVisible();
 
-    // The preset dropdown is in the header region with explicit aria-label.
-    const presetSelect = page.getByLabel(/Load preset crew configuration/i);
-    await expect(presetSelect).toBeVisible();
-    await presetSelect.selectOption("k15-reference");
-
-    // The default crew (Alpha…Foxtrot) should disappear; preset-k15-1..6 appear.
-    await expect(page.getByText(/preset-k15-1/).first()).toBeVisible({ timeout: 5_000 });
-    await expect(page.getByText(/\bAlpha\b/)).toHaveCount(0);
+    // Presets were eliminated (Diego 2026-05-29) — the user configures crew size
+    // manually. Default crew is 6 (Alpha…Foxtrot).
+    await expect(page.getByText(/\bFoxtrot\b/).first()).toBeVisible();
+    // Removing one member via the crew-size stepper drops the last member (Foxtrot).
+    await page.getByRole("button", { name: /remove one crew member/i }).click();
+    await expect(page.getByText(/\bFoxtrot\b/)).toHaveCount(0, { timeout: 5_000 });
   });
 
-  test("save/load toolbar mounts after sim; load dropdown is always visible", async ({ page }) => {
+  test("save / load / export toolbar is fully available before a run (config-only saving)", async ({ page }) => {
     await page.goto("/");
     await page.getByRole("button", { name: /^Crew$/i }).click();
     await expect(page.getByRole("heading", { name: /^Crew Composition$/i })).toBeVisible();
 
-    // Load dropdown is in the page initially (always-visible by design).
+    // Load dropdown is always visible by design.
     await expect(page.getByLabel(/Load recent IMM session/i)).toBeVisible();
-    // Save and Export buttons are gated on outcome; hidden pre-sim.
-    await expect(page.getByRole("button", { name: /Save current IMM session/i })).toHaveCount(0);
-    await expect(page.getByRole("button", { name: /Export current IMM session as JSON/i })).toHaveCount(0);
+    // 2026-05-29: Save and Export are now always available so a config-only
+    // session (no outcome yet) can be saved/exported before running.
+    await expect(page.getByRole("button", { name: /Save current IMM session/i })).toBeVisible();
+    await expect(page.getByRole("button", { name: /Export current IMM session as JSON/i })).toBeVisible();
   });
 
   test("K15 validation badge only renders for K15 reference scenario", async ({ page }) => {

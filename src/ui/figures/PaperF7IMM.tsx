@@ -52,19 +52,19 @@ export function PaperF7IMM() {
   return (
     <div className="p-8 bg-white" style={{ width: 1400 }}>
       <div className="mb-6">
-        <h1 className="text-2xl font-semibold text-gray-900">
+        <h1 className="text-[24px] font-semibold text-gray-900">
           IMM Calculator multi-mission comparison — operational ISS HMS kit
         </h1>
-        <p className="mono text-sm text-gray-600 mt-2">
+        <p className="mono text-[14px] text-gray-600 mt-2">
           {f7.rows.length} missions · T = {f7.trials.toLocaleString()} trials per mission · seed = 0x{(workedExample.seed).toString(16)} · kit = {f7.kit.label}
         </p>
-        <p className="mono text-xs text-gray-500 mt-1">
+        <p className="mono text-[12px] text-gray-500 mt-1">
           {f7.crew_label}
         </p>
       </div>
 
       {/* Mission comparison table */}
-      <table className="mono text-sm w-full border border-gray-300">
+      <table className="mono text-[14px] w-full border border-gray-300">
         <thead>
           <tr className="bg-gray-100 text-gray-800">
             <th className="text-left p-2">Mission</th>
@@ -97,7 +97,7 @@ export function PaperF7IMM() {
                 <td className="p-2 text-right text-gray-800">{row.pLocl_mean.toFixed(2)}</td>
                 <td className="p-2 text-right text-gray-800">{row.missionSuccess_mean.toFixed(1)}</td>
                 <td className="p-2 text-center">
-                  <span className={`inline-block border ${chipClass(color)} text-xs uppercase font-bold tracking-wide px-2 py-0.5 rounded`}>
+                  <span className={`inline-block border ${chipClass(color)} text-[12px] uppercase font-bold tracking-wide px-2 py-0.5 rounded`}>
                     {color}
                   </span>
                 </td>
@@ -109,7 +109,7 @@ export function PaperF7IMM() {
 
       {/* Visual: CHI horizontal bars sorted by duration */}
       <div className="mt-8 max-w-5xl">
-        <h3 className="text-sm font-semibold text-gray-700 mb-3">Crew Health Index ($\chi$) per mission, sorted by duration:</h3>
+        <h3 className="text-[14px] font-semibold text-gray-700 mb-3">Crew Health Index ($\chi$) per mission, sorted by duration:</h3>
         <div className="space-y-1.5">
           {rows.map((row) => {
             const widthPct = row.chi_mean; // CHI is already in 0–100 range
@@ -118,7 +118,7 @@ export function PaperF7IMM() {
                            : color === "yellow" ? "bg-amber-400"
                            : "bg-emerald-400";
             return (
-              <div key={row.missionId} className="flex items-center gap-2 mono text-xs">
+              <div key={row.missionId} className="flex items-center gap-2 mono text-[12px]">
                 <div className="w-44 truncate text-gray-700">{row.missionId}</div>
                 <div className="w-12 text-right text-gray-600">{row.durationDays}d</div>
                 <div className="flex-1 bg-gray-100 rounded relative h-6">

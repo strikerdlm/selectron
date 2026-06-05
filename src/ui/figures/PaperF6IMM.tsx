@@ -31,13 +31,13 @@ export function PaperF6IMM() {
   return (
     <div className="p-8 bg-white" style={{ width: 1400 }}>
       <div className="mb-6">
-        <h1 className="text-2xl font-semibold text-gray-900">
+        <h1 className="text-[24px] font-semibold text-gray-900">
           NASA HSRB Likelihood × Consequence — IMM Calculator at v0.5.x
         </h1>
-        <p className="mono text-sm text-gray-600 mt-2">
+        <p className="mono text-[14px] text-gray-600 mt-2">
           {f6.mission.label} · kit = {f6.kit.label} · T = {f6.trials.toLocaleString()} trials · seed = 0x{(workedExample.seed).toString(16)}
         </p>
-        <p className="mono text-xs text-gray-500 mt-1">{f6.crew_label}</p>
+        <p className="mono text-[12px] text-gray-500 mt-1">{f6.crew_label}</p>
       </div>
 
       {/* 5×5 LxC grid */}
@@ -61,7 +61,7 @@ export function PaperF6IMM() {
               return (
                 <div
                   key={`L${Lrow}C${Ccol}`}
-                  className={`${cellColor} ${ring} flex items-center justify-center h-16 text-lg text-gray-900 transition-all`}
+                  className={`${cellColor} ${ring} flex items-center justify-center h-16 text-[18px] text-gray-900 transition-all`}
                 >
                   {score}
                 </div>
@@ -75,9 +75,9 @@ export function PaperF6IMM() {
       <div className={`mt-6 border-2 ${colorClass} rounded p-5 max-w-4xl`}>
         <div className="flex items-baseline gap-4 flex-wrap">
           <span className="text-4xl font-bold">L{L} × C{C} = {f6.assessment.score}</span>
-          <span className="mono text-sm uppercase tracking-wide">{color}</span>
+          <span className="mono text-[14px] uppercase tracking-wide">{color}</span>
         </div>
-        <dl className="mono text-xs mt-3 grid grid-cols-2 gap-x-6 gap-y-1">
+        <dl className="mono text-[12px] mt-3 grid grid-cols-2 gap-x-6 gap-y-1">
           <dt className="text-gray-700">Likelihood</dt>
           <dd>L{L} · {f6.assessment.likelihoodLabel} · pFailure = {(100 * f6.assessment.pMissionFailure).toFixed(2)}%</dd>
           <dt className="text-gray-700">Consequence</dt>
@@ -91,8 +91,8 @@ export function PaperF6IMM() {
 
       {/* IMM outputs vs K15 reference */}
       <div className="mt-6 max-w-4xl">
-        <h3 className="text-sm font-semibold text-gray-700 mb-2">IMM Calculator outputs vs K15 Table 1 reference (issHMS scenario):</h3>
-        <table className="mono text-xs w-full border border-gray-300">
+        <h3 className="text-[14px] font-semibold text-gray-700 mb-2">IMM Calculator outputs vs K15 Table 1 reference (issHMS scenario):</h3>
+        <table className="mono text-[12px] w-full border border-gray-300">
           <thead>
             <tr className="bg-gray-100">
               <th className="text-left p-2">Metric</th>

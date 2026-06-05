@@ -11,7 +11,7 @@ describe("IMM priors", () => {
   it("every prior carries a provenance tag and source_ref", () => {
     const priors = loadIMMPriors();
     for (const [_id, p] of Object.entries(priors.conditions)) {
-      expect(["tierA-nasa","tierB-lit","tierC-synth","user-custom"]).toContain(p.provenance);
+      expect(["tierA-nasa","tierB-lit","tierB-pymc","tierC-synth","user-custom"]).toContain(p.provenance);
       expect(typeof p.source_ref).toBe("string");
       expect(p.source_ref.length).toBeGreaterThan(0);
     }

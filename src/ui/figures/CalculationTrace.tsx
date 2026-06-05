@@ -10,8 +10,13 @@
 // "Like /frontend-design" — cool, dense, scientific aesthetic. Lay text always
 // visible (no collapse-by-default), connected via a downward arrow glyph so the
 // reader's eye travels from equation → human meaning naturally.
+//
+// 2026-05-29 (Diego): in interactive views the whole trace is COLLAPSED by
+// default — the header acts as a toggle and the steps appear only when the user
+// clicks to read the explanation. Paper figures (e.g. F4) pass collapsible={false}
+// so they always render the full expanded chain.
 
-import type { ReactNode } from "react";
+import { useState, type ReactNode } from "react";
 import type { Criterion } from "@/types";
 import type { Posterior } from "@/types";
 import type { AccessTier } from "@/types";
@@ -42,7 +47,7 @@ function TraceStepCard({ step, last }: { step: TraceStep; last: boolean }) {
           >
             {step.n}
           </span>
-          <h4 className="display text-base text-ink-0 leading-tight">{step.title}</h4>
+          <h4 className="display text-[16px] text-ink-0 leading-tight">{step.title}</h4>
         </div>
 
         {/* EQUATION — scientific notation, monospace */}
@@ -67,10 +72,10 @@ function TraceStepCard({ step, last }: { step: TraceStep; last: boolean }) {
             aria-hidden
           >
             <span className="text-signal text-[14px] leading-none">↓</span>
-            in plain English
+            Explanation
           </span>
         </div>
-        <p className="text-sm text-ink-1 leading-relaxed pl-3 mt-1">{step.lay}</p>
+        <p className="text-[14px] text-ink-1 leading-relaxed pl-3 mt-1">{step.lay}</p>
 
         {/* CITATION */}
         <div className="mt-4 pt-3 border-t border-line/40 mono text-[10px] text-ink-3">
@@ -227,6 +232,71 @@ function mcdaSteps(args: {
   ];
 }
 
+/**
+ * Collapsible shell shared by both trace views. When `collapsible` (the default
+ * for interactive views) the whole step chain is hidden until the user clicks
+ * the header. Paper figures pass `collapsible={false}` to always render expanded.
+ */
+function TraceShell({
+  collapsible,
+  title,
+  badges,
+  intro,
+  steps,
+}: {
+  collapsible: boolean;
+  title: ReactNode;
+  badges: ReactNode;
+  intro: ReactNode;
+  steps: TraceStep[];
+}) {
+  const [open, setOpen] = useState(false);
+  const expanded = collapsible ? open : true;
+
+  const headerInner = (
+    <>
+      <div className="flex items-baseline justify-between gap-3">
+        <h3 className="display text-[18px] text-ink-0 flex items-center gap-2">
+          {collapsible && (
+            <span className="mono text-signal text-[14px]" aria-hidden>{expanded ? "▾" : "▸"}</span>
+          )}
+          {title}
+        </h3>
+        <div className="flex items-center gap-2">{badges}</div>
+      </div>
+      <p className="text-[14px] text-ink-1 mt-2 leading-relaxed">
+        {expanded ? (
+          intro
+        ) : (
+          <span className="text-ink-2">Click to read the step-by-step explanation of how this number was computed.</span>
+        )}
+      </p>
+    </>
+  );
+
+  return (
+    <div className="space-y-0">
+      {collapsible ? (
+        <button
+          type="button"
+          onClick={() => setOpen((o) => !o)}
+          aria-expanded={expanded}
+          className="w-full text-left panel p-4 mb-3 border-signal/40 hover:border-signal/70 transition-colors cursor-pointer"
+        >
+          {headerInner}
+        </button>
+      ) : (
+        <header className="panel p-4 mb-3 border-signal/40">{headerInner}</header>
+      )}
+
+      {expanded &&
+        steps.map((s, i) => (
+          <TraceStepCard key={s.n} step={s} last={i === steps.length - 1} />
+        ))}
+    </div>
+  );
+}
+
 export function MCDACalculationTrace(props: {
   posterior: Posterior;
   criteria: readonly Criterion[];
@@ -234,35 +304,33 @@ export function MCDACalculationTrace(props: {
   alias: string;
   seed: number;
   accessTier: AccessTier; // scope-expansion-3
+  /** Interactive views collapse by default; paper figures pass false. */
+  collapsible?: boolean;
 }) {
   const steps = mcdaSteps(props);
   return (
-    <div className="space-y-0">
-      <header className="panel p-4 mb-3 border-signal/40">
-        <div className="flex items-baseline justify-between gap-3">
-          <h3 className="display text-lg text-ink-0">
-            How we scored <span className="text-signal">{props.alias}</span>
-          </h3>
-          <div className="flex items-center gap-2">
-            <span className="mono text-[10px] uppercase tracking-cap text-signal border border-signal/40 rounded px-2 py-0.5">
-              tier · {TIER_LABEL[props.accessTier]}
-            </span>
-            <span className="mono text-[10px] uppercase tracking-cap text-ink-2">
-              stage a · bayesian mcda
-            </span>
-          </div>
-        </div>
-        <p className="text-sm text-ink-1 mt-2 leading-relaxed">
+    <TraceShell
+      collapsible={props.collapsible ?? true}
+      title={<>How we scored <span className="text-signal">{props.alias}</span></>}
+      badges={
+        <>
+          <span className="mono text-[10px] uppercase tracking-cap text-signal border border-signal/40 rounded px-2 py-0.5">
+            tier · {TIER_LABEL[props.accessTier]}
+          </span>
+          <span className="mono text-[10px] uppercase tracking-cap text-ink-2">
+            stage a · bayesian mcda
+          </span>
+        </>
+      }
+      intro={
+        <>
           The total-score posterior on the right is the output of these four steps. Each
           step shows the math, the concrete numbers, and a plain-English explanation
           below the equation.
-        </p>
-      </header>
-
-      {steps.map((s, i) => (
-        <TraceStepCard key={s.n} step={s} last={i === steps.length - 1} />
-      ))}
-    </div>
+        </>
+      }
+      steps={steps}
+    />
   );
 }
 
@@ -400,7 +468,7 @@ function immSteps(args: {
         </span>
       ),
       lay:
-        "We add up all the lost crew-days across all conditions to get QTL — Quality Time Lost. The Crew Health Index is QTL expressed as a percentage of the mission's available person-days: 100% means a perfectly healthy mission, 90% means 10% of the mission's productive time was lost. CHI is the headline number because it normalizes for mission length and crew size, so a 14-day MDRS run and a 520-day Mars500 run can be compared on the same scale.",
+        "We add up all the lost crew-days across all conditions to get QTL — Quality Time Lost. The Crew Health Index is QTL expressed as a percentage of the mission's available person-days: 100% means a perfectly healthy mission, 90% means 10% of the mission's productive time was lost. CHI is the headline number because it normalizes for mission length and crew size, so a 14-day campaign and a 520-day campaign can be compared on the same scale.",
       citation: {
         id: "[A22 Fig. 1] / [M18 §2.1.2]",
         label: "QTL aggregation + Crew Health Index definition",
@@ -442,34 +510,32 @@ export function IMMCalculationTrace(props: {
   chiStar: number;
   priorsVersion: string;
   accessTier: AccessTier; // scope-expansion-3
+  /** Interactive views collapse by default; paper figures pass false. */
+  collapsible?: boolean;
 }) {
   const steps = immSteps(props);
   return (
-    <div className="space-y-0">
-      <header className="panel p-4 mb-3 border-signal/40">
-        <div className="flex items-baseline justify-between gap-3">
-          <h3 className="display text-lg text-ink-0">
-            How we projected <span className="text-signal">{props.mission.id}</span>
-          </h3>
-          <div className="flex items-center gap-2">
-            <span className="mono text-[10px] uppercase tracking-cap text-signal border border-signal/40 rounded px-2 py-0.5">
-              tier · {TIER_LABEL[props.accessTier]}
-            </span>
-            <span className="mono text-[10px] uppercase tracking-cap text-ink-2">
-              stage b · imm forward monte-carlo
-            </span>
-          </div>
-        </div>
-        <p className="text-sm text-ink-1 mt-2 leading-relaxed">
+    <TraceShell
+      collapsible={props.collapsible ?? true}
+      title={<>How we projected <span className="text-signal">{props.mission.id}</span></>}
+      badges={
+        <>
+          <span className="mono text-[10px] uppercase tracking-cap text-signal border border-signal/40 rounded px-2 py-0.5">
+            tier · {TIER_LABEL[props.accessTier]}
+          </span>
+          <span className="mono text-[10px] uppercase tracking-cap text-ink-2">
+            stage b · imm forward monte-carlo
+          </span>
+        </>
+      }
+      intro={
+        <>
           The Crew Health Index histogram on the right is what comes out of these six
           steps. Each step shows the math, the concrete numbers, and a plain-English
           explanation below the equation. seed = 0x{props.seed.toString(16)}.
-        </p>
-      </header>
-
-      {steps.map((s, i) => (
-        <TraceStepCard key={s.n} step={s} last={i === steps.length - 1} />
-      ))}
-    </div>
+        </>
+      }
+      steps={steps}
+    />
   );
 }

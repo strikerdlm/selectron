@@ -1,6 +1,6 @@
 // Centralised ECharts core registration. All figures import from here.
 import * as echarts from "echarts/core";
-import { BarChart, LineChart, ScatterChart, RadarChart, CustomChart } from "echarts/charts";
+import { BarChart, LineChart, ScatterChart, RadarChart, CustomChart, HeatmapChart, ParallelChart } from "echarts/charts";
 import {
   GridComponent,
   LegendComponent,
@@ -9,6 +9,8 @@ import {
   RadarComponent,
   TitleComponent,
   TooltipComponent,
+  VisualMapComponent,
+  ParallelComponent,
 } from "echarts/components";
 import { CanvasRenderer, SVGRenderer } from "echarts/renderers";
 
@@ -18,6 +20,8 @@ echarts.use([
   ScatterChart,
   RadarChart,
   CustomChart,
+  HeatmapChart,
+  ParallelChart,
   GridComponent,
   LegendComponent,
   MarkAreaComponent,
@@ -25,6 +29,8 @@ echarts.use([
   RadarComponent,
   TitleComponent,
   TooltipComponent,
+  VisualMapComponent,
+  ParallelComponent,
   CanvasRenderer,
   SVGRenderer,
 ]);

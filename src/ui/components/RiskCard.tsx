@@ -9,10 +9,12 @@ const pct = (x: number) => (100 * x).toFixed(1) + "%";
 const days = (x: number) => x.toFixed(1) + "d";
 
 export function RiskCard({ posterior, alias }: Props) {
-  const { chi, pEarlyTermination, expectedLostCrewDays, ess, trials } = posterior;
+  const { chi, pEarlyTermination, expectedLostCrewDays, trials } = posterior;
   const chiCI90Width = chi.ci90[1] - chi.ci90[0];
 
-  const sharpness = Math.max(0, Math.min(1, 1 - chiCI90Width / 0.3));
+  // Estimate-precision gauge (1 − CI₉₀width/0.30): certainty of the CHI estimate,
+  // NOT mission quality. A poor CHI can be estimated just as precisely as a good one.
+  const precision = Math.max(0, Math.min(1, 1 - chiCI90Width / 0.3));
 
   return (
     <div className="panel p-6">
@@ -25,7 +27,7 @@ export function RiskCard({ posterior, alias }: Props) {
         <span className="display mono text-5xl text-ink-0 leading-none">{pct(chi.mean)}</span>
         <span className="mono text-xs text-ink-2">CHI</span>
       </div>
-      <div className="mono mt-1 text-[10px] text-ink-3">crew health index — posterior mean (1 = nominal)</div>
+      <div className="mono mt-1 text-[12px] text-ink-3">crew health index — posterior mean (1 = nominal)</div>
 
       <div className="hairline my-5" />
 
@@ -60,20 +62,23 @@ export function RiskCard({ posterior, alias }: Props) {
 
         <dt className="text-ink-2">trials</dt>
         <dd className="text-right tabular-nums text-ink-1">{trials.toLocaleString()}</dd>
-
-        <dt className="text-ink-2">ESS (= trials)</dt>
-        <dd className="text-right tabular-nums text-ink-1">{ess.toFixed(0)}</dd>
       </dl>
 
       <div className="mt-6">
-        <div className="mono mb-1 flex items-center justify-between text-[10px] text-ink-2">
-          <span>CHI sharpness</span>
-          <span className="tabular-nums">{(100 * sharpness).toFixed(0)}%</span>
+        <div className="mono mb-1 flex items-center justify-between text-[12px] text-ink-2">
+          <span
+            className="inline-flex items-center gap-1 cursor-help border-b border-dotted border-ink-3/50"
+            title="Estimate precision — how tightly the 90% credible interval is pinned (1 − CI₉₀width/0.30). This is the certainty of the CHI estimate, NOT mission quality: a poor CHI can be estimated just as precisely as a good one."
+          >
+            CHI estimate precision
+            <span aria-hidden className="text-ink-3">ⓘ</span>
+          </span>
+          <span className="tabular-nums">{(100 * precision).toFixed(0)}%</span>
         </div>
         <div className="relative h-[3px] w-full bg-line">
           <div
             className="absolute inset-y-0 left-0 bg-signal transition-[width] duration-300 ease-out"
-            style={{ width: `${100 * sharpness}%` }}
+            style={{ width: `${100 * precision}%` }}
           />
         </div>
       </div>

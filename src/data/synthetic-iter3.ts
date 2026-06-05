@@ -10,12 +10,19 @@
 import type { Candidate } from "@/types";
 import type { PriorsJson } from "@/risk/priorsSchema";
 import { ANALOG_CONDITIONS } from "@/risk/conditions";
+import { ANALOG_MISSIONS } from "@/data/analog-missions";
 import { makeRng } from "@/engine/prng";
 
 const PRIORS_SEED = 0xfeed;
 const SAMPLES_PER_MISSION = 1000;
 
-const MISSION_TYPES = ["antarctic", "mars500", "hi-seas", "mdrs", "emmpol"] as const;
+// Every mission type present in the catalog. Derived (not hardcoded) so a new
+// mission type can never be silently dropped — that gap left "thor" (short-22d)
+// with no priors → zero events → CHI = 100 % (a spurious "perfect, GO" verdict).
+const MISSION_TYPES = Array.from(new Set(ANALOG_MISSIONS.map((m) => m.type)));
+
+const SD_LOG = 0.3;
+const meanLogFor = (kind: string): number => (kind === "event" ? Math.log(0.05) : Math.log(0.0005));
 
 function makeLogLambdaSamples(meanLog: number, sdLog: number, seed: number): number[] {
   const rng = makeRng(seed);
@@ -29,25 +36,28 @@ function makeLogLambdaSamples(meanLog: number, sdLog: number, seed: number): num
   return out;
 }
 
+function makeMissionEntry(meanLog: number, seed: number) {
+  const samples = makeLogLambdaSamples(meanLog, SD_LOG, seed);
+  const mean = samples.reduce((a, b) => a + b, 0) / samples.length;
+  const variance = samples.reduce((a, b) => a + (b - mean) * (b - mean), 0) / samples.length;
+  return { log_lambda_samples: samples, mean_log_lambda: mean, sd_log_lambda: Math.sqrt(variance) };
+}
+
 function buildSyntheticPriors(): PriorsJson {
   const conditions: PriorsJson["conditions"] = {};
   let salt = PRIORS_SEED;
   for (const c of ANALOG_CONDITIONS) {
-    const isEvent = c.kind === "event";
-    const meanLog = isEvent ? Math.log(0.05) : Math.log(0.0005);
-    const sdLog = 0.3;
+    const meanLog = meanLogFor(c.kind);
+    // ONE posterior per condition, SHARED across all mission types. The Iter-3
+    // scaffold has no evidence for per-environment rate differences, so drawing
+    // a fresh per-type sample only injected spurious noise into the mission
+    // comparison (e.g. a 45-day and 90-day HI-SEAS mission — same type, same EVA
+    // count — disagreeing for no physical reason). With a shared posterior the
+    // comparison varies only with real mission parameters: duration (Poisson
+    // scaling), crew size, and EVA count. (Diego 2026-05-29.)
+    const entry = makeMissionEntry(meanLog, ++salt);
     const missions: PriorsJson["conditions"][string]["missions"] = {};
-    for (const m of MISSION_TYPES) {
-      const samples = makeLogLambdaSamples(meanLog, sdLog, ++salt);
-      const mean = samples.reduce((a, b) => a + b, 0) / samples.length;
-      const variance =
-        samples.reduce((a, b) => a + (b - mean) * (b - mean), 0) / samples.length;
-      missions[m] = {
-        log_lambda_samples: samples,
-        mean_log_lambda: mean,
-        sd_log_lambda: Math.sqrt(variance),
-      };
-    }
+    for (const m of MISSION_TYPES) missions[m] = entry;
     conditions[c.id] = {
       missions,
       vulnerability_beta:

@@ -14,7 +14,7 @@
 
 import ReactEChartsCore from "echarts-for-react/lib/core";
 import { echarts } from "./echarts-base";
-import { NATURE_THEME_NAME } from "./theme";
+import { useFigureTheme } from "./useFigureTheme";
 import { FigureCaption } from "./FigureCaption";
 import type { IMMOutcome, PosteriorSummary } from "../../imm/types";
 
@@ -147,6 +147,8 @@ type SparklineProps = {
 };
 
 function ConvergenceSparkline({ trialCheckpoints, sigmaChi }: SparklineProps) {
+  const { themeName } = useFigureTheme();
+
   if (sigmaChi.length === 0) {
     return (
       <div className="panel px-3 py-2 flex items-center justify-between gap-3" data-testid="imm-headline-sparkline-placeholder">
@@ -213,7 +215,7 @@ function ConvergenceSparkline({ trialCheckpoints, sigmaChi }: SparklineProps) {
         <ReactEChartsCore
           echarts={echarts}
           option={option}
-          theme={NATURE_THEME_NAME}
+          theme={themeName}
           style={{ height: 40, width: "100%" }}
           notMerge
         />

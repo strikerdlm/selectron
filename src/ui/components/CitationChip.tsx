@@ -22,7 +22,7 @@ export function CitationChip({ citation, expanded = false }: CitationChipProps) 
 
   return (
     <div
-      className="mono text-[10px] leading-snug"
+      className="mono text-[12px] leading-snug"
       style={{ color: isRetracted ? "var(--warn)" : "var(--ink-2)" }}
     >
       <div className="flex items-baseline gap-1.5 flex-wrap">
@@ -37,7 +37,7 @@ export function CitationChip({ citation, expanded = false }: CitationChipProps) 
             href={`https://doi.org/${citation.doi}`}
             target="_blank"
             rel="noreferrer"
-            className="text-[9px] uppercase tracking-cap transition-colors hover:text-signal"
+            className="text-[11px] uppercase tracking-cap transition-colors hover:text-signal"
             style={{ color: "var(--ink-3)" }}
             title={`DOI: ${citation.doi}`}
           >
@@ -48,7 +48,7 @@ export function CitationChip({ citation, expanded = false }: CitationChipProps) 
         {/* Scite verified badge */}
         {isVerified && (
           <span
-            className="text-[9px] uppercase tracking-cap px-1 rounded-full border"
+            className="text-[11px] uppercase tracking-cap px-1 rounded-full border"
             style={{ color: "var(--go)", borderColor: "var(--go)", background: "rgba(86,214,160,0.06)" }}
             title="Scite-verified: no retractions or concerns"
           >
@@ -59,7 +59,7 @@ export function CitationChip({ citation, expanded = false }: CitationChipProps) 
         {/* Retraction warning */}
         {isRetracted && (
           <span
-            className="text-[9px] uppercase tracking-cap px-1 rounded-full border"
+            className="text-[11px] uppercase tracking-cap px-1 rounded-full border"
             style={{ color: "var(--warn)", borderColor: "var(--warn)", background: "rgba(255,107,94,0.08)" }}
           >
             ⚠ retracted
@@ -69,7 +69,7 @@ export function CitationChip({ citation, expanded = false }: CitationChipProps) 
         {/* Expression of concern */}
         {isConcern && (
           <span
-            className="text-[9px] uppercase tracking-cap px-1 rounded-full border"
+            className="text-[11px] uppercase tracking-cap px-1 rounded-full border"
             style={{ color: "var(--signal)", borderColor: "var(--signal)", background: "rgba(245,181,65,0.08)" }}
           >
             ⚠ concern
@@ -78,7 +78,7 @@ export function CitationChip({ citation, expanded = false }: CitationChipProps) 
 
         {/* Citation count */}
         {typeof citation.smart_citation_count === "number" && (
-          <span className="text-[9px] text-ink-3" title="Scite smart citation count">
+          <span className="text-[11px] text-ink-3" title="Scite smart citation count">
             {citation.smart_citation_count.toLocaleString()} cit.
           </span>
         )}
@@ -87,7 +87,7 @@ export function CitationChip({ citation, expanded = false }: CitationChipProps) 
         {citation.relevance_quote && (
           <button
             type="button"
-            className="text-[9px] uppercase tracking-cap transition-colors hover:text-signal"
+            className="text-[11px] uppercase tracking-cap transition-colors hover:text-signal"
             style={{ color: "var(--ink-3)" }}
             onClick={() => setShowQuote((v) => !v)}
             aria-expanded={showQuote}
@@ -99,14 +99,14 @@ export function CitationChip({ citation, expanded = false }: CitationChipProps) 
       </div>
 
       {/* Title (truncated) */}
-      <div className="text-[9px] text-ink-3 truncate max-w-xs mt-0.5" title={citation.title}>
+      <div className="text-[11px] text-ink-3 truncate max-w-xs mt-0.5" title={citation.title}>
         {citation.title}
       </div>
 
       {/* Relevance quote (expanded) */}
       {showQuote && citation.relevance_quote && (
         <div
-          className="mt-1.5 px-2 py-1 rounded border-l-2 text-[9px] text-ink-2 italic"
+          className="mt-1.5 px-2 py-1 rounded border-l-2 text-[11px] text-ink-2 italic"
           style={{ borderColor: "var(--signal)", background: "rgba(245,181,65,0.04)" }}
         >
           "{citation.relevance_quote}"

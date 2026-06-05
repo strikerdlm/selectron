@@ -55,11 +55,11 @@ console.log(`  HSRB LxC: L${f6_assessment.likelihood} × C${f6_assessment.conseq
 const F7_MISSION_IDS = [
   "iss-6mo",         // K15 reference (180d, 6-crew)
   "iss-drm1",        // S20 DRM1 (365d)
-  "mdrs-2wk",        // Earth analog short
-  "hi-seas-45d",     // Earth analog medium
-  "hi-seas-90d",     // Earth analog long
+  "analog-14d",      // Earth analog short
+  "analog-45d",      // Earth analog medium
+  "analog-90d",      // Earth analog long
   "antarctic-winter", // Earth analog 12-person 365d
-  "mars500",         // 520d analog isolation
+  "analog-520d",     // 520d analog isolation
 ] as const;
 
 console.log(`\n=== F7 extraction: ${F7_MISSION_IDS.length} missions × ISS HMS at T = ${T_F7.toLocaleString()} ===\n`);

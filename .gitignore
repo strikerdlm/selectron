@@ -27,3 +27,15 @@ test-results/
 # PyMC MCMC checkpoints — multi-MB binary; commit only priors.json
 notebooks/*.nc
 notebooks/.ipynb_checkpoints/
+
+# Python offline pipeline
+python/.venv/
+python/outputs/
+python/src/*.egg-info/
+__pycache__/
+
+# Repo-root outputs (fitted priors, batch reports)
+outputs/
+
+# Graphify skill generated artifacts
+research/graphify-out/

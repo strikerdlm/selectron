@@ -147,6 +147,9 @@ let originalRevokeObjectURL: typeof URL.revokeObjectURL | undefined;
 beforeEach(async () => {
   await db.delete();
   await db.open();
+  // CrewComposition autosaves working state to localStorage; clear it so each
+  // test starts from INITIAL_CREW rather than a prior test's autosaved crew.
+  try { localStorage.clear(); } catch { /* no-op */ }
   createObjectURLMock.mockClear();
   revokeObjectURLMock.mockClear();
   FakeWorker.lastOutcome = fakeOutcome();
@@ -193,17 +196,32 @@ async function runFakeSim() {
 }
 
 describe("CrewComposition · IMM-50 save / load / export toolbar", () => {
-  it("save and export buttons are hidden until a simulation outcome exists (load dropdown always visible)", async () => {
+  it("save / export / load are all available before a run (config-only session saving)", async () => {
     renderWithDb();
     await waitForReady();
-    // Pre-run-sim: toolbar region IS present (load dropdown is always visible
-    // — needed so the user can load a saved session BEFORE running a sim),
-    // but the save and export buttons (which need an outcome to act on) are
-    // hidden until outcome state is populated.
+    // 2026-05-29: Save and Export are now always available so a config-only
+    // session (no outcome yet) can be saved before running. The toolbar region
+    // and load dropdown remain present as before.
     expect(screen.queryByRole("region", { name: /save load export/i })).not.toBeNull();
     expect(screen.queryByLabelText(/load recent IMM session/i)).not.toBeNull();
-    expect(screen.queryByRole("button", { name: /save current IMM session/i })).toBeNull();
-    expect(screen.queryByRole("button", { name: /export current IMM session as JSON/i })).toBeNull();
+    expect(screen.queryByRole("button", { name: /save current IMM session/i })).not.toBeNull();
+    expect(screen.queryByRole("button", { name: /export current IMM session as JSON/i })).not.toBeNull();
+  });
+
+  it("saving before a run persists a config-only session (outcomes = null)", async () => {
+    renderWithDb();
+    await waitForReady();
+    // No fake sim run — Save should still work and store outcomes = null.
+    const saveBtn = screen.getByRole("button", { name: /save current IMM session/i });
+    await act(async () => {
+      fireEvent.click(saveBtn);
+    });
+    await waitFor(async () => {
+      const rows = await listIMMSessions({ candidateId: null });
+      expect(rows.length).toBe(1);
+      expect(rows[0].outcomes).toBeNull();
+      expect(rows[0].crew.length).toBeGreaterThan(0);
+    });
   });
 
   it("toolbar mounts after a fake-worker sim populates outcome", async () => {
@@ -235,7 +253,7 @@ describe("CrewComposition · IMM-50 save / load / export toolbar", () => {
       expect(rows[0].candidateId).toBeNull();
       expect(rows[0].engine).toBe("monte-carlo");
       expect(rows[0].vulnerabilityMode).toBe("boolean-flags");
-      expect(rows[0].outcomes.chi.mean).toBeCloseTo(91.3, 1);
+      expect(rows[0].outcomes!.chi.mean).toBeCloseTo(91.3, 1);
     });
 
     // The select should now expose 1 saved option + the leading sentinel.

@@ -47,12 +47,12 @@ function ResultMetric({
 
   return (
     <div className="flex items-center justify-between gap-2">
-      <span className="mono text-[10px] text-ink-2 uppercase tracking-cap">{label}</span>
+      <span className="mono text-[12px] text-ink-2 uppercase tracking-cap">{label}</span>
       <div className="flex items-baseline gap-1.5">
-        <span className="mono text-[14px] tabular-nums font-medium" style={{ color }}>
+        <span className="mono text-[16px] tabular-nums font-medium" style={{ color }}>
           {mean.toFixed(1)}{unit}
         </span>
-        <span className="mono text-[9px] text-ink-3">
+        <span className="mono text-[11px] text-ink-3">
           [{lo.toFixed(1)}, {hi.toFixed(1)}]
         </span>
       </div>
@@ -99,7 +99,7 @@ export function CompositeCrewPanel({
         <h3 className="label text-ink-1 uppercase tracking-cap">Crew Composite</h3>
         {/* Gate verdict badge */}
         <span
-          className="mono text-[10px] uppercase tracking-cap px-2 py-0.5 rounded-full border"
+          className="mono text-[12px] uppercase tracking-cap px-2 py-0.5 rounded-full border"
           style={{
             color: qualified ? "var(--go)" : "var(--warn)",
             borderColor: qualified ? "var(--go)" : "var(--warn)",
@@ -125,13 +125,13 @@ export function CompositeCrewPanel({
 
       {/* Aggregation method selector */}
       <div className="flex flex-col gap-1.5">
-        <label htmlFor="crew-composite-aggregator" className="label text-ink-2 text-[10px] uppercase tracking-cap">
+        <label htmlFor="crew-composite-aggregator" className="label text-ink-2 text-[12px] uppercase tracking-cap">
           Aggregation method
         </label>
         <select
           id="crew-composite-aggregator"
           aria-label="Aggregation method"
-          className="mono text-[12px] bg-transparent border border-line rounded px-3 py-1.5
+          className="mono text-[14px] bg-transparent border border-line rounded px-3 py-1.5
                      text-ink-1 cursor-pointer focus:border-signal focus:outline-none"
           value={method}
           onChange={(e) => onMethodChange(e.target.value as CrewCompositeMethod)}
@@ -147,7 +147,7 @@ export function CompositeCrewPanel({
       {/* Weakest link callout */}
       {weakestMemberId && (
         <div
-          className="mono text-[11px] border rounded px-3 py-2 text-ink-2"
+          className="mono text-[13px] border rounded px-3 py-2 text-ink-2"
           style={{ borderColor: "var(--signal)", background: "rgba(245,181,65,0.06)" }}
         >
           <span className="text-ink-3">weakest · </span>
@@ -158,13 +158,13 @@ export function CompositeCrewPanel({
       {/* DQ member list */}
       {disqualifiedMemberIds.length > 0 && (
         <div className="flex flex-col gap-1">
-          <span className="label text-[10px] uppercase tracking-cap" style={{ color: "var(--warn)" }}>
+          <span className="label text-[12px] uppercase tracking-cap" style={{ color: "var(--warn)" }}>
             Gate failures
           </span>
           {disqualifiedMemberIds.map((id) => (
             <div
               key={id}
-              className="mono text-[11px] border rounded px-3 py-1.5"
+              className="mono text-[13px] border rounded px-3 py-1.5"
               style={{ borderColor: "var(--warn)", background: "rgba(255,107,94,0.06)", color: "var(--warn)" }}
             >
               {id}
@@ -177,7 +177,7 @@ export function CompositeCrewPanel({
       <button
         type="button"
         disabled={simState === "running"}
-        className="mono mt-2 w-full rounded border px-4 py-2 text-[12px]
+        className="mono mt-2 w-full rounded border px-4 py-2 text-[14px]
                    uppercase tracking-cap transition-colors"
         style={{
           borderColor: simState === "running" ? "var(--line)" : "var(--signal)",
@@ -194,7 +194,7 @@ export function CompositeCrewPanel({
       {/* Simulation error */}
       {simState === "error" && simError && (
         <div
-          className="mono text-[10px] rounded border px-3 py-2 mt-1"
+          className="mono text-[12px] rounded border px-3 py-2 mt-1"
           style={{ borderColor: "var(--warn)", color: "var(--warn)", background: "rgba(255,107,94,0.06)" }}
         >
           sim error: {simError}
@@ -204,7 +204,7 @@ export function CompositeCrewPanel({
       {/* IMMOutcome results panel */}
       {simState === "done" && outcome && (
         <div className="border-t border-line pt-4 mt-1 flex flex-col gap-3">
-          <h4 className="label text-[10px] text-ink-2 uppercase tracking-cap">
+          <h4 className="label text-[12px] text-ink-2 uppercase tracking-cap">
             IMM Results · CI₉₅
           </h4>
 
@@ -244,7 +244,7 @@ export function CompositeCrewPanel({
           </div>
 
           {/* Convergence info */}
-          <div className="mono text-[9px] text-ink-3 mt-1">
+          <div className="mono text-[11px] text-ink-3 mt-1">
             σ CHI {(outcome.convergence.sigmaChi.at(-1) ?? 0).toFixed(3)} ·{" "}
             σ P(evac) {(outcome.convergence.sigmaPevac.at(-1) ?? 0).toFixed(3)}
           </div>

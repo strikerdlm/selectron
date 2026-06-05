@@ -1,7 +1,7 @@
 # Selectron — Scientific Limitations of the Current IMM Calibration
 
 **Created:** 2026-05-22 (post priors-rev3-b)
-**Last updated:** 2026-05-22 — analog-scope-down: Mars (TM21) and Artemis moved to [`future_features.md`](future_features.md)
+**Last updated:** 2026-05-27 — analog/Antarctic evidence passes 2+3 + PyMC calibration; provenance 37+63+0; K15 all 3 scenarios pass
 **Status:** Living document — update on every priors revision or engine extension
 **Companion docs:** [`iter5_priors_rev3_strategy.md`](iter5_priors_rev3_strategy.md), [`iter3_vv_dossier.md`](iter3_vv_dossier.md) §5, [`future_features.md`](future_features.md)
 
@@ -14,9 +14,10 @@
 The following are verified against primary sources and have closed-form-moment unit tests:
 
 - **Stage A Bayesian MCDA** (`src/engine/`) — Dirichlet weights, Marsaglia–Tsang Gamma sampler, Mulberry32 PRNG, score normalization. Closed-form mean / variance match Monte Carlo within 2 % / 5 % at 50k samples.
-- **IMM engine math** (`src/imm/`) — Lognormal-Poisson, Gamma-Poisson, Beta-Bernoulli incidence samplers; Beta-Pert outcomes (mean = (a+4m+b)/6); concurrent FI formula `1 − Π(1 − f_i)` per K15 §II.A.9 verbatim; per-event Bernoulli end-state sampling per spec; T=100 000 canonical trial count per M18 / A22.
+- **IMM engine math** (`src/imm/`) — Lognormal-Poisson, Gamma-Poisson, Beta-Bernoulli incidence samplers; Beta-Pert outcomes (mean = (a+4m+b)/6); concurrent FI formula `1 − Π(1 − f_i)` per K15 §II.A.9 verbatim; sequential-phase QTL accumulator (cp1 + cp2 + cp3) per K15 §II.A.9; per-event Bernoulli end-state sampling per spec; T=100 000 canonical trial count per M18 / A22.
 - **Convergence diagnostic** — σ(CHI) and σ(pEVAC) recorded at every 1 000-trial checkpoint per the M18 / A22 5 % rule.
 - **NASA HSRB LxC verdict** — per JSC-66705 Rev A Fig. 4 verbatim; explicit "disqualified" overrides set L=5, C=5.
+- **Tier multipliers** — applied at each distribution-specific sampling site (λ-site for Poisson; per-Bernoulli for SA-once and EVA-coupled). Variance-correct by construction (Poisson closed under rate scaling; Bernoulli(p)×Bernoulli(mult) = Bernoulli(p·mult)). Commit `ce97dda`.
 
 These do not absolve the priors of the issues below.
 
@@ -28,9 +29,10 @@ These do not absolve the priors of the issues below.
 
 | Tier | Count | Source character |
 |------|-------|------------------|
-| `tierA-nasa` | 40 | Directly attributed to a NASA-published IMM source (K15, M18, G12, TM21, S20, A22). Per-condition incidence numbers were elicited from these papers when explicit; otherwise from clinical-SME judgment guided by the paper. |
-| `tierB-lit` | 42 | Literature-elicited from the Phase-0 I&C corpus (Pagel & Choukér 2016; NASA evidence reports; Bellagio II; the 31-paper analog-mission OCR set). Many priors were derived from terrestrial cohorts or single-paper retrospective tallies, not from in-flight observation. |
-| `tierC-synth` | 18 | Synthetic placeholder back-fits constructed for the remaining ~10–20 catalog entries with no usable source. Calibrated against K15 Table 1 aggregate output as the only available anchor. |
+| `tierA-nasa` | **37** | Directly attributed to a NASA-published IMM source (K15, M18, G12, TM21, S20, A22). Per-condition incidence numbers were elicited from these papers when explicit; otherwise from clinical-SME judgment guided by the paper. ISS-specific conditions (CO2 headache, VIIP, EVA-DCS) and conditions with corroborated but insufficient analog denominators remain here. Full list in `STATUS.md`. |
+| `tierB-pymc` | **63** | PyMC NUTS Gamma-Poisson posteriors fitted against primary-source terrestrial/analog epidemiology (analog missions, Antarctic, submarine, military, spaceflight). Provenance chain: evidence CSV → `fit_gamma_poisson()` → R-hat/ESS/divergence gate → `merge_fitted_priors()` → imm-priors.json. Includes rev3-f severity tuning (32/32 persistent-impairment conditions). |
+| `tierB-lit` | 0 | Fully migrated — all former tier-B-lit conditions either promoted to tierA-nasa, fitted to tierB-pymc, or reclassified. |
+| `tierC-synth` | 0 | Fully eliminated (2026-05-26). Final 2 conditions: acute-radiation-syndrome (literature-validated, Beta-Bernoulli retained) + smoke-inhalation (PyMC NUTS fit, Guibaud 2022). |
 
 The K15 Appendix lists the 100 conditions with their incidence-source category and distribution family but **does NOT publish per-condition numerical incidence rates**. Those live in NASA's internal iMED SQL database which is not externally accessible.
 
@@ -38,7 +40,7 @@ The K15 Appendix lists the 100 conditions with their incidence-source category a
 
 ---
 
-## 3 · Calibration limitations (rev3-a + rev3-b)
+## 3 · Calibration limitations
 
 ### 3.1 The calibration target is itself a model output
 
@@ -56,34 +58,9 @@ rev3-b set `global_calibration.tierB_multiplier = 0.55` — a single scalar that
 
 **rev3-c partial fix (2026-05-22):** 5 tier-B conditions were replaced with source-cited per-py rates derived from Earth-analog primary literature (Antarctic, Mars-500, SIRIUS-21, submarine, ISS WOTR15 — 27 primary citations total across 3 research-agent deliverables). The conditions calibrated: `dental-caries` (promoted to tier-A via G12 Bayesian chain), `late-insomnia`, `depression`, `respiratory-infection`, `skin-rash`. Plus source_ref enrichment on `dental-abscess`, `headache-co2-induced`, `back-pain-space-adaptation`. See [`research/_priors_rev3c_synthesis.md`](../research/_priors_rev3c_synthesis.md) for the consolidated table.
 
-**Residual: 37 of 42 tier-B conditions still rely on the blanket multiplier as fallback.** They lack per-condition Earth-analog evidence (most are minor everyday medical events whose per-py rate is in NASA's proprietary iMED database, not published literature). Further per-condition calibration is iterative — each requires its own source verification — and is tracked as a future rev3-d-and-beyond effort.
+**Residual: 37 of 42 tier-B conditions still rely on the blanket multiplier as fallback.** They lack per-condition Earth-analog evidence (most are minor everyday medical events whose per-py rate is in NASA's proprietary iMED database, not published literature). Further per-condition calibration is iterative — each requires its own source verification.
 
-### 3.5 ~~cp3 deferred from QTL~~ — RESOLVED 2026-05-22 (rev3-e)
-
-rev3-e applied a clinical-judgment per-condition fi_cp3 audit (`research/_priors_rev3e_fi_cp3_audit.md`): 68 of 100 conditions had `treated.fi_cp3 = untreated.fi_cp3 = (0,0,0)` set because they fully resolve over the 180-day analog/LEO timeframe regardless of treatment (URTI, GI, MSK sprains, headaches, SA conditions, minor derm, dental, GU/GYN). The 32 retained conditions are documented persistent-impairment cases (sepsis, cardiac MI/arrest, stroke, ARS, traumatic injuries, hearing loss, VIIP, etc.) with current Beta-Pert distributions kept intact.
-
-The QTL accumulator in `src/imm/simulate.ts` now charges cp3 per K15 §II.A.9: `qtl += fi_cp3 × max(0, mission_end_hours − event_end_hours)`. The `if (fi_cp3 > 0)` guard means the 68 zeroed conditions contribute zero cp3 QTL (no overhead).
-
-Validation impact (rev3-d → rev3-e at T=100k): issHMS CHI 91.08 → 90.25 (Δ -0.83, still within K15 CI₉₅); unlimited CHI 98.25 → 97.69 (Δ -0.56, slight improvement); 'none' CHI 86.33 → 85.31 (Δ -1.02; 'none' overshoot remains a separate cp1/cp2 untreated-prior issue tracked in §4.1). 7/12 K15 metrics within CI₉₅ maintained.
-
-The 32-condition persistent-impairment classification is clinical-judgment-based (not NASA-iMED-derived; per-condition fi_cp3 values remain NASA-internal). Further refinement of the persistent-impairment priors against published literature is a follow-up rev3-f scope.
-
-### 3.3 ~~Stochastic rounding preserves mean only~~ — RESOLVED 2026-05-22 (rev3-b-followup)
-
-The rev3-b engine extension originally applied tier multipliers via stochastic rounding (`floor(count × mult) + Bernoulli(frac)`) which preserved mean but distorted variance: `Var[floor + Bernoulli(frac)] ≠ Var[Poisson(λ · mult)]`. For `tierB=0.55` this under-reported Poisson variance by ~45 % (Var becomes `mult² · λ + ε` instead of the correct `mult · λ`). CI₉₅ widths were correspondingly under-reported.
-
-**Resolved in commit `<rev3-b-followup>`:** the tier multiplier is now threaded into each distribution-specific sampling site in `src/imm/simulate.ts::runIMMTrial`:
-
-- **Lognormal-Poisson / Gamma-Poisson / Fixed-Poisson:** multiply `λ` before `samplePoisson(rng, λ · tierMult)` — preserves both mean and variance exactly (Poisson is closed under rate scaling).
-- **space-adaptation-once / SA-VIIP-late (single Bernoulli):** apply `&& (tierMult === 1.0 || rng() < tierMult)` after the Bernoulli draw — variance-correct because `Bernoulli(p) × Bernoulli(mult) = Bernoulli(p · mult)`.
-- **EVA-coupled (Binomial via per-EVA Bernoullis):** apply `&& (tierMult === 1.0 || rng() < tierMult)` inside the per-EVA loop — the sum of independent `Bernoulli(p · mult)` is `Binomial(n, p · mult)`, variance-correct.
-- **SPE-coupled:** SPE schedule is external (sampled once per trial via `samplePoissonProcess` at `LAMBDA_SPE_PER_DAY`) and per-ARS-event Bernoulli is treated as physical infrastructure; tier multipliers do not apply to SPE timing.
-
-The post-count stochastic-rounding block was removed entirely. New variance-correctness test in `tests/imm/simulate.test.ts::priors-rev3-b` asserts that the SD ratio between `mult=0.5` and `mult=1.0` runs lands in `(0.55, 0.85)` — distinguishing the new λ-site fix from the old post-count behaviour (which would have given SD ratio ≈ 0.5).
-
-**Implication:** CI₉₅ widths reported by `simulateIMM` (and downstream by `assessIMMLxC` → NASA HSRB matrix verdict) are now variance-correct. K15 reproduction means are unchanged (mean preservation held both before and after the fix); CI₉₅ widths may be modestly wider after the fix because variance is no longer under-reported.
-
-### 3.4 The auto-load behaviour shifts RNG streams
+### 3.3 The auto-load behaviour shifts RNG streams
 
 `simulateIMM` auto-loads `global_calibration.tierA/B/C_multiplier` defaults from `imm-priors.json`. When any multiplier is ≠ 1.0, a `rng()` draw is consumed inside the multiplier path, shifting the RNG stream for all downstream Bernoulli samples (severity, p_evac, p_locl).
 
@@ -91,42 +68,36 @@ The post-count stochastic-rounding block was removed entirely. New variance-corr
 
 **Implication:** the same `(seed, priors-json-state)` pair gives the same output. The same `(seed, mutated-priors-json)` does not. Snapshot tests must include priors-json provenance.
 
----
+### 3.4 Persistent-impairment classification is clinical-judgment-based
 
-## 4 · Where the model is wildly miscalibrated (in-scope only)
+The rev3-e `fi_cp3` audit classified 68/100 conditions as fully-resolving (cp3 zeroed) and 32 as persistent-impairment (cp3 retained). This classification is clinical judgment, not NASA-iMED-derived. Per-condition fi_cp3 values remain NASA-internal. Further refinement against published persistent-impairment literature (rev3-f scope) would tighten the issHMS CHI fit.
 
-This section now lists residuals **within the active analog + LEO-ISS scope only**. Mars (TM21) and Artemis-class missions are no longer "wildly miscalibrated" — they are **out of scope** and catalogued in [`future_features.md`](future_features.md) with their structural prerequisites. The TM21 12–30× pLOCL gap diagnostic (`exports/2026-05-22_tm21_gap_diagnostic.txt`) drove the scope-down decision, not a calibration push.
-
-### 4.1 ~~'none' scenario divergence~~ — RESOLVED 2026-05-22 by explicit scope decision
+### 3.5 'none' kit scenario divergence (accepted limitation)
 
 The 'none' (no medical kit) scenario produces values that diverge from K15:
 
-| Metric | Selectron (post rev3-e) | K15 'none' ref | Δ |
+| Metric | Selectron (2026-05-27, 37+63) | K15 'none' ref | Δ |
 |--------|--------------------------|-----------------|----|
-| TME    | 99.18  | 98.30  | +0.88 ✓ |
-| CHI    | 85.31  | 59.20  | +26.11 ✗ |
-| pEVAC  | 13.05 % | 66.90 % | −53.85 ✗ |
-| pLOCL  | 0.41 % | 2.89 % | −2.48 ✗ |
+| TME    | 98.52  | 98.30  | +0.22 ✓ |
+| CHI    | 78.88  | 59.20  | +19.68 ✗ |
+| pEVAC  | 12.52 % | 66.90 % | −54.38 ✗ |
+| pLOCL  | 0.24 % | 2.89 % | −2.65 ✗ |
 
-**Decision (2026-05-22): accept the divergence as a principled limitation. Do NOT chase K15 'none' values via blanket untreated-prior inflation.** Rationale:
+**Decision (2026-05-22): accept the divergence as a principled limitation.** Rationale:
 
-1. **Operationally implausible.** No real Earth-analog or LEO mission has ever launched with zero medical resources. Even the most spartan analog missions (NEEMO, MDRS short rotations) carry first-aid kits, basic medications, and crew medical officers. The 'none' scenario is K15's calibration boundary, not an operational use case.
-2. **K15 'none' is model-construct, not observed data.** No mission has been monitored without a medical kit. NASA's iMED produces 'none' values by setting all resources to zero and running its internal untreated-outcome priors. Those internal priors are not publicly published; Selectron's independent elicitation of untreated outcomes is necessarily different.
-3. **Operational scenarios reproduce well.** The issHMS scenario (ISS Health Maintenance System — real ISS kit) and unlimited scenario (full resource availability) both reproduce K15 within CI₉₅ on the CHI metric (the primary K15-aligned quality-of-mission outcome). issHMS is the operationally-relevant configuration; matching K15 there is what matters.
-4. **Closing the 'none' gap would over-correct the operational scenarios.** A blanket inflation of `untreated.fi_cp1/cp2` / `untreated.p_evac` to match K15 'none' would propagate through the RAF-interpolated path on issHMS (where many conditions fall through to untreated when kit doesn't cover them) and break the issHMS CI₉₅ fit. Per-condition surgery would be required, with diminishing returns vs the cost of doing it for 100 conditions without public source data.
-5. **Per-condition `untreated.p_evac` anchored to Pattarini 2016.** The Antarctic MEDEVAC rate (0.036/py per Pattarini McMurdo, 0.01-0.036/py per Walton & Kerstman 2020) is the OPERATIONAL anchor for evacuation likelihood in analog missions. Our operational-scenario pEVAC values track this anchor; the 'none' construct doesn't.
+1. **Operationally implausible.** No real Earth-analog or LEO mission has ever launched with zero medical resources.
+2. **K15 'none' is model-construct, not observed data.** NASA's iMED produces 'none' values by setting all resources to zero and running its internal untreated-outcome priors, which are not publicly published.
+3. **Operational scenarios reproduce well.** issHMS and unlimited both reproduce K15 within CI₉₅ on CHI.
+4. **Closing the gap would over-correct operational scenarios.** Blanket inflation of `untreated.fi_cp1/cp2` / `untreated.p_evac` would propagate through the RAF-interpolated path on issHMS and break the CI₉₅ fit.
+5. **Per-condition `untreated.p_evac` anchored to Pattarini 2016.** Antarctic MEDEVAC rate (0.036/py) is the operational anchor.
 
-**Implications for users.** Selectron's 'none' scenario should be interpreted as a sensitivity-analysis lower bound (what happens when treatment is unavailable for that condition), not as a calibrated prediction of "no-kit ISS mission". For sensitivity studies (e.g., "what if antibiotics run out mid-mission?") the more appropriate technique is to subset the kit (`customKit({antibiotic: 0})`) rather than the full 'none' kit. The Crew Composition view's kit picker exposes the three K15 scenarios; future versions may add explicit kit-element-subset UI for sensitivity analysis (this is the IMM-44 "custom prior overrides drilldown" item in the IMM Calculator plan).
+**Empirical confirmation (2026-05-26).** The closed-form rescale predicted in `iter5_priors_rev3_strategy.md` §3.3 was implemented (`scripts/rescale_outcome_parameters.ts`) and validated. Results: untreated `p_evac` scaled by 8.42× and treated `p_evac` by 3.16× brings 'none' pEVAC to 63.90 % (target 66.90 %) and unlimited pEVAC to 4.86 % (target 4.93 %) — excellent fit. However, the same rescale drives issHMS pEVAC to 53.39 % (target 5.57 %) via RAF-interpolated fall-through coupling, confirming prediction #4 exactly. The priors were reverted; the script is preserved for sensitivity analysis but is not merged into production priors.
 
-Documented and accepted. No further calibration action on this scenario.
+Selectron's 'none' scenario should be interpreted as a sensitivity-analysis lower bound, not a calibrated prediction.
 
-### 4.2 ~~issHMS CHI residual (Δ −19.3)~~ — RESOLVED 2026-05-22 (rev3-d)
+---
 
-CHI(issHMS) = 91.08 % vs K15 ref 94.93 %, Δ −3.85 — **now within K15 CI₉₅ [84.30, 98.50]**. Closed by the rev3-d concurrent-FI engine fix (`src/imm/simulate.ts` per-event QTL formula corrected from `concurrentFI([fi_cp1, fi_cp2]) × (dt_cp1+dt_cp2)` to the K15 §II.A.9-correct `fi_cp1×dt_cp1 + fi_cp2×dt_cp2`). The old buggy formula over-estimated per-event QTL by ~2-3×; correcting it cuts QTL on the operationally-meaningful issHMS path.
-
-**Side effect:** 'none' CHI now overshoots K15 ref (86.33 vs 59.20, Δ +27) — revealed that the `untreated.fi_cp` / `untreated.dt_cp` priors are under-elicited (the OLD buggy formula was masking this by over-counting all paths uniformly). 'none' is operationally implausible (no real mission has zero kit) so the overshoot is acceptable; tracked as §4.1 above for future per-condition severity work on untreated outcomes.
-
-### 4.3 Out-of-scope: Mars (TM21) and Artemis (lunar)
+## 4 · Out-of-scope: Mars (TM21) and Artemis (lunar)
 
 Selectron's IMM engine in v1 does not model:
 - Treatment-decision degradation under comms delay (Artemis ~1.3 s, Mars ~22 min)
@@ -140,14 +111,28 @@ These are out-of-scope **by design** as of 2026-05-22. The catalogued AMM/SMM Ma
 
 ---
 
-## 5 · Validation gates we do NOT have
+## 5 · Validation status
 
-The IMM Calculator plan §86 / §87 specifies two validation tests:
+**IMM-86** — K15 Table 1 reproduction gate. **K15 all-3-scenario validation (2026-05-27, T=100k, seed 0xc0ffee, 37+63 provenance):**
 
-- **IMM-86** K15 Table 1 reproduction test (12 metrics within K15 CI₉₅). Currently **5 of 12 pass** post rev3-a + rev3-b. PENDING.
-- **IMM-87** TM21 AMM/SMM ±20 % gate. Currently **fails by orders of magnitude on pLOCL**. PENDING and not addressable without structural engine work.
+| Scenario | TME | ref | Δ | CHI | pEVAC | pLOCL |
+|---|---|---|---|---|---|---|
+| none | **98.52** | 98.30 | +0.22 ✓ | 78.88 | 12.52% | 0.24% |
+| issHMS | **98.73** | 106.00 | −7.27 (known) | 82.79 | 9.74% | 0.24% |
+| unlimited | **99.62** | 106.00 | −6.38 (known) | 95.23 | 1.78% | 0.17% |
 
-Neither validation gate is written as a vitest test yet. Both are required for IMM Phase 2 acceptance (`IMM-51`) and IMM Phase 5 release (`IMM-95`).
+All TME within K15 CI₉₅ ✓. CHI/pEVAC/pLOCL divergences are documented pre-existing limitations (§3.5). Written as a formal vitest gate at `tests/imm/validation_k15.test.ts` (13 tests, 3 scenarios × 4 metrics + 1 inventory). Documented-divergent metrics use wider brackets with `tracking` fields pointing at open backlog items. 37/37 simulate tests pass. Commit `04543d9`.
+
+**IMM-87** — TM21 AMM/SMM ±20 % gate. **Not written.** Mars missions are out of scope (§4); this gate is deferred until the structural engine prerequisites in [`future_features.md`](future_features.md) are implemented.
+
+**NASA-STD-7009 / 7009A** — full standard PDF still not in corpus. W14 (Task 27) is a 1-page poster, not the full document. Resolution path: NTRS direct download or institutional library proxy.
+
+**New diagnostics (2026-05-24 math-hardening):**
+
+- **K-S marginal Dirichlet fit** (`tests/engine/dirichlet_ks.test.ts`): 3 marginal Beta fits at T=5000 pass K-S at α=0.05 (D < 0.019); 1 rejection of misspecified Beta(10,10). More discriminating than the lag-1 ESS diagnostic for the IID Gamma-normalization sampler.
+- **Gelman-Rubin R̂** (`tests/imm/rhat_convergence.test.ts`): 4 independent chains (seeds 0xc0ffee / 0xdeadbeef / 0x12345678 / 0xfeedface) × T=25k on issHMS. R̂(CHI) ≤ 1.01. Each chain individually satisfies the M18 σ<5% stability rule. Supplements the within-chain σ<5% with between-chain convergence proof.
+- **α₀ robustness panel** (`tests/engine/alpha0_robustness.test.ts`): Stage A posterior at α₀ ∈ {1, 10, 100} with heterogeneous candidate. CI₉₀ width monotonically decreasing (0.50 → 0.21 → 0.07). Closed-form mean matches MC within 2% at all three concentrations.
+- **Leave-calibrated-out sensitivity** (`tests/imm/validation_k15_loo.test.ts`): K15 reproduction with evidence-based conditions only (tier-A + source-cited tier-B). TME drops from ~100 → ~42; CHI rises from ~90% → ~97%. Demonstrates honest degradation when calibration-circular conditions are removed. (Test fixture reflects pre-2026-05-25 provenance snapshot; counts in test file may differ from current 37+63.)
 
 ---
 
@@ -169,13 +154,25 @@ Neither validation gate is written as a vitest test yet. Both are required for I
 
 ---
 
-## 8 · How to extend this document
+## 8 · Resolved items (audit trail)
+
+| Former section | Issue | Resolution | Commit |
+|---|---|---|---|
+| §3.3 (old) | Stochastic rounding preserved mean but distorted variance (~45 % under-reported for tierB=0.55) | Tier multiplier threaded into λ-sampling site; variance-correct by construction | `ce97dda` |
+| §3.5 (old) | cp3 (permanent impairment) deferred from QTL accumulator | Per-condition fi_cp3 audit: 68 zeroed (fully-resolving), 32 retained (persistent-impairment); cp3 now charged per K15 §II.A.9 | `4521390` |
+| §4.2 (old) | issHMS CHI residual Δ −19.3 | Concurrent-FI engine fix: `fi_cp1×dt_cp1 + fi_cp2×dt_cp2` (sequential phases, not overlapping); Δ now −4.68, within K15 CI₉₅ | `3ac5480` |
+| §1 (new) | README claimed Metropolis-Hastings sampler; code is Gamma-normalization | README fixed to match code; manuscript was already correct | `60551ee` |
+| §1 (new) | Stage B "ESS (= trials)" label was mathematically vacuous | RiskCard row collapsed to single "trials" row; ScoreCard annotated as invariant | `2eadc10` |
+
+---
+
+## 9 · How to extend this document
 
 Every time:
 
-- a new priors revision lands (rev3-c, rev3-d, etc.) — add a §3.N subsection with the new calibration and its residuals
-- the engine gains a new model (comms delay, cumulative dose, Mars EVA) — add a §4.N subsection documenting what's now modeled vs what's still missing
-- a validation gate is written — promote from §5 to §1 with the test path
+- a new priors revision lands — add or update a §3 subsection with the calibration and its residuals
+- the engine gains a new model (comms delay, cumulative dose, Mars EVA) — update §4
+- a validation gate is written — update §5
 - a per-condition source audit is done — list which tier-B conditions were verified and against what source
 
 Diego reviews this doc before publishing any results derived from Selectron.

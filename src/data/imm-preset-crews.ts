@@ -92,17 +92,17 @@ export const PRESET_CREWS: Record<string, IMMPresetCrew> = {
   },
   "mdrs-rotation": {
     key: "mdrs-rotation",
-    label: "MDRS 6-person rotation",
+    label: "6-person · 14-day campaign",
     members: MDRS_ROTATION,
   },
   "hi-seas-6mo": {
     key: "hi-seas-6mo",
-    label: "HI-SEAS 6-month",
+    label: "6-person · 6-month campaign",
     members: HI_SEAS_6MO,
   },
   "antarctic-winter": {
     key: "antarctic-winter",
-    label: "Antarctic winter-over (12-person)",
+    label: "12-person · 365-day campaign",
     members: ANTARCTIC_WINTER,
   },
 };

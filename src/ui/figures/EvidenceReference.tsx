@@ -16,7 +16,7 @@
 
 import ReactEChartsCore from "echarts-for-react/lib/core";
 import { echarts } from "./echarts-base";
-import { NATURE_THEME_NAME } from "./theme";
+import { useFigureTheme } from "./useFigureTheme";
 import type { Criterion } from "@/types";
 import { FigureCaption } from "./FigureCaption";
 import { f5Caption } from "./captions/F5.captions";
@@ -54,6 +54,7 @@ export type EvidenceReferenceProps = {
 };
 
 export function EvidenceReference({ criterion, enteredValue }: EvidenceReferenceProps) {
+  const { themeName } = useFigureTheme();
   const { min, max } = criterion.scale;
   const points = buildGaussianPoints(min, max);
 
@@ -126,7 +127,7 @@ export function EvidenceReference({ criterion, enteredValue }: EvidenceReference
       <ReactEChartsCore
         echarts={echarts}
         option={option}
-        theme={NATURE_THEME_NAME}
+        theme={themeName}
         style={{ height: 60, width: 180 }}
         notMerge
       />

@@ -1,7 +1,0 @@
-**Background.** Selection panels for analog-astronaut missions collapse genuine uncertainty into ordinal rankings, and mission-risk verdicts are typically not aligned with the NASA Human System Risk Board (HSRB; JSC-66705 Rev A). No published Bayesian MCDA pipeline exists for astronaut, aircrew, or analog-astronaut selection, and no formal bridge from analog Monte Carlo to the HSRB grid exists.
-
-**Methods.** Selectron is a reproducible TypeScript pipeline. Stage A samples a Bayesian posterior over each candidate's total score from a Dirichlet weight prior elicited against a Phase-0 literature synthesis (12 evidence-grounded criteria across three tiers). Stage B runs an IMM-style four-step forward Monte Carlo at the NASA-canonical T = 100 000 trials per Myers (2018) and Antonsen (2022), over 12 modeled medical and behavioral conditions. The Crew Health Index posterior is mapped to the NASA HSRB 5×5 Likelihood × Consequence matrix verbatim from JSC-66705 Rev A Figure 4 and §3.2.4.
-
-**Results.** A canonical worked example (one synthetic candidate × eight analog missions × three tiers) produces credible-interval-bounded posteriors and an HSRB green/yellow/red verdict per mission. Convergence (σ < 5 %) is reached well before T = 100 000.
-
-**Conclusions.** Calibrated candidate uncertainty plus NASA-institutional-aligned mission-risk verdict in one MIT-licensed artifact is novel for analog-astronaut selection.

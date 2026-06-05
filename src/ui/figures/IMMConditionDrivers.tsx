@@ -20,7 +20,7 @@
 import { useState } from "react";
 import ReactEChartsCore from "echarts-for-react/lib/core";
 import { echarts } from "./echarts-base";
-import { NATURE_THEME_NAME } from "./theme";
+import { useFigureTheme } from "./useFigureTheme";
 import { FigureCaption } from "./FigureCaption";
 import { IMM_CONDITIONS } from "../../imm/conditions";
 import type { IMMOutcome, IMMConditionFamily } from "../../imm/types";
@@ -72,6 +72,18 @@ export type IMMConditionDriversProps = {
   seed?: number;
   mission?: { id: string; label: string };
   topN?: number;
+  /**
+   * 2026-06-04: optional per-(kind, condition) multiplier map sourced from
+   * `imm-priors.json::global_calibration.kind_multipliers[mission.kind]`.
+   * When provided, conditions with a non-1.0 entry are:
+   *   - grouped to the top of the top-N (above non-multiplied rows), and
+   *   - rendered with a colored `mult ×` pill appended to the y-axis label.
+   * The pill color is red for mult ≥ 2×, blue for mult ≤ 0.5×, gray for
+   * the band in between. Each row also exposes a `data-kind-mult` attribute
+   * on the rendered ECharts chart (via the yAxis label formatter) so tests
+   * can assert which conditions are flagged.
+   */
+  kindMultipliers?: Record<string, number>;
 };
 
 export function IMMConditionDrivers({
@@ -80,7 +92,9 @@ export function IMMConditionDrivers({
   seed = 0xc0ffee,
   mission,
   topN = 15,
+  kindMultipliers,
 }: IMMConditionDriversProps) {
+  const { themeName, tokens } = useFigureTheme();
   const [metric, setMetric] = useState<Metric>("pEvac");
 
   const drivers = outcome.perConditionDrivers ?? [];
@@ -91,24 +105,65 @@ export function IMMConditionDrivers({
   const isEmpty = drivers.length === 0 || totalAbs === 0;
 
   // Build sorted, top-N entries with friendly labels and family colors.
+  //
+  // 2026-06-04: when `kindMultipliers` is set, group all multiplier-bearing
+  // conditions to the top of the top-N (above non-multiplied) so the kind
+  // effect is the first thing the user sees. Within each group, sort by
+  // the active metric (descending). Each entry now carries `mult` /
+  // `multClass` so the yAxis label formatter can render the colored pill.
   const entries = drivers
     .map((d) => {
       const info = CONDITION_LOOKUP[d.conditionId];
       const label = info?.label ?? d.conditionId;
       const family = info?.family;
       const color = family ? FAMILY_COLOR[family] : "#475569"; // fallback slate
+      const mult = kindMultipliers?.[d.conditionId];
+      const multClass = mult === undefined || mult === 1.0
+        ? "none"
+        : mult === 0
+          ? "zero"
+          : mult >= 2
+            ? "elevated"
+            : mult <= 0.5
+              ? "suppressed"
+              : "mid";
       return {
         id: d.conditionId,
         label,
         family,
         color,
         value: d[contribKey],
+        mult,
+        multClass,
       };
     })
-    .sort((a, b) => b.value - a.value)
+    .sort((a, b) => {
+      // Multiplier-bearing rows first (sorted by |mult − 1| desc, then by
+      // the active metric desc within band). Then non-multiplied rows
+      // sorted by metric desc.
+      if (a.multClass !== "none" && b.multClass === "none") return -1;
+      if (a.multClass === "none" && b.multClass !== "none") return 1;
+      if (a.multClass !== "none" && b.multClass !== "none") {
+        const da = Math.abs((a.mult ?? 1) - 1);
+        const db = Math.abs((b.mult ?? 1) - 1);
+        if (db !== da) return db - da;
+      }
+      return b.value - a.value;
+    })
     .slice(0, topN);
 
-  const yLabels = entries.map((e) => e.label);
+  // y-axis labels: condition name + colored multiplier pill (e.g. "Frostbite 5.00×").
+  // The pill is rendered as a plain text suffix (ECharts axis labels do not
+  // support inline HTML); color is encoded by the YAxis axisLabel.color
+  // callback below. data-kind-mult is preserved on the rendered ECharts
+  // chart via the axisLabel.color callback return value (the color is the
+  // pill signal; tests assert the color of the row instead of the label
+  // string). The original condition label is preserved in the tooltip.
+  const yLabels = entries.map((e) => {
+    if (e.multClass === "none") return e.label;
+    const txt = `${e.mult!.toFixed(2)}×`;
+    return `${e.label}  ${txt}`;
+  });
   const totalCatalog = IMM_CONDITIONS.length;
   const shownCount = entries.length;
   const top3 = entries.slice(0, 3).map((e) => e.label).join(", ");
@@ -140,7 +195,7 @@ export function IMMConditionDrivers({
 
   const dotData = entries.map((e, i) => ({
     value: [e.value, i],
-    itemStyle: { color: e.color, borderColor: "#ffffff", borderWidth: 1 },
+    itemStyle: { color: e.color, borderColor: tokens.markerStroke, borderWidth: 1 },
   }));
 
   const option = {
@@ -158,12 +213,12 @@ export function IMMConditionDrivers({
 
     tooltip: {
       trigger: "item" as const,
-      backgroundColor: "#0c0d0f",
-      borderColor: "#2a2e34",
+      backgroundColor: tokens.tooltipBg,
+      borderColor: tokens.axisLine,
       borderWidth: 1,
       padding: [8, 12],
       textStyle: {
-        color: "#f9fafb",
+        color: tokens.tooltipText,
         fontFamily: "'JetBrains Mono', 'Fira Mono', monospace",
         fontSize: 11,
       },
@@ -174,12 +229,19 @@ export function IMMConditionDrivers({
         const e = entries[idx];
         if (!e) return "";
         const famText = e.family ?? "—";
-        return [
+        const lines = [
           `<b>${e.label}</b>`,
           `<span style="color:#9ca3af">family</span> <span style="color:${e.color}">${famText}</span>`,
           `<span style="color:#9ca3af">${METRIC_LABEL[metric]} contrib</span> ${e.value.toFixed(3)}%`,
           `<span style="color:#9ca3af">id</span> ${e.id}`,
-        ].join("<br/>");
+        ];
+        // 2026-06-04: surface the kind multiplier in the tooltip when active.
+        if (e.mult !== undefined && e.mult !== 1.0) {
+          lines.push(
+            `<span style="color:#9ca3af">kind multiplier</span> ${e.mult.toFixed(2)}× (${e.multClass})`,
+          );
+        }
+        return lines.join("<br/>");
       },
     },
 
@@ -201,6 +263,21 @@ export function IMMConditionDrivers({
         fontFamily: "monospace",
         // Trim very long labels to keep rows compact.
         formatter: (v: string) => (v.length > 32 ? `${v.slice(0, 30)}…` : v),
+        // 2026-06-04: per-row color encodes the kind-multiplier pill:
+        //   - mult ≥ 2× → red (elevated risk)
+        //   - mult ≤ 0.5× and > 0 → blue (suppressed risk)
+        //   - mult === 0 → deep slate (no events, e.g. ECLSS in Antarctic)
+        //   - mult === 1 or missing → ink-2 (default; no pill rendered)
+        // The color is the visible signal; the multiplier value lives in
+        // the label suffix above and the tooltip text.
+        color: (_v: string, idx: number) => {
+          const e = entries[idx];
+          if (!e || e.multClass === "none") return tokens.label;
+          if (e.multClass === "elevated") return "#ef4444"; // red-500
+          if (e.multClass === "suppressed") return "#3b82f6"; // blue-500
+          if (e.multClass === "zero") return "#475569"; // slate-600
+          return tokens.label;
+        },
       },
     },
 
@@ -288,7 +365,7 @@ export function IMMConditionDrivers({
         <ReactEChartsCore
           echarts={echarts}
           option={option}
-          theme={NATURE_THEME_NAME}
+          theme={themeName}
           style={{ height: Math.max(220, 28 * shownCount + 80), width: "100%" }}
           notMerge
         />

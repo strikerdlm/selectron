@@ -21,7 +21,7 @@ describe("IMM_MISSIONS", () => {
   });
 
   it("includes the 8 existing analog missions for IMM-runnable parity", () => {
-    const expectedIds = ["mdrs-2wk","short-7d","emmpol-6","hi-seas-45d","short-22d","hi-seas-90d","antarctic-winter","mars500"];
+    const expectedIds = ["analog-7d","analog-10d","analog-14d","analog-22d","analog-45d","analog-90d","antarctic-winter","analog-520d"];
     for (const id of expectedIds) {
       expect(IMM_MISSIONS.find(m => m.id === id)).toBeDefined();
     }

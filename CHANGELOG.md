@@ -5,6 +5,141 @@ All notable changes to Selectron are documented here. Format roughly follows
 references to the commits and STATUS.md audit-log entries that produced each
 entry.
 
+## [0.5.7] — 2026-05-30 — Light/dark theme, +2pt type scale, correlation Analysis tab
+
+Frontend feature pass (subagent-driven, two-stage reviewed per task). No engine
+math changed — `src/imm/`, `src/risk/`, and the priors are untouched (one `export`
+keyword added to `FAMILY_BETA`/`FAMILY_BETA_DEFAULT` in `src/imm/simulate.ts`,
+behavior-neutral). The committed manuscript figures and `paper/submission/manuscript.docx`
+are byte-identical. Spec/plan: `docs/superpowers/{specs,plans}/2026-05-30-selectron-light-theme-correlations*`.
+
+### Added
+- **Light/dark theme** with a persisted header toggle (dark default). The palette is
+  RGB-channel CSS variables (`--bg-0: 8 9 10` → `rgb(var(--bg-0) / <alpha-value>)`), so
+  every Tailwind utility — including the 77 opacity-modifier call-sites — re-colors on
+  toggle with no component edits. A no-FOUC inline script applies the stored theme
+  pre-mount. The light palette is contrast-checked to WCAG AA (≥4.5:1 on white; amber
+  `#f5b541`→`#a56800`, plus darkened go/warn for light backgrounds).
+- **In-app working-view figures now follow the theme toggle.** A `FigureThemeContext`
+  (defaults to *light* so the provider-less `?testFigure=` manuscript/snapshot path is
+  unchanged) lets the 8 live-only IMM/analysis figures (Calibration V&V, Crew results)
+  plus the 4 phase3f-gated MCDA/Sim figures (`PosteriorPlot`, `RiskHistogram`,
+  `EvidenceReference`, `ScoreBreakdownRadar`) render dark-on-dark crisply. The gated four
+  keep **byte-identical light rendering** — verified by the `phase3f` `toHaveScreenshot`
+  gate (5/5), so the manuscript figures they generate are unaffected. The remaining coupled
+  figures are also themed: `DashboardSummary` is phase3f-gated (F4, byte-identical light,
+  verified); `MissionComparison` routes its one chrome literal through a token; `LxCMatrix`
+  was already theme-correct (it is an HTML L×C matrix using CSS-variable-backed Tailwind
+  classes, with only its semantic risk-cell colors hardcoded). **Every in-app figure now
+  follows the theme toggle**, and the `?testFigure=` manuscript/snapshot path stays light by
+  construction.
+- **Analysis tab** — a journal-grade gallery of five multivariate / correlation figures:
+  **A1** parallel coordinates (candidates × criteria, score-colored), **A2** a
+  multi-dimensional IMM risk bubble scatter (incidence λ × worst-case severity ×
+  body-system × expected mission contribution), **A3** a criteria scatterplot matrix
+  (SPLOM), **A4** a criterion-correlation heatmap (all 12 criteria), and **A5** a
+  criterion × condition-family vulnerability-coupling heatmap (the Stage-A→λ β-modulation
+  architecture). Sources a seeded synthetic demo cohort (N=40, seed `0xc0ffee`, injected
+  covariance) when the live pool has < 8 well-scored candidates, else the live pool. New
+  `selectron-dark` ECharts theme + `useFigureTheme` tokens; existing figures and the
+  manuscript figure set are untouched.
+- **`src/analysis/`** pure math layer (TDD, 22 tests): `correlation.ts`
+  (Pearson/Spearman/matrix), `imm-bubbles.ts` (rate/severity/contribution + body-system
+  grouping; honors `lambda_unit` so per-EVA/SPE conditions are excluded from the per-PY
+  axis — 96 of 100 conditions plottable), `coupling.ts` (criterion×family Σ|β| matrix),
+  `demo-cohort.ts`.
+
+### Changed
+- **Overall type scale +2pt** on the live-app chrome (Tailwind `fontSize` scale +2px;
+  hard-coded `text-[Npx]` literals bumped +2px). The figure components in
+  `src/ui/figures/` are deliberately excluded so the manuscript figures (F3/F4/F6/F7,
+  generated from those components) stay reproducible at their original scale.
+
+### Notes
+- The +2pt scale applies to live-app chrome only. The three paper-figure components
+  (`CalculationTrace`, `PaperF6IMM`, `PaperF7IMM`) have **both** their `text-[Npx]`
+  literals (`6cf24cb`) and their named text classes (`52c0747`) pinned to original sizes,
+  so regenerating the manuscript figures (F4/F6/F7) via `tests/e2e/paper-figures.spec.ts`
+  reproduces them at their original scale; the committed `paper/figures/*.png` and
+  `manuscript.docx` are byte-identical. (Optional author choice: if the figures themselves
+  should adopt +2pt, unpin those literals and regenerate intentionally.)
+
+## [0.5.6] — 2026-05-29 — UI / UX hardening + interaction bug-fixes
+
+Frontend-only pass driven by Diego's live feedback. No engine math changed
+(the `src/imm/` IMM Calculator and `src/risk/` Monte Carlo are untouched except
+the synthetic-scaffold priors below); the manuscript pipeline is unaffected.
+
+### Fixed
+- **Mission comparison "thor" → CHI 100 % bug.** `short-22d` uses mission type
+  `"thor"`, which the hardcoded `SYNTHETIC_PRIORS` type list omitted, so that
+  mission found no prior for any condition → zero events → a spurious "perfect,
+  GO" verdict. Mission types are now derived from the catalog (cannot drift).
+- **Mission comparison ranked by cumulative risk** (total expected lost
+  crew-days) instead of the per-time CHI fraction, so longer / more EVA-intensive
+  missions correctly rank as higher risk — the previous "7-day worse than
+  365-day" inversion is gone. Per-condition λ is now shared across mission types
+  (the per-type scaffold values were noise, not evidence).
+- **"Sharpness" relabelled "estimate precision"** (ScoreCard + RiskCard) with a
+  tooltip — it measures posterior CI₉₀ certainty, not candidate/mission quality.
+
+### Changed
+- **Crew Composition** rebuilt around manual configuration: the preset-crew
+  dropdown (which loaded score-less, gate-failing "red" crews) is removed; crew
+  size is a 1–6 stepper with add / remove and editable per-member fields (sex,
+  risk flags, EVA eligibility + count); mission duration is editable; a prominent
+  live **Mission-severity** dashboard (CHI, Δ-vs-ISS, mission-success, pEVAC,
+  HSRB L×C) sits at the top.
+- **"How we scored" calculation trace** is collapsible (collapsed by default in
+  the wizard / Sim views; paper figure F4 stays fully expanded).
+- **Health-support breakdown** reorganised into a care-capability dashboard,
+  collapsed by default.
+
+### Added
+- **Calibration run persistence.** A root-level `CalibrationJobsProvider` keeps
+  fit / validation / sensitivity jobs polling and their results intact across
+  Calibration-tab switches and full page refreshes (localStorage); a nav dot
+  shows background activity.
+- **Config-only session saving + autosave.** IMM sessions can be saved before a
+  run completes (`IMMSession.outcomes` is now nullable), and the working crew /
+  mission / kit / settings auto-persist to localStorage and restore on refresh.
+
+## [0.5.5] — 2026-05-29 — Iter-6 calibration, ASR retarget, manuscript hardening
+
+### Changed
+- **Submission target → Advances in Space Research** (Elsevier/COSPAR, subscription
+  track, no APC). npj Microgravity dropped (fully OA, APC $3,790 unaffordable).
+  Manuscript retitled to lead with the reproducible NASA-IMM mission-risk + HSRB-LxC
+  contribution rather than the personnel-selection frame.
+- **Prior provenance → 100 % evidence-based:** 34 `tierA-nasa` + 66 `tierB-pymc`
+  + 0 `tierC-synth` (final, after community/military pass 4 moved ankle-sprain /
+  dental-abscess / UTI from tier-A to PyMC-fitted tier-B). All 66 tier-B fitted via
+  PyMC NUTS (R-hat = 1.000, ESS > 2500); elbow/hip/wrist proxy-anchored.
+- **K15 reproduction** (post-pass-4, T = 100 000, seed `0xc0ffee`): all 3 TME +
+  unlimited CHI (95.3, Δ +0.3) within K15 CI₉₅; issHMS CHI 82.8 (Δ −12.1) marginally
+  below CI₉₅ after the evidence-based incidence recalibration; 8 documented-divergent.
+
+### Added
+- Iter-6 Python offline calibration pipeline (PyMC NUTS fitter, K15 validator,
+  Sobol/Morris SA) + FastAPI Calibration API + Calibration browser view.
+- rev3-f severity tuning — 32/32 persistent-impairment conditions from 126 evidence rows.
+
+### Manuscript hardening (2026-05-29)
+- Internal-consistency fixes: removed the §2.3 "restored reproduction within CI₉₅ on
+  issHMS CHI" overclaim; corrected the §1 "synthetic placeholder" tier description to
+  fully-evidence-based; "eight-mission" → seven (matches the F7 generator); reconciled
+  §4.4 (8 divergent) vs §4.5 (7 outcome-parameter-driven); corrected the dental-caries
+  tier label (`tierB-pymc`, not "promoted to tier-A").
+- Honest-cap framing: same-kit-K15-is-yellow disclosure (§3.4); metric-specific
+  non-circularity (tier-A reproduces CHI, not TME); Fig 7 T = 25 000 rare-event
+  convergence caveat; PyMC-convergence ≠ evidential-pedigree note (§4.4).
+- Narrowed the "aircrew" novelty claim and cited Taylan et al. (2024) pilot-MCDM
+  precedent; resolved the 2 orphan bibliography entries (now cited).
+- Replaced raw `__COMMIT_SHA__` / `__ZENODO_DOI__` template tokens with clean editorial
+  placeholders filled at the submission commit.
+- Reconciled living docs to the manuscript (README, CITATION.cff, supplementary
+  frontmatter, this changelog, superseded npj submission checklist).
+
 ## [0.5.0] — 2026-05-22 — Iter-5 IMM Calculator
 
 This is the **Iter-5 release** of Selectron. It ships the NASA-IMM-aligned

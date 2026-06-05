@@ -41,33 +41,37 @@ export const IMM_MISSIONS: IMMMission[] = [
     evaSchedule: Array.from({length: 401}, (_, i) => 200 + Math.floor(i * 1.5)) },
 
   // ── Earth-based analog missions (active) ──────────────────────────────────
-  { id: "mdrs-2wk", label: "MDRS 2-week rotation",
-    kind: "analog-isolation",
+  //   2026-06-04: split `analog-isolation` into `analog-controlled` (heated
+  //   habitat: MDRS/HI-SEAS/EMMPOL/THOR) and `antarctic-station` (occupationally
+  //   exposed: extreme cold, high altitude, chronic hypoxia). ID strings are
+  //   preserved so persisted Dexie IMMSession rows still load.
+  { id: "analog-7d", label: "7-day campaign",
+    kind: "analog-controlled",
+    durationDays: 7, crewSize: 6, totalEVAs: 3, evaSchedule: [2, 4, 6] },
+  { id: "analog-10d", label: "10-day campaign",
+    kind: "analog-controlled",
+    durationDays: 10, crewSize: 6, totalEVAs: 4, evaSchedule: [2, 4, 6, 8] },
+  { id: "analog-14d", label: "14-day campaign",
+    kind: "analog-controlled",
     durationDays: 14, crewSize: 6, totalEVAs: 6,
     evaSchedule: [3, 5, 7, 9, 11, 13] },
-  { id: "short-7d", label: "Short MDRS (7 days)",
-    kind: "analog-isolation",
-    durationDays: 7, crewSize: 6, totalEVAs: 3, evaSchedule: [2, 4, 6] },
-  { id: "emmpol-6", label: "EMMPOL-6 (10 days)",
-    kind: "analog-isolation",
-    durationDays: 10, crewSize: 6, totalEVAs: 4, evaSchedule: [2, 4, 6, 8] },
-  { id: "hi-seas-45d", label: "HI-SEAS 45-day",
-    kind: "analog-isolation",
+  { id: "analog-22d", label: "22-day campaign",
+    kind: "analog-controlled",
+    durationDays: 22, crewSize: 6, totalEVAs: 5, evaSchedule: [4, 8, 12, 16, 20] },
+  { id: "analog-45d", label: "45-day campaign",
+    kind: "analog-controlled",
     durationDays: 45, crewSize: 6, totalEVAs: 8,
     evaSchedule: [5, 12, 18, 24, 30, 36, 40, 43] },
-  { id: "short-22d", label: "THOR 22-day",
-    kind: "analog-isolation",
-    durationDays: 22, crewSize: 6, totalEVAs: 5, evaSchedule: [4, 8, 12, 16, 20] },
-  { id: "hi-seas-90d", label: "HI-SEAS 90-day",
-    kind: "analog-isolation",
+  { id: "analog-90d", label: "90-day campaign",
+    kind: "analog-controlled",
     durationDays: 90, crewSize: 6, totalEVAs: 14,
     evaSchedule: Array.from({length: 14}, (_, i) => 6 + i * 6) },
-  { id: "antarctic-winter", label: "Antarctic winter-over (365 d)",
-    kind: "analog-isolation",
+  { id: "antarctic-winter", label: "365-day campaign",
+    kind: "antarctic-station",
     durationDays: 365, crewSize: 12, totalEVAs: 24,
     evaSchedule: Array.from({length: 24}, (_, i) => Math.round((i + 1) * 365 / 25)) },
-  { id: "mars500", label: "Mars-500 (520 d)",
-    kind: "analog-isolation",
+  { id: "analog-520d", label: "520-day campaign",
+    kind: "analog-controlled",
     durationDays: 520, crewSize: 6, totalEVAs: 30,
     evaSchedule: Array.from({length: 30}, (_, i) => Math.round((i + 1) * 520 / 31)) },
 ];
@@ -77,9 +81,14 @@ export const IMM_MISSIONS: IMMMission[] = [
  * UI picker, in default IMMSession initialisation, and in any new validation
  * tests. Engine code that needs the full catalog (e.g. K15 reference lookup)
  * can still import `IMM_MISSIONS` directly.
+ *
+ * 2026-06-04: filter expanded to include the two new `analog-controlled` and
+ * `antarctic-station` kinds. Legacy `analog-isolation` rows (none remain in the
+ * active catalog) still pass through for any persisted Dexie session that
+ * references a kind literal removed by the retag.
  */
 export const ACTIVE_MISSIONS: IMMMission[] = IMM_MISSIONS.filter(
-  m => m.kind === "analog-isolation" || m.kind === "leo-iss",
+  m => m.kind === "analog-isolation" || m.kind === "analog-controlled" || m.kind === "antarctic-station" || m.kind === "leo-iss",
 );
 
 /**

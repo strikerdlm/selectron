@@ -23,7 +23,7 @@ export function StepStrip() {
                 setStep(s);
               }}
               className={
-                "mono uppercase tracking-cap text-[11px] py-3 px-4 -mb-px border-b-2 transition-colors " +
+                "mono uppercase tracking-cap text-[13px] py-3 px-4 -mb-px border-b-2 transition-colors " +
                 (active
                   ? "text-ink-0 border-signal"
                   : clickable

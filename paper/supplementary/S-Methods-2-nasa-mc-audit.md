@@ -1,8 +1,16 @@
 ---
 title: "Supplementary Methods 2 — NASA Monte-Carlo Trial-Count Audit"
-parent: "Selectron manuscript (npj Microgravity submission, July 2026)"
+parent: "Selectron manuscript (Advances in Space Research submission, 2026)"
 generated_from: "docs/iter3_nasa_monte_carlo_audit.md"
 ---
+
+> **⚠ NOT FOR SUBMISSION (peer-review R4, 2026-05-29).**
+> The 100 000-forward-trial / 75 000-MCMC trial-count audit below remains
+> numerically valid, but this file references the retired `src/risk/` engine
+> and method names (e.g. `simulateMission`). The current canonical statement
+> of the trial count and the σ < 5 % convergence rule is in the manuscript
+> (§2.3, §2.6). This file is **excluded from the submission package** and
+> retained as development history.
 
 # NASA IMM Monte-Carlo methods audit — Selectron alignment
 

@@ -18,15 +18,16 @@ test("screenshot CrewComposition initial state", async ({ page }) => {
   console.log(`Screenshot → ${out}`);
 });
 
-test("screenshot CrewComposition after K15 preset crew loaded", async ({ page }) => {
+test("screenshot CrewComposition with an expanded crew card (editable fields)", async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 1800 });
   await page.goto("/");
   await page.getByRole("button", { name: /^Crew$/i }).click();
   await page.waitForSelector('h2:has-text("Crew Composition")', { timeout: 5_000 });
-  await page.getByLabel(/Load preset crew configuration/i).selectOption("k15-reference");
+  // Expand the first crew card to show the editable member fields (presets eliminated).
+  await page.getByRole("button", { name: /Alpha —/i }).first().click();
   await page.waitForTimeout(800);
   const date = new Date().toISOString().slice(0, 10);
-  const out = path.resolve(`exports/${date}_crew_composition_k15_preset.png`);
+  const out = path.resolve(`exports/${date}_crew_composition_expanded_card.png`);
   await page.screenshot({ path: out, fullPage: true });
   // eslint-disable-next-line no-console
   console.log(`Screenshot → ${out}`);

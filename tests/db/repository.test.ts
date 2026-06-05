@@ -366,8 +366,8 @@ describe("IMMSession CRUD", () => {
     expect(back!.candidateId).toBe("cand-1");
     expect(back!.mission.id).toBe("mars-transit");
     expect(back!.crew).toHaveLength(2);
-    expect(back!.outcomes.chi.mean).toBeCloseTo(0.92, 5);
-    expect(back!.outcomes.perConditionDrivers[0].conditionId).toBe("renal.stone");
+    expect(back!.outcomes!.chi.mean).toBeCloseTo(0.92, 5);
+    expect(back!.outcomes!.perConditionDrivers[0].conditionId).toBe("renal.stone");
     expect(new Date(back!.createdAt).getTime()).toBeLessThanOrEqual(Date.now());
   });
 
@@ -438,7 +438,7 @@ describe("IMMSession CRUD", () => {
     expect(after!.createdAt).toBe(before!.createdAt);
     expect(after!.trials).toBe(50000);
     expect(after!.seed).toBe(0xdeadbeef);
-    expect(after!.outcomes.chi.mean).toBeCloseTo(0.92, 5); // untouched
+    expect(after!.outcomes!.chi.mean).toBeCloseTo(0.92, 5); // untouched
   });
 
   test("updateIMMSession throws on missing id", async () => {

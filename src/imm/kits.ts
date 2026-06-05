@@ -55,12 +55,46 @@ function buildUnlimitedKitResources(): Record<string, number> {
   return result;
 }
 
-export const IMM_KITS: Record<"none"|"issHMS"|"unlimited", IMMKitScenario> = {
-  none: { scenarioId: "none", label: "No Medical Resources", resources: {} },
-  issHMS: { scenarioId: "issHMS", label: "ISS Health Maintenance System", resources: issHmsResources },
+/**
+ * Medium tier - analog/Antarctic-station capability (NASA LoC II-III).
+ * Subset of issHMS: self-administrable + guided meds + basic procedures a single
+ * station physician carries; no sustained ALS hardware. Cited:
+ * research/2026-05-28_health_support_sourcing.md (analog-lugg1999, analog-carmm,
+ * analog-concordia, loc-conops-mars). Quantities scaled to a small crew.
+ */
+const mediumResources: Record<string, number> = {
+  "antibiotic-broad-spectrum": 20, "antibiotic-narrow-spectrum": 10,
+  "antiviral": 5, "antifungal": 5, "analgesic-mild": 40, "analgesic-strong": 8,
+  "antiemetic": 10, "antihistamine": 20, "decongestant": 10, "antacid": 20,
+  "antidiarrheal": 10, "laxative": 10, "oral-rehydration": 10, "scopolamine": 10,
+  "topical-steroid": 10, "topical-antibiotic": 10, "eye-drops": 10, "ear-drops": 10,
+  "sleep-aid": 10, "anti-anxiety": 8, "antidepressant": 20, "anticonvulsant": 20,
+  "antihypertensive": 20, "hormonal-contraceptive": 20,
+  "burn-dressing": 6, "bandage-large": 15, "bandage-small": 40,
+  "dental-temporary-filling": 4, "dental-filling-material": 2,
+  "iv-fluid": 4, "suture-kit": 3, "splint": 4, "cervical-collar": 1,
+  "catheter-urinary": 2, "oxygen-supplemental": 1,
+  "aed": 1, "epinephrine": 2,
+};
+
+export const IMM_KITS: Record<"none"|"medium"|"issHMS"|"unlimited", IMMKitScenario> = {
+  none: {
+    scenarioId: "none", label: "No Medical Resources", resources: {},
+    capabilities: { telemedicine: "audio", provider: "none" },
+  },
+  medium: {
+    scenarioId: "medium", label: "Analog / Antarctic Station (Level II–III)",
+    resources: mediumResources,
+    capabilities: { telemedicine: "video", provider: "physician" },
+  },
+  issHMS: {
+    scenarioId: "issHMS", label: "ISS Health Maintenance System", resources: issHmsResources,
+    capabilities: { telemedicine: "video", provider: "cmo" },
+  },
   unlimited: {
     scenarioId: "unlimited", label: "Unlimited Medical Resources",
     resources: buildUnlimitedKitResources(),
+    capabilities: { telemedicine: "video", provider: "physician" },
   },
 };
 

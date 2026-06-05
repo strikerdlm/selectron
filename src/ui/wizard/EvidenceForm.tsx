@@ -94,16 +94,16 @@ export function EvidenceForm({
   return (
     <div className="space-y-4 border-l border-line pl-4">
       <div>
-        <div className="mono text-[10px] text-ink-3 mb-2">
+        <div className="mono text-[12px] text-ink-3 mb-2">
           instrument · <span className="text-ink-1">{instrumentLabel}</span>
         </div>
         {transform?.note && (
-          <p className="mono text-[10px] text-amber-300 leading-relaxed mb-2">
+          <p className="mono text-[12px] text-amber-300 leading-relaxed mb-2">
             ⚠ scale transform · {transform.note}
           </p>
         )}
         {tierNotes && (
-          <p className="mono text-[10px] text-ink-2 leading-relaxed mb-2">{tierNotes}</p>
+          <p className="mono text-[12px] text-ink-2 leading-relaxed mb-2">{tierNotes}</p>
         )}
       </div>
       <div>
@@ -113,7 +113,7 @@ export function EvidenceForm({
               from criterion labels; instead, surface the direction inline as a
               plain-English caption right next to the slider. */}
           {criterion.higherIsBetter === false && (
-            <span className="ml-2 mono text-[10px] uppercase tracking-cap text-amber-300">
+            <span className="ml-2 mono text-[12px] uppercase tracking-cap text-amber-300">
               ↓ lower is better
             </span>
           )}
@@ -138,7 +138,7 @@ export function EvidenceForm({
             {currentValue.toFixed(1)}
           </span>
         </div>
-        <p className="mono mt-1 text-[10px] text-ink-3">
+        <p className="mono mt-1 text-[12px] text-ink-3">
           scale: {nativeMin}–{nativeMax}
           {units ? ` ${units}` : ""}
           {multiplier !== 1 && (
@@ -173,7 +173,7 @@ export function EvidenceForm({
         <label className="label">citation</label>
         <div className="flex items-center gap-4 mt-1 mb-2">
           {(["doi", "url", "free"] as const).map((m) => (
-            <label key={m} className="mono text-[11px] text-ink-1 flex items-center gap-2">
+            <label key={m} className="mono text-[13px] text-ink-1 flex items-center gap-2">
               <input
                 type="radio"
                 name={`cite-${criterion.id}`}
@@ -229,7 +229,7 @@ export function EvidenceForm({
 
       {entry && <AttachmentList entry={entry} />}
       {!entry && (
-        <p className="mono text-[10px] text-ink-3">
+        <p className="mono text-[12px] text-ink-3">
           save raw value to enable attachments
         </p>
       )}

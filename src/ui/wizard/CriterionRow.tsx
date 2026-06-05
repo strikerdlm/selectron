@@ -37,12 +37,12 @@ export function CriterionRow({
       >
         <span className="flex items-baseline gap-3">
           <span className={`inline-block h-[8px] w-[8px] rounded-full ${dotColor[status]}`} />
-          <span className="mono text-[11px] text-ink-3">
+          <span className="mono text-[13px] text-ink-3">
             {String(index + 1).padStart(2, "0")}
           </span>
           <span className="text-ink-0">{criterion.label}</span>
         </span>
-        <span className="mono text-[11px] tabular-nums text-ink-2">
+        <span className="mono text-[13px] tabular-nums text-ink-2">
           {entry?.rawValue !== undefined && entry?.rawValue !== null
             ? `${entry.rawValue.toFixed(1)} / ${criterion.scale.max}`
             : "—"}

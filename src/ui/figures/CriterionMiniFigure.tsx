@@ -20,7 +20,7 @@
 import { useMemo } from "react";
 import ReactEChartsCore from "echarts-for-react/lib/core";
 import { echarts } from "./echarts-base";
-import { NATURE_THEME_NAME } from "./theme";
+import { useFigureTheme } from "./useFigureTheme";
 import type { Criterion } from "../../types";
 
 const N_POINTS = 80;
@@ -53,6 +53,7 @@ interface CriterionMiniFigureProps {
 }
 
 export function CriterionMiniFigure({ criterion, rawScore }: CriterionMiniFigureProps) {
+  const { themeName, tokens } = useFigureTheme();
   const { min, max } = criterion.scale;
   const clampedScore = Math.max(min, Math.min(max, rawScore));
 
@@ -92,9 +93,9 @@ export function CriterionMiniFigure({ criterion, rawScore }: CriterionMiniFigure
       tooltip: {
         trigger: "axis",
         axisPointer: { type: "none" },
-        backgroundColor: "rgba(0,0,0,0.7)",
+        backgroundColor: tokens.tooltipBg,
         borderColor: "transparent",
-        textStyle: { color: "#f0f0e8", fontSize: 10, fontFamily: "'JetBrains Mono', monospace" },
+        textStyle: { color: tokens.tooltipText, fontSize: 10, fontFamily: "'JetBrains Mono', monospace" },
         formatter: (params: { axisValue: number }[]) => {
           const x = params[0]?.axisValue;
           if (x === undefined) return "";
@@ -139,15 +140,15 @@ export function CriterionMiniFigure({ criterion, rawScore }: CriterionMiniFigure
         },
       ],
     };
-  // Only rebuild when criterion identity or score changes
+  // Rebuild when criterion identity, score, or theme changes
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [criterion.id, criterion.scale.min, criterion.scale.max, criterion.gateThreshold?.value, clampedScore]);
+  }, [criterion.id, criterion.scale.min, criterion.scale.max, criterion.gateThreshold?.value, clampedScore, themeName, tokens]);
 
   return (
     <ReactEChartsCore
       echarts={echarts}
       option={option}
-      theme={NATURE_THEME_NAME}
+      theme={themeName}
       style={{ height: 80, width: "100%" }}
       notMerge
     />

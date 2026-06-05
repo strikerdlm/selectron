@@ -16,7 +16,7 @@ export function ScenarioSelector({ value, onChange, disabled = false }: Props) {
     <div className="panel p-4 border-signal/40 mb-4" role="radiogroup" aria-label="Scenario tier">
       <div className="flex items-baseline justify-between gap-3 mb-3">
         <h3 className="display text-base text-ink-0">Scenario</h3>
-        <span className="mono text-[10px] uppercase tracking-cap text-ink-2">
+        <span className="mono text-[12px] uppercase tracking-cap text-ink-2">
           accessibility tier
         </span>
       </div>
@@ -34,7 +34,7 @@ export function ScenarioSelector({ value, onChange, disabled = false }: Props) {
               disabled={disabled}
               onClick={() => !disabled && onChange(tier)}
               className={
-                "mono uppercase tracking-cap text-[11px] px-3 py-2 border rounded-md transition-colors text-left " +
+                "mono uppercase tracking-cap text-[13px] px-3 py-2 border rounded-md transition-colors text-left " +
                 (active
                   ? "border-signal text-signal bg-signal/10"
                   : disabled
@@ -63,7 +63,7 @@ export function ScenarioSelector({ value, onChange, disabled = false }: Props) {
             <div
               key={t}
               className={
-                "border-l-2 pl-2 mono text-[10px] " +
+                "border-l-2 pl-2 mono text-[12px] " +
                 (active ? "border-signal text-ink-1" : "border-line text-ink-3")
               }
             >
@@ -76,7 +76,7 @@ export function ScenarioSelector({ value, onChange, disabled = false }: Props) {
         })}
       </div>
 
-      <p className="mt-3 mono text-[10px] text-ink-3 leading-relaxed">
+      <p className="mt-3 mono text-[12px] text-ink-3 leading-relaxed">
         switching tier changes BOTH the criteria list AND the instrument used for each one.
         The Bayesian MCDA aggregation runs against whatever subset is active — the posterior
         is always internally honest about which tests the program actually measured.

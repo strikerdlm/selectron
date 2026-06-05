@@ -18,7 +18,7 @@
 
 import ReactEChartsCore from "echarts-for-react/lib/core";
 import { echarts } from "./echarts-base";
-import { NATURE_THEME_NAME } from "./theme";
+import { useFigureTheme } from "./useFigureTheme";
 import { FigureCaption } from "./FigureCaption";
 import { f6Caption } from "./captions/F6.captions";
 
@@ -31,6 +31,7 @@ export type RadarDatum = {
 type Props = { data: RadarDatum[] };
 
 export function ScoreBreakdownRadar({ data }: Props) {
+  const { themeName, tokens } = useFigureTheme();
   // Empty-state guard: no data or all contributions are zero.
   const allZero = data.length === 0 || data.every((d) => d.contribution === 0);
   if (allZero) {
@@ -58,11 +59,11 @@ export function ScoreBreakdownRadar({ data }: Props) {
       radius: "65%",
       splitNumber: 4,
       axisName: {
-        color: "#475569",
+        color: tokens.label,
         fontSize: 10,
       },
       splitLine: {
-        lineStyle: { color: "#e5e7eb" },
+        lineStyle: { color: tokens.splitLine },
       },
       splitArea: { show: false },
     },
@@ -89,7 +90,7 @@ export function ScoreBreakdownRadar({ data }: Props) {
       <ReactEChartsCore
         echarts={echarts}
         option={option}
-        theme={NATURE_THEME_NAME}
+        theme={themeName}
         style={{ height: 280, width: "100%" }}
         notMerge
       />

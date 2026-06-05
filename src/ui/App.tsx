@@ -1,10 +1,15 @@
 import { useEffect, useState } from "react";
 import { DbProvider } from "@/contexts/DbContext";
+import { CalibrationJobsProvider, useCalibrationJobs } from "@/contexts/CalibrationJobsContext";
+import { ThemeProvider } from "./theme/ThemeContext";
+import { ThemeToggle } from "./theme/ThemeToggle";
 import { createCandidate } from "@/db/repository";
 import { Dashboard } from "./views/Dashboard";
 import { Wizard } from "./views/Wizard";
 import { Sim } from "./views/Sim";
 import { CrewComposition } from "./views/CrewComposition";
+import { Calibration } from "./views/Calibration";
+import { Analysis } from "./views/Analysis";
 import { ToastHost } from "./components/Toast";
 import { ErrorBoundary } from "./components/ErrorBoundary";
 import { TestFigureHost } from "./testing/TestFigureHost";
@@ -15,7 +20,9 @@ type View =
   | { kind: "dashboard" }
   | { kind: "wizard"; candidateId: string; step: 0 | 1 | 2 | 3 }
   | { kind: "sim"; candidateId: string }
-  | { kind: "crew-composition" };
+  | { kind: "crew-composition" }
+  | { kind: "calibration" }
+  | { kind: "analysis" };
 
 function useUtcClock() {
   const [now, setNow] = useState(() => new Date());
@@ -28,6 +35,27 @@ function useUtcClock() {
 
 const fmtUtc = (d: Date) => d.toISOString().slice(11, 19) + "Z";
 const fmtDate = (d: Date) => d.toISOString().slice(0, 10);
+
+/**
+ * Pulsing dot on the Calibration nav button — visible whenever a fit /
+ * validation / sensitivity job is running in the background, so the user
+ * knows a run is still in flight even from another tab. Rendered inside
+ * CalibrationJobsProvider (it's in the header), so the hook resolves.
+ */
+function CalibrationActivityDot() {
+  const { fit, validation, sensitivity } = useCalibrationJobs();
+  const active = [fit, validation, sensitivity].some(
+    (j) => j.status === "queued" || j.status === "running",
+  );
+  if (!active) return null;
+  return (
+    <span
+      className="signal-dot"
+      title="A calibration job is running in the background"
+      aria-label="calibration job running"
+    />
+  );
+}
 
 export function App() {
   const [view, setView] = useState<View>({ kind: "dashboard" });
@@ -44,7 +72,9 @@ export function App() {
   }
 
   return (
-    <DbProvider>
+    <ThemeProvider>
+     <DbProvider>
+      <CalibrationJobsProvider>
       <div className="min-h-screen text-ink-0">
         {/* HEADER ─────────────────────────────────────────────────────────────── */}
         <header className="border-b border-line">
@@ -56,12 +86,13 @@ export function App() {
               >
                 SELECTRON
               </h1>
-              <span className="mono text-[11px] uppercase tracking-cap text-ink-1">
+              <span className="mono text-[13px] uppercase tracking-cap text-ink-1">
                 by <span className="text-ink-0">Diego Malpica MD</span>
               </span>
               <span className="label text-signal">iter 03 · phase 3f</span>
             </div>
-            <div className="mono flex items-center gap-4 text-[11px] text-ink-2">
+            <div className="mono flex items-center gap-4 text-[13px] text-ink-2">
+              <ThemeToggle />
               {/* Nav links */}
               <button
                 className={`uppercase tracking-cap transition-colors ${
@@ -82,6 +113,27 @@ export function App() {
                 onClick={() => setView({ kind: "crew-composition" })}
               >
                 Crew
+              </button>
+              <button
+                className={`uppercase tracking-cap transition-colors inline-flex items-center gap-1.5 ${
+                  view.kind === "calibration"
+                    ? "text-signal border-b border-signal pb-0.5"
+                    : "text-ink-2 hover:text-ink-0"
+                }`}
+                onClick={() => setView({ kind: "calibration" })}
+              >
+                Calibration
+                <CalibrationActivityDot />
+              </button>
+              <button
+                className={`uppercase tracking-cap transition-colors ${
+                  view.kind === "analysis"
+                    ? "text-signal border-b border-signal pb-0.5"
+                    : "text-ink-2 hover:text-ink-0"
+                }`}
+                onClick={() => setView({ kind: "analysis" })}
+              >
+                Analysis
               </button>
               {/* UTC clock + meta */}
               <div className="flex items-center gap-2 hidden sm:flex">
@@ -148,15 +200,31 @@ export function App() {
               <CrewComposition />
             </ErrorBoundary>
           )}
+          {view.kind === "calibration" && (
+            <ErrorBoundary
+              fallbackLabel="The Calibration view crashed during render"
+              onReset={() => setView({ kind: "dashboard" })}
+            >
+              <Calibration />
+            </ErrorBoundary>
+          )}
+          {view.kind === "analysis" && (
+            <ErrorBoundary
+              fallbackLabel="The Analysis view crashed during render"
+              onReset={() => setView({ kind: "dashboard" })}
+            >
+              <Analysis />
+            </ErrorBoundary>
+          )}
         </main>
 
         {/* FOOTER ──────────────────────────────────────────────────────────────── */}
         <footer className="mt-10 border-t border-line">
           <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-4 px-8 py-5">
-            <div className="mono text-[10px] uppercase tracking-cap text-ink-3">
+            <div className="mono text-[12px] uppercase tracking-cap text-ink-3">
               selectron · iter 03 · bayesian mcda + mission-risk monte carlo
             </div>
-            <div className="mono text-[10px] uppercase tracking-cap text-ink-3">
+            <div className="mono text-[12px] uppercase tracking-cap text-ink-3">
               <a
                 href="https://github.com/strikerdlm/selectron"
                 className="hover:text-signal transition-colors"
@@ -170,6 +238,8 @@ export function App() {
         </footer>
         <ToastHost />
       </div>
-    </DbProvider>
+      </CalibrationJobsProvider>
+     </DbProvider>
+    </ThemeProvider>
   );
 }

@@ -12,7 +12,7 @@
 
 import ReactEChartsCore from "echarts-for-react/lib/core";
 import { echarts } from "./echarts-base";
-import { NATURE_THEME_NAME } from "./theme";
+import { useFigureTheme } from "./useFigureTheme";
 import { FigureCaption } from "./FigureCaption";
 import type { IMMOutcome, PosteriorSummary } from "../../imm/types";
 
@@ -54,6 +54,7 @@ export function IMMValidationCompare({
   outcome,
   reference = K15_ISSHMS_DEFAULT,
 }: IMMValidationCompareProps) {
+  const { themeName } = useFigureTheme();
   const rows: MetricRow[] = [
     { label: "TME",   unit: "events", summary: outcome.tme,   refMean: reference.tme.mean   },
     { label: "CHI",   unit: "%",      summary: outcome.chi,   refMean: reference.chi.mean   },
@@ -218,7 +219,7 @@ export function IMMValidationCompare({
       <ReactEChartsCore
         echarts={echarts}
         option={option}
-        theme={NATURE_THEME_NAME}
+        theme={themeName}
         style={{ height: 280, width: "100%" }}
         notMerge
       />

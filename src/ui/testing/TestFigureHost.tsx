@@ -19,6 +19,7 @@ import { simulateMission } from "@/risk/simulate";
 import { saveSimSession } from "@/db/repository";
 import { assessLxC } from "@/risk/lxc";
 import { scoreCandidate } from "@/engine/mcda";
+import { normalizeScore } from "@/engine/normalize";
 // MissionComparison (paper-F7) now supported via pre-seeded IDB sessions.
 
 function syntheticPosterior(): Posterior {
@@ -62,9 +63,9 @@ function syntheticChiSamples(): number[] {
 //             hi-seas-45d is the only 45-day analog mission in the catalog)
 //   tier  = "medium"
 //
-// For F3/F4 (MCDA figures), scores are built from PLACEHOLDER_CRITERIA at
-// midpoint of each criterion's scale, which gives z=0.5 for all criteria
-// (deterministic, no Monte-Carlo needed for the normalized score vector).
+// For F3/F4 (MCDA figures), scores are taken from HETERO_SCORES — a
+// heterogeneous candidate whose z-values span [0.15, 0.92], producing a
+// non-degenerate posterior with visible CI₉₀ spread (peer-review-2 Issue 3).
 // The scoreCandidate call uses the seeded MCDA engine (5,000 iterations).
 //
 // For F6 (LxC matrix), we derive a RiskPosterior from a quick simulateMission
@@ -78,22 +79,38 @@ const PAPER_TIER  = "medium" as const;
 // hi-seas-45d is the 45-day HI-SEAS mission (closest to the spec's "mdrs-45d").
 const PAPER_MISSION = ANALOG_MISSIONS.find((m) => m.id === "hi-seas-45d")!;
 
-/** Midpoint scores for every PLACEHOLDER criterion. */
-function paperScores(): Record<string, number> {
-  const out: Record<string, number> = {};
-  for (const c of PLACEHOLDER_CRITERIA) {
-    out[c.id] = (c.scale.min + c.scale.max) / 2;
-  }
-  return out;
-}
+/**
+ * Heterogeneous candidate scores replacing the midpoint fixture.
+ *
+ * Midpoint scores produce z_k = 0.5 for all criteria → degenerate posterior
+ * (S_i ≡ 0.5, CI₉₀ width = 0). These heterogeneous values span the full
+ * criterion range so Dirichlet weight uncertainty translates into visible
+ * composite-score spread. Closes peer-review-2 Issue 3.
+ *
+ * behavioral.teamwork uses scale {min:1, max:5} — value 4 is in-range.
+ */
+const HETERO_SCORES: Record<string, number> = {
+  "psych.conscientiousness":           85,
+  "psych.emotional_stability":         40,
+  "physical.vo2max":                   60,
+  "professional.technical_competence":  3,
+  "behavioral.teamwork":                4,   // scale 1–5
+  "cognitive.nasa_cognition_battery":   2.0,
+  "cognitive.pvt_b_rt_ms":           220,
+  "physical.sot5_equilibrium":         85,
+  "psych.resilience_cdrisc":           90,
+  "psych.emotional_intelligence":       1.5,
+  "psych.mmpi2rf_eid":                 42,
+  "psych.bdi2_baseline":                3,
+};
 
-/** MCDA Posterior for paper-F3 and paper-F4. */
+/** MCDA Posterior for paper-F3 and paper-F4. Uses heterogeneous scores (non-degenerate). */
 function paperMCDAPosterior(): Posterior {
   return scoreCandidate({
     candidate: {
       id:     "demo-01",
       alias:  PAPER_ALIAS,
-      scores: paperScores(),
+      scores: HETERO_SCORES,
     },
     criteria:   PLACEHOLDER_CRITERIA,
     alpha:      new Array(PLACEHOLDER_CRITERIA.length).fill(1),
@@ -102,12 +119,27 @@ function paperMCDAPosterior(): Posterior {
   });
 }
 
+/** Closed-form per-criterion contributions (w̄_k · z_k) for the ScoreBreakdownRadar. */
+function paperRadarData(): import("@/ui/figures/ScoreBreakdownRadar").RadarDatum[] {
+  const K = PLACEHOLDER_CRITERIA.length;
+  const wBar = 1 / K; // Dirichlet(1,…,1) mean weight per criterion
+  return PLACEHOLDER_CRITERIA.map((c) => {
+    const raw = HETERO_SCORES[c.id];
+    const z   = normalizeScore(raw, c.scale, c.higherIsBetter);
+    return {
+      criterionId: c.id,
+      label:       c.label,
+      contribution: wBar * z,
+    };
+  });
+}
+
 /** RiskPosterior derived from simulateMission for paper-F6. */
 function paperRiskPosterior(): RiskPosterior {
   const template = {
     id:     "demo-01",
     alias:  PAPER_ALIAS,
-    scores: paperScores(),
+    scores: HETERO_SCORES,
   };
   const crew = synthesizeCrew(template, PAPER_MISSION.crewSize);
   return simulateMission(
@@ -267,16 +299,8 @@ export function TestFigureHost({ figureId }: { figureId: string }) {
     );
   }
   if (figureId === "F6") {
-    let fakeSeed = 0xc0ffee;
-    const radarData = PLACEHOLDER_CRITERIA.map((c) => {
-      fakeSeed = (fakeSeed * 1664525 + 1013904223) | 0;
-      return {
-        criterionId: c.id,
-        label: c.label,
-        contribution: 0.1 + 0.05 * Math.abs(Math.sin(fakeSeed / 1_000_000)),
-      };
-    });
-    return wrap(<ScoreBreakdownRadar data={radarData} />);
+    // Use score-derived contributions from HETERO_SCORES (non-degenerate, asymmetric spokes).
+    return wrap(<ScoreBreakdownRadar data={paperRadarData()} />);
   }
 
   // ── paper-specific fixtures (T10) ─────────────────────────────────────────
@@ -371,10 +395,11 @@ function PaperF4() {
       <MCDACalculationTrace
         posterior={posterior}
         criteria={PLACEHOLDER_CRITERIA}
-        scores={paperScores()}
+        scores={HETERO_SCORES}
         alias={PAPER_ALIAS}
         seed={PAPER_SEED}
         accessTier={PAPER_TIER}
+        collapsible={false}
       />
     </div>
   );

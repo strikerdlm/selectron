@@ -87,7 +87,7 @@ export function StepReview() {
     <div className="grid grid-cols-1 gap-6 lg:grid-cols-12">
       <section className="lg:col-span-7 panel p-6 space-y-4">
         <h2 className="display text-lg">Step 3 — Review</h2>
-        <table className="mono w-full text-[11px]">
+        <table className="mono w-full text-[13px]">
           <thead>
             <tr className="text-ink-3 uppercase tracking-cap">
               <th className="text-left">criterion</th>
@@ -117,7 +117,7 @@ export function StepReview() {
         </table>
 
         <div className="flex justify-between">
-          <button onClick={() => setStep(1)} className="mono uppercase tracking-cap text-[11px] px-3 py-2 text-ink-2 hover:text-ink-0">
+          <button onClick={() => setStep(1)} className="mono uppercase tracking-cap text-[13px] px-3 py-2 text-ink-2 hover:text-ink-0">
             ← back
           </button>
           <button
@@ -125,7 +125,7 @@ export function StepReview() {
               markStepCompleted(2);
               setStep(3);
             }}
-            className="mono uppercase tracking-cap text-[11px] px-4 py-2 border border-signal text-signal hover:bg-signal/10 rounded-md"
+            className="mono uppercase tracking-cap text-[13px] px-4 py-2 border border-signal text-signal hover:bg-signal/10 rounded-md"
           >
             next →
           </button>
