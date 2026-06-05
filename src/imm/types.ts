@@ -164,7 +164,7 @@ export type IMMOutcome = {
 /**
  * Output of `posteriorPredictiveSimulateIMM`. Each summary is a posterior
  * distribution over the metric (one value per posterior draw, not per trial).
- * Same PosteriorSummary shape as IMMOutcome so the UI renders point + interval
+ * Reuses IMMOutcome's PosteriorSummary per metric so the UI renders point + interval
  * estimates without extra aggregation.
  */
 export type PosteriorPredictiveOutcome = {
@@ -174,8 +174,8 @@ export type PosteriorPredictiveOutcome = {
   pLoclPost: PosteriorSummary;
   /** Posterior distribution of CHI (% scale, 0..100). */
   chiPost: PosteriorSummary;
-  /** Per-condition posterior of expected TME contribution (per-draw mean tmeContrib). */
-  perConditionLambdaPost: Record<string, PosteriorSummary>;
+  /** Per-condition posterior of expected TME contribution (per-draw mean tmeContrib, events per trial). */
+  perConditionTmeContribPost: Record<string, PosteriorSummary>;
   /** Number of posterior draws used. */
   nDraws: number;
   /** Monte Carlo trials run per posterior draw. */

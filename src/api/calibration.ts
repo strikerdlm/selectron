@@ -215,14 +215,14 @@ export function getSensitivityStatus(jobId: string): Promise<JobStatusResponse> 
 // ── Posterior draws (analog MCMC posterior, 2026-06-04) ──────────────────────
 
 /** One condition's posterior λ samples, wire-faithful to the FastAPI response. */
-export interface PosteriorDrawWire {
+export interface PosteriorDraw {
   condition_id: string;
-  /** Strictly positive posterior λ values, length === n_draws. */
+  /** Posterior λ values (non-negative; >0 for Gamma/Lognormal conditions), length === n_draws. */
   lambdas: number[];
 }
 
 export interface PosteriorDrawsResponse {
-  draws: PosteriorDrawWire[];
+  draws: PosteriorDraw[];
   n_draws: number;
   seed: number;
   kind: string | null;
