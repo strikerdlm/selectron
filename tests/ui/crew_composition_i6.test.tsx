@@ -335,3 +335,50 @@ describe("CrewComposition · I6 analog Bayesian MCMC posterior", () => {
     ).toBeDefined();
   });
 });
+
+// ── 2026-06-05: analog surfaces render BEFORE any sim run ───────────────────
+// The kind-multipliers table reads only the static calibrated priors, and the
+// I6 posterior layer consumes the calibration API + the pp worker sweep — both
+// independent of the main T=100k `outcome`. Gating them on `outcome` forced a
+// fresh full run after every mission switch just to *read* the analog context
+// (observed live 2026-06-05; the table's own comment already claimed "mounted
+// always"). These tests pin the un-gated behaviour: NO runMainSim() call.
+describe("CrewComposition · analog surfaces render pre-run", () => {
+  it("antarctic mission, no completed run: kind-multipliers table + I6 panel mount and the pp figure renders", async () => {
+    seedPersistedState("antarctic-winter"); // kind antarctic-station
+    renderWithDb();
+    await waitForReady();
+    // Deliberately NO runMainSim() — `outcome` stays undefined for the whole test.
+
+    // Static multiplier table mounts without any run.
+    expect(
+      await screen.findByTestId("kind-multipliers-mount", undefined, { timeout: 3000 }),
+    ).toBeDefined();
+
+    // I6 panel mounts pre-run and the posterior-predictive figure renders
+    // (400 ms debounce → mocked fetch → pp worker reply, all under findBy).
+    expect(
+      await screen.findByTestId("imm-i6-posterior", undefined, { timeout: 3000 }),
+    ).toBeDefined();
+    expect(await screen.findByTestId("pp-pEvac", undefined, { timeout: 3000 })).toBeDefined();
+    expect(getPosteriorDrawsMock).toHaveBeenCalled();
+  });
+
+  it("leo-iss mission, no completed run: table mounts (empty state) but I6 stays kind-gated", async () => {
+    seedPersistedState("iss-6mo"); // kind leo-iss — POSTERIOR_KINDS gate must still hold
+    renderWithDb();
+    await waitForReady();
+
+    expect(
+      await screen.findByTestId("kind-multipliers-mount", undefined, { timeout: 3000 }),
+    ).toBeDefined();
+
+    // Wait past the 400 ms debounce window so a regression that schedules the
+    // fetch (and mounts the panel) would be caught.
+    await act(async () => {
+      await new Promise((r) => setTimeout(r, 500));
+    });
+    expect(screen.queryByTestId("imm-i6-posterior")).toBeNull();
+    expect(getPosteriorDrawsMock).not.toHaveBeenCalled();
+  });
+});

@@ -1192,22 +1192,6 @@ export function CrewComposition() {
             </div>
           )}
 
-          {/* 2026-06-04: per-(kind, condition) multiplier table. Mounted
-              always (not gated on outcome) so the user can read the active
-              multiplier context before running a sim. The mount point
-              carries a data-testid for the badge's "view per-condition
-              multipliers ↓" anchor to scroll to. */}
-          <div
-            className="panel"
-            data-testid="kind-multipliers-mount"
-            id="kind-multipliers-mount"
-          >
-            <h3 className="label text-ink-1 uppercase tracking-cap mb-3">
-              Kind multipliers · {missionKindContextLabel(state.mission.kind)}
-            </h3>
-            <KindMultipliersTable kind={state.mission.kind} />
-          </div>
-
           <div className="panel">
             <h3 className="label text-ink-1 uppercase tracking-cap mb-4">
               I1 · Headline
@@ -1271,57 +1255,83 @@ export function CrewComposition() {
             </div>
           )}
 
-          {/* I6 — analog Bayesian MCMC posterior, gated on the eligible kinds
-              (antarctic-station / analog-controlled) that carry a kind_multipliers
-              block in the calibrated priors. The draws are fetched from the optional
-              Python calibration API and the posterior-predictive sweep runs in the
-              worker; the panel degrades gracefully when the API is unreachable. */}
-          {POSTERIOR_KINDS.has(state.mission.kind) && (
-            <div className="panel" data-testid="imm-i6-posterior">
-              <h3 className="label text-ink-1 uppercase tracking-cap mb-4">
-                I6 · Analog Bayesian MCMC Posterior
-              </h3>
-              {ppState === "running" && !ppDraws && (
-                <p className="text-[11px] italic text-ink-3">
-                  fetching posterior draws from Python calibration API…
-                </p>
-              )}
-              {ppState === "running" && ppDraws && (
-                <p className="text-[11px] italic text-ink-3">
-                  running posterior-predictive sweep ({Math.min(64, ppDraws.n_draws)} draws × 200 trials per draw)…
-                </p>
-              )}
-              {ppState === "api-error" && (
-                <p className="text-[11px] italic text-ink-3">
-                  Python calibration API unreachable — start it with{" "}
-                  <code className="mono">cd python &amp;&amp; uvicorn api.main:app --reload</code>{" "}
-                  to see posterior draws.
-                </p>
-              )}
-              {ppState === "compute-error" && (
-                <p className="text-[11px] italic text-ink-3">
-                  posterior-predictive sweep failed{ppError ? `: ${ppError}` : " (unknown error)"}.
-                </p>
-              )}
-              {ppState === "done" && ppDraws && ppOutcome && (
-                <IMMAnalogPosteriorPlot
-                  draws={ppDraws}
-                  outcome={ppOutcome}
-                  kind={state.mission.kind}
-                  trialsPerDraw={ppOutcome.trialsPerDraw}
-                />
-              )}
-              {ppState === "done" && ppDraws && !ppOutcome && (
-                <p className="text-[11px] italic text-ink-3">
-                  No per-condition posterior draws for kind "{state.mission.kind}" — this
-                  is expected for mission kinds without a kind_multipliers block in the
-                  calibrated priors.
-                </p>
-              )}
-            </div>
-          )}
         </div>
       )}
+
+      {/* ── Analog-mission context — NOT gated on `outcome` (2026-06-05). The
+          kind-multipliers table reads only the static calibrated priors, and
+          the I6 posterior layer consumes the calibration API + the worker
+          sweep driven by the pp effect above — both independent of the main
+          T=100k run. Previously these sat inside the figures region, so every
+          mission switch (which clears `outcome` via the stale-outcome guard)
+          blanked them until a fresh full run; observed live 2026-06-05. ── */}
+      <div className="flex flex-col gap-6 mt-4" role="region" aria-label="Analog mission context">
+
+        {/* 2026-06-04: per-(kind, condition) multiplier table. Mounted always
+            (not gated on outcome) so the user can read the active multiplier
+            context before running a sim. The mount point carries a data-testid
+            for the badge's "view per-condition multipliers ↓" anchor to scroll to. */}
+        <div
+          className="panel"
+          data-testid="kind-multipliers-mount"
+          id="kind-multipliers-mount"
+        >
+          <h3 className="label text-ink-1 uppercase tracking-cap mb-3">
+            Kind multipliers · {missionKindContextLabel(state.mission.kind)}
+          </h3>
+          <KindMultipliersTable kind={state.mission.kind} />
+        </div>
+
+        {/* I6 — analog Bayesian MCMC posterior, gated on the eligible kinds
+            (antarctic-station / analog-controlled) that carry a kind_multipliers
+            block in the calibrated priors. The draws are fetched from the optional
+            Python calibration API and the posterior-predictive sweep runs in the
+            worker; the panel degrades gracefully when the API is unreachable. */}
+        {POSTERIOR_KINDS.has(state.mission.kind) && (
+          <div className="panel" data-testid="imm-i6-posterior">
+            <h3 className="label text-ink-1 uppercase tracking-cap mb-4">
+              I6 · Analog Bayesian MCMC Posterior
+            </h3>
+            {ppState === "running" && !ppDraws && (
+              <p className="text-[11px] italic text-ink-3">
+                fetching posterior draws from Python calibration API…
+              </p>
+            )}
+            {ppState === "running" && ppDraws && (
+              <p className="text-[11px] italic text-ink-3">
+                running posterior-predictive sweep ({Math.min(64, ppDraws.n_draws)} draws × 200 trials per draw)…
+              </p>
+            )}
+            {ppState === "api-error" && (
+              <p className="text-[11px] italic text-ink-3">
+                Python calibration API unreachable — start it with{" "}
+                <code className="mono">cd python &amp;&amp; uvicorn api.main:app --reload</code>{" "}
+                to see posterior draws.
+              </p>
+            )}
+            {ppState === "compute-error" && (
+              <p className="text-[11px] italic text-ink-3">
+                posterior-predictive sweep failed{ppError ? `: ${ppError}` : " (unknown error)"}.
+              </p>
+            )}
+            {ppState === "done" && ppDraws && ppOutcome && (
+              <IMMAnalogPosteriorPlot
+                draws={ppDraws}
+                outcome={ppOutcome}
+                kind={state.mission.kind}
+                trialsPerDraw={ppOutcome.trialsPerDraw}
+              />
+            )}
+            {ppState === "done" && ppDraws && !ppOutcome && (
+              <p className="text-[11px] italic text-ink-3">
+                No per-condition posterior draws for kind "{state.mission.kind}" — this
+                is expected for mission kinds without a kind_multipliers block in the
+                calibrated priors.
+              </p>
+            )}
+          </div>
+        )}
+      </div>
 
       {/* IMM-50 / 2026-05-29: save / load / export toolbar.
        *   - Load dropdown is ALWAYS visible (loading a saved session brings in
