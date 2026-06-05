@@ -22,7 +22,40 @@ const SAMPLES_PER_MISSION = 1000;
 const MISSION_TYPES = Array.from(new Set(ANALOG_MISSIONS.map((m) => m.type)));
 
 const SD_LOG = 0.3;
-const meanLogFor = (kind: string): number => (kind === "event" ? Math.log(0.05) : Math.log(0.0005));
+
+// Per-condition literature-derived mean log-lambda for the Iter-3 v2 expansion
+// (conditions 13–30). Values in events/person-day (rate) or p/EVA (event).
+// Rates are conservative best estimates anchored to the analog-mission evidence
+// corpus (Pagel & Choukèr 2016, Basner 2014, Ponomarev 2021, etc.).
+// Conditions not listed here fall back to the flat kind-based default below.
+const CONDITION_MEAN_LOG: Readonly<Record<string, number>> = {
+  // ── Musculoskeletal ──────────────────────────────────────────────────────
+  "low-back-pain":                    Math.log(0.00041), // ~0.15/py sedentary confinement
+  "deconditioning-cardiorespiratory": Math.log(0.00082), // ~0.30/py; Abeln 2022 10–15% VO₂max loss
+  // ── Physiologic ─────────────────────────────────────────────────────────
+  "upper-respiratory-infection":      Math.log(0.00027), // ~0.10/py (near-zero in deep isolation)
+  "gastrointestinal-complaint":       Math.log(0.00068), // ~0.25/py; dietary-change constipation/nausea
+  "weight-loss-significant":          Math.log(0.00027), // ~0.10/py detection threshold
+  "dental-problem":                   Math.log(0.00027), // ~0.10/py; Robertson 2020 analog rate
+  "skin-complaint":                   Math.log(0.00041), // ~0.15/py; hygiene/humidity-limited
+  "headache-tension":                 Math.log(0.00137), // ~0.50/py; Basner 2014 somatic complaints
+  "thermal-regulatory-challenge":     Math.log(0.00014), // ~0.05/py; polar-specific exposure
+  // ── Psychiatric ─────────────────────────────────────────────────────────
+  "third-quarter-phenomenon":         Math.log(0.00192), // ~0.70/py; majority of long missions
+  "monotony-boredom":                 Math.log(0.00027), // ~0.10/py clinically significant
+  "sleep-aid-reliance":               Math.log(0.00082), // ~0.30/py initiation; 45–50% ISS prevalence
+  "seasonal-affective-response":      Math.log(0.00027), // ~0.10/py; Palinkas 2004 Antarctic winter-over
+  "autonomy-frustration":             Math.log(0.00027), // ~0.10/py episodic; Sandal 2018
+  // ── Performance ─────────────────────────────────────────────────────────
+  "sustained-cognitive-decrement":    Math.log(0.00041), // ~0.15/py; 1/6 crew Mars-500
+  "operational-error":                Math.log(0.05),    // 5% per EVA; Luger 2014 MARS2013
+  // ── Team ────────────────────────────────────────────────────────────────
+  "leadership-challenge":             Math.log(0.08),    // 8% per EVA-equivalent; Roma & Bedwell 2017
+  "role-ambiguity-conflict":          Math.log(0.00041), // ~0.15/py; McMenamin 2020
+};
+
+const meanLogFor = (id: string, kind: string): number =>
+  CONDITION_MEAN_LOG[id] ?? (kind === "event" ? Math.log(0.05) : Math.log(0.0005));
 
 function makeLogLambdaSamples(meanLog: number, sdLog: number, seed: number): number[] {
   const rng = makeRng(seed);
@@ -47,7 +80,7 @@ function buildSyntheticPriors(): PriorsJson {
   const conditions: PriorsJson["conditions"] = {};
   let salt = PRIORS_SEED;
   for (const c of ANALOG_CONDITIONS) {
-    const meanLog = meanLogFor(c.kind);
+    const meanLog = meanLogFor(c.id, c.kind);
     // ONE posterior per condition, SHARED across all mission types. The Iter-3
     // scaffold has no evidence for per-environment rate differences, so drawing
     // a fresh per-type sample only injected spurious noise into the mission
@@ -69,7 +102,7 @@ function buildSyntheticPriors(): PriorsJson {
                 // Negative β: HIGH-quality candidate (z>0) → β·z<0 → exp<1 → λ↓.
                 // Magnitudes calibrated so worst-vs-best (4 SD spread, ±2 z units)
                 // produces a meaningful 2-4× incidence multiplier spread.
-                // Condition families present in ANALOG_CONDITIONS v1:
+                // Condition families present in ANALOG_CONDITIONS v2:
                 //   psychiatric, team, physiologic, musculoskeletal, performance.
                 // Future families (Iter-2+ ConditionFamily expansion) are cast via
                 // string comparison to avoid TS2367 narrowing errors while keeping

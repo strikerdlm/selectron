@@ -13,8 +13,8 @@ const VALID_FAMILIES = new Set([
 const VALID_KINDS = new Set(["rate", "event"]);
 
 describe("ANALOG_CONDITIONS", () => {
-  it("ships exactly 12 conditions for Iter-3 v1 (spec §5)", () => {
-    expect(ANALOG_CONDITIONS).toHaveLength(12);
+  it("ships exactly 30 conditions for Iter-3 v2 (spec §5)", () => {
+    expect(ANALOG_CONDITIONS).toHaveLength(30);
   });
 
   it("has unique ids", () => {
