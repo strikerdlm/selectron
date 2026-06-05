@@ -162,10 +162,10 @@ describe("posteriorPredictiveSimulateIMM", () => {
 
     const s = out.perConditionTmeContribPost[CID];
     // Union-fill records 0 for draws with no events; with the base zeroed,
-    // every draw contributes 0, so the summary mean is exactly 0 (present or absent).
-    if (s !== undefined) {
-      expect(s.mean).toBe(0);
-    }
+    // every draw contributes 0, so the summary mean is exactly 0.
+    // simulateIMM emits every condition every draw, so s must be defined.
+    expect(s).toBeDefined();
+    expect(s!.mean).toBe(0);
   });
 
   // (e) Contract errors --------------------------------------------------------
@@ -196,5 +196,18 @@ describe("posteriorPredictiveSimulateIMM", () => {
         posterior: {}, nDraws: 4, trialsPerDraw: 0, seed: 0,
       }),
     ).toThrow();
+  });
+
+  it("throws when a posterior array contains NaN (non-finite draw)", () => {
+    const m = priorMeanLambda("acute-sinusitis");
+    const bad = constDraws(m, 8);
+    bad[0] = NaN;
+    expect(() =>
+      posteriorPredictiveSimulateIMM({
+        crew: CREW, mission: ISS_6MO, kit: IMM_KITS.none,
+        posterior: { "acute-sinusitis": bad },
+        nDraws: 8, trialsPerDraw: 100, seed: 0,
+      }),
+    ).toThrow(/non-negative finite/);
   });
 });

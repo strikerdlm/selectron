@@ -66,6 +66,12 @@ export type PosteriorPredictiveOpts = {
  * Summarize a sample of per-draw metric values into a PosteriorSummary.
  * Percentiles use a sorted copy with floor indices clamped to [0, n-1].
  * n === 0 → all zeros. `sd` is the population standard deviation.
+ *
+ * NOTE: duplicates the engine's private posteriorSummary — engine file is frozen
+ * under the K15 invariance canary for this plan; dedup deferred.
+ *
+ * Small-n note: with nearest-rank floor indices, ci90/ci95 degenerate toward the
+ * min–max range below ~21/~41 draws respectively; intended operating point is nDraws ≥ 64.
  */
 function summarize(values: number[]): PosteriorSummary {
   const n = values.length;
@@ -138,6 +144,12 @@ export function posteriorPredictiveSimulateIMM(
         `posteriorPredictiveSimulateIMM: posterior["${cid}"] has ${lams.length} draws, need >= ${nDraws}`,
       );
     }
+    // The engine silently coerces non-finite multipliers to 1.0, which would mask bad inputs.
+    if (lams.some(v => !Number.isFinite(v) || v < 0)) {
+      throw new Error(
+        `Posterior draws for "${cid}" must be non-negative finite numbers`,
+      );
+    }
   }
 
   // Resolve the base kind-multiplier map once (explicit override wins, else the
@@ -146,6 +158,15 @@ export function posteriorPredictiveSimulateIMM(
     opts.kindMultipliers ??
     loadIMMPriors().global_calibration.kind_multipliers?.[mission.kind] ??
     {};
+
+  // Build cleanBase once: strip documentation sentinel keys (e.g. `_doc_`) and
+  // any non-numeric values — hoisted out of the draw loop to avoid O(nDraws) redundancy.
+  const cleanBase: Record<string, number> = {};
+  for (const [k, v] of Object.entries(base)) {
+    if (k.startsWith("_")) continue;
+    if (typeof v !== "number") continue;
+    cleanBase[k] = v;
+  }
 
   // Cache prior point means for the conditions present in the posterior.
   const pointMeans = new Map<string, number | null>();
@@ -160,13 +181,8 @@ export function posteriorPredictiveSimulateIMM(
   const tmeByCond: Record<string, number[]> = {};
 
   for (let d = 0; d < nDraws; d++) {
-    // Build the per-draw composite multiplier map. Copy the base, dropping the
-    // documentation sentinel keys (e.g. `_doc_`) that live in the JSON map.
-    const composite: Record<string, number> = {};
-    for (const [k, v] of Object.entries(base)) {
-      if (k.startsWith("_")) continue;
-      composite[k] = v;
-    }
+    // Build the per-draw composite multiplier map from the pre-filtered cleanBase.
+    const composite: Record<string, number> = { ...cleanBase };
     for (const [cid, lams] of Object.entries(posterior)) {
       const m = pointMeans.get(cid);
       if (m == null) continue; // Beta-Bernoulli / missing / degenerate → skip.
