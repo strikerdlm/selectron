@@ -25,9 +25,13 @@
 //     vulnerabilityCriteria (0 hits in src/imm/conditions.ts) — it degrades
 //     the Stage-A crew composite (asserted below) but does NOT move the IMM
 //     mission-risk numbers. The test narrative is explicit about this.
-//   - psych.mmpi2rf_eid / cognitive.nasa_cognition_battery are the two wired
-//     clearance gates (gate-then-modulate): selection WOULD have hard-DQ'd
-//     this crew before any Stage B / IMM run.
+//   - psych.mmpi2rf_eid / cognitive.nasa_cognition_battery are DUAL-ROLE:
+//     they are the two wired clearance gates (gate-then-modulate: selection
+//     WOULD have hard-DQ'd this crew before any Stage B / IMM run) AND they
+//     are themselves λ-coupled via vulnerabilityCriteria (EID on 3 conditions,
+//     cognition on 7 — verified 2026-06-05 in src/imm/conditions.ts). So the
+//     risk elevation asserted below is driven by all four psych/cognitive
+//     scores jointly, not by emotional_stability + conscientiousness alone.
 //
 // The test demonstrates, on the real calibrated engine (auto-loaded
 // analog-controlled kind_multipliers included):
