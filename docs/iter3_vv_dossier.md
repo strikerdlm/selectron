@@ -490,3 +490,121 @@ UI verification: `npm run dev` → open `/#crew-composition` → pick
 campaign" (badge: "Antarctic winter-over priors"). Run T=5,000 preview;
 the Antarctic run should show higher TME pressure and a different
 mission-success fraction than the controlled run.
+
+### §7.9 Posterior-predictive validation (2026-06-05)
+
+> Numbering note: this subsection is appended at the END of §7. The
+> "§7.4" label used in the originating plan was a stale guess written
+> before §7 grew to §7.8; §7.4 is already occupied (Antarctic pEVAC
+> cross-validation). This addendum is therefore filed as **§7.9**.
+
+This subsection validates the analog Bayesian MCMC posterior-predictive
+layer (`posteriorPredictiveSimulateIMM`, `src/imm/posterior-predictive.ts`)
+that propagates per-condition posterior λ uncertainty into the
+mission-level pEVAC / pLOCL / CHI estimates surfaced by figure I6.
+
+**Mechanism — composite kind-multiplier moment-matching.** The wrapper
+makes ZERO engine changes. For each posterior draw `d` and condition `cid`
+with posterior draw λ_d and prior point mean E[λ], it builds a per-draw
+composite multiplier
+
+```
+composite[cid] = (base[cid] ?? 1) × (λ_d / E[λ])
+```
+
+and passes it to the untouched `simulateIMM` via the existing
+`kindMultipliers` hook (`base` = the explicit override else the mission
+kind's `imm-priors.json` map). Because the engine samples λ with prior
+mean E[λ], the factor `λ_d / E[λ]` scales the engine's per-draw mean to
+λ_d while preserving the prior's relative dispersion. This is an explicit
+**moment-matching** approximation: the per-draw mean is scaled to the
+draw, prior dispersion is preserved. It is **NOT a clean
+epistemic/aleatory decomposition** — within a draw λ is re-sampled scaled
+each trial (not held fixed), so the within-draw variance still mixes
+parameter and sampling uncertainty. The label is set accordingly; we do
+not over-claim a variance partition.
+
+**Unbiasedness gate.** Because every λ_d is drawn from the condition's
+fitted Gamma/Lognormal posterior, E[λ_d] = E[λ]; the posterior-predictive
+GRAND mean should therefore agree with the point-prior `simulateIMM` mean
+up to a small Jensen gap (pEVAC is a nonlinear, saturating function of
+cumulative TME) plus Monte-Carlo noise. The gate test
+(`tests/imm/posterior_predictive.test.ts`, `describe("K15 unbiasedness")`)
+constructs every per-condition posterior from a symmetric ±40 %
+perturbation set `[0.6,0.7,0.8,0.9,1.1,1.2,1.3,1.4]` whose length (8)
+divides nDraws (64), so **E[draws] = E[λ] holds exactly** (asserted to
+1e-12 per condition before the run). On the K15 reference config
+(`iss-6mo` / `IMM_KITS.issHMS` / the file's 2-member crew fixture / seed
+`0xc0ffee`), nDraws = 64, trialsPerDraw = 500, all 99 Gamma/Lognormal
+conditions perturbed:
+
+| Quantity | Value |
+|---|---|
+| posterior-predictive grand mean pEVAC | **2.5438 %** |
+| point-prior mean pEVAC (`simulateIMM`, T = 16 000, same seed) | **2.4312 %** |
+| absolute delta | 0.1125 pp |
+| **relative delta** | **4.63 %** |
+
+Gate tolerance is set at **15 % relative (≈ 3.2× headroom** over the
+measured 4.63 %). The residual ~4.6 % is the moment-matching Jensen gap
+plus MC noise at these sample sizes — agreement is approximate, not
+exact, exactly as the nonlinearity predicts. **Unbiasedness agreement
+does NOT prove the posterior is consumed** (a wrapper that ignored
+`posterior` would also agree on the mean); propagation is proven
+separately (below).
+
+**The widened interval IS the feature.** The point-prior pipeline reports
+a per-trial CI whose 0/1 evac flag is degenerate at the trial level
+(`simulateIMM` pEVAC ci90 = [0.000, 0.000] on this config — each trial is
+a single Bernoulli outcome, so the per-trial percentile interval collapses).
+The posterior-predictive ci90 is a different object: it is the spread of
+the per-DRAW metric means induced by evidence-base (posterior λ)
+uncertainty. Measured pEVAC ci90 = **[1.400, 4.000] → width 2.60 pp**
+around a 2.54 % mean. These two intervals measure different things — one
+is per-trial sampling noise, the other is posterior-predictive parameter
+spread — and the widened band is the realism this layer adds. (This
+particular width arises from the synthetic deterministic ±40 %
+perturbation used in the unbiasedness fixture; it is a propagation-
+magnitude demonstration, distinct from the production I6 figure, which
+consumes the API's real fitted Gamma/Lognormal draws — e.g. the
+antarctic-station snapshot shows pEVAC 8.9 % with 90 % CI [5.5, 12.0].)
+
+**Load-bearing propagation test.** The gate above is necessary but not
+sufficient; the propagation test (`tests/imm/posterior_predictive.test.ts`,
+"propagates posterior draws into per-condition TME and downstream CHI")
+elevates two high-incidence conditions (`acute-sinusitis`, `diarrhea`) to
+**5× their prior mean** and asserts (a) the per-condition TME contribution
+rises to **> 2×** the 1× baseline and (b) the downstream CHI strictly
+falls. This test **fails against any implementation that ignores
+`posterior`** — that is its purpose. A negative-control sibling
+("composes with explicit kindMultipliers") zeroes the base multiplier for
+the elevated condition and asserts its TME contribution collapses to
+exactly 0, confirming the composite `(base ?? 1) × (λ_d / E[λ])` path
+(0 × anything = 0) rather than a silent fall-through to the point prior.
+
+**Reproducers.**
+
+- Unbiasedness gate + propagation + negative control + contract errors:
+  `tests/imm/posterior_predictive.test.ts` (9 tests; the K15 unbiasedness
+  gate logs its measured delta and ci90 width to the console on each run).
+- Python posterior draws + determinism: `python/tests/test_posterior_module.py`,
+  `test_posterior_router.py`, `test_posterior_determinism.py` (10 tests;
+  the determinism test is a subprocess regression guard against the
+  PYTHONHASHSEED-randomized `hash()` defect, now CRC32-seeded).
+- I6 figure render: `tests/ui/analog_posterior_plot.test.tsx` (6 tests);
+  CrewComposition worker wiring + error-state discrimination:
+  `tests/ui/crew_composition_i6.test.tsx` (5 tests).
+
+**E2E note (honest).** The Playwright snapshot
+`tests/e2e/__snapshots__/phase3f.smoke.spec.ts/i6-analog-posterior.png`
+("i6 analog posterior figure renders for antarctic mission") was captured
+with the optional Python calibration API live locally — the PNG shows the
+REAL posterior figure (per-condition λ histograms + pEVAC/pLOCL/CHI cards
++ TME table). The test itself asserts ONLY region visibility, never
+posterior content: it soft-waits (non-throwing) for the figure's
+`pp-pEvac` done-sentinel so the live-API capture lands on the real figure,
+but hard-asserts only that the I6 panel is visible. In CI **without** the
+API, the panel degrades to its `api-error` state by design and the test
+still passes — the app's offline-first contract is preserved (the SPA is
+fully functional without the Python service; I6 is the only surface that
+consumes it, and it degrades gracefully).
