@@ -75,7 +75,9 @@ const MISSIONS: IMMMission[] = [
   synth("leo-iss-22d-synth", "leo-iss", 22, Math.round(22 / 14)),
   synth("leo-iss-45d-synth", "leo-iss", 45, Math.round(45 / 14)),
   synth("leo-iss-90d-synth", "leo-iss", 90, Math.round(90 / 14)),
-  catalog("leo-iss-180d"), catalog("leo-iss-365d"),
+  // Catalog leo-iss 180/365-d missions: `iss-6mo` (180 d, 12 EVAs) and
+  // `iss-drm1` (365 d, 20 EVAs) per src/data/imm-missions.ts.
+  catalog("iss-6mo"), catalog("iss-drm1"),
   // interplanetary-mars-future: catalog at 426/923 (out of range), synthetic at all 5
   synth("mars-22d-synth",  "interplanetary-mars-future", 22,  Math.round(22 / 5)),
   synth("mars-45d-synth",  "interplanetary-mars-future", 45,  Math.round(45 / 5)),
