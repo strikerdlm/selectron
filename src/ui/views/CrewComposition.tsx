@@ -41,6 +41,11 @@ import { IMMAnalogPosteriorPlot } from "../figures/IMMAnalogPosteriorPlot";
 
 type SimState = "idle" | "running" | "done" | "error";
 
+// I6 posterior-predictive state has two error variants so the panel can show an
+// actionable message: "api-error" means the fetch itself failed (Python API is
+// unreachable); "compute-error" means draws arrived but the worker sweep failed.
+type PpState = "idle" | "running" | "done" | "api-error" | "compute-error";
+
 // 2026-06-04 (I6): mission kinds that carry a `kind_multipliers` block in the
 // calibrated priors — the only kinds for which `/posterior/draws` returns
 // per-condition draws. For other kinds the endpoint returns empty draws and the
@@ -330,7 +335,8 @@ export function CrewComposition() {
   //   error   — Python API unreachable or worker threw
   const [ppDraws, setPpDraws] = useState<PosteriorDrawsResponse | null>(null);
   const [ppOutcome, setPpOutcome] = useState<PosteriorPredictiveOutcome | undefined>();
-  const [ppState, setPpState] = useState<SimState>("idle");
+  const [ppState, setPpState] = useState<PpState>("idle");
+  const [ppError, setPpError] = useState<string | undefined>();
   const ppReqRef = useRef(0);
   const ppAbortRef = useRef<AbortController | null>(null);
   const ppWorkerRef = useRef<Worker | null>(null);
@@ -455,6 +461,8 @@ export function CrewComposition() {
     }
     const reqId = ++ppReqRef.current;
     setPpState("running");
+    setPpDraws(null);    // reset stale draws so phase detection is correct during fetch
+    setPpError(undefined);
     const handle = setTimeout(() => {
       // Abort any prior fetch and terminate any prior pp worker before starting.
       if (ppAbortRef.current) { ppAbortRef.current.abort(); ppAbortRef.current = null; }
@@ -477,21 +485,24 @@ export function CrewComposition() {
           let w: Worker;
           try {
             w = new Worker(new URL("../../workers/imm-simulate.worker.ts", import.meta.url), { type: "module" });
-          } catch {
-            if (reqId === ppReqRef.current) setPpState("error");
+          } catch (err) {
+            if (reqId === ppReqRef.current) {
+              setPpError((err as Error).message);
+              setPpState("compute-error");
+            }
             return;
           }
           ppWorkerRef.current = w;
           w.onmessage = (e: MessageEvent<{ ok: true; result: PosteriorPredictiveOutcome } | { ok: false; error: string }>) => {
             if (reqId === ppReqRef.current) {
               if (e.data.ok) { setPpOutcome(e.data.result); setPpState("done"); }
-              else setPpState("error");
+              else { setPpError(e.data.error); setPpState("compute-error"); }
             }
             w.terminate();
             if (ppWorkerRef.current === w) ppWorkerRef.current = null;
           };
           w.onerror = () => {
-            if (reqId === ppReqRef.current) setPpState("error");
+            if (reqId === ppReqRef.current) setPpState("compute-error");
             w.terminate();
             if (ppWorkerRef.current === w) ppWorkerRef.current = null;
           };
@@ -514,7 +525,7 @@ export function CrewComposition() {
           // failure means the Python API is unreachable (offline-first contract:
           // degrade gracefully rather than crash the view).
           if ((err as Error).name === "AbortError") return;
-          if (reqId === ppReqRef.current) setPpState("error");
+          if (reqId === ppReqRef.current) setPpState("api-error");
         });
     }, 400);
     return () => {
@@ -1270,16 +1281,26 @@ export function CrewComposition() {
               <h3 className="label text-ink-1 uppercase tracking-cap mb-4">
                 I6 · Analog Bayesian MCMC Posterior
               </h3>
-              {ppState === "running" && (
+              {ppState === "running" && !ppDraws && (
                 <p className="text-[11px] italic text-ink-3">
                   fetching posterior draws from Python calibration API…
                 </p>
               )}
-              {ppState === "error" && (
+              {ppState === "running" && ppDraws && (
+                <p className="text-[11px] italic text-ink-3">
+                  running posterior-predictive sweep ({Math.min(64, ppDraws.n_draws)} draws × 200 trials per draw)…
+                </p>
+              )}
+              {ppState === "api-error" && (
                 <p className="text-[11px] italic text-ink-3">
                   Python calibration API unreachable — start it with{" "}
                   <code className="mono">cd python &amp;&amp; uvicorn api.main:app --reload</code>{" "}
                   to see posterior draws.
+                </p>
+              )}
+              {ppState === "compute-error" && (
+                <p className="text-[11px] italic text-ink-3">
+                  posterior-predictive sweep failed{ppError ? `: ${ppError}` : " (unknown error)"}.
                 </p>
               )}
               {ppState === "done" && ppDraws && ppOutcome && (

@@ -164,16 +164,25 @@ interface PpPayload {
 }
 
 class FakeWorker {
-  onmessage: ((e: { data: { ok: true; result: unknown } }) => void) | null = null;
+  onmessage: ((e: { data: { ok: true; result: unknown } | { ok: false; error: string } }) => void) | null = null;
   onerror: ((e: ErrorEvent) => void) | null = null;
   static lastPpPayload: PpPayload | null = null;
+  // Set to true in a test to make the next pp worker reply with {ok:false, error:"boom"}.
+  // Reset in beforeEach via FakeWorker.ppShouldFail = false.
+  static ppShouldFail = false;
   postMessage(payload: unknown) {
     const p = payload as { mode?: string };
     if (p && p.mode === "posterior-predictive") {
       FakeWorker.lastPpPayload = payload as PpPayload;
-      Promise.resolve().then(() => {
-        this.onmessage?.({ data: { ok: true, result: PP_OUTCOME } });
-      });
+      if (FakeWorker.ppShouldFail) {
+        Promise.resolve().then(() => {
+          this.onmessage?.({ data: { ok: false, error: "boom" } });
+        });
+      } else {
+        Promise.resolve().then(() => {
+          this.onmessage?.({ data: { ok: true, result: PP_OUTCOME } });
+        });
+      }
       return;
     }
     // Legacy preview / main run payload → IMMOutcome.
@@ -191,6 +200,7 @@ beforeEach(async () => {
   getPosteriorDrawsMock.mockReset();
   getPosteriorDrawsMock.mockResolvedValue(cannedDrawsResponse());
   FakeWorker.lastPpPayload = null;
+  FakeWorker.ppShouldFail = false;
   vi.stubGlobal("Worker", FakeWorker as unknown as typeof Worker);
 });
 
@@ -271,5 +281,57 @@ describe("CrewComposition · I6 analog Bayesian MCMC posterior", () => {
 
     expect(getPosteriorDrawsMock).not.toHaveBeenCalled();
     expect(screen.queryByTestId("imm-i6-posterior")).toBeNull();
+  });
+
+  it("fetch rejection → api-error: I6 panel shows the API-unreachable note", async () => {
+    seedPersistedState("antarctic-winter"); // kind antarctic-station (POSTERIOR_KINDS gate passes)
+    getPosteriorDrawsMock.mockReset();
+    getPosteriorDrawsMock.mockRejectedValueOnce(new Error("ECONNREFUSED"));
+    renderWithDb();
+    await waitForReady();
+    await runMainSim();
+
+    // The I6 panel is gated on outcome, so we need outcome to be set first.
+    // After the debounce+fetch reject, the panel should show the api-error note.
+    await screen.findByTestId("imm-i6-posterior", undefined, { timeout: 3000 });
+    expect(
+      await screen.findByText(/calibration API unreachable/i, undefined, { timeout: 3000 }),
+    ).toBeDefined();
+  });
+
+  it("empty draws → panel shows no-per-condition-draws note; no pp worker message", async () => {
+    seedPersistedState("antarctic-winter");
+    getPosteriorDrawsMock.mockReset();
+    getPosteriorDrawsMock.mockResolvedValueOnce({
+      draws: [],
+      n_draws: 0,
+      seed: 0,
+      kind: "antarctic-station",
+    });
+    renderWithDb();
+    await waitForReady();
+    await runMainSim();
+
+    await screen.findByTestId("imm-i6-posterior", undefined, { timeout: 3000 });
+    // The panel should display the "no per-condition draws" message.
+    expect(
+      await screen.findByText(/no per-condition posterior draws/i, undefined, { timeout: 3000 }),
+    ).toBeDefined();
+    // No pp worker payload should have been posted (early return before spawning worker).
+    expect(FakeWorker.lastPpPayload).toBeNull();
+  });
+
+  it("worker failure envelope → compute-error: panel shows compute-failure note with error text", async () => {
+    seedPersistedState("antarctic-winter");
+    FakeWorker.ppShouldFail = true;
+    renderWithDb();
+    await waitForReady();
+    await runMainSim();
+
+    await screen.findByTestId("imm-i6-posterior", undefined, { timeout: 3000 });
+    // The panel should display the compute-error note containing the worker error string.
+    expect(
+      await screen.findByText(/posterior-predictive sweep failed.*boom/i, undefined, { timeout: 3000 }),
+    ).toBeDefined();
   });
 });
