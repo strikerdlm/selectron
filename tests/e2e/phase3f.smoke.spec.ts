@@ -135,7 +135,7 @@ test.describe("Crew Composition view", () => {
   //     states (offline-first contract).
   test("i6 analog posterior figure renders for antarctic mission", async ({ page }) => {
     // The full 100k-trial worker sim + the posterior-predictive sweep can take
-    // well over the 30s default; allow generous headroom for this one test.
+    // well over the 60s default; allow generous headroom for this one test.
     test.setTimeout(150_000);
     await page.goto("/");
     await page.getByRole("button", { name: /crew/i }).click();

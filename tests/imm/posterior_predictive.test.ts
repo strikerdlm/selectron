@@ -233,11 +233,17 @@ describe("posteriorPredictiveSimulateIMM", () => {
 //   pEvacPost ci90 = [1.400, 4.000]  →  width 2.60 pp  (cited in V&V §7.9)
 // Runtime ~10 s (pp ~6.5 s + point ~3 s) — well under the 60 s budget.
 //
-// TOLERANCE: 15 % relative (≈ 3.2× headroom over the measured 4.63 %). The gate
-// is an UNBIASEDNESS check (the two pipelines share a central estimate), NOT a
-// propagation check — propagation is proven by the load-bearing 5×→>2× test
-// above. Agreement here does not prove the posterior is consumed; the widened
-// ci90 (here 2.60 pp around a 2.5 % mean) is the actual feature.
+// TOLERANCE: 15 % relative. The gate is an UNBIASEDNESS check (the two pipelines
+// share a central estimate), NOT a propagation check — propagation is proven by
+// the load-bearing 5×→>2× test above. Agreement here does not prove the
+// posterior is consumed; the widened ci90 (here 2.60 pp around a 2.5 % mean) is
+// the actual feature.
+//
+// DURABILITY NOTE: measured relDelta is 4.63 % at the canonical seed 0xc0ffee.
+// An 8-seed sweep of this config spans ~1.1%–10.9%, so the 15 % tolerance gives
+// ~1.4× headroom against the observed worst case. The gate is seed-locked to
+// 0xc0ffee, so CI is deterministic; the sweep characterizes durability against
+// engine-internal RNG / draw-order changes.
 describe("K15 unbiasedness", () => {
   it("posterior-predictive grand mean agrees with point-prior mean within 15%", () => {
     const PERTURB = [0.6, 0.7, 0.8, 0.9, 1.1, 1.2, 1.3, 1.4]; // length 8, mean exactly 1.0
@@ -284,7 +290,11 @@ describe("K15 unbiasedness", () => {
         `${pp.pEvacPost.ci90[1].toFixed(3)}] width=${ci90Width.toFixed(3)}pp`,
     );
 
-    // Unbiasedness gate (15% relative, ~3.2× headroom over the measured 4.63%).
+    // Unbiasedness gate (15 % relative). Measured relDelta 4.63 % at the
+    // canonical seed 0xc0ffee; an 8-seed sweep of this config spans ~1.1%–10.9%,
+    // so the 15 % tolerance gives ~1.4× headroom against the observed worst case
+    // (the gate is seed-locked to 0xc0ffee, so CI is deterministic; the sweep
+    // characterizes durability against engine-internal RNG / draw-order changes).
     expect(relDelta).toBeLessThan(0.15);
     // The widened interval is the feature: it must be a real, non-degenerate band.
     expect(ci90Width).toBeGreaterThan(0);

@@ -1,6 +1,6 @@
 # Iter-3 V&V Dossier — NASA-STD-7009 Eight Credibility Factors
 
-**Status:** living document. Last revised 2026-05-19 (Phase 3F closure; Phase 3A in-flight, Phase 3B blocked on Diego's T37 curation).
+**Status:** living document. Last revised 2026-06-05 (Phase 3F closure; Phase 3A in-flight, Phase 3B blocked on Diego's T37 curation).
 
 **Mandate:** Iter-3 spec §9 [W14, M18] requires the model to be assessed against the eight NASA-STD-7009a credibility factors. This dossier holds the per-factor evidence and identifies remaining gaps. Re-read on every Iter-3 sign-off step.
 
@@ -491,7 +491,7 @@ campaign" (badge: "Antarctic winter-over priors"). Run T=5,000 preview;
 the Antarctic run should show higher TME pressure and a different
 mission-success fraction than the controlled run.
 
-### §7.9 Posterior-predictive validation (2026-06-05)
+### 7.9 Posterior-predictive validation (2026-06-05)
 
 > Numbering note: this subsection is appended at the END of §7. The
 > "§7.4" label used in the originating plan was a stale guess written
@@ -545,13 +545,17 @@ conditions perturbed:
 | absolute delta | 0.1125 pp |
 | **relative delta** | **4.63 %** |
 
-Gate tolerance is set at **15 % relative (≈ 3.2× headroom** over the
-measured 4.63 %). The residual ~4.6 % is the moment-matching Jensen gap
-plus MC noise at these sample sizes — agreement is approximate, not
-exact, exactly as the nonlinearity predicts. **Unbiasedness agreement
-does NOT prove the posterior is consumed** (a wrapper that ignored
-`posterior` would also agree on the mean); propagation is proven
-separately (below).
+Gate tolerance is set at **15 % relative**. The residual ~4.6 % is the
+moment-matching Jensen gap plus MC noise at these sample sizes —
+agreement is approximate, not exact, exactly as the nonlinearity
+predicts. The measured relDelta is **4.63 % at the canonical seed
+`0xc0ffee`**; an 8-seed sweep of this config spans **~1.1%–10.9%**, so
+the 15 % tolerance gives **~1.4× headroom against the observed worst
+case**. The gate is seed-locked to `0xc0ffee`, so CI is deterministic;
+the sweep characterizes durability against engine-internal RNG /
+draw-order changes. **Unbiasedness agreement does NOT prove the
+posterior is consumed** (a wrapper that ignored `posterior` would also
+agree on the mean); propagation is proven separately (below).
 
 **The widened interval IS the feature.** The point-prior pipeline reports
 a per-trial CI whose 0/1 evac flag is degenerate at the trial level
@@ -567,7 +571,9 @@ particular width arises from the synthetic deterministic ±40 %
 perturbation used in the unbiasedness fixture; it is a propagation-
 magnitude demonstration, distinct from the production I6 figure, which
 consumes the API's real fitted Gamma/Lognormal draws — e.g. the
-antarctic-station snapshot shows pEVAC 8.9 % with 90 % CI [5.5, 12.0].)
+antarctic-station snapshot shows pEVAC 8.9 % with 90 % CI [5.5, 12.0];
+this is a live-API rendering reported for illustration and is not a
+value verified by the test suite.)
 
 **Load-bearing propagation test.** The gate above is necessary but not
 sufficient; the propagation test (`tests/imm/posterior_predictive.test.ts`,
