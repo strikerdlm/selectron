@@ -1376,7 +1376,7 @@ export function CrewComposition() {
                     within_ci95: false,
                   },
                 },
-                laypersonCaptionsExpanded: {},
+                interpretationCaptionsExpanded: {},
               });
               notify(
                 outcome

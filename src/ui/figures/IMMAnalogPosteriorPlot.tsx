@@ -202,7 +202,7 @@ export function IMMAnalogPosteriorPlot({ draws, outcome, kind, trialsPerDraw }: 
       "Keenan et al. (2015) ICES-2015-123 [K15]. " +
       "PyMC NUTS posterior calibration (59/59 tier-B conditions), Selectron Calibration API.",
     reproducibility: `kind=${kind}, nDraws=${outcome.nDraws}, trialsPerDraw=${trialsPerDraw}, seed=${draws.seed}`,
-    layperson:
+    interpretation:
       "This figure shows how uncertain the model is about each astronaut crew's medical risk " +
       "for a given mission type. The three metric cards (pEVAC, pLOCL, CHI) show the most " +
       "likely outcome and the range of plausible values (90% interval). The small histograms " +

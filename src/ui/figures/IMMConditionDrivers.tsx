@@ -319,7 +319,7 @@ export function IMMConditionDrivers({
     reproducibility:
       `seed=${seedHex}, trials=${trials.toLocaleString()}, topN=${topN}, ` +
       `metric=${metric}, commit=__COMMIT_SHA__`,
-    layperson:
+    interpretation:
       "Out of 100 medical conditions modelled, only a handful drive most of the " +
       "simulated emergencies. This chart shows the worst offenders — the conditions " +
       "with the largest contribution to either the chance of emergency evacuation " +

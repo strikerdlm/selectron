@@ -7,7 +7,7 @@ export type CaptionBlock = {
   source: string;
   reproducibility: string;
   /** Optional plain-language summary (~100 words) for lay readers. */
-  layperson?: string;
+  interpretation?: string;
 };
 
 export function FigureCaption({ block }: { block: CaptionBlock }) {
@@ -29,8 +29,8 @@ export function FigureCaption({ block }: { block: CaptionBlock }) {
           <p><span className="text-ink-3 uppercase tracking-cap">methods.</span> {block.methods}</p>
           <p><span className="text-ink-3 uppercase tracking-cap">source.</span> {block.source}</p>
           <p><span className="text-ink-3 uppercase tracking-cap">repro.</span> {block.reproducibility}</p>
-          {block.layperson && (
-            <p><span className="text-ink-3 uppercase tracking-cap">layperson.</span> {block.layperson}</p>
+          {block.interpretation && (
+            <p><span className="text-ink-3 uppercase tracking-cap">interpretation.</span> {block.interpretation}</p>
           )}
         </div>
       )}

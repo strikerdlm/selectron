@@ -250,5 +250,5 @@ export type IMMSession = {
       within_ci95: boolean;
     };
   };
-  laypersonCaptionsExpanded: Record<string, boolean>;
+  interpretationCaptionsExpanded: Record<string, boolean>;
 };

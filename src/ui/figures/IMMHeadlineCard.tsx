@@ -268,7 +268,7 @@ export function IMMHeadlineCard({
       `Mission: ${missionLabel}.`,
     reproducibility:
       `seed=${seedHex}, trials=${trials.toLocaleString()}, commit=__COMMIT_SHA__`,
-    layperson:
+    interpretation:
       "These four numbers summarise what happened across the simulated missions. " +
       "Total medical events (TME) counts how often any crew member needed medical " +
       "care. Crew Health Index (CHI) goes from 0% to 100% — a CHI of 95% means " +
