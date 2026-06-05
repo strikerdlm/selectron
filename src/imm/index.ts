@@ -14,3 +14,5 @@ export { interpolateBetaPertByRAF } from "./treatment";
 export { sampleSeverity } from "./severity";
 export { calibrateTierCMultipliers, K15_TABLE1_REF, K15_REFERENCE_CREW } from "./calibration";
 export type { CalibrationResult } from "./calibration";
+export { posteriorPredictiveSimulateIMM } from "./posterior-predictive";
+export type { PosteriorPredictiveOpts } from "./posterior-predictive";
