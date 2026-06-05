@@ -99,4 +99,104 @@ describe("IMMAnalogPosteriorPlot (I6)", () => {
     expect(container.querySelector("[data-testid='pp-row-dental-abscess']")).not.toBeNull();
     expect(container.querySelector("[data-testid='pp-row-ankle-sprain-strain']")).not.toBeNull();
   });
+
+  // ── Histogram-path tests ───────────────────────────────────────────────────
+
+  it("degenerate: all-equal lambdas renders without throwing", () => {
+    const degenerateDraws: PosteriorDrawsResponse = {
+      draws: [
+        { condition_id: "degenerate-cond", lambdas: [0.5, 0.5, 0.5, 0.5, 0.5] },
+        { condition_id: "normal-cond", lambdas: [0.001, 0.0012, 0.0009, 0.0011, 0.0013] },
+      ],
+      n_draws: 5,
+      seed: 1,
+      kind: "leo-iss",
+    };
+    const outcome: PosteriorPredictiveOutcome = {
+      pEvacPost: makeSummary(5.0),
+      pLoclPost: makeSummary(0.3),
+      chiPost: makeSummary(90.0),
+      perConditionTmeContribPost: {
+        "degenerate-cond": makeSummary(0.01),
+        "normal-cond": makeSummary(0.005),
+      },
+      nDraws: 5,
+      trialsPerDraw: 100,
+    };
+    // Should render without throwing; metric cards always present
+    expect(() =>
+      render(
+        <IMMAnalogPosteriorPlot
+          draws={degenerateDraws}
+          outcome={outcome}
+          kind="leo-iss"
+          trialsPerDraw={100}
+        />,
+      ),
+    ).not.toThrow();
+  });
+
+  it("degenerate: empty lambdas array alongside a condition with data renders without throwing", () => {
+    const emptyLambdasDraws: PosteriorDrawsResponse = {
+      draws: [
+        { condition_id: "empty-cond", lambdas: [] },
+        { condition_id: "normal-cond", lambdas: [0.002, 0.0022, 0.0019] },
+      ],
+      n_draws: 2,
+      seed: 2,
+      kind: "leo-iss",
+    };
+    const outcome: PosteriorPredictiveOutcome = {
+      pEvacPost: makeSummary(4.0),
+      pLoclPost: makeSummary(0.2),
+      chiPost: makeSummary(88.0),
+      perConditionTmeContribPost: {
+        "empty-cond": makeSummary(0.0),
+        "normal-cond": makeSummary(0.004),
+      },
+      nDraws: 2,
+      trialsPerDraw: 100,
+    };
+    expect(() =>
+      render(
+        <IMMAnalogPosteriorPlot
+          draws={emptyLambdasDraws}
+          outcome={outcome}
+          kind="leo-iss"
+          trialsPerDraw={100}
+        />,
+      ),
+    ).not.toThrow();
+  });
+
+  it("empty state: draws.draws=[] renders italic empty-state note and metric cards", () => {
+    const emptyDraws: PosteriorDrawsResponse = {
+      draws: [],
+      n_draws: 0,
+      seed: 0,
+      kind: "leo-iss",
+    };
+    const outcome: PosteriorPredictiveOutcome = {
+      pEvacPost: makeSummary(3.1),
+      pLoclPost: makeSummary(0.15),
+      chiPost: makeSummary(85.0),
+      perConditionTmeContribPost: {},
+      nDraws: 0,
+      trialsPerDraw: 100,
+    };
+    const { container } = render(
+      <IMMAnalogPosteriorPlot
+        draws={emptyDraws}
+        outcome={outcome}
+        kind="leo-iss"
+        trialsPerDraw={100}
+      />,
+    );
+    // Metric cards still render in empty state
+    expect(container.querySelector("[data-testid='pp-pEvac']")).not.toBeNull();
+    expect(container.querySelector("[data-testid='pp-pLocl']")).not.toBeNull();
+    expect(container.querySelector("[data-testid='pp-chi']")).not.toBeNull();
+    // Italic empty-state note contains a stable substring
+    expect(container.textContent).toContain("No per-condition draws available");
+  });
 });

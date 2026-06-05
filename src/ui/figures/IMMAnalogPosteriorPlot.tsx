@@ -41,8 +41,12 @@ function buildLambdaHistogram(
 ): { centers: string[]; counts: number[] } {
   if (lambdas.length === 0) return { centers: [], counts: [] };
 
-  const lo = Math.min(...lambdas);
-  const hi = Math.max(...lambdas);
+  let lo = lambdas[0];
+  let hi = lambdas[0];
+  for (let i = 1; i < lambdas.length; i++) {
+    if (lambdas[i] < lo) lo = lambdas[i];
+    if (lambdas[i] > hi) hi = lambdas[i];
+  }
   const range = hi - lo;
   const width = range > 0 ? range / bins : 1;
   const safeBins = range > 0 ? bins : 1;
@@ -55,8 +59,8 @@ function buildLambdaHistogram(
   }
 
   const centers = Array.from({ length: safeBins }, (_, i) => {
-    const c = lo + (i + 0.5) * width;
-    // Format to 4 significant figures
+    // Format to 3 significant figures
+    const c = range === 0 ? lo : lo + (i + 0.5) * width;
     return c.toPrecision(3);
   });
 
@@ -107,7 +111,7 @@ function LambdaHistPanel({ conditionId, lambdas, themeName }: LambdaHistPanelPro
   const option = {
     animation: false,
     useUTC: true,
-    aria: { enabled: true },
+    aria: { enabled: true, decal: { show: true } },
     grid: { left: 8, right: 8, top: 28, bottom: 32, containLabel: true },
     title: {
       text: conditionId,
@@ -160,14 +164,14 @@ function LambdaHistPanel({ conditionId, lambdas, themeName }: LambdaHistPanelPro
 
 // ─── Main component ──────────────────────────────────────────────────────────
 
-export type Props = {
+export type IMMAnalogPosteriorPlotProps = {
   draws: PosteriorDrawsResponse;
   outcome: PosteriorPredictiveOutcome;
   kind: string;
   trialsPerDraw: number;
 };
 
-export function IMMAnalogPosteriorPlot({ draws, outcome, kind, trialsPerDraw }: Props) {
+export function IMMAnalogPosteriorPlot({ draws, outcome, kind, trialsPerDraw }: IMMAnalogPosteriorPlotProps) {
   const { themeName } = useFigureTheme();
 
   // Per-condition table — top 10 by mean desc
