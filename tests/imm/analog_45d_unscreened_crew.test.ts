@@ -59,6 +59,8 @@ const SEED = 0xc0ffee;
 const TRIALS = 3_000; // matches the kind_multipliers suite's TR convention
 
 const mission = IMM_MISSIONS.find((m) => m.id === "analog-45d")!;
+// 2026-06-05 (Diego): "test an analog mission for 22 days with the same bad crew".
+const mission22 = IMM_MISSIONS.find((m) => m.id === "analog-22d")!;
 const kit = IMM_KITS.medium; // "Analog / Antarctic Station (Level II–III)"
 
 /**
@@ -181,5 +183,69 @@ describe("analog-45d · unscreened high-risk crew (no Stage-A selection)", () =>
     expect(Math.abs(a.tme.mean - b.tme.mean)).toBeLessThan(1e-12);
     expect(Math.abs(a.chi.mean - b.chi.mean)).toBeLessThan(1e-12);
     expect(Math.abs(a.pEvac.mean - b.pEvac.mean)).toBeLessThan(1e-12);
+  });
+});
+
+// 2026-06-05 (Diego): "test an analog mission for 22 days with the same bad
+// crew" — the identical unscreened/screened fixtures on the shorter
+// `analog-22d` campaign. Gate verdicts are mission-independent (already
+// asserted above), so this block characterizes the duration-scaled risk:
+//
+// Margin choice (3-seed × {3k, 8k}-trial sweep, 2026-06-05): at 22 days
+// ΔTME spans +1.19 to +1.29 and ΔCHI spans −0.36 to −0.44 across every
+// seed/T pair — asserted with headroom. ΔpEVAC and ΔMSP sign-invert across
+// seeds at these trial counts (22-day rare-event tails are even thinner
+// than at 45 days), so they remain deliberately unasserted.
+describe("analog-22d · same unscreened crew (22-day campaign)", () => {
+  it("fixture: analog-22d is the 22-day analog-controlled campaign", () => {
+    expect(mission22.kind).toBe("analog-controlled");
+    expect(mission22.durationDays).toBe(22);
+    expect(mission22.crewSize).toBe(6);
+  });
+
+  it("skipping selection elevates 22-day mission risk via the vulnerability path (TME↑, CHI↓)", () => {
+    const screened = simulateIMM({
+      crew: screenedCrew,
+      mission: mission22,
+      kit,
+      trials: TRIALS,
+      seed: SEED,
+      criteria: PLACEHOLDER_CRITERIA,
+    });
+    const unscreened = simulateIMM({
+      crew: unscreenedCrew,
+      mission: mission22,
+      kit,
+      trials: TRIALS,
+      seed: SEED,
+      criteria: PLACEHOLDER_CRITERIA,
+    });
+
+    expect(unscreened.tme.mean).toBeGreaterThan(screened.tme.mean + 0.7);
+    expect(unscreened.chi.mean).toBeLessThan(screened.chi.mean - 0.1);
+  });
+
+  it("duration monotonicity: the same unscreened crew accrues fewer expected medical events in 22 days than in 45", () => {
+    const u22 = simulateIMM({
+      crew: unscreenedCrew,
+      mission: mission22,
+      kit,
+      trials: TRIALS,
+      seed: SEED,
+      criteria: PLACEHOLDER_CRITERIA,
+    });
+    const u45 = simulateIMM({
+      crew: unscreenedCrew,
+      mission,
+      kit,
+      trials: TRIALS,
+      seed: SEED,
+      criteria: PLACEHOLDER_CRITERIA,
+    });
+    // General-Poisson incidence scales with durationDays (rev3-b duration
+    // scaling), so 22-day TME must sit well below 45-day TME for the same
+    // crew. Observed at 0xc0ffee/T=3k: 5.49 vs 11.27 — assert the ordering
+    // with margin rather than the exact values.
+    expect(u22.tme.mean).toBeLessThan(u45.tme.mean - 2);
   });
 });
