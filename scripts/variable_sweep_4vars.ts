@@ -105,7 +105,7 @@ function wilson(k: number, n: number, z = 1.959964): [number, number] {
   const half = (z * Math.sqrt((p * (1 - p)) / n + z2 / (4 * n * n))) / den;
   return [Math.max(0, mid - half), Math.min(1, mid + half)];
 }
-function phi(x: number): number {
+function phi(x: number): number { // standard normal CDF (Abramowitz–Stegun 7.1.26 via erf)
   const t = 1 / (1 + 0.3275911 * Math.abs(x) / Math.SQRT2);
   const erf = 1 - (((((1.061405429 * t - 1.453152027) * t) + 1.421413741) * t - 0.284496736) * t + 0.254829592) * t * Math.exp(-(x * x) / 2);
   return x >= 0 ? 0.5 * (1 + erf) : 0.5 * (1 - erf);
@@ -118,6 +118,7 @@ function twoPropZ(k1: number, n1: number, k2: number, n2: number): { z: number; 
   return { z, p: 2 * (1 - phi(Math.abs(z))) };
 }
 function riskRatio(k1: number, n1: number, k2: number, n2: number): { rr: number; lo: number; hi: number; corrected: boolean } {
+  // RR = unscreened/screened. Haldane–Anscombe +0.5 when any cell is 0.
   const corrected = k1 === 0 || k2 === 0;
   const a = k1 + (corrected ? 0.5 : 0), b = k2 + (corrected ? 0.5 : 0);
   const m = n1 + (corrected ? 1 : 0), n = n2 + (corrected ? 1 : 0);
@@ -191,7 +192,7 @@ console.error(`\nTotal runtime: ${(totalWallMs / 1000).toFixed(1)}s`);
 // ── write output JSON ───────────────────────────────────────────────────────
 const out = {
   meta: {
-    T, seed: SEED, kit: kit.scenarioId, date: "2026-06-05",
+    T, seed: SEED, defaultKit: kit.scenarioId, date: "2026-06-05",
     crews: { GOOD, BAD }, totalWallMs,
   },
   cells,
