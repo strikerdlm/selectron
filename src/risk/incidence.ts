@@ -135,6 +135,8 @@ export function applyVulnerabilityMultiplier(
 
 /** Standard normal via Box–Muller. Deterministic given a seeded rng. */
 export function sampleStandardNormal(rng: Rng): number {
+  // Floor at 1e-12 (matches src/imm/incidence.ts and synthetic-iter3.ts Box–Muller floors;
+  // src/engine/gamma.ts's private normal uses Number.EPSILON — intentionally not shared).
   const u1 = Math.max(rng(), 1e-12);
   const u2 = rng();
   return Math.sqrt(-2 * Math.log(u1)) * Math.cos(2 * Math.PI * u2);
@@ -160,6 +162,9 @@ export function sampleFrailty(rng: Rng, phi: number): number {
 export function sampleGammaPoisson(rng: Rng, mean: number, phi: number): number {
   if (!Number.isFinite(mean) || mean < 0) {
     throw new SelectronError("E_BAD_PRIOR", `NB mean must be finite non-negative, got ${mean}`, { mean });
+  }
+  if (!Number.isFinite(phi) || phi <= 0) {
+    throw new SelectronError("E_BAD_PRIOR", `NB phi must be a finite positive number, got ${phi}`, { phi });
   }
   return samplePoisson(rng, mean * sampleFrailty(rng, phi));
 }

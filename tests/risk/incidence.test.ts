@@ -202,7 +202,7 @@ describe("sampleFrailty (mean 1, var 1/phi)", () => {
   });
   it("throws on non-positive phi", () => {
     const rng = makeRng(1);
-    expect(() => sampleFrailty(rng, 0)).toThrow();
+    expect(() => sampleFrailty(rng, 0)).toThrow(SelectronError);
   });
 });
 
@@ -216,5 +216,8 @@ describe("sampleGammaPoisson (Negative-Binomial marginal)", () => {
     const variance = sumsq / n - mean * mean;
     expect(Math.abs(mean - lambda)).toBeLessThan(0.05);
     expect(Math.abs(variance - (lambda + (lambda * lambda) / phi))).toBeLessThan(0.2);
+  });
+  it("throws on non-positive phi", () => {
+    expect(() => sampleGammaPoisson(makeRng(1), 3, 0)).toThrow(SelectronError);
   });
 });
