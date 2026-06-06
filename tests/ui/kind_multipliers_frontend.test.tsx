@@ -119,7 +119,7 @@ describe("missionKindContextLabel (via KindMultipliersTable empty states)", () =
 // 2. KindMultipliersTable — antarctic-station sorted correctly
 // ────────────────────────────────────────────────────────────────────────────
 describe("KindMultipliersTable (antarctic-station)", () => {
-  it("renders 15 modulated conditions sorted by |mult − 1| desc; frostbite (5.00×) at the top, altitude-sickness (4.00×) second", () => {
+  it("renders 16 modulated conditions sorted by |mult − 1| desc; frostbite (5.00×) at the top, altitude-sickness (4.00×) second", () => {
     const { container } = render(
       <KindMultipliersTable kind={"antarctic-station" satisfies IMMMissionKind} />,
     );
