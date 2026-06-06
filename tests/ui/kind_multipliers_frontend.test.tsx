@@ -4,7 +4,7 @@
 //
 // Scope:
 //   1. missionKindContextLabel — returns the expected string for every kind.
-//   2. KindMultipliersTable — antarctic-station renders the 15 modulated
+//   2. KindMultipliersTable — antarctic-station renders the 16 modulated
 //      conditions sorted by |mult − 1| desc, with frostbite at the top.
 //   3. KindMultipliersTable — leo-iss shows the empty state.
 //   4. KindMultipliersTable — analog-isolation shows the empty state
@@ -124,9 +124,8 @@ describe("KindMultipliersTable (antarctic-station)", () => {
       <KindMultipliersTable kind={"antarctic-station" satisfies IMMMissionKind} />,
     );
     const rows = container.querySelectorAll("[data-testid='kind-mult-row']");
-    // 15 conditions modulated for antarctic-station per
-    // research/evidence_extracted/antarctic_kind_multipliers.md
-    expect(rows.length).toBe(15);
+    // 16 conditions modulated for antarctic-station (15 original + interpersonal-conflict 2.00×)
+    expect(rows.length).toBe(16);
 
     // Frostbite has the largest |Δ| (5.00 − 1.00 = 4.00). It is not in
     // IMM_CONDITIONS (forward-compatible multiplier only; see dossier

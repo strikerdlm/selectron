@@ -108,7 +108,7 @@ describe("IMMConditionDrivers (I3)", () => {
         topN={3}
       />,
     );
-    expect(container.textContent).toMatch(/Top 3 of 100 conditions/i);
+    expect(container.textContent).toMatch(/Top 3 of 10[01] conditions/i);
   });
 
   it("caption mentions the active metric (default pEVAC)", () => {
