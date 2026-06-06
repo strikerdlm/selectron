@@ -12,6 +12,7 @@ import type { PriorsJson } from "@/risk/priorsSchema";
 import { ANALOG_CONDITIONS } from "@/risk/conditions";
 import { ANALOG_MISSIONS } from "@/data/analog-missions";
 import { makeRng } from "@/engine/prng";
+import conflictTeamPriors from "@/data/conflict-team-priors.json";
 
 const PRIORS_SEED = 0xfeed;
 const SAMPLES_PER_MISSION = 1000;
@@ -93,10 +94,14 @@ function buildTeamBlock(): NonNullable<PriorsJson["team"]> {
     lambda_base_samples[id] = makeLogLambdaSamples(Math.log(lambdaBase), 0.25, (PRIORS_SEED ^ 0x7a3b) + i)
       .map((x) => Math.exp(x));
   });
+
+  const fitted = (conflictTeamPriors as { team?: Partial<NonNullable<PriorsJson["team"]>> }).team;
+
   return {
-    crew_frailty_phi_samples: [2, 2.5, 3, 3.5, 4], // weakly identified; deliberately wide (Basner n=2/6)
+    crew_frailty_phi_samples: fitted?.crew_frailty_phi_samples ?? [2, 2.5, 3, 3.5, 4],
     member_frailty_phi: 4,
     pi_unstable_base: 0.658, // Tu 2024: 133/202 crews unstable
+    pi_unstable_samples: fitted?.pi_unstable_samples,
     alpha_fit: -0.5,
     sigma_log_beta: 0.3,     // ≈ ±35% β uncertainty (V&V sensitivity band)
     temporal_a: 2,
@@ -104,7 +109,9 @@ function buildTeamBlock(): NonNullable<PriorsJson["team"]> {
     beta_het: 0.3,
     beta_weak: 0.4,
     dyad_ref_n: 6,
-    lambda_base_samples,
+    lambda_base_samples: fitted?.lambda_base_samples
+      ? { ...lambda_base_samples, ...fitted.lambda_base_samples }
+      : lambda_base_samples,
   };
 }
 
