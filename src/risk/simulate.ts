@@ -25,7 +25,7 @@ import { lostDays } from "./treatment";
 import { conditionBehavior } from "./condition-behavior";
 import { drawTrialLatentState, type TeamHyper, type TrialLatentState } from "./crew-state";
 import { dyadFactor, heterogeneityFactor, weakestLinkFactor, attributeEvents } from "./crew-conditions";
-import { integratedIntensity, type LatentClass } from "./temporal";
+import { integratedIntensity, firstEventFraction, type LatentClass } from "./temporal";
 
 type Rng = () => number;
 
@@ -42,8 +42,20 @@ export type TrialResult = {
   perCondition: Record<string, number>;
 };
 
+type TrialDiag = {
+  teamFirstFractions: number[];
+  latentClassFlags: number[];
+  teamMemberConcentration: number[][];
+};
+
 export type RiskPosteriorWithDiagnostics = RiskPosterior & {
-  diagnostics?: { chiSamples: number[]; qtlSamples: number[] };
+  diagnostics?: {
+    chiSamples: number[];
+    qtlSamples: number[];
+    teamFirstFractions?: number[];
+    latentClassFlags?: number[];
+    teamMemberConcentration?: number[][];
+  };
 };
 
 const DEFAULT_CHI_STAR = 0.7;
@@ -174,6 +186,7 @@ function runCrewPass(
   rng: Rng,
   idx: ReadonlyMap<string, Criterion>,
   perCondition: Record<string, number>,
+  diag?: TrialDiag,
 ): number {
   let q = 0;
   const dyad = dyadFactor(crew.length, team.dyad_ref_n);
@@ -194,10 +207,16 @@ function runCrewPass(
     if (!samples || samples.length === 0 || !condPrior) continue;
     const lambdaBase = samples[Math.min(Math.floor(rng() * samples.length), samples.length - 1)];
     const mean = lambdaBase * dyad * het * weak * mission.durationDays * intg * latent.crewFrailty;
+    // Collect first-event fraction for conflict-event (diagnostics mode only).
+    // Called before samplePoisson so rng ordering is predictable when diag enabled.
+    if (diag && c.id === "conflict-event") {
+      const frac = firstEventFraction(rng, mean, latent.latentClass as LatentClass, team.temporal_a, team.temporal_p);
+      diag.teamFirstFractions.push(frac);
+    }
     const n = samplePoisson(rng, mean);
     if (n === 0) continue;
-    // advances rng deterministically (n draws); per-member counts are wired in Task 11 B5 diagnostics
-    attributeEvents(rng, n, proneness);
+    const attributed = attributeEvents(rng, n, proneness);
+    if (diag) diag.teamMemberConcentration.push(attributed);
     q += accumulateLostDays(rng, c.id, n, condPrior, mission, perCondition);
   }
   return q;
@@ -210,6 +229,7 @@ export function runMissionTrial(
   conditions: readonly Condition[],
   seed: number,
   criteriaIndex?: ReadonlyMap<string, Criterion>,
+  diag?: TrialDiag,
 ): TrialResult {
   const idx = criteriaIndex ?? new Map<string, Criterion>();
   let totalQTL = 0;
@@ -221,6 +241,9 @@ export function runMissionTrial(
   const hyper = team ? defaultHyper(team, rngLatent) : undefined;
   const latent: TrialLatentState | null =
     hyper ? drawTrialLatentState(crew, idx, hyper, rngLatent) : null;
+  if (diag && latent) {
+    diag.latentClassFlags.push(latent.latentClass);
+  }
 
   // Phase 1a — medical/physiologic (UNCHANGED behavior, isolated substream)
   // Phase 1b — psychiatric/performance (frailty + latent temporal + NB)
@@ -284,7 +307,7 @@ export function runMissionTrial(
   // Phase 2 — crew-level team conditions
   if (latent && team) {
     const rngCrew = makeRng((seed ^ SALT_CREW) >>> 0);
-    totalQTL += runCrewPass(crew, mission, conditions, priors, team, latent, rngCrew, idx, perCondition);
+    totalQTL += runCrewPass(crew, mission, conditions, priors, team, latent, rngCrew, idx, perCondition, diag);
   }
 
   // Spec §3.5 mandates CHI ∈ [0,1] by construction. Under pathological priors a
@@ -395,8 +418,12 @@ export function simulateMission(
   const perConditionSamples: Record<string, number[]> = {};
   for (const c of conditions) perConditionSamples[c.id] = new Array<number>(trials).fill(0);
 
+  const diagCollector: TrialDiag | undefined = options.diagnostics
+    ? { teamFirstFractions: [], latentClassFlags: [], teamMemberConcentration: [] }
+    : undefined;
+
   for (let t = 0; t < trials; t++) {
-    const result = runMissionTrial(crew, mission, priors, conditions, (options.seed + t) >>> 0, criteriaIndex);
+    const result = runMissionTrial(crew, mission, priors, conditions, (options.seed + t) >>> 0, criteriaIndex, diagCollector);
     chiSamples[t] = result.chi;
     qtlSamples[t] = result.qtl;
     for (const cid of Object.keys(perConditionSamples)) {
@@ -421,6 +448,18 @@ export function simulateMission(
     ess: trials,
     trials,
   };
-  if (options.diagnostics) posterior.diagnostics = { chiSamples, qtlSamples };
+  if (options.diagnostics) {
+    posterior.diagnostics = {
+      chiSamples,
+      qtlSamples,
+      ...(diagCollector
+        ? {
+            teamFirstFractions: diagCollector.teamFirstFractions,
+            latentClassFlags: diagCollector.latentClassFlags,
+            teamMemberConcentration: diagCollector.teamMemberConcentration,
+          }
+        : {}),
+    };
+  }
   return posterior;
 }
