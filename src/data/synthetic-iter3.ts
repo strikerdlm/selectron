@@ -50,7 +50,7 @@ const CONDITION_MEAN_LOG: Readonly<Record<string, number>> = {
   "sustained-cognitive-decrement":    Math.log(0.00041), // ~0.15/py; 1/6 crew Mars-500
   "operational-error":                Math.log(0.05),    // 5% per EVA; Luger 2014 MARS2013
   // ── Team ────────────────────────────────────────────────────────────────
-  "leadership-challenge":             Math.log(0.08),    // 8% per EVA-equivalent; Roma & Bedwell 2017
+  "leadership-challenge":             Math.log(0.00055), // ~0.20/py crew-level rate; superseded by team block λ in the crew pass
   "role-ambiguity-conflict":          Math.log(0.00041), // ~0.15/py; McMenamin 2020
 };
 
@@ -74,6 +74,38 @@ function makeMissionEntry(meanLog: number, seed: number) {
   const mean = samples.reduce((a, b) => a + b, 0) / samples.length;
   const variance = samples.reduce((a, b) => a + (b - mean) * (b - mean), 0) / samples.length;
   return { log_lambda_samples: samples, mean_log_lambda: mean, sd_log_lambda: Math.sqrt(variance) };
+}
+
+// Synthetic-structural defaults for the conflict/team Bayesian layer (spec
+// docs/superpowers/specs/2026-06-06-selectron-conflict-team-bayesian-design.md §5–§7).
+// The PyMC-fittable params (pi_unstable_base/samples, lambda_base_samples,
+// crew_frailty_phi_samples) get OVERWRITTEN by conflict-team-priors.json in a
+// later task; these literature-anchored defaults keep the engine fully
+// functional without the Python service.
+function buildTeamBlock(): NonNullable<PriorsJson["team"]> {
+  const teamIds = ANALOG_CONDITIONS.filter((c) => c.family === "team").map((c) => c.id);
+  // Crew-level per-day base rate for a reference 6-person crew, anchored to
+  // Bell 2019 ("all teams report ≥1 conflict by 40% of mission / 90 d"):
+  //   1 − exp(−λ·0.4·90) ≈ 0.97  →  λ ≈ 0.097/day.
+  const lambdaBase = 0.097;
+  const lambda_base_samples: Record<string, number[]> = {};
+  teamIds.forEach((id, i) => {
+    lambda_base_samples[id] = makeLogLambdaSamples(Math.log(lambdaBase), 0.25, (PRIORS_SEED ^ 0x7a3b) + i)
+      .map((x) => Math.exp(x));
+  });
+  return {
+    crew_frailty_phi_samples: [2, 2.5, 3, 3.5, 4], // weakly identified; deliberately wide (Basner n=2/6)
+    member_frailty_phi: 4,
+    pi_unstable_base: 0.658, // Tu 2024: 133/202 crews unstable
+    alpha_fit: -0.5,
+    sigma_log_beta: 0.3,     // ≈ ±35% β uncertainty (V&V sensitivity band)
+    temporal_a: 2,
+    temporal_p: 2,           // back-loaded ramp
+    beta_het: 0.3,
+    beta_weak: 0.4,
+    dyad_ref_n: 6,
+    lambda_base_samples,
+  };
 }
 
 function buildSyntheticPriors(): PriorsJson {
@@ -129,6 +161,7 @@ function buildSyntheticPriors(): PriorsJson {
     model_version: "synthetic-iter3-ui-scaffold",
     fitted_at: "2026-05-19T00:00:00Z",
     conditions,
+    team: buildTeamBlock(),
   };
 }
 
