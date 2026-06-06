@@ -50,6 +50,17 @@ export const FAMILY_BETA: Partial<Record<IMMConditionFamily, number>> = {
 };
 export const FAMILY_BETA_DEFAULT = -0.2;
 
+// Phase A: Xu et al. 2020 crew minimum-C → safety climate → safety performance.
+// β_csc is attenuated vs per-family FAMILY_BETA because the pathway is mediated through
+// team safety climate rather than a direct individual → outcome path.
+const CSC_BETA = -0.15;
+const CSC_FAMILIES = new Set<IMMConditionFamily>(["behavioral", "traumatic", "musculoskeletal"]);
+// Phase B: Sandal 2018 + Bell 2019 third-quarter phenomenon.
+// When thirdQuarterMode=true, amplifies the conscientiousness β for psychiatric/behavioral
+// families. Magnitude anchored to Sandal 2018 coping nadir + Bell 2019 conflict onset.
+const THIRD_QUARTER_C_AMP = 1.4;
+const THIRD_QUARTER_C_FAMILIES = new Set<IMMConditionFamily>(["psychiatric", "behavioral"]);
+
 type Occurrence = {
   conditionId: string;
   crewIndex: number;
@@ -125,7 +136,61 @@ export type IMMTrialOpts = {
    * the caller does not thread an explicit map. Tests can override directly.
    */
   kindMultipliers?: Record<string, number>;
+  /**
+   * Phase A (Xu et al. 2020): pre-computed crew-level safety-climate coefficient.
+   * Applied as a λ multiplier on behavioral / traumatic / musculoskeletal conditions
+   * for ALL crew members. Computed once per simulation by simulateIMM from the crew's
+   * minimum psych.conscientiousness score via computeCrewSafetyClimateMultiplier.
+   * Default 1.0 — K15 reference crew (no stageAScores) gets 1.0 automatically.
+   */
+  crewSafetyClimateMultiplier?: number;
+  /**
+   * Phase B (Sandal 2018 + Bell 2019): third-quarter phenomenon mode.
+   * When true, amplifies the psych.conscientiousness β by THIRD_QUARTER_C_AMP (1.4×)
+   * for psychiatric and behavioral conditions. Inert for crew without
+   * psych.conscientiousness stageAScores (applyStageAVulnerabilityMultiplier
+   * falls through to baseLambda when stageAScores is absent — K15 safe).
+   * Default false.
+   */
+  thirdQuarterMode?: boolean;
 };
+
+/**
+ * Phase A: Crew-level safety-climate multiplier (Xu et al. 2020).
+ *
+ * The MINIMUM conscientiousness score across all crew members drives team safety climate,
+ * which in turn predicts individual safety compliance and participation (Xu 2020, 3-wave
+ * longitudinal, N=451). Halfhill et al. 2005 (military teams) and Van Vianen et al. 2001
+ * (drilling/student teams) corroborate: group minimum C predicts team performance and
+ * task cohesion.
+ *
+ * Algorithm:
+ *   1. Collect psych.conscientiousness scores from all crew members who have stageAScores.
+ *   2. Find the minimum.
+ *   3. Z-score it: z = ((minC − 50) / 100) × 4  (±2 SD convention for [0,100] scale).
+ *   4. Return exp(CSC_BETA × z). Low minC → z<0 → CSC>1 → elevated λ for the crew.
+ *
+ * Returns 1.0 (identity) when no crew member supplies psych.conscientiousness scores —
+ * the K15 reference crew carries no stageAScores, so K15 invariance is preserved.
+ *
+ * Applied as a multiplier on behavioral / traumatic / musculoskeletal λ for ALL crew
+ * members in runIMMTrial. A single low-C crew member elevates safety-sensitive risk
+ * for the entire crew via the safety-climate pathway.
+ */
+export function computeCrewSafetyClimateMultiplier(
+  crew: IMMCrewMember[],
+  criteriaIndex: ReadonlyMap<string, Criterion>,
+): number {
+  const crit = criteriaIndex.get("psych.conscientiousness");
+  if (!crit) return 1.0;
+  const scores = crew
+    .map(m => m.stageAScores?.["psych.conscientiousness"])
+    .filter((s): s is number => s !== undefined && Number.isFinite(s));
+  if (scores.length === 0) return 1.0;
+  const minC = Math.min(...scores);
+  const z = zScoreAgainstScale(minC, crit.scale);
+  return Math.exp(CSC_BETA * z);
+}
 
 /**
  * IC-5: Compute Stage A z-scored vulnerability multiplier for a condition.
@@ -152,6 +217,7 @@ export function applyStageAVulnerabilityMultiplier(
   family: IMMConditionFamily,
   vulnerabilityCriteria: string[],
   criteriaIndex: ReadonlyMap<string, Criterion>,
+  criterionBetaAmplifiers?: Readonly<Record<string, number>>,
 ): number {
   if (vulnerabilityCriteria.length === 0 || !member.stageAScores) return baseLambda;
 
@@ -166,7 +232,8 @@ export function applyStageAVulnerabilityMultiplier(
     if (!c) continue;
     const zRaw = zScoreAgainstScale(raw, c.scale);
     const zSigned = c.higherIsBetter ? zRaw : -zRaw;
-    beta[cid] = familyBeta;
+    // Phase B: per-criterion β amplifier (e.g. third-quarter mode for psych.conscientiousness).
+    beta[cid] = familyBeta * (criterionBetaAmplifiers?.[cid] ?? 1.0);
     z[cid] = zSigned;
   }
 
@@ -211,12 +278,13 @@ function sampleGeneralPoissonCount(
   vulnerabilityCriteria: string[],
   criteriaIndex: ReadonlyMap<string, Criterion>,
   tierMult: number = 1.0,
+  criterionBetaAmplifiers?: Readonly<Record<string, number>>,
 ): number {
   const inc = prior.incidence;
   if (inc.distribution === "Lognormal-Poisson") {
     const lambdaPerDay = sampleLognormal(rng, inc.mu_log_lambda!, inc.sigma_log_lambda!);
     const rfmLambda = applyRiskFactorMultiplier(lambdaPerDay, member, prior);
-    const modLambda = applyStageAVulnerabilityMultiplier(rfmLambda, member, family, vulnerabilityCriteria, criteriaIndex);
+    const modLambda = applyStageAVulnerabilityMultiplier(rfmLambda, member, family, vulnerabilityCriteria, criteriaIndex, criterionBetaAmplifiers);
     // rev3-b-followup: tierMult applied at the λ-sampling site → Poisson(λ · tierMult)
     // preserves both mean *and* variance (Var = λ · tierMult, not mult² · λ which
     // is what post-count stochastic rounding produced).
@@ -225,7 +293,7 @@ function sampleGeneralPoissonCount(
   if (inc.distribution === "Gamma-Poisson") {
     const lambdaPerDay = sampleGamma(inc.alpha!, rng) / inc.beta!;
     const rfmLambda = applyRiskFactorMultiplier(lambdaPerDay, member, prior);
-    const modLambda = applyStageAVulnerabilityMultiplier(rfmLambda, member, family, vulnerabilityCriteria, criteriaIndex);
+    const modLambda = applyStageAVulnerabilityMultiplier(rfmLambda, member, family, vulnerabilityCriteria, criteriaIndex, criterionBetaAmplifiers);
     return samplePoisson(rng, modLambda * durationDays * tierMult);
   }
   // Fixed: already handled inline in the caller (lambda_fixed is a rate-per-day too)
@@ -269,6 +337,8 @@ export function runIMMTrial(
   const occurrences: Occurrence[] = [];
   const earlyTerminated = new Set<number>();
   const rafHistory: Array<{ conditionId: string; raf: number }> = [];
+  const crewCSC = opts.crewSafetyClimateMultiplier ?? 1.0;
+  const thirdQtMode = opts.thirdQuarterMode ?? false;
 
   // T23: Pre-sample SPE event times once per trial (one solar event affects all crew).
   // λ_SPE = LAMBDA_SPE_PER_DAY (solar max estimate per K15 §II.A.4).
@@ -302,7 +372,16 @@ export function runIMMTrial(
       // guard the lookup with a typeof check for forward-compat).
       const rawKindMult = opts.kindMultipliers?.[cond.id];
       const kindMult = (typeof rawKindMult === "number" && Number.isFinite(rawKindMult)) ? rawKindMult : 1.0;
-      const effectiveMult = tierMult * kindMult;
+      // Phase A: crew safety-climate coefficient (Xu 2020 min-C path). Inert when crewCSC=1.0
+      // (no crew member has C scores → computeCrewSafetyClimateMultiplier returns 1.0).
+      const cscFamilyMult = CSC_FAMILIES.has(cond.family) ? crewCSC : 1.0;
+      const effectiveMult = tierMult * kindMult * cscFamilyMult;
+      // Phase B: third-quarter β amplifier for psych.conscientiousness.
+      // Inert when thirdQtMode=false or condition family not in THIRD_QUARTER_C_FAMILIES.
+      const thirdQtBetaAmps: Readonly<Record<string, number>> | undefined =
+        (thirdQtMode && THIRD_QUARTER_C_FAMILIES.has(cond.family))
+          ? { "psych.conscientiousness": THIRD_QUARTER_C_AMP }
+          : undefined;
 
       let count = 0;
       if (cond.processType === "general-Poisson") {
@@ -310,15 +389,15 @@ export function runIMMTrial(
           // Fixed: lambda_fixed is a per-person-day rate; scale by duration, then apply RFM.
           // IC-5: apply Stage A vulnerability multiplier on top of RFM.
           // rev3-b-followup: tierMult applied to λ directly (variance-preserving).
-          // 2026-06-04: kindMult threaded into effectiveMult.
+          // Phase A/B: effectiveMult includes CSC; thirdQtBetaAmps amplifies C β.
           const baseLambdaPerDay = prior.incidence.lambda_fixed!;
           const rfmLambdaPerDay = applyRiskFactorMultiplier(baseLambdaPerDay, member, prior);
-          const modLambdaPerDay = applyStageAVulnerabilityMultiplier(rfmLambdaPerDay, member, cond.family, cond.vulnerabilityCriteria, criteriaIndex);
+          const modLambdaPerDay = applyStageAVulnerabilityMultiplier(rfmLambdaPerDay, member, cond.family, cond.vulnerabilityCriteria, criteriaIndex, thirdQtBetaAmps);
           count = samplePoisson(rng, modLambdaPerDay * mission.durationDays * effectiveMult);
         } else {
           // Gamma-Poisson / Lognormal-Poisson: draw λ/day from hierarchical prior, apply RFM,
           // IC-5 Stage A multiplier, then scale by mission duration before Poisson sampling.
-          count = sampleGeneralPoissonCount(rng, prior, member, mission.durationDays, cond.family, cond.vulnerabilityCriteria, criteriaIndex, effectiveMult);
+          count = sampleGeneralPoissonCount(rng, prior, member, mission.durationDays, cond.family, cond.vulnerabilityCriteria, criteriaIndex, effectiveMult, thirdQtBetaAmps);
         }
       } else if (cond.processType === "space-adaptation-once") {
         // T24: once-per-mission cap — skip if this crew member already had this condition.
@@ -593,6 +672,12 @@ export function simulateIMM(opts: {
    * kind without an entry (e.g. leo-iss), the engine falls through to 1.0.
    */
   kindMultipliers?: Record<string, number>;
+  /**
+   * Phase B (Sandal 2018 + Bell 2019): when true, activates third-quarter phenomenon
+   * mode — the conscientiousness β for psychiatric/behavioral conditions is amplified
+   * by THIRD_QUARTER_C_AMP (1.4×). Threaded into runIMMTrial. Default false.
+   */
+  thirdQuarterMode?: boolean;
 }): IMMOutcome {
   const { crew, mission, kit, trials, seed } = opts;
   const chiStar = opts.chiStar ?? 0.7;
@@ -608,6 +693,9 @@ export function simulateIMM(opts: {
   const criteriaIndex: ReadonlyMap<string, Criterion> = opts.criteria
     ? new Map(opts.criteria.map(c => [c.id, c]))
     : new Map();
+  // Phase A: crew-level safety-climate coefficient (Xu 2020 team min-C pathway).
+  // Returns 1.0 when no crew member has psych.conscientiousness scores → K15 safe.
+  const crewCSC = computeCrewSafetyClimateMultiplier(crew, criteriaIndex);
   const chiStarPct = chiStar * 100;
   const rng = makeRng(seed);
   const L_hours = mission.durationDays * 24;
@@ -635,6 +723,10 @@ export function simulateIMM(opts: {
       kindMultipliers: effectiveKindMults,
       criteriaIndex,
       conditionFilter: opts.conditionFilter,
+      // Phase A: pre-computed crew safety-climate coefficient (1.0 for K15 crew).
+      crewSafetyClimateMultiplier: crewCSC,
+      // Phase B: third-quarter phenomenon mode (false by default → inert).
+      thirdQuarterMode: opts.thirdQuarterMode,
     });
     tmes.push(r.tme);
     // CHI clamped at [0, 100] — QTL can exceed denom under pathological priors (v1 analogue of risk/simulate.ts §3.5 guard).

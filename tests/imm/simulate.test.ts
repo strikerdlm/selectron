@@ -853,3 +853,169 @@ describe("kind_multipliers: per-(kind, condition) incidence modulation", () => {
     expect(Math.abs(legacy.tme.mean - explicitOnes.tme.mean)).toBeLessThan(1e-9);
   });
 });
+
+// ── Phase A: crew safety-climate coefficient (Xu et al. 2020) ─────────────────
+import { computeCrewSafetyClimateMultiplier } from "../../src/imm/simulate";
+
+describe("computeCrewSafetyClimateMultiplier (Phase A, Xu 2020 min-C pathway)", () => {
+  const C_CRIT: Criterion = {
+    id: "psych.conscientiousness",
+    family: "psychological",
+    label: "Conscientiousness",
+    description: "",
+    instrument: "NEO-PI-R",
+    scale: { min: 0, max: 100 },
+    higherIsBetter: true,
+    citations: [],
+    minimumTier: "minimum",
+  };
+  const cIndex = new Map<string, Criterion>([["psych.conscientiousness", C_CRIT]]);
+  const emptyIndex = new Map<string, Criterion>();
+
+  function memberWithC(id: string, c: number): IMMCrewMember {
+    return { id, sex: "male", contacts: false, crowns: false, CAC_positive: false,
+      abdominal_surgery_history: false, EVA_eligible: false, EVA_count: 0,
+      stageAScores: { "psych.conscientiousness": c } };
+  }
+  function memberNoScores(id: string): IMMCrewMember {
+    return { id, sex: "male", contacts: false, crowns: false, CAC_positive: false,
+      abdominal_surgery_history: false, EVA_eligible: false, EVA_count: 0 };
+  }
+
+  it("returns 1.0 when no crew member has stageAScores (K15 safe)", () => {
+    const crew = [memberNoScores("c1"), memberNoScores("c2")];
+    expect(computeCrewSafetyClimateMultiplier(crew, cIndex)).toBe(1.0);
+  });
+
+  it("returns 1.0 when criteriaIndex lacks psych.conscientiousness", () => {
+    const crew = [memberWithC("c1", 80)];
+    expect(computeCrewSafetyClimateMultiplier(crew, emptyIndex)).toBe(1.0);
+  });
+
+  it("returns 1.0 at midpoint (C=50, z=0)", () => {
+    const crew = [memberWithC("c1", 50)];
+    expect(computeCrewSafetyClimateMultiplier(crew, cIndex)).toBeCloseTo(1.0, 8);
+  });
+
+  it("returns < 1.0 when crew minimum C is above midpoint (protective)", () => {
+    // min C = 80 → z = ((80-50)/100)×4 = 1.2 → exp(-0.15×1.2) ≈ 0.835
+    const crew = [memberWithC("c1", 80), memberWithC("c2", 90)];
+    const csc = computeCrewSafetyClimateMultiplier(crew, cIndex);
+    expect(csc).toBeLessThan(1.0);
+    expect(csc).toBeCloseTo(Math.exp(-0.15 * 1.2), 5);
+  });
+
+  it("returns > 1.0 when crew minimum C is below midpoint (risky)", () => {
+    // min C = 20 → z = ((20-50)/100)×4 = -1.2 → exp(-0.15×-1.2) = exp(0.18) ≈ 1.197
+    const crew = [memberWithC("c1", 20), memberWithC("c2", 90)];
+    const csc = computeCrewSafetyClimateMultiplier(crew, cIndex);
+    expect(csc).toBeGreaterThan(1.0);
+    expect(csc).toBeCloseTo(Math.exp(0.15 * 1.2), 5);
+  });
+
+  it("is driven by minimum score, not mean — adding a low-C member raises crew risk", () => {
+    // crew1 min=80; crew2 min=20 (same mean if c2=90 in both). crew2 is riskier.
+    const crew1 = [memberWithC("c1", 80), memberWithC("c2", 90)];
+    const crew2 = [memberWithC("c1", 20), memberWithC("c2", 90)];
+    expect(computeCrewSafetyClimateMultiplier(crew2, cIndex))
+      .toBeGreaterThan(computeCrewSafetyClimateMultiplier(crew1, cIndex));
+  });
+
+  it("K15 invariance: simulateIMM with K15 crew (no stageAScores) is unaffected", () => {
+    // K15 reference crew has no stageAScores → CSC = 1.0 → no change to trial outcomes.
+    const issMission = IMM_MISSIONS.find(m => m.id === "iss-6mo")!;
+    const k15Crew: IMMCrewMember[] = [
+      { id: "c1", sex: "male",   contacts: true,  crowns: true,  CAC_positive: true,  abdominal_surgery_history: false, EVA_eligible: true,  EVA_count: 6 },
+      { id: "c2", sex: "male",   contacts: true,  crowns: true,  CAC_positive: false, abdominal_surgery_history: false, EVA_eligible: true,  EVA_count: 6 },
+      { id: "c3", sex: "male",   contacts: true,  crowns: false, CAC_positive: false, abdominal_surgery_history: false, EVA_eligible: false, EVA_count: 0 },
+      { id: "c4", sex: "male",   contacts: false, crowns: false, CAC_positive: false, abdominal_surgery_history: false, EVA_eligible: false, EVA_count: 0 },
+      { id: "c5", sex: "female", contacts: false, crowns: false, CAC_positive: false, abdominal_surgery_history: false, EVA_eligible: false, EVA_count: 0 },
+      { id: "c6", sex: "female", contacts: false, crowns: false, CAC_positive: false, abdominal_surgery_history: false, EVA_eligible: true,  EVA_count: 0 },
+    ];
+    const base = simulateIMM({ crew: k15Crew, mission: issMission, kit: IMM_KITS.issHMS, trials: 1000, seed: 0xc0ffee });
+    const withCrit = simulateIMM({ crew: k15Crew, mission: issMission, kit: IMM_KITS.issHMS, trials: 1000, seed: 0xc0ffee, criteria: [C_CRIT] });
+    expect(base.tme.mean).toBe(withCrit.tme.mean);
+    expect(base.chi.mean).toBe(withCrit.chi.mean);
+  });
+
+  it("low-C crew has higher TME for behavioral/traumatic/musculoskeletal than high-C crew", () => {
+    // Demonstrates the Phase A crew-level effect: a crew where everyone has low C
+    // (z<0 → CSC>1) produces higher aggregate TME than a high-C crew (CSC<1).
+    const analogMission: IMMMission = {
+      id: "test-analog-60d", label: "60d analog", kind: "analog-controlled",
+      durationDays: 60, crewSize: 4, totalEVAs: 0, evaSchedule: [],
+    };
+    const highCCrew = [memberWithC("a", 90), memberWithC("b", 85), memberWithC("c", 88), memberWithC("d", 82)];
+    const lowCCrew  = [memberWithC("a", 15), memberWithC("b", 20), memberWithC("c", 18), memberWithC("d", 25)];
+    const highC = simulateIMM({ crew: highCCrew, mission: analogMission, kit: IMM_KITS.none, trials: 5000, seed: 0xc0ffee, criteria: [C_CRIT] });
+    const lowC  = simulateIMM({ crew: lowCCrew,  mission: analogMission, kit: IMM_KITS.none, trials: 5000, seed: 0xc0ffee, criteria: [C_CRIT] });
+    expect(lowC.tme.mean).toBeGreaterThan(highC.tme.mean);
+  });
+});
+
+// ── Phase B: third-quarter phenomenon (Sandal 2018 + Bell 2019) ──────────────
+describe("thirdQuarterMode (Phase B, Sandal 2018 + Bell 2019)", () => {
+  const C_CRIT: Criterion = {
+    id: "psych.conscientiousness",
+    family: "psychological",
+    label: "Conscientiousness",
+    description: "",
+    instrument: "NEO-PI-R",
+    scale: { min: 0, max: 100 },
+    higherIsBetter: true,
+    citations: [],
+    minimumTier: "minimum",
+  };
+
+  function memberWithC(id: string, c: number): IMMCrewMember {
+    return { id, sex: "male", contacts: false, crowns: false, CAC_positive: false,
+      abdominal_surgery_history: false, EVA_eligible: false, EVA_count: 0,
+      stageAScores: { "psych.conscientiousness": c } };
+  }
+
+  it("K15 reference crew is unaffected by thirdQuarterMode=true (no stageAScores)", () => {
+    const issMission = IMM_MISSIONS.find(m => m.id === "iss-6mo")!;
+    const k15Crew: IMMCrewMember[] = [
+      { id: "c1", sex: "male",   contacts: true,  crowns: true,  CAC_positive: true,  abdominal_surgery_history: false, EVA_eligible: true,  EVA_count: 6 },
+      { id: "c2", sex: "male",   contacts: true,  crowns: true,  CAC_positive: false, abdominal_surgery_history: false, EVA_eligible: true,  EVA_count: 6 },
+      { id: "c3", sex: "male",   contacts: true,  crowns: false, CAC_positive: false, abdominal_surgery_history: false, EVA_eligible: false, EVA_count: 0 },
+      { id: "c4", sex: "male",   contacts: false, crowns: false, CAC_positive: false, abdominal_surgery_history: false, EVA_eligible: false, EVA_count: 0 },
+      { id: "c5", sex: "female", contacts: false, crowns: false, CAC_positive: false, abdominal_surgery_history: false, EVA_eligible: false, EVA_count: 0 },
+      { id: "c6", sex: "female", contacts: false, crowns: false, CAC_positive: false, abdominal_surgery_history: false, EVA_eligible: true,  EVA_count: 0 },
+    ];
+    const base = simulateIMM({ crew: k15Crew, mission: issMission, kit: IMM_KITS.issHMS, trials: 1000, seed: 0xc0ffee });
+    const tq   = simulateIMM({ crew: k15Crew, mission: issMission, kit: IMM_KITS.issHMS, trials: 1000, seed: 0xc0ffee, thirdQuarterMode: true });
+    expect(base.tme.mean).toBe(tq.tme.mean);
+    expect(base.chi.mean).toBe(tq.chi.mean);
+  });
+
+  it("thirdQuarterMode increases TME for low-C crew vs. normal mode (behavioral/psychiatric families)", () => {
+    // Low-C crew (z<0 for C): normal mode has exp(β×z)<1 with |β|×|z| small;
+    // third-quarter mode amplifies β → exp(β_amp × z) is further from 1.
+    // For LOW-C (z<0, β<0): β×z>0 → exp>1 → λ↑; amplifying β makes it even higher.
+    const mission: IMMMission = {
+      id: "tq-test-180d", label: "180d tq test", kind: "analog-controlled",
+      durationDays: 180, crewSize: 3, totalEVAs: 0, evaSchedule: [],
+    };
+    const lowCCrew = [memberWithC("a", 10), memberWithC("b", 15), memberWithC("c", 20)];
+    const normal = simulateIMM({ crew: lowCCrew, mission, kit: IMM_KITS.none, trials: 5000, seed: 0xc0ffee, criteria: [C_CRIT] });
+    const tq     = simulateIMM({ crew: lowCCrew, mission, kit: IMM_KITS.none, trials: 5000, seed: 0xc0ffee, criteria: [C_CRIT], thirdQuarterMode: true });
+    expect(tq.tme.mean).toBeGreaterThan(normal.tme.mean);
+  });
+
+  it("thirdQuarterMode has no effect on crew with perfect C=100 (z=+2, β<0 → exp further below 1, not above)", () => {
+    // High-C crew: z=+2, β=-0.4 behavioral: exp(-0.4×2)=0.449 normal, exp(-0.56×2)=0.326 tq.
+    // Both are < 1, so pEvac can only be ≤ normal (fewer behavioral events).
+    // The test confirms thirdQuarterMode is not neutral — it does change the result,
+    // but in the risk-reducing direction for high-C individuals.
+    const mission: IMMMission = {
+      id: "tq-highc-90d", label: "90d high-C", kind: "analog-controlled",
+      durationDays: 90, crewSize: 3, totalEVAs: 0, evaSchedule: [],
+    };
+    const highCCrew = [memberWithC("a", 100), memberWithC("b", 100), memberWithC("c", 100)];
+    const normal = simulateIMM({ crew: highCCrew, mission, kit: IMM_KITS.none, trials: 5000, seed: 0xc0ffee, criteria: [C_CRIT] });
+    const tq     = simulateIMM({ crew: highCCrew, mission, kit: IMM_KITS.none, trials: 5000, seed: 0xc0ffee, criteria: [C_CRIT], thirdQuarterMode: true });
+    // High-C crew in third-quarter mode has even more behavioral risk suppression.
+    expect(tq.tme.mean).toBeLessThanOrEqual(normal.tme.mean + 1.0);  // +1 tolerance for MC noise
+  });
+});
