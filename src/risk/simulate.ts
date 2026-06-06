@@ -178,6 +178,7 @@ function runCrewPass(
   let q = 0;
   const dyad = dyadFactor(crew.length, team.dyad_ref_n);
   if (dyad === 0) return 0;
+  // proneness = conflict load = −quality_z; high teamwork (z>0) → low proneness
   const proneness = crew.map((m) => {
     const z = vulnerabilityVector(m, ["behavioral.teamwork"], idx)["behavioral.teamwork"];
     return Number.isFinite(z) ? -z : 0;
@@ -195,6 +196,7 @@ function runCrewPass(
     const mean = lambdaBase * dyad * het * weak * mission.durationDays * intg * latent.crewFrailty;
     const n = samplePoisson(rng, mean);
     if (n === 0) continue;
+    // advances rng deterministically (n draws); per-member counts are wired in Task 11 B5 diagnostics
     attributeEvents(rng, n, proneness);
     q += accumulateLostDays(rng, c.id, n, condPrior, mission, perCondition);
   }
@@ -394,7 +396,7 @@ export function simulateMission(
   for (const c of conditions) perConditionSamples[c.id] = new Array<number>(trials).fill(0);
 
   for (let t = 0; t < trials; t++) {
-    const result = runMissionTrial(crew, mission, priors, conditions, options.seed + t, criteriaIndex);
+    const result = runMissionTrial(crew, mission, priors, conditions, (options.seed + t) >>> 0, criteriaIndex);
     chiSamples[t] = result.chi;
     qtlSamples[t] = result.qtl;
     for (const cid of Object.keys(perConditionSamples)) {
