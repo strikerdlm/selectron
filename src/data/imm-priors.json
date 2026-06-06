@@ -4154,6 +4154,99 @@
         "sleep-aid": 14
       }
     },
+    "interpersonal-conflict": {
+      "conditionId": "interpersonal-conflict",
+      "provenance": "tierB-lit",
+      "source_ref": "research/evidence/2026-06-06_interpersonal-conflict_ICE-prior.md (Bell 2019 systematic review 72 sources: all analog crews ≥1 conflict by day 90; Basner 2014 Mars-500 520d weekly conflict questionnaire; Van Fossen 2021 Antarctic personality-conflict correlation; Marcinkowski 2021 ICE 4-type conflict typology. ISS baseline λ=0.000667/pd derived from P(crew≥1 clinically-significant event in 90d)=0.5 scaled ×0.5 for LEO mission-control support advantage. Antarctic/analog kind_multipliers 2.0×/1.5×.)",
+      "incidence": {
+        "distribution": "Gamma-Poisson",
+        "alpha": 2,
+        "beta": 3000,
+        "lambda_unit": "events-per-person-day"
+      },
+      "severity": {
+        "worst_case_prob_alpha": 1.2,
+        "worst_case_prob_beta": 4.8
+      },
+      "treated": {
+        "fi_cp1": {
+          "min": 0.05,
+          "mode": 0.2,
+          "max": 0.45
+        },
+        "dt_cp1_hours": {
+          "min": 12,
+          "mode": 48,
+          "max": 168
+        },
+        "fi_cp2": {
+          "min": 0,
+          "mode": 0.05,
+          "max": 0.15
+        },
+        "dt_cp2_hours": {
+          "min": 24,
+          "mode": 168,
+          "max": 504
+        },
+        "fi_cp3": {
+          "min": 0,
+          "mode": 0,
+          "max": 0
+        },
+        "p_evac": {
+          "min": 5e-06,
+          "mode": 5e-05,
+          "max": 0.00025
+        },
+        "p_locl": {
+          "min": 0,
+          "mode": 1e-06,
+          "max": 5e-06
+        }
+      },
+      "untreated": {
+        "fi_cp1": {
+          "min": 0.2,
+          "mode": 0.45,
+          "max": 0.75
+        },
+        "dt_cp1_hours": {
+          "min": 48,
+          "mode": 168,
+          "max": 720
+        },
+        "fi_cp2": {
+          "min": 0.05,
+          "mode": 0.15,
+          "max": 0.35
+        },
+        "dt_cp2_hours": {
+          "min": 72,
+          "mode": 336,
+          "max": 1080
+        },
+        "fi_cp3": {
+          "min": 0,
+          "mode": 0,
+          "max": 0
+        },
+        "p_evac": {
+          "min": 0.00008,
+          "mode": 0.0008,
+          "max": 0.004
+        },
+        "p_locl": {
+          "min": 0,
+          "mode": 1e-05,
+          "max": 5e-05
+        }
+      },
+      "risk_factor_multipliers": {},
+      "required_resources": {
+        "anti-anxiety": 3
+      }
+    },
     "nasal-congestion-space-adaptation": {
       "conditionId": "nasal-congestion-space-adaptation",
       "provenance": "tierB-pymc",
@@ -9388,6 +9481,7 @@
         "_doc_": "2026-06-04 Antarctic vs controlled-habitat context modulation. Anchored on research/analog_incidence_antarctic.md (Bhatia 2012 Maitri 26-PY; Palinkas 2004 313 US winter-overs; Pattarini 2016 USAP 3 stations; Hong 2022 Korean 88 winter-overs; Pe\u0159ina 2024 multi-station dental; Nirwan 2022 SP altitude). Multiplier of 1.0 = no change. Applied AFTER tier multiplier, BEFORE risk-factor / Stage-A multipliers. Source_ref: research/evidence_extracted/antarctic_kind_multipliers.md (forthcoming).",
         "depression": 0.5,
         "anxiety": 1.5,
+        "interpersonal-conflict": 2.0,
         "respiratory-infection": 0.2,
         "gastroenteritis": 0.1,
         "skin-rash": 0.33,
@@ -9406,6 +9500,7 @@
         "_doc_": "2026-06-04 controlled-habitat context modulation. Heated, climate-stable, real-time medical support. Most conditions at base-rate; URTI / depression modestly suppressed (no McMurdo Crud reservoir, shorter durations). Space-adaptation / ECLSS-specific conditions set to 0 (no microgravity, no CO2 scrubber failure modes).",
         "respiratory-infection": 0.5,
         "depression": 0.5,
+        "interpersonal-conflict": 1.5,
         "frostbite": 0.0,
         "altitude-sickness": 0.0,
         "hypoxia-related-headache": 0.0,
