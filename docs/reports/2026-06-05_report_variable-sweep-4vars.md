@@ -199,7 +199,7 @@ Other 3 at reference:
 | screened (GOOD) | 17.42 | 95.61 | 1.96% | 0.082% |
 | unscreened (BAD) | 22.47 | 94.84 | 2.26% | 0.088% |
 
-**Across all 90 cells, the unscreened/screened TME ratio is 1.288–1.851 (mean 1.661).** The pEVAC ratio is 0.843–1.333 (mean 1.095). The TME ratio is dominated by the ~11× psychiatric event ratio (1.23× medical ratio is in the same range); the pEVAC ratio is the small evisceration tail signal.
+**Across all 90 cells, the unscreened/screened TME ratio is 1.288–1.851 (mean 1.661).** The pEVAC ratio is 0.843–1.333 (mean 1.095). The TME ratio is dominated by the ~11× psychiatric event ratio (the 1.23× medical ratio is in the same range); the pEVAC ratio is the small evacuation tail signal. **The ~11× is a bounding sensitivity contrast** between an ideal (EID T = 35) and a clinical-extreme (EID T = 90) profile, not a calibrated screened-vs-unscreened population effect — see the framing in the Literature-coherence note below.
 
 **The screening effect is durable across all 90 cells.** No cell inverts the screening signal — unscreened crews are uniformly worse on TME. The smallest unscreened/screened TME ratio (1.288) is in the **45-d analog / `none`-kit** cell, where the very small unscreened/screened TME gap (8.71 vs 11.21) maps to the smallest relative ratio. The largest ratio (1.851) is in the **22-d Mars / `medium`-kit** cell (screened 10.31, unscreened 19.10), where the very different Mars kind-multiplier profile amplifies the vulnerability gap on the very low baseline.
 
