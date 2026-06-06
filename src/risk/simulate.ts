@@ -81,7 +81,7 @@ function sampleFromPosterior(rng: Rng, samples: readonly number[]): number {
 //   VO₂max=70 (max, good; higherIsBetter=true):  z=+2, β=-0.2 → exp(-0.4)≈0.67 (λ↓) ✓
 //   VO₂max=20 (min, bad):                        z=-2, β=-0.2 → exp(+0.4)≈1.49 (λ↑) ✓
 //   MMPI-EID=120 (max, bad; higherIsBetter=false): zVal=+2, z=-2, β=-0.2 → exp(+0.4)≈1.49 (λ↑) ✓
-function vulnerabilityVector(
+export function vulnerabilityVector(
   member: Candidate,
   criterionIds: readonly string[],
   criteriaIndex: ReadonlyMap<string, Criterion>,
