@@ -18,6 +18,21 @@ export type ConditionPrior = {
   untreated_lost_days_mean: number;
 };
 
+export type TeamHyperPriors = {
+  crew_frailty_phi_samples: number[]; // shared crew strain G ~ Gamma(phi,1/phi)
+  member_frailty_phi: number;         // per-member strain h_i shape
+  pi_unstable_base: number;           // base P(unstable) at mean fit (Tu 2024 ≈ 0.658)
+  pi_unstable_samples?: number[];     // optional PyMC posterior for the base rate
+  alpha_fit: number;                  // fit → instability slope (≤ 0)
+  sigma_log_beta: number;             // β lognormal width (≥ 0)
+  temporal_a: number;                 // unstable ramp amplitude
+  temporal_p: number;                 // unstable ramp exponent (> 1 back-loads)
+  beta_het: number;                   // heterogeneity coefficient (≥ 0)
+  beta_weak: number;                  // weakest-link coefficient (≥ 0)
+  dyad_ref_n: number;                 // reference crew size (D(6)=15)
+  lambda_base_samples: Record<string, number[]>; // per team-condition base rate posterior
+};
+
 export type PriorsJson = {
   model_version: string;
   fitted_at: string;
@@ -25,6 +40,7 @@ export type PriorsJson = {
   r_hat_max?: number;
   ess_min?: number;
   conditions: Record<string, ConditionPrior>;
+  team?: TeamHyperPriors;
 };
 
 function bail(msg: string, details?: Record<string, unknown>): never {
@@ -83,5 +99,34 @@ export function validatePriorsJson(x: unknown): asserts x is PriorsJson {
     checkProb(cp.worst_case_prob_q, `condition "${cid}" worst_case_prob_q`);
     checkNonNeg(cp.treated_lost_days_mean, `condition "${cid}" treated_lost_days_mean`);
     checkNonNeg(cp.untreated_lost_days_mean, `condition "${cid}" untreated_lost_days_mean`);
+  }
+
+  if (x.team !== undefined) {
+    if (!isObject(x.team)) bail("priors.json 'team' must be an object");
+    const t = x.team as Record<string, unknown>;
+    if (!Array.isArray(t.crew_frailty_phi_samples) || t.crew_frailty_phi_samples.length === 0) {
+      bail("team.crew_frailty_phi_samples must be a non-empty array");
+    }
+    for (const s of t.crew_frailty_phi_samples) checkNonNeg(s, "team.crew_frailty_phi_samples[]");
+    checkNonNeg(t.member_frailty_phi, "team.member_frailty_phi");
+    if ((t.member_frailty_phi as number) <= 0) bail("team.member_frailty_phi must be > 0");
+    checkProb(t.pi_unstable_base, "team.pi_unstable_base");
+    if (t.pi_unstable_samples !== undefined) {
+      if (!Array.isArray(t.pi_unstable_samples) || t.pi_unstable_samples.length === 0) bail("team.pi_unstable_samples must be a non-empty array when present");
+      for (const s of t.pi_unstable_samples) checkProb(s, "team.pi_unstable_samples[]");
+    }
+    checkNum(t.alpha_fit, "team.alpha_fit");
+    checkNonNeg(t.sigma_log_beta, "team.sigma_log_beta");
+    checkNonNeg(t.temporal_a, "team.temporal_a");
+    checkNonNeg(t.temporal_p, "team.temporal_p");
+    checkNonNeg(t.beta_het, "team.beta_het");
+    checkNonNeg(t.beta_weak, "team.beta_weak");
+    checkNonNeg(t.dyad_ref_n, "team.dyad_ref_n");
+    if ((t.dyad_ref_n as number) < 2) bail("team.dyad_ref_n must be ≥ 2");
+    if (!isObject(t.lambda_base_samples)) bail("team.lambda_base_samples must be an object");
+    for (const [k, arr] of Object.entries(t.lambda_base_samples)) {
+      if (!Array.isArray(arr) || arr.length === 0) bail(`team.lambda_base_samples["${k}"] must be a non-empty array`);
+      for (const s of arr) checkNonNeg(s, `team.lambda_base_samples["${k}"][]`);
+    }
   }
 }

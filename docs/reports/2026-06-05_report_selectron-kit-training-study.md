@@ -36,6 +36,8 @@ Same fixture as the duration study (`scripts/duration_study_screened_vs_unscreen
 
 The unscreened crew fails both clearance gates; the screened crew qualifies. Both are run without gating — the comparison shows what selection prevents. "Trained" and "untrained" map to the screened/unscreened distinction: the screened crew has high emotional competence, low psychiatric pathology, and cognitive reserve; the unscreened crew has clinical-range pathology.
 
+These are deliberate **bounding extremes** (EID T = 35, a near-ideal screened profile, vs EID T = 90, the clinical ceiling — +4 SD above the normative mean of 50), not representative populations. Every screened-vs-unscreened ratio below — in particular the ~11× psychiatric figure of §7 — bounds the *sensitivity* of the selection criterion and is not a calibrated estimate of any real unscreened cohort; no analog mission has ever flown an unscreened control arm. See the duration-study report (§6 finding 2) and the defensibility review (§1) for the full treatment.
+
 ### 1.3 Durations and missions
 45 d (catalog `analog-45d`), 90 d (catalog `analog-90d`), 120 d (synthetic `analog-controlled`, 18 EVAs).
 
@@ -180,7 +182,9 @@ Expected psychiatric events across all conditions (behavioral + psychiatric fami
 
 The ~11× psychiatric-event ratio from the duration study is **completely invariant to kit level**. This is expected: the vulnerability multiplier exp(β·z) acts on condition incidence λ, not on treatment efficacy. More medical resources treat events that occur; they do not prevent them from occurring in the first place. Consequently, p(≥ 1 psych event) for the unscreened crew remains 45–81% across all kits at 45–120 days, while for the screened crew it remains 5–14%.
 
-This has a direct operational implication: **medical resources buy evacuation-risk reduction; crew selection buys psychiatric-burden reduction**. A well-stocked base with an unscreened crew will have near-normal pEVAC but will still generate 11× more behavioral/psychiatric events than a screened crew — with associated performance degradation, interpersonal conflict, and mission-objective risk that the evacuation metric does not capture.
+**The 11× is a bounding contrast, not a population effect** (EID T = 35 vs the T = 90 clinical extreme; see §1.2). What is resource-independent is the *mechanism* — selection acts on incidence, kit acts on outcome — not a measured screened-vs-unscreened gap in any real cohort. The screened arm's modeled burden has an empirical anchor: ~5% per-expedition DSM/ICD psychiatric-disorder prevalence is repeatedly reported for *already-screened* polar winter-over crews (Palinkas & Suedfeld, 2008; Lugg, 2005; Friedman & Bui, 2017).
+
+This has a direct operational implication: **medical resources buy evacuation-risk reduction; crew selection buys psychiatric-burden reduction**. A well-stocked base with a poorly-selected crew will have near-normal pEVAC but a much higher behavioral/psychiatric event load than a well-selected one — with associated performance degradation, interpersonal conflict, and mission-objective risk that the evacuation metric does not capture. (The *magnitude* of that load difference is a sensitivity bound, not a calibrated forecast.)
 
 ---
 
@@ -213,7 +217,7 @@ At 90 days (the canonical long analog campaign):
 
 3. **At unlimited resources, crew selection has no significant pEVAC effect at 45 or 120 days** (RR 1.02 and 1.07, both p > 0.48). The evacuations that occur despite unlimited care are driven by a residual untreatable fraction that is similar for both crews. Selection does not prevent those.
 
-4. **Crew selection retains its psychiatric-burden effect regardless of resources** (10.8–11.2× throughout). This is the dimension where selection is irreplaceable: medical resources can treat a behavioral event once it occurs, but they cannot prevent it. The unscreened crew generates ~11× more behavioral/psychiatric events under any kit level; these affect mission performance in ways that pEVAC does not capture.
+4. **Crew selection retains its psychiatric-burden effect regardless of resources** (the modeled ratio holds at ~11× throughout). This is the dimension where selection is irreplaceable: medical resources can treat a behavioral event once it occurs, but they cannot prevent it. The ~11× is a **best-/worst-case sensitivity bound** (EID T = 35 vs T = 90), not a calibrated population effect — but the *qualitative* claim (psychiatric burden is the most selection-sensitive endpoint, and it is resource-independent) is robust and literature-supported, and these events affect mission performance in ways that pEVAC does not capture.
 
 5. **The combination of screened crew + issHMS/unlimited resources produces the lowest pLOCL at 120 days** (0.035–0.045%), significantly below all other conditions. The interaction is asymmetric: good resources do not rescue the unscreened crew's LOCL risk (0.100–0.110% remains constant), suggesting a residual pathway driven by the crew's psychiatric event load that medical care cannot fully close.
 
@@ -228,6 +232,14 @@ At 90 days (the canonical long analog campaign):
 - Common-random-numbers seeding makes between-arm tests conservative; the crew × kit interaction pattern is consistent across durations, supporting robustness.
 - The "unlimited" kit eliminates supply constraints but does not model provider skill, telemedicine latency, or procedural complexity — all of which would attenuate its real-world benefit.
 - Psychiatric events are counted but not mapped to performance metrics; the 11× ratio translates operationally to mission degradation beyond what pEVAC/pLOCL capture.
+
+---
+
+## References (psychiatric-burden anchor)
+
+- Palinkas, L. A., & Suedfeld, P. (2008). Psychological effects of polar expeditions. *The Lancet, 371*(9607), 153–163. https://doi.org/10.1016/S0140-6736(07)61056-3
+- Lugg, D. J. (2005). Behavioral health in Antarctica: implications for long-duration space missions. *Aviation, Space, and Environmental Medicine, 76*(6 Suppl), B74–B77. PMID 15943198.
+- Friedman, E., & Bui, B. (2017). A psychiatric formulary for long-duration spaceflight. *Aerospace Medicine and Human Performance, 88*(11), 1024–1033. https://doi.org/10.3357/AMHP.4901.2017
 
 ---
 

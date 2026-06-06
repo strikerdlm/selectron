@@ -51,7 +51,7 @@ export const ANALOG_CONDITIONS: readonly Condition[] = [
     id: "conflict-event",
     label: "Interpersonal conflict incident",
     family: "team",
-    kind: "event",
+    kind: "rate",
     vulnerabilityCriteria: ["behavioral.teamwork", "psych.conscientiousness"],
     citations: [
       "10.1371/journal.pone.0093298", // Basner 2014
@@ -368,7 +368,7 @@ export const ANALOG_CONDITIONS: readonly Condition[] = [
     id: "leadership-challenge",
     label: "Leadership crisis or challenge episode",
     family: "team",
-    kind: "event",
+    kind: "rate",
     vulnerabilityCriteria: ["behavioral.teamwork", "psych.emotional_intelligence"],
     citations: [
       "10.3389/fpsyg.2019.00811", // Bell 2019 — leadership dynamics in long-duration missions

@@ -723,3 +723,80 @@ API, the panel degrades to its `api-error` state by design and the test
 still passes — the app's offline-first contract is preserved (the SPA is
 fully functional without the Python service; I6 is the only surface that
 consumes it, and it degrades gracefully).
+
+---
+
+## 9. Bayesian conflict/team layer — src/risk/ (added 2026-06-06)
+
+This section documents the validation of the Stage-B conflict/team Bayesian layer
+added to `src/risk/` (spec `docs/superpowers/specs/2026-06-06-selectron-conflict-team-bayesian-design.md`).
+The `src/imm/` NASA-IMM Calculator is entirely untouched.
+
+### 9.1 Substream determinism control
+
+**Design:** Four dedicated PRNG substreams per trial — SALT_LATENT (`0x00abcd04`),
+SALT_MEDICAL (`0x00abcd01`), SALT_PSYCH (`0x00abcd02`), SALT_CREW (`0x00abcd03`) — each
+derived as `makeRng((seed ^ SALT_X) >>> 0)`. Medical/physiologic conditions always read
+from `rngMedical`, independent of whether the conflict layer is active.
+
+**Test:** `tests/risk/determinism_control.test.ts` — 1 test asserting that per-condition
+QTL means for all physiologic and musculoskeletal conditions are **bit-identical** between
+a run with `SYNTHETIC_PRIORS.team` present and a run with `team: undefined`.
+Passes on the calibrated priors at `{ seed: 0xc0ffee, trials: 3000 }`.
+
+**Implication for V&V Factor 1 (Verification):** the medical incidence model's
+determinism guarantee — which underpins the K15 invariance canary in `src/imm/` — is
+provably unperturbed by the conflict/team engine at the bit level.
+
+### 9.2 PyMC-fit anchors (three identifiable parameters)
+
+Three parameters were fit from published aggregate statistics using PyMC NUTS
+(`python/src/selectron/conflict_fit.py`, seed `0xc0ffee & 0xFFFFFFFF`):
+
+| Parameter | Evidence anchor | Posterior (NUTS, 2000 draws) | Literature target |
+|---|---|---|---|
+| `π_unstable` | Tu 2024: 133/202 crews unstable | mean 0.656, 95% CI ~[0.59, 0.72] | 133/202 = 0.658 |
+| `λ_base` (per day) | Bell 2019: 71/72 teams ≥1 conflict by 40%/90d | mean 0.107/day | P(≥1 by 40%/90d) ≈ 0.978 |
+| `φ_crew` (frailty) | Basner 2014: 85% of conflicts from top-⅓ of crew | Gamma(2, 1.5) prior (weakly identified) | wide, mean 3.0 |
+
+`φ_crew` is explicitly disclosed as weakly identified — no published estimate of
+crew-level overdispersion (Basner n=2 of 6; Bell 2019 only team-level totals). The
+prior is intentionally wide. A future fit with raw dyadic-conflict time series would
+sharpen it.
+
+Numerical stability fix: `p40 = pm.math.clip(p40, 1e-6, 1−1e-6)` before the
+log-rate transform prevents explosion in the near-degenerate Beta(72, 2) posterior
+(`BELL2019_TEAMS=72, BELL2019_WITH_CONFLICT=71`).
+
+### 9.3 B5 Posterior-Predictive Checks (literature-anchored)
+
+`tests/risk/conflict_ppc.test.ts` — 3 checks on a 6-person HI-SEAS 90-day simulation
+(`{ seed: 0xc0ffee, trials: 8000, diagnostics: true }`):
+
+| Check | Literature anchor | Assertion | Result |
+|---|---|---|---|
+| Bell 2019 onset | P(≥1 conflict by 40% of mission) on neutral crew | `byPoint4 > 0.85` | PASS |
+| Tu 2024 latent class | Unstable fraction lower for high-fit (teamwork=5) vs low-fit (teamwork=1) crews | `frac(crew(5)) < frac(crew(1))` | PASS |
+| Basner concentration | Top member's share of attributed conflicts exceeds 1/n | `topShare > 1/6` | PASS |
+
+Scale note: the B5 checks use `behavioral.teamwork` scores on the `{min:1, max:5}` criterion
+scale. The plan spec cited out-of-scale values (9, 3); these were corrected to `(5, 1)` to
+match the actual criterion bounds.
+
+### 9.4 De-EVA validation
+
+Before this fix, `conflict-event` and `leadership-challenge` were `kind: "event"` — sampled
+via `sampleBinomial(rng, evaCount, p)`. Antarctic winter-over and Mars-500 have `evaCount=0`,
+producing zero conflict events on both missions despite 365-day durations. This was
+structurally incorrect: crew conflict is a function of confinement duration and interpersonal
+dynamics, not extravehicular activity.
+
+Fix: both conditions reclassified to `kind: "rate"`. Validated by
+`tests/risk/simulate_threepass.test.ts` test 1: "365-d Antarctic (evaCount=0) now produces
+> 0 team-condition QTL."
+
+### 9.5 Scope boundary
+
+`src/imm/` (the NASA-IMM Calculator, the manuscript's primary engine) is entirely untouched.
+The conflict/team layer lives exclusively in `src/risk/` (the Stage-B analog pipeline). The
+two pipelines are independent per CLAUDE.md: "do not refactor one in terms of the other."

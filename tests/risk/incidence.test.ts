@@ -173,3 +173,51 @@ describe("applyVulnerabilityMultiplier", () => {
     expect(() => applyVulnerabilityMultiplier(-0.1, {}, {})).toThrow(SelectronError);
   });
 });
+
+import { sampleStandardNormal, sampleFrailty, sampleGammaPoisson } from "@/risk/incidence";
+
+describe("sampleStandardNormal", () => {
+  it("has mean ~0 and sd ~1 over many draws", () => {
+    const rng = makeRng(0xc0ffee);
+    const n = 200_000;
+    let sum = 0, sumsq = 0;
+    for (let i = 0; i < n; i++) { const z = sampleStandardNormal(rng); sum += z; sumsq += z * z; }
+    const mean = sum / n;
+    const sd = Math.sqrt(sumsq / n - mean * mean);
+    expect(Math.abs(mean)).toBeLessThan(0.02);
+    expect(Math.abs(sd - 1)).toBeLessThan(0.02);
+  });
+});
+
+describe("sampleFrailty (mean 1, var 1/phi)", () => {
+  it("has mean ~1 and variance ~1/phi", () => {
+    const rng = makeRng(0xc0ffee);
+    const phi = 4, n = 200_000;
+    let sum = 0, sumsq = 0;
+    for (let i = 0; i < n; i++) { const g = sampleFrailty(rng, phi); sum += g; sumsq += g * g; }
+    const mean = sum / n;
+    const variance = sumsq / n - mean * mean;
+    expect(Math.abs(mean - 1)).toBeLessThan(0.02);
+    expect(Math.abs(variance - 1 / phi)).toBeLessThan(0.02);
+  });
+  it("throws on non-positive phi", () => {
+    const rng = makeRng(1);
+    expect(() => sampleFrailty(rng, 0)).toThrow(SelectronError);
+  });
+});
+
+describe("sampleGammaPoisson (Negative-Binomial marginal)", () => {
+  it("matches shared-frailty Poisson: mean ~lambda, var ~lambda + lambda^2/phi", () => {
+    const rng = makeRng(0xc0ffee);
+    const lambda = 3, phi = 2, n = 300_000;
+    let sum = 0, sumsq = 0;
+    for (let i = 0; i < n; i++) { const k = sampleGammaPoisson(rng, lambda, phi); sum += k; sumsq += k * k; }
+    const mean = sum / n;
+    const variance = sumsq / n - mean * mean;
+    expect(Math.abs(mean - lambda)).toBeLessThan(0.05);
+    expect(Math.abs(variance - (lambda + (lambda * lambda) / phi))).toBeLessThan(0.2);
+  });
+  it("throws on non-positive phi", () => {
+    expect(() => sampleGammaPoisson(makeRng(1), 3, 0)).toThrow(SelectronError);
+  });
+});
