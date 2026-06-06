@@ -48,6 +48,12 @@ export type Condition = {
   kind: ConditionKind; // "rate" → Poisson; "event" → Binomial
   vulnerabilityCriteria: string[]; // Iter-1/2 criterion ids that modulate λ
   citations: string[];
+  // Optional behavior overrides for the conflict/team Bayesian layer.
+  // When omitted, behavior is derived from `family` (see src/risk/condition-behavior.ts).
+  scope?: "member" | "crew";
+  temporal?: "stationary" | "latent";
+  dispersion?: "poisson" | "negbin";
+  frailtyCoupled?: boolean;
 };
 
 export type CredibleInterval = readonly [number, number];
