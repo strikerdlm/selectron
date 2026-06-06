@@ -31,11 +31,18 @@ def fit_conflict_team_priors(seed: int, draws: int, tune: int, team_condition_id
         p40 = pm.Beta("p40", alpha=1 + BELL2019_WITH_CONFLICT,
                       beta=1 + (BELL2019_TEAMS - BELL2019_WITH_CONFLICT))
         # map by-40% probability to a per-day base rate: p = 1 - exp(-lam*0.4*90)
-        lam = pm.Deterministic("lam", -pm.math.log(1 - p40) / (0.4 * 90))
+        # clip p40 to avoid log explosion when p40 → 1
+        p40_safe = pm.math.clip(p40, 1e-6, 1.0 - 1e-6)
+        lam = pm.Deterministic("lam", -pm.math.log(1 - p40_safe) / (0.4 * 90))
         idata_lam = pm.sample(draws=draws, tune=tune, chains=2, random_seed=seed,
                               progressbar=False)
     lam_samples = idata_lam.posterior["lam"].values.reshape(-1)
     lam_samples = lam_samples[np.isfinite(lam_samples) & (lam_samples > 0)]
+    if len(lam_samples) == 0:
+        raise RuntimeError(
+            "lam_samples empty after filtering — all lambda draws are non-finite or non-positive. "
+            "Check for NUTS divergences on p40 near 1."
+        )
 
     # crew frailty phi: weakly identified. Sample a wide prior consistent with high
     # concentration (small phi => high overdispersion). Disclosed as wide.
