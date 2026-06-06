@@ -17,10 +17,15 @@ import {
   applyVulnerabilityMultiplier,
   sampleBinomial,
   samplePoisson,
+  sampleGammaPoisson,
 } from "./incidence";
 import { sampleSeverity } from "./progression";
 import { type PriorsJson, validatePriorsJson } from "./priorsSchema";
 import { lostDays } from "./treatment";
+import { conditionBehavior } from "./condition-behavior";
+import { drawTrialLatentState, type TeamHyper, type TrialLatentState } from "./crew-state";
+import { dyadFactor, heterogeneityFactor, weakestLinkFactor, attributeEvents } from "./crew-conditions";
+import { integratedIntensity, type LatentClass } from "./temporal";
 
 type Rng = () => number;
 
@@ -42,6 +47,11 @@ export type RiskPosteriorWithDiagnostics = RiskPosterior & {
 };
 
 const DEFAULT_CHI_STAR = 0.7;
+
+const SALT_LATENT  = 0x00abcd04;
+const SALT_MEDICAL = 0x00abcd01;
+const SALT_PSYCH   = 0x00abcd02;
+const SALT_CREW    = 0x00abcd03;
 
 // Spec §3.3 + §3.4 prescribe severity-conditional lost-day distributions
 // D^{treated}_{k, s_j} and D^{untreated}_{k, s_j} (best vs worst case). Iter-3
@@ -116,36 +126,146 @@ function clampProb(p: number): number {
   return p;
 }
 
+function defaultHyper(
+  team: NonNullable<PriorsJson["team"]>,
+  rng0: Rng,
+): TeamHyper {
+  const pick = (arr: number[]) =>
+    arr[Math.min(Math.floor(rng0() * arr.length), arr.length - 1)];
+  return {
+    crewFrailtyPhi: pick(team.crew_frailty_phi_samples),
+    memberFrailtyPhi: team.member_frailty_phi,
+    piUnstableBase: team.pi_unstable_samples
+      ? pick(team.pi_unstable_samples)
+      : team.pi_unstable_base,
+    alphaFit: team.alpha_fit,
+    sigmaLogBeta: team.sigma_log_beta,
+    fitCriterionId: "behavioral.teamwork",
+  };
+}
+
+function accumulateLostDays(
+  rng: Rng,
+  cid: string,
+  n: number,
+  condPrior: PriorsJson["conditions"][string],
+  mission: AnalogMission,
+  perCondition: Record<string, number>,
+): number {
+  const tau = treatmentFraction(cid, mission);
+  const dBest = lostDays(condPrior.untreated_lost_days_mean, condPrior.treated_lost_days_mean, tau);
+  let q = 0;
+  for (let j = 0; j < n; j++) {
+    const severity = sampleSeverity(rng, condPrior.worst_case_prob_q);
+    const dj = dBest * (severity === 1 ? WORST_CASE_MULTIPLIER : 1.0);
+    q += dj;
+    perCondition[cid] = (perCondition[cid] ?? 0) + dj;
+  }
+  return q;
+}
+
+function runCrewPass(
+  crew: readonly Candidate[],
+  mission: AnalogMission,
+  conditions: readonly Condition[],
+  priors: PriorsJson,
+  team: NonNullable<PriorsJson["team"]>,
+  latent: TrialLatentState,
+  rng: Rng,
+  idx: ReadonlyMap<string, Criterion>,
+  perCondition: Record<string, number>,
+): number {
+  let q = 0;
+  const dyad = dyadFactor(crew.length, team.dyad_ref_n);
+  if (dyad === 0) return 0;
+  const proneness = crew.map((m) => {
+    const z = vulnerabilityVector(m, ["behavioral.teamwork"], idx)["behavioral.teamwork"];
+    return Number.isFinite(z) ? -z : 0;
+  });
+  const het = heterogeneityFactor(proneness, team.beta_het);
+  const weak = weakestLinkFactor(proneness, team.beta_weak);
+  const intg = integratedIntensity(latent.latentClass as LatentClass, team.temporal_a, team.temporal_p);
+
+  for (const c of conditions) {
+    if (conditionBehavior(c).scope !== "crew") continue;
+    const samples = team.lambda_base_samples[c.id];
+    const condPrior = priors.conditions[c.id];
+    if (!samples || samples.length === 0 || !condPrior) continue;
+    const lambdaBase = samples[Math.min(Math.floor(rng() * samples.length), samples.length - 1)];
+    const mean = lambdaBase * dyad * het * weak * mission.durationDays * intg * latent.crewFrailty;
+    const n = samplePoisson(rng, mean);
+    if (n === 0) continue;
+    attributeEvents(rng, n, proneness);
+    q += accumulateLostDays(rng, c.id, n, condPrior, mission, perCondition);
+  }
+  return q;
+}
+
 export function runMissionTrial(
   crew: readonly Candidate[],
   mission: AnalogMission,
   priors: PriorsJson,
   conditions: readonly Condition[],
-  rng: Rng,
+  seed: number,
   criteriaIndex?: ReadonlyMap<string, Criterion>,
 ): TrialResult {
+  const idx = criteriaIndex ?? new Map<string, Criterion>();
   let totalQTL = 0;
   const perCondition: Record<string, number> = {};
 
+  // Phase 0 — shared latent state (dedicated substream)
+  const team = priors.team;
+  const rngLatent = makeRng((seed ^ SALT_LATENT) >>> 0);
+  const hyper = team ? defaultHyper(team, rngLatent) : undefined;
+  const latent: TrialLatentState | null =
+    hyper ? drawTrialLatentState(crew, idx, hyper, rngLatent) : null;
+
+  // Phase 1a — medical/physiologic (UNCHANGED behavior, isolated substream)
+  // Phase 1b — psychiatric/performance (frailty + latent temporal + NB)
+  const rngMedical = makeRng((seed ^ SALT_MEDICAL) >>> 0);
+  const rngPsych = makeRng((seed ^ SALT_PSYCH) >>> 0);
+
   for (const c of conditions) {
+    const beh = conditionBehavior(c);
+    if (beh.scope === "crew") continue; // handled in Phase 2
     const condPrior = priors.conditions[c.id];
     if (!condPrior) continue;
     const missionPrior = condPrior.missions[mission.type];
     if (!missionPrior) continue;
+    const rng = beh.frailtyCoupled ? rngPsych : rngMedical;
 
-    for (const member of crew) {
+    for (let mi = 0; mi < crew.length; mi++) {
+      const member = crew[mi];
       const logLambda = sampleFromPosterior(rng, missionPrior.log_lambda_samples);
       const baseLambda = Math.exp(logLambda);
-      const z = vulnerabilityVector(member, c.vulnerabilityCriteria, criteriaIndex ?? new Map());
-      const lambdaI = applyVulnerabilityMultiplier(
-        baseLambda,
-        condPrior.vulnerability_beta,
-        z,
-      );
+      const z = vulnerabilityVector(member, c.vulnerabilityCriteria, idx);
+      const betaMap = latent
+        ? Object.fromEntries(
+            Object.entries(condPrior.vulnerability_beta).map(([k, v]) => [
+              k,
+              v * Math.exp(latent.betaLogShift),
+            ]),
+          )
+        : condPrior.vulnerability_beta;
+      let lambdaI = applyVulnerabilityMultiplier(baseLambda, betaMap, z);
+      if (latent && beh.frailtyCoupled) {
+        lambdaI *= latent.crewFrailty * latent.memberFrailty[mi];
+      }
 
       let n = 0;
       if (c.kind === "rate") {
-        n = samplePoisson(rng, lambdaI * mission.durationDays);
+        let mean = lambdaI * mission.durationDays;
+        if (latent && beh.temporal === "latent" && team) {
+          mean *= integratedIntensity(
+            latent.latentClass as LatentClass,
+            team.temporal_a,
+            team.temporal_p,
+          );
+        }
+        n =
+          beh.dispersion === "negbin" && team
+            ? sampleGammaPoisson(rng, mean, team.member_frailty_phi)
+            : samplePoisson(rng, mean);
       } else {
         // Spec §3.2: for event-triggered conditions, the log_lambda posterior
         // encodes log(p_event); after the vulnerability multiplier it can
@@ -155,19 +275,14 @@ export function runMissionTrial(
         n = sampleBinomial(rng, mission.evaCount, clampProb(lambdaI));
       }
       if (n === 0) continue;
-
-      const tau = treatmentFraction(c.id, mission);
-      const treatedMean = condPrior.treated_lost_days_mean;
-      const untreatedMean = condPrior.untreated_lost_days_mean;
-      const dBest = lostDays(untreatedMean, treatedMean, tau);
-
-      for (let j = 0; j < n; j++) {
-        const severity = sampleSeverity(rng, condPrior.worst_case_prob_q);
-        const dj = dBest * (severity === 1 ? WORST_CASE_MULTIPLIER : 1.0);
-        totalQTL += dj;
-        perCondition[c.id] = (perCondition[c.id] ?? 0) + dj;
-      }
+      totalQTL += accumulateLostDays(rng, c.id, n, condPrior, mission, perCondition);
     }
+  }
+
+  // Phase 2 — crew-level team conditions
+  if (latent && team) {
+    const rngCrew = makeRng((seed ^ SALT_CREW) >>> 0);
+    totalQTL += runCrewPass(crew, mission, conditions, priors, team, latent, rngCrew, idx, perCondition);
   }
 
   // Spec §3.5 mandates CHI ∈ [0,1] by construction. Under pathological priors a
@@ -265,7 +380,6 @@ export function simulateMission(
     throw new SelectronError("E_BAD_MISSION", "crew must be non-empty");
   }
   const chiStar = options.chiStar ?? DEFAULT_CHI_STAR;
-  const rng = makeRng(options.seed);
 
   // Build criteria index once per simulation call (option (a) from plan G5:
   // testable, avoids re-importing inside the hot trial loop).
@@ -280,7 +394,7 @@ export function simulateMission(
   for (const c of conditions) perConditionSamples[c.id] = new Array<number>(trials).fill(0);
 
   for (let t = 0; t < trials; t++) {
-    const result = runMissionTrial(crew, mission, priors, conditions, rng, criteriaIndex);
+    const result = runMissionTrial(crew, mission, priors, conditions, options.seed + t, criteriaIndex);
     chiSamples[t] = result.chi;
     qtlSamples[t] = result.qtl;
     for (const cid of Object.keys(perConditionSamples)) {

@@ -93,8 +93,7 @@ describe("runMissionTrial", () => {
     const priors = syntheticPriors();
     const crew = syntheticCrew(6);
     const mission = ANALOG_MISSIONS.find((m) => m.type === "mars500")!;
-    const rng = makeRng(0xc0ffee);
-    const r = runMissionTrial(crew, mission, priors, ANALOG_CONDITIONS, rng);
+    const r = runMissionTrial(crew, mission, priors, ANALOG_CONDITIONS, 0xc0ffee);
     expect(r.chi).toBeGreaterThanOrEqual(0);
     expect(r.chi).toBeLessThanOrEqual(1);
     expect(r.qtl).toBeGreaterThanOrEqual(0);
@@ -107,8 +106,7 @@ describe("runMissionTrial", () => {
     const priors = syntheticPriors();
     const crew = syntheticCrew(4);
     const mission = ANALOG_MISSIONS.find((m) => m.type === "antarctic")!;
-    const rng = makeRng(0xface);
-    const r = runMissionTrial(crew, mission, priors, ANALOG_CONDITIONS, rng);
+    const r = runMissionTrial(crew, mission, priors, ANALOG_CONDITIONS, 0xface);
     let sum = 0;
     for (const v of Object.values(r.perCondition)) sum += v;
     expect(Math.abs(sum - r.qtl)).toBeLessThan(1e-9);
@@ -127,8 +125,7 @@ describe("runMissionTrial", () => {
       label: "THOR (no prior, regression guard)",
     };
     const crew = syntheticCrew(3);
-    const rng = makeRng(0x1234);
-    const r = runMissionTrial(crew, mission, priors, ANALOG_CONDITIONS, rng);
+    const r = runMissionTrial(crew, mission, priors, ANALOG_CONDITIONS, 0x1234);
     expect(r.qtl).toBe(0);
     expect(r.chi).toBe(1);
   });
