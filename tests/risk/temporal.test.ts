@@ -1,6 +1,7 @@
 import { describe, it, expect } from "vitest";
 import { integratedIntensity, firstEventFraction } from "@/risk/temporal";
 import { makeRng } from "@/engine/prng";
+import { SelectronError } from "@/engine/errors";
 
 describe("integratedIntensity", () => {
   it("stable class integrates to 1", () => {
@@ -34,5 +35,14 @@ describe("firstEventFraction", () => {
       return c / n;
     };
     expect(pBy(1)).toBeLessThan(pBy(0)); // unstable later onset for same total mean
+  });
+});
+
+describe("shape-parameter guards", () => {
+  it("throws on negative a (would break M_c monotonicity)", () => {
+    expect(() => integratedIntensity(1, -3, 2)).toThrow(SelectronError);
+  });
+  it("throws on non-positive p", () => {
+    expect(() => firstEventFraction(makeRng(1), 3, 1, 2, 0)).toThrow(SelectronError);
   });
 });

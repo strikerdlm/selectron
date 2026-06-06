@@ -1,7 +1,18 @@
+import { SelectronError } from "@/engine/errors";
+
 type Rng = () => number;
 
 /** Latent class: 0 = stable (flat), 1 = unstable (back-loaded rising). */
 export type LatentClass = 0 | 1;
+
+function checkShapeParams(a: number, p: number): void {
+  if (!Number.isFinite(a) || a < 0) {
+    throw new SelectronError("E_BAD_PRIOR", `temporal a must be finite and ≥ 0, got ${a}`, { a });
+  }
+  if (!Number.isFinite(p) || p <= 0) {
+    throw new SelectronError("E_BAD_PRIOR", `temporal p must be finite and > 0, got ${p}`, { p });
+  }
+}
 
 /** M_c(u) = ∫₀ᵘ g_c. stable = u; unstable = u + a·u^(p+1)/(p+1). */
 function cumulativeShape(u: number, cls: LatentClass, a: number, p: number): number {
@@ -10,6 +21,7 @@ function cumulativeShape(u: number, cls: LatentClass, a: number, p: number): num
 
 /** ∫₀¹ g_c du — the duration-independent average intensity factor. */
 export function integratedIntensity(cls: LatentClass, a: number, p: number): number {
+  checkShapeParams(a, p);
   return cumulativeShape(1, cls, a, p);
 }
 
@@ -25,6 +37,7 @@ export function firstEventFraction(
   a: number,
   p: number,
 ): number {
+  checkShapeParams(a, p);
   if (!(totalMean > 0)) return 1;
   const E = -Math.log(Math.max(rng(), 1e-12)); // Exp(1)
   const M1 = cumulativeShape(1, cls, a, p);
