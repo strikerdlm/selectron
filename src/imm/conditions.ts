@@ -14,7 +14,8 @@ export const IMM_CONDITIONS: IMMCondition[] = [
     "processType": "general-Poisson",
     "riskFactors": [],
     "vulnerabilityCriteria": [
-      "physical.vo2max"
+      "physical.vo2max",
+      "psych.conscientiousness"
     ]
   },
   {
@@ -139,7 +140,9 @@ export const IMM_CONDITIONS: IMMCondition[] = [
     "riskFactors": [
       "SPE"
     ],
-    "vulnerabilityCriteria": []
+    "vulnerabilityCriteria": [
+      "psych.conscientiousness"
+    ]
   },
   {
     "id": "acute-sinusitis",
@@ -339,7 +342,8 @@ export const IMM_CONDITIONS: IMMCondition[] = [
     "processType": "general-Poisson",
     "riskFactors": [],
     "vulnerabilityCriteria": [
-      "physical.vo2max"
+      "physical.vo2max",
+      "psych.conscientiousness"
     ]
   },
   {
@@ -591,7 +595,8 @@ export const IMM_CONDITIONS: IMMCondition[] = [
     "processType": "general-Poisson",
     "riskFactors": [],
     "vulnerabilityCriteria": [
-      "physical.vo2max"
+      "physical.vo2max",
+      "psych.conscientiousness"
     ]
   },
   {
@@ -803,7 +808,9 @@ export const IMM_CONDITIONS: IMMCondition[] = [
     "incidenceDist": "Gamma",
     "processType": "general-Poisson",
     "riskFactors": [],
-    "vulnerabilityCriteria": []
+    "vulnerabilityCriteria": [
+      "psych.conscientiousness"
+    ]
   },
   {
     "id": "mouth-ulcer",
@@ -1112,7 +1119,9 @@ export const IMM_CONDITIONS: IMMCondition[] = [
     "incidenceDist": "Fixed",
     "processType": "general-Poisson",
     "riskFactors": [],
-    "vulnerabilityCriteria": []
+    "vulnerabilityCriteria": [
+      "psych.conscientiousness"
+    ]
   },
   {
     "id": "traumatic-hypovolemic-shock",
@@ -1123,7 +1132,8 @@ export const IMM_CONDITIONS: IMMCondition[] = [
     "processType": "general-Poisson",
     "riskFactors": [],
     "vulnerabilityCriteria": [
-      "physical.vo2max"
+      "physical.vo2max",
+      "psych.conscientiousness"
     ]
   },
   {

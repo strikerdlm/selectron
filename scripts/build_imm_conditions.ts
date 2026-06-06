@@ -222,6 +222,12 @@ const slug = (s: string) =>
 // Maps each IMM condition family to the Selectron criteria whose Stage A scores
 // should modulate that condition's vulnerability multiplier.
 // Criterion IDs must match exactly the `id` fields in src/data/placeholder-criteria.ts.
+//
+// Conscientiousness coupling evidence (see research/evidence_extracted/conscientiousness_vulnerability_coupling.md):
+//   traumatic  — Clarke et al. 2005 meta-analysis (k=43, N>26000, r_c=0.27): low conscientiousness
+//                predicts accident involvement; added alongside vo2max (β=-0.2, traumatic default).
+//   toxicologic — Molloy et al. 2014 meta-analysis (k=124): conscientiousness predicts medication
+//                 adherence r=0.15; Adachi et al. 2022 OR≈1.9 for adherence across CV/RA populations.
 function inferVulnerabilityCriteria(family: string): string[] {
   const map: Record<string, string[]> = {
     "psychiatric":       ["psych.mmpi2rf_eid", "psych.emotional_stability", "psych.bdi2_baseline"],
@@ -241,8 +247,8 @@ function inferVulnerabilityCriteria(family: string): string[] {
     "ENT":               [],
     "ophthalmologic":    [],
     "dermatologic":      [],
-    "toxicologic":       [],
-    "traumatic":         ["physical.vo2max"],
+    "toxicologic":       ["psych.conscientiousness"],
+    "traumatic":         ["physical.vo2max", "psych.conscientiousness"],
   };
   return map[family] ?? [];
 }

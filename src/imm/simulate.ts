@@ -140,7 +140,7 @@ export type IMMTrialOpts = {
  * Returns modifiedLambda = applyVulnerabilityMultiplier(baseLambda, beta, z).
  * Falls through to baseLambda when no criteria are present or no stageAScores.
  *
- * 58 of the 100 production conditions now carry vulnerabilityCriteria, so this
+ * 61 of the 100 production conditions now carry vulnerabilityCriteria, so this
  * path is active whenever a crew member supplies stageAScores. It falls through to
  * the unmodified baseLambda for crews without Stage-A scores — e.g. the K15
  * reference crew used in all reported validation and figure runs, which is why
