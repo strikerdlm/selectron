@@ -1,8 +1,18 @@
 # Evidence: English et al. 2004 — Team Referent Conscientiousness Outperforms Aggregates
 
-**Citation:** English, A., Griffith, R. L., & Steelman, L. A. (2004). Team performance:
-The effect of team conscientiousness and task type. *Small Group Research, 35*(6), 643–665.
-<https://doi.org/10.1177/1046496404266320>
+> **CORRECTION (2026-06-07, citation-integrity pass).** The 2026-06-07 peer review found the **study
+> design below is fabricated**: this paper's real sample is **≈30 cockpit crews of 3 pilots each**, NOT
+> "two studies of undergraduate 4-person teams (N₁=108, N₂=96)." The directional claim (team *referent*
+> conscientiousness adds incremental validity over individual/mean aggregates) is correct, but the
+> per-study Ns, the 4-person-team design, and any effect sizes in §1–§2 are **unverified and must not be
+> cited** until re-read against the primary source. The DOI/title/page range have **not** been
+> re-verified this pass (it was not on the verification list — see `_doi_verification_log.md`). This file
+> backs **no shipped coefficient** (the engine uses CSC/ATC anchored to Xu/Clarke/Peeters/Bell/Beus);
+> it is retained as supporting context only.
+
+**Citation (UNVERIFIED — re-check before use):** English, A., Griffith, R. L., & Steelman, L. A. (2004).
+*Team performance / Small Group Research*. DOI and volume/issue/pages pending primary-source
+re-verification.
 
 **Design:** Experimental / quasi-experimental; two studies with undergraduate teams (N₁ = 108
 4-person teams; N₂ = 96 4-person teams). NEO-PI-R administered individually; team performance

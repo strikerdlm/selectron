@@ -800,3 +800,94 @@ Fix: both conditions reclassified to `kind: "rate"`. Validated by
 `src/imm/` (the NASA-IMM Calculator, the manuscript's primary engine) is entirely untouched.
 The conflict/team layer lives exclusively in `src/risk/` (the Stage-B analog pipeline). The
 two pipelines are independent per CLAUDE.md: "do not refactor one in terms of the other."
+
+---
+
+## 10. Analog selection/training model — evidence-tightening (added 2026-06-07)
+
+Implements `docs/superpowers/plans/2026-06-07-selectron-analog-model-tuning.md` in response to the
+2026-06-07 peer review. **Analog-only**; `leo-iss`/K15 is byte-identical by construction (every new
+mechanism is gated on `isTerrestrialAnalog(kind)` and/or `stageAScores` presence; canary green).
+
+### 10.1 What changed (all in `src/imm/simulate.ts` unless noted)
+
+| Change | Mechanism | Gate |
+|---|---|---|
+| **Phase 3 — agreeableness coupling** | `computeCrewTeamworkClimateMultiplier()` (team-min `behavioral.teamwork`, `ATC_BETA=−0.15`) on `{behavioral, traumatic, musculoskeletal}`, parallel to the conscientiousness CSC path | `stageAScores` present |
+| **Phase 2 A1 — selection baseline** | `selectionPsychMultiplier()`: `unscreened-random` × `SELECTION_PSYCH_RATIO=4.0` on the **psychiatric family only** | `isTerrestrialAnalog(kind)` + `selectionContext` |
+| **Phase 2 A2 — situational strength** | `applySituationalStrength()`: `screened-trained` dampens crew CSC/ATC toward 1.0 by `SITUATIONAL_STRENGTH_DAMP=0.6` | `isTerrestrialAnalog(kind)` + `selectionContext` |
+| **Phase 4 — third-quarter removed** | `THIRD_QUARTER_*` / `thirdQuarterMode` deleted (refuted phenomenon); was opt-in/inert → no reported result changed | n/a |
+| **A3 — time×selection bridge (docs)** | `src/risk/crew-state.ts` `piUnstable = logistic(α₀ + αFit·fitZ)` already shifts the Tu-2024 latent-class mix by crew fit; `temporal_a/p` relabeled operator-supplied (not fit) | `src/risk` only |
+
+### 10.2 Why A1 is psychiatric-only (not psychiatric+behavioral)
+
+The Palinkas & Suedfeld 2008 ~5% DSM floor / Kessler 2005 26.2% any-disorder anchors measure
+**psychiatric morbidity** (anxiety, depression, late-insomnia). The behavioral family
+(`behavioral-emergency`, `interpersonal-conflict`) is **excluded** from the 4× selection floor:
+behavioral-emergency drives evacuation/LOCL, and inflating it would widen the crew-quality **pLOCL**
+gap, contradicting the well-supported finding that selection reduces **morbidity, not mortality**
+(defensibility review §4–5; Antonsen 2022). behavioral-emergency still carries the crew-climate
+(CSC/ATC) and individual trait coupling — just not the selection-process baseline.
+
+### 10.3 Coefficient provenance (peer review §3.5)
+
+`CSC_BETA`, `ATC_BETA`, `SITUATIONAL_STRENGTH_DAMP` are **operator-supplied tuning parameters**
+(directionally literature-anchored, sensitivity-swept). `SELECTION_PSYCH_RATIO=4.0` is a conservative
+anchor to the Palinkas/Kessler ratio (≈5×). All DOIs resolved — see
+`research/evidence_extracted/_doi_verification_log.md`. The fabricated Van Fossen 2021 file was
+deleted; Xu 2020, Bell 2019, Lee & Dalal 2016, Wilmot & Ones 2019 records corrected.
+
+### 10.4 Analog validation gate (`npm run validate:imm:analog`)
+
+New reporter `scripts/validate_imm_analog.ts` (parallel to the ISS-only `validate_imm.ts`):
+- **Hard gate:** `leo-iss`/K15 byte-identical under `selectionContext` (exits 1 on drift) — PASS.
+- Emergent analog outcomes (T=20k, seed 0xc0ffee):
+
+| Mission | Crew | TME | CHI | pEVAC | ≈evac/py | pLOCL |
+|---|---|---|---|---|---|---|
+| analog-90d | screened-trained | 17.1 | 96.0 | 1.19% | 0.0080 | 0.020% |
+| analog-90d | unscreened-random | 22.8 | 93.8 | 1.80% | 0.0122 | 0.045% |
+| antarctic-winter (365d) | screened-trained | 118.8 | 90.6 | 7.42% | 0.0062 | 0.115% |
+| antarctic-winter (365d) | unscreened-random | 226.3 | 84.9 | 10.79% | 0.0090 | 0.345% |
+
+Screened-arm evac/py (~0.006–0.008) sits at the **USAP 0.01 / McMurdo 0.036** anchors (Walton &
+Kerstman 2020; Pattarini 2016). The unscreened arm shows the expected higher psychiatric TME burden
+and lower CHI. The residual crew-quality **pLOCL** difference (all <0.35%, an order of magnitude below
+pEVAC) is **not** driven by the A1 selection floor — the psychiatric family (anxiety/depression/
+late-insomnia) carries ~0 `p_locl`, so the 4× cannot move LOCL. It is the **pre-existing individual
+trait-coupling** (a low-trait crew elevates `p_locl`-bearing families via the vulnerability path,
+predating this work) — the documented psychiatric-pathway model-specific prediction (kit-training
+review §4), flagged not hidden and deliberately not tuned further. This is **inter-model /
+analog-anchor agreement, not validation against in-flight data** (the same caveat the manuscript states
+for ISS).
+
+### 10.6 Default-context divergence (engine/script vs UI) — read before a manuscript run
+
+The engine and the validation scripts default `selectionContext` to **`undefined`** (no A1/A2 — the
+pre-2026-06-07 behavior is preserved, so existing tests and sweeps are unaffected). The **UI**
+(`CrewComposition`) defaults to **`screened-trained`** (A2 dampening active — the app's target
+population). Consequence: a future analog-manuscript run must pass `selectionContext` **explicitly** to
+`simulateIMM`; a bare call will silently differ from the UI figures. Make the chosen arm explicit in any
+reported run.
+
+### 10.7 e2e snapshot status (this checkout)
+
+The Playwright pixel snapshots (`phase3f.smoke.spec.ts`) were run on this Windows checkout after
+installing Chromium. `mission-kind-context.png` reports a **1735-px (0.06) diff that is identical with
+and without this work's changes** (verified by stash-compare at HEAD) — a pre-existing cross-machine
+**font-rendering** mismatch (baselines were generated on a different host), NOT a regression. The new
+"selection" row lives in the mission-meta `<dl>`, which is **outside** every `toHaveScreenshot` region
+(the only nearby one captures the mission-`<select>`/badge `<div>`), so it contributes **zero** pixels
+to any baseline. Baselines were deliberately **not** regenerated here (doing so on a font-mismatched
+host would corrupt them for CI / other machines). Unit suite (632/632) + `vite build` are the
+authoritative "nothing breaks" evidence on this host.
+
+### 10.5 Time-of-isolation treatment (the corrected approach)
+
+The model carries time-in-confinement through (a) **linear-in-duration incidence** → cumulative
+P(≥1 event) near-certain by ≥45 d (JARE/ANARE; defensibility review Assumption 2) and (b) the
+**kit-depletion (RAF)** superlinearity in pEVAC (Antonsen 2022). The third-quarter *nadir* amplifier
+was removed (refuted). The per-day psychiatric hazard *may* rise with cumulative confinement, but
+Antonsen 2022 (`10.1038/s41526-022-00193-9`, primary-text confirmed) uses constant-rate incidence and
+states "the assumption of constant incidence may underpredict ... 730/1195-day DRMs" — so this is
+documented as a **limitation**, not shipped as a mechanism.

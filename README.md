@@ -24,6 +24,19 @@
 
 ---
 
+> **Research statement.** Selectron is a legitimate, valid, and safe **academic research effort and
+> experimentation in aerospace medicine** — specifically, a reproducible Bayesian decision-science
+> methodology for analog-astronaut crew selection and mission medical-risk estimation. It is the
+> original scientific work of **Dr. Diego L. Malpica, MD** (sole author), conducted for peer-reviewed
+> publication (*Advances in Space Research*, Elsevier/COSPAR) and grounded entirely in the
+> peer-reviewed literature and published agency/military technical reports (NASA, ESA, JAXA, CSA, DoD).
+> All priors, coefficients, and validation anchors are cited to resolvable DOIs; every model assumption
+> and limitation is disclosed in the [V&V dossier](docs/iter3_vv_dossier.md). It is **not** a clinical,
+> diagnostic, or operational tool, makes no real-world flight-certification decisions, and contains no
+> personal or sensitive data — it runs entirely offline on the operator's own machine. AI assistants
+> (Claude / Anthropic) were used only for code-completion and prose-formatting assistance and are
+> disclosed per the target journal's generative-AI policy.
+
 ## What Selectron is
 
 A working TypeScript application and a methodology paper, in one repository.

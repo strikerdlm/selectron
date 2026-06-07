@@ -1,15 +1,14 @@
-# Evidence: Wilmot et al. 2019 — Occupational Complexity Attenuates the C-Performance Relation
+# Evidence: Wilmot & Ones 2019 — Occupational Complexity Attenuates the C-Performance Relation
 
-**Citation:** Wilmot, M. P., Wanberg, C. R., Kammeyer-Mueller, J. D., & Ones, D. S. (2019).
-Extraversion advantages at work: A quantitative review and synthesis of the meta-analytic evidence.
-*Proceedings of the National Academy of Sciences, 116*(46), 23219–23225.
-<https://doi.org/10.1073/pnas.1910668116>
-
-*Note: The primary finding on C-complexity moderation is from the companion meta-analysis:*
-
-**Wilmot, M. P., & Ones, D. S. (2019).** A century of research on conscientiousness at work.
-*Proceedings of the National Academy of Sciences, 116*(46), 23219–23225.
-<https://doi.org/10.1073/pnas.1910013116>
+> **CORRECTION (2026-06-07, citation-integrity pass).** The prior header conflated two different PNAS
+> papers and used a non-resolving DOI for the conscientiousness one. **Verified record** (Crossref
+> 2026-06-07, see `_doi_verification_log.md`): the C-complexity moderation finding is from
+> **Wilmot, M. P., & Ones, D. S. (2019). A century of research on conscientiousness at work.
+> *PNAS, 116*(46), 23004–23010. <https://doi.org/10.1073/pnas.1908430116>**. The *extraversion*
+> companion (Wilmot, Wanberg, Kammeyer-Mueller & Ones 2019, `10.1073/pnas.1910668116`) is a **separate**
+> paper and is not the source for the conscientiousness claim. Only the **direction**
+> (complexity attenuates C→performance) is verified; the specific ρ values (0.32→0.16) quoted below were
+> **not** verifiable in the abstract — treat them as unconfirmed.
 
 **Design:** Meta-analysis of meta-analyses (quantitative synthesis); k > 200 meta-analytic
 samples; total primary N > 250,000. Examined Big Five C as a predictor of job performance
