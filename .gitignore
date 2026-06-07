@@ -39,3 +39,6 @@ outputs/
 
 # Graphify skill generated artifacts
 research/graphify-out/
+
+# Author's local working notes for Claude Code (not for public remote)
+CLAUDE.md
