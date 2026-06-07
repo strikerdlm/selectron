@@ -12,7 +12,8 @@
     "typecheck": "tsc --noEmit",
     "e2e": "playwright test",
     "calibrate:imm": "tsx scripts/calibrate_imm_priors.ts",
-    "validate:imm": "tsx scripts/validate_imm.ts"
+    "validate:imm": "tsx scripts/validate_imm.ts",
+    "validate:imm:analog": "tsx scripts/validate_imm_analog.ts"
   },
   "dependencies": {
     "dexie": "^4.4.2",

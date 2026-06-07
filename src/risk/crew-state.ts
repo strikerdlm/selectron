@@ -49,6 +49,13 @@ export function drawTrialLatentState(
   hyper: TeamHyper,
   rng: Rng,
 ): TrialLatentState {
+  // A3 TIME×SELECTION BRIDGE (peer review 2026-06-07): crew fit (mean teamwork z)
+  // shifts the latent-class mix. piUnstableBase is the Tu-2024-FIT split (≈0.658);
+  // alphaFit<0 lowers P(unstable) for a higher-fit (selected/trained) crew, so a
+  // selected crew gets the flat trajectory and a random crew the back-loaded rising
+  // one. This is how the model couples selection to time-in-confinement. The split
+  // is fit; alphaFit and the ramp shape (temporal_a/p) are operator-supplied — see
+  // src/data/synthetic-iter3.ts.
   const fitZ = meanFitZ(crew, idx, hyper.fitCriterionId);
   const alpha0 = Math.log(hyper.piUnstableBase / (1 - hyper.piUnstableBase));
   const piUnstable = logistic(alpha0 + hyper.alphaFit * fitZ);

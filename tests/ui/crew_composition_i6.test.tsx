@@ -382,3 +382,38 @@ describe("CrewComposition · analog surfaces render pre-run", () => {
     expect(getPosteriorDrawsMock).not.toHaveBeenCalled();
   });
 });
+
+describe("CrewComposition · selection/training gradient toggle (Phase 2, 2026-06-07)", () => {
+  it("analog mission: toggle is enabled, defaults to screened-trained, and flips to unscreened-random on click", async () => {
+    seedPersistedState("antarctic-winter"); // kind antarctic-station (analog)
+    renderWithDb();
+    await waitForReady();
+
+    const screened = await screen.findByTestId("selection-screened-trained");
+    const random = await screen.findByTestId("selection-unscreened-random");
+    // Enabled on an analog mission.
+    expect((screened as HTMLButtonElement).disabled).toBe(false);
+    expect((random as HTMLButtonElement).disabled).toBe(false);
+    // Default active = screened-trained (the app's target population).
+    expect(screened.getAttribute("data-active")).toBe("true");
+    expect(random.getAttribute("data-active")).toBe("false");
+
+    await act(async () => {
+      fireEvent.click(random);
+      await new Promise((r) => setTimeout(r, 0));
+    });
+    expect(screen.getByTestId("selection-unscreened-random").getAttribute("data-active")).toBe("true");
+    expect(screen.getByTestId("selection-screened-trained").getAttribute("data-active")).toBe("false");
+  });
+
+  it("leo-iss mission: the selection toggle is disabled (analog-only lever; K15 unaffected)", async () => {
+    seedPersistedState("iss-6mo"); // kind leo-iss
+    renderWithDb();
+    await waitForReady();
+
+    const screened = await screen.findByTestId("selection-screened-trained");
+    const random = await screen.findByTestId("selection-unscreened-random");
+    expect((screened as HTMLButtonElement).disabled).toBe(true);
+    expect((random as HTMLButtonElement).disabled).toBe(true);
+  });
+});

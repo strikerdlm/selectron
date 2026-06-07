@@ -15,6 +15,8 @@ import { ACTIVE_MISSIONS } from "../../data/imm-missions";
 import type { IMMMission } from "../../imm/types";
 import { IMM_KITS } from "../../imm/kits";
 import type { IMMKitScenario } from "../../imm/types";
+import type { SelectionContext } from "../../imm/simulate";
+import { isTerrestrialAnalog } from "../../imm/simulate";
 import { HealthSupportTierPicker } from "../health/HealthSupportTierPicker";
 import { HealthSupportBreakdown } from "../health/HealthSupportBreakdown";
 import { ISS_HMS_BASELINE_CHI } from "../../imm/health-support";
@@ -212,6 +214,9 @@ interface CrewState {
   seed: number;
   aggregator: CrewCompositeMethod;
   chiStar: number;
+  // 2026-06-07: selection/training gradient. Only affects terrestrial-analog
+  // missions (engine-gated on isTerrestrialAnalog) — inert for leo-iss / K15.
+  selectionContext: SelectionContext;
 }
 
 const INITIAL_STATE: CrewState = {
@@ -222,6 +227,8 @@ const INITIAL_STATE: CrewState = {
   seed: 0xc0ffee,
   aggregator: "worst-link",
   chiStar: 0.7,
+  // The app is FOR screened analog-astronaut candidates → default to screened-trained.
+  selectionContext: "screened-trained",
 };
 
 // ─── localStorage autosave (Diego 2026-05-29) ────────────────────────────────
@@ -243,6 +250,7 @@ function persistCrewState(s: CrewState): void {
         seed: s.seed,
         aggregator: s.aggregator,
         chiStar: s.chiStar,
+        selectionContext: s.selectionContext,
       }),
     );
   } catch {
@@ -262,6 +270,7 @@ function loadPersistedCrewState(): CrewState | null {
       seed: number;
       aggregator: CrewCompositeMethod;
       chiStar: number;
+      selectionContext: SelectionContext;
     }>;
     if (!Array.isArray(p.members) || !p.mission) return null;
     const kit =
@@ -274,6 +283,7 @@ function loadPersistedCrewState(): CrewState | null {
       seed: p.seed ?? INITIAL_STATE.seed,
       aggregator: p.aggregator ?? INITIAL_STATE.aggregator,
       chiStar: p.chiStar ?? INITIAL_STATE.chiStar,
+      selectionContext: p.selectionContext ?? INITIAL_STATE.selectionContext,
     };
   } catch {
     return null;
@@ -449,13 +459,14 @@ export function CrewComposition() {
       w.postMessage({
         crew: state.members, mission: state.mission, kit: state.kit,
         trials: 5000, seed: state.seed, chiStar: state.chiStar, criteria: PLACEHOLDER_CRITERIA,
+        selectionContext: state.selectionContext,
       });
     }, 400);
     return () => {
       clearTimeout(handle);
       if (previewWorkerRef.current) { previewWorkerRef.current.terminate(); previewWorkerRef.current = null; }
     };
-  }, [state.members, state.mission, state.kit, state.seed, state.chiStar]);
+  }, [state.members, state.mission, state.kit, state.seed, state.chiStar, state.selectionContext]);
 
   // ── I6 (2026-06-04): analog Bayesian MCMC posterior-predictive effect ─────
   // Fetch per-condition posterior λ draws from the Python calibration API, then
@@ -631,6 +642,17 @@ export function CrewComposition() {
     invalidateOutcome();
   }
 
+  /**
+   * 2026-06-07: selection/training gradient. Engine-gated to terrestrial-analog
+   * kinds, so this lever is inert for leo-iss / K15. "screened-trained" = the
+   * app's target population (psychologically screened, trained analog crews);
+   * "unscreened-random" = general-population baseline (peer review §3.4).
+   */
+  function setSelectionContext(ctx: SelectionContext) {
+    setState((s) => ({ ...s, selectionContext: ctx }));
+    invalidateOutcome();
+  }
+
   const runSimulation = useCallback(() => {
     if (simState === "running") return;
     if (state.members.length === 0) return;
@@ -678,8 +700,9 @@ export function CrewComposition() {
       seed: state.seed,
       chiStar: state.chiStar,
       criteria: PLACEHOLDER_CRITERIA,
+      selectionContext: state.selectionContext,
     });
-  }, [simState, state.members, state.mission, state.kit, state.trials, state.seed, state.chiStar]);
+  }, [simState, state.members, state.mission, state.kit, state.trials, state.seed, state.chiStar, state.selectionContext]);
 
   // ── worker cleanup on unmount ───────────────────────────────────────────
   useEffect(() => {
@@ -923,6 +946,46 @@ export function CrewComposition() {
                   aria-label="mission duration in days"
                 />
                 <span className="text-ink-3">d</span>
+              </dd>
+
+              {/* 2026-06-07: selection/training gradient (analog-only). Distinguishes a
+                  screened-and-trained crew from a random/unscreened population — the two
+                  populations the app contrasts (peer review §3.4). Engine-gated to
+                  terrestrial-analog kinds, so the buttons are disabled for leo-iss / K15. */}
+              <dt className="text-ink-3">selection</dt>
+              <dd className="flex flex-col gap-1">
+                <div
+                  className="flex items-center gap-1"
+                  role="group"
+                  aria-label="crew selection context"
+                  data-testid="selection-context-group"
+                >
+                  {(["screened-trained", "unscreened-random"] as const).map((ctx) => {
+                    const active = state.selectionContext === ctx;
+                    const analog = isTerrestrialAnalog(state.mission.kind);
+                    return (
+                      <button
+                        key={ctx}
+                        type="button"
+                        disabled={!analog}
+                        data-testid={`selection-${ctx}`}
+                        data-active={active}
+                        aria-pressed={active}
+                        onClick={() => setSelectionContext(ctx)}
+                        className={`mono text-[11px] px-2 py-0.5 rounded border transition-colors
+                          ${active ? "border-signal text-ink-0 bg-signal/10" : "border-line/50 text-ink-3 hover:text-ink-1"}
+                          disabled:opacity-30 disabled:cursor-not-allowed`}
+                      >
+                        {ctx === "screened-trained" ? "screened + trained" : "unscreened / random"}
+                      </button>
+                    );
+                  })}
+                </div>
+                <span className="mono text-[10px] text-ink-3">
+                  {isTerrestrialAnalog(state.mission.kind)
+                    ? "selection-process baseline + situational strength (Palinkas 2008; Lee & Dalal 2016)"
+                    : "analog-only lever — no effect on ISS / K15"}
+                </span>
               </dd>
 
               <dt className="text-ink-3">crew size</dt>

@@ -85,16 +85,84 @@ export const FAMILY_BETA: Partial<Record<IMMConditionFamily, number>> = {
 };
 export const FAMILY_BETA_DEFAULT = -0.2;
 
-// Phase A: Xu et al. 2020 crew minimum-C → safety climate → safety performance.
-// β_csc is attenuated vs per-family FAMILY_BETA because the pathway is mediated through
-// team safety climate rather than a direct individual → outcome path.
+// ── Crew-level trait → safety-climate coefficients (ANALOG MISSIONS ONLY) ─────
+// Two parallel crew-level pathways modulate safety-sensitive incidence via the
+// team's WEAKEST member (minimum score), per the deep-level team-composition
+// literature (Bell 2007: team-minimum is the strongest field-setting predictor):
+//   - CSC conscientiousness — Xu 2020 min-C → safety climate → safety compliance
+//   - ATC agreeableness/teamwork — Clarke & Robertson 2005 A r_c=.26 ≈ C .27;
+//       Peeters 2006 A-elevation ρ=.24 > C .20; Beus 2014 (agreeableness the
+//       largest safety-behavior variance share). Closes the §3.2 review gap:
+//       the model previously coupled conscientiousness but NOT agreeableness.
+//
+// `behavioral.teamwork` is the interpersonal-compatibility PROXY for agreeableness
+// (no `psych.agreeableness` criterion exists in the catalog) — stated as a proxy,
+// not an identity (peer review §3.2 / 2026-06-07).
+//
+// CSC_BETA / ATC_BETA are OPERATOR-SUPPLIED TUNING PARAMETERS (peer review §3.5):
+// the Xu 2020 path-coefficient derivation (0.28 × 0.35 ≈ 0.10) could not be
+// verified against the source, so these magnitudes are chosen ordinally to give a
+// ~25-35% λ swing across the score range — NOT elicited from a primary regression.
+// Both crew coefficients are dampened for trained crews (situational strength, A2)
+// and sensitivity-swept in the analog validation gate.
+//
+// 2026-06-07: the Phase B "third-quarter mode" amplifier was REMOVED — it rested
+// on a contested-to-refuted nadir phenomenon (Bell 2019, Hawkes 2017, Skorupa
+// 2024, Kanas 2021 all refute; its own cited anchor argued against it). It was
+// opt-in and wired into no UI / production path, so removal changes no reported
+// result. Time-of-isolation is carried by linear-in-duration incidence + the
+// kit-depletion (RAF) mechanism; see docs/superpowers/plans/2026-06-07-*.md §4.
 const CSC_BETA = -0.15;
-const CSC_FAMILIES = new Set<IMMConditionFamily>(["behavioral", "traumatic", "musculoskeletal"]);
-// Phase B: Sandal 2018 + Bell 2019 third-quarter phenomenon.
-// When thirdQuarterMode=true, amplifies the conscientiousness β for psychiatric/behavioral
-// families. Magnitude anchored to Sandal 2018 coping nadir + Bell 2019 conflict onset.
-const THIRD_QUARTER_C_AMP = 1.4;
-const THIRD_QUARTER_C_FAMILIES = new Set<IMMConditionFamily>(["psychiatric", "behavioral"]);
+const ATC_BETA = -0.15;
+const SAFETY_CLIMATE_FAMILIES = new Set<IMMConditionFamily>(["behavioral", "traumatic", "musculoskeletal"]);
+const CSC_CRITERION = "psych.conscientiousness";
+const ATC_CRITERION = "behavioral.teamwork";
+
+// ── Selection/training gradient (ANALOG MISSIONS ONLY) ───────────────────────
+// Distinguishes a TRAINED-AND-SELECTED crew from RANDOM/UNSCREENED people — the
+// two populations the app contrasts. Both effects are gated on
+// isTerrestrialAnalog(kind) so leo-iss / K15 stays byte-identical.
+//
+//   A1 selection-process baseline floor — screened polar crews sit at the
+//      Palinkas & Suedfeld 2008 ~5% DSM floor; an unscreened/random population
+//      approaches general-population 12-mo prevalence (~20% any disorder). The
+//      kind_multipliers are calibrated on SCREENED winter-over cohorts, so the
+//      default and the "screened-trained" arm are 1.0; the "unscreened-random"
+//      arm ELEVATES psychiatric/behavioral λ by SELECTION_PSYCH_RATIO. This is a
+//      DECOMPOSITION (environment = kind_mult; selection process = this factor),
+//      not a second floor on an already-screened baseline (peer review 2026-06-07).
+//      ~4× composes with the per-condition trait coupling to reproduce the
+//      documented ~11× screened-vs-extreme bound (defensibility review §1).
+//
+//   A2 situational-strength β-dampening — in mature, highly-trained programs with
+//      strong safety climate the trait → outcome coupling is ATTENUATED (peer
+//      review §3.4; Wilmot & Ones 2019; Lee 2016). The "screened-trained" arm
+//      pulls the crew-level CSC/ATC multipliers toward 1.0 by
+//      SITUATIONAL_STRENGTH_DAMP. OPERATOR-SUPPLIED tuning parameter.
+export type SelectionContext = "screened-trained" | "unscreened-random";
+const SELECTION_PSYCH_RATIO = 4.0;
+// A1 applies to the PSYCHIATRIC family only ({anxiety, depression, late-insomnia})
+// — the morbidity cluster the Palinkas 5% DSM floor / Kessler 26.2% any-disorder
+// anchors actually measure. It deliberately EXCLUDES the behavioral family
+// (behavioral-emergency drives evacuation/LOCL): inflating that by 4× would widen
+// the crew-quality pLOCL gap, contradicting the well-supported finding that
+// selection reduces psychiatric MORBIDITY, not MORTALITY (defensibility review §4-5;
+// Antonsen 2022). behavioral-emergency still carries crew-climate (CSC/ATC) and
+// individual trait coupling — just not the selection-process baseline floor.
+const SELECTION_PSYCH_FAMILIES = new Set<IMMConditionFamily>(["psychiatric"]);
+const SITUATIONAL_STRENGTH_DAMP = 0.6;
+
+/** A1: selection-process baseline multiplier on psychiatric/behavioral λ. Exported for testability. */
+export function selectionPsychMultiplier(ctx: SelectionContext | undefined, family: IMMConditionFamily): number {
+  if (ctx !== "unscreened-random") return 1.0;
+  return SELECTION_PSYCH_FAMILIES.has(family) ? SELECTION_PSYCH_RATIO : 1.0;
+}
+
+/** A2: dampen a crew-level safety-climate multiplier toward 1.0 for trained crews. Exported for testability. */
+export function applySituationalStrength(mult: number, ctx: SelectionContext | undefined): number {
+  if (ctx !== "screened-trained") return mult;
+  return 1 + (mult - 1) * SITUATIONAL_STRENGTH_DAMP;
+}
 
 type Occurrence = {
   conditionId: string;
@@ -172,22 +240,29 @@ export type IMMTrialOpts = {
    */
   kindMultipliers?: Record<string, number>;
   /**
-   * Phase A (Xu et al. 2020): pre-computed crew-level safety-climate coefficient.
-   * Applied as a λ multiplier on behavioral / traumatic / musculoskeletal conditions
-   * for ALL crew members. Computed once per simulation by simulateIMM from the crew's
-   * minimum psych.conscientiousness score via computeCrewSafetyClimateMultiplier.
+   * Phase A (Xu et al. 2020): pre-computed crew-level conscientiousness safety-climate
+   * coefficient. Applied as a λ multiplier on behavioral / traumatic / musculoskeletal
+   * conditions for ALL crew members. Computed once per simulation by simulateIMM from
+   * the crew's minimum psych.conscientiousness score via computeCrewSafetyClimateMultiplier.
    * Default 1.0 — K15 reference crew (no stageAScores) gets 1.0 automatically.
    */
   crewSafetyClimateMultiplier?: number;
   /**
-   * Phase B (Sandal 2018 + Bell 2019): third-quarter phenomenon mode.
-   * When true, amplifies the psych.conscientiousness β by THIRD_QUARTER_C_AMP (1.4×)
-   * for psychiatric and behavioral conditions. Inert for crew without
-   * psych.conscientiousness stageAScores (applyStageAVulnerabilityMultiplier
-   * falls through to baseLambda when stageAScores is absent — K15 safe).
-   * Default false.
+   * Phase 3 (peer review §3.2): pre-computed crew-level agreeableness/teamwork
+   * safety-climate coefficient, parallel to crewSafetyClimateMultiplier. Computed
+   * once per simulation from the crew's minimum behavioral.teamwork score via
+   * computeCrewTeamworkClimateMultiplier. Default 1.0 — K15 reference crew gets 1.0.
    */
-  thirdQuarterMode?: boolean;
+  crewTeamworkClimateMultiplier?: number;
+  /**
+   * Phase 2 (peer review §3.4 / 2026-06-07): selection/training gradient.
+   * "unscreened-random" elevates psychiatric/behavioral λ by SELECTION_PSYCH_RATIO
+   * (A1 selection-process baseline floor). Effect is GATED on terrestrial-analog
+   * missions inside runIMMTrial, so leo-iss / K15 is unaffected regardless of value.
+   * Default undefined → no effect. (The A2 situational-strength β-dampening is applied
+   * to the crew CSC/ATC multipliers upstream in simulateIMM, not here.)
+   */
+  selectionContext?: SelectionContext;
 };
 
 /**
@@ -212,19 +287,46 @@ export type IMMTrialOpts = {
  * members in runIMMTrial. A single low-C crew member elevates safety-sensitive risk
  * for the entire crew via the safety-climate pathway.
  */
+function computeCrewMinScoreClimateMultiplier(
+  crew: IMMCrewMember[],
+  criteriaIndex: ReadonlyMap<string, Criterion>,
+  criterionId: string,
+  beta: number,
+): number {
+  const crit = criteriaIndex.get(criterionId);
+  if (!crit) return 1.0;
+  const scores = crew
+    .map(m => m.stageAScores?.[criterionId])
+    .filter((s): s is number => s !== undefined && Number.isFinite(s));
+  if (scores.length === 0) return 1.0;
+  const min = Math.min(...scores);
+  const zRaw = zScoreAgainstScale(min, crit.scale);
+  // Sign convention: for higherIsBetter criteria a low minimum → z<0 → with β<0
+  // exp(β·z) > 1 (elevated risk). Both psych.conscientiousness and
+  // behavioral.teamwork are higherIsBetter, so this matches the original CSC math.
+  const zSigned = crit.higherIsBetter ? zRaw : -zRaw;
+  return Math.exp(beta * zSigned);
+}
+
 export function computeCrewSafetyClimateMultiplier(
   crew: IMMCrewMember[],
   criteriaIndex: ReadonlyMap<string, Criterion>,
 ): number {
-  const crit = criteriaIndex.get("psych.conscientiousness");
-  if (!crit) return 1.0;
-  const scores = crew
-    .map(m => m.stageAScores?.["psych.conscientiousness"])
-    .filter((s): s is number => s !== undefined && Number.isFinite(s));
-  if (scores.length === 0) return 1.0;
-  const minC = Math.min(...scores);
-  const z = zScoreAgainstScale(minC, crit.scale);
-  return Math.exp(CSC_BETA * z);
+  return computeCrewMinScoreClimateMultiplier(crew, criteriaIndex, CSC_CRITERION, CSC_BETA);
+}
+
+/**
+ * Phase 3 (peer review §3.2): crew-level agreeableness/teamwork safety-climate
+ * multiplier, parallel to the conscientiousness path. Uses the team minimum
+ * `behavioral.teamwork` (interpersonal-compatibility proxy for agreeableness).
+ * Returns 1.0 when no crew member supplies behavioral.teamwork scores — so the
+ * K15 reference crew (no stageAScores) is unaffected and K15 stays byte-identical.
+ */
+export function computeCrewTeamworkClimateMultiplier(
+  crew: IMMCrewMember[],
+  criteriaIndex: ReadonlyMap<string, Criterion>,
+): number {
+  return computeCrewMinScoreClimateMultiplier(crew, criteriaIndex, ATC_CRITERION, ATC_BETA);
 }
 
 /**
@@ -252,7 +354,6 @@ export function applyStageAVulnerabilityMultiplier(
   family: IMMConditionFamily,
   vulnerabilityCriteria: string[],
   criteriaIndex: ReadonlyMap<string, Criterion>,
-  criterionBetaAmplifiers?: Readonly<Record<string, number>>,
 ): number {
   if (vulnerabilityCriteria.length === 0 || !member.stageAScores) return baseLambda;
 
@@ -267,8 +368,7 @@ export function applyStageAVulnerabilityMultiplier(
     if (!c) continue;
     const zRaw = zScoreAgainstScale(raw, c.scale);
     const zSigned = c.higherIsBetter ? zRaw : -zRaw;
-    // Phase B: per-criterion β amplifier (e.g. third-quarter mode for psych.conscientiousness).
-    beta[cid] = familyBeta * (criterionBetaAmplifiers?.[cid] ?? 1.0);
+    beta[cid] = familyBeta;
     z[cid] = zSigned;
   }
 
@@ -313,13 +413,12 @@ function sampleGeneralPoissonCount(
   vulnerabilityCriteria: string[],
   criteriaIndex: ReadonlyMap<string, Criterion>,
   tierMult: number = 1.0,
-  criterionBetaAmplifiers?: Readonly<Record<string, number>>,
 ): number {
   const inc = prior.incidence;
   if (inc.distribution === "Lognormal-Poisson") {
     const lambdaPerDay = sampleLognormal(rng, inc.mu_log_lambda!, inc.sigma_log_lambda!);
     const rfmLambda = applyRiskFactorMultiplier(lambdaPerDay, member, prior);
-    const modLambda = applyStageAVulnerabilityMultiplier(rfmLambda, member, family, vulnerabilityCriteria, criteriaIndex, criterionBetaAmplifiers);
+    const modLambda = applyStageAVulnerabilityMultiplier(rfmLambda, member, family, vulnerabilityCriteria, criteriaIndex);
     // rev3-b-followup: tierMult applied at the λ-sampling site → Poisson(λ · tierMult)
     // preserves both mean *and* variance (Var = λ · tierMult, not mult² · λ which
     // is what post-count stochastic rounding produced).
@@ -328,7 +427,7 @@ function sampleGeneralPoissonCount(
   if (inc.distribution === "Gamma-Poisson") {
     const lambdaPerDay = sampleGamma(inc.alpha!, rng) / inc.beta!;
     const rfmLambda = applyRiskFactorMultiplier(lambdaPerDay, member, prior);
-    const modLambda = applyStageAVulnerabilityMultiplier(rfmLambda, member, family, vulnerabilityCriteria, criteriaIndex, criterionBetaAmplifiers);
+    const modLambda = applyStageAVulnerabilityMultiplier(rfmLambda, member, family, vulnerabilityCriteria, criteriaIndex);
     return samplePoisson(rng, modLambda * durationDays * tierMult);
   }
   // Fixed: already handled inline in the caller (lambda_fixed is a rate-per-day too)
@@ -383,7 +482,11 @@ export function runIMMTrial(
   const earlyTerminated = new Set<number>();
   const rafHistory: Array<{ conditionId: string; raf: number }> = [];
   const crewCSC = opts.crewSafetyClimateMultiplier ?? 1.0;
-  const thirdQtMode = opts.thirdQuarterMode ?? false;
+  const crewATC = opts.crewTeamworkClimateMultiplier ?? 1.0;
+  // Phase 2: the selection/training gradient only bites on terrestrial-analog
+  // missions — double-gated here (simulateIMM already nulls it for non-analog
+  // kinds) so leo-iss / K15 is byte-identical regardless of the option value.
+  const selCtx: SelectionContext | undefined = isTerrestrialMission ? opts.selectionContext : undefined;
 
   // T23: Pre-sample SPE event times once per trial (one solar event affects all crew).
   // λ_SPE = LAMBDA_SPE_PER_DAY (solar max estimate per K15 §II.A.4).
@@ -417,16 +520,15 @@ export function runIMMTrial(
       // guard the lookup with a typeof check for forward-compat).
       const rawKindMult = opts.kindMultipliers?.[cond.id];
       const kindMult = (typeof rawKindMult === "number" && Number.isFinite(rawKindMult)) ? rawKindMult : 1.0;
-      // Phase A: crew safety-climate coefficient (Xu 2020 min-C path). Inert when crewCSC=1.0
-      // (no crew member has C scores → computeCrewSafetyClimateMultiplier returns 1.0).
-      const cscFamilyMult = CSC_FAMILIES.has(cond.family) ? crewCSC : 1.0;
-      const effectiveMult = tierMult * kindMult * cscFamilyMult;
-      // Phase B: third-quarter β amplifier for psych.conscientiousness.
-      // Inert when thirdQtMode=false or condition family not in THIRD_QUARTER_C_FAMILIES.
-      const thirdQtBetaAmps: Readonly<Record<string, number>> | undefined =
-        (thirdQtMode && THIRD_QUARTER_C_FAMILIES.has(cond.family))
-          ? { "psych.conscientiousness": THIRD_QUARTER_C_AMP }
-          : undefined;
+      // Phase A + Phase 3: crew-level safety-climate coefficients on the
+      // safety-sensitive families. CSC = conscientiousness (Xu 2020), ATC =
+      // agreeableness/teamwork (Clarke 2005 / Peeters 2006 / Bell 2007). Both are
+      // 1.0 when no crew member supplies the relevant stageAScores → K15 safe.
+      const climateFamilyMult = SAFETY_CLIMATE_FAMILIES.has(cond.family) ? (crewCSC * crewATC) : 1.0;
+      // Phase 2 A1: selection-process baseline elevation on psychiatric/behavioral
+      // λ for an unscreened/random crew (1.0 for screened-trained / default / non-analog).
+      const selPsychMult = selectionPsychMultiplier(selCtx, cond.family);
+      const effectiveMult = tierMult * kindMult * climateFamilyMult * selPsychMult;
 
       let count = 0;
       if (cond.processType === "general-Poisson") {
@@ -437,12 +539,12 @@ export function runIMMTrial(
           // Phase A/B: effectiveMult includes CSC; thirdQtBetaAmps amplifies C β.
           const baseLambdaPerDay = prior.incidence.lambda_fixed!;
           const rfmLambdaPerDay = applyRiskFactorMultiplier(baseLambdaPerDay, member, prior);
-          const modLambdaPerDay = applyStageAVulnerabilityMultiplier(rfmLambdaPerDay, member, cond.family, cond.vulnerabilityCriteria, criteriaIndex, thirdQtBetaAmps);
+          const modLambdaPerDay = applyStageAVulnerabilityMultiplier(rfmLambdaPerDay, member, cond.family, cond.vulnerabilityCriteria, criteriaIndex);
           count = samplePoisson(rng, modLambdaPerDay * mission.durationDays * effectiveMult);
         } else {
           // Gamma-Poisson / Lognormal-Poisson: draw λ/day from hierarchical prior, apply RFM,
           // IC-5 Stage A multiplier, then scale by mission duration before Poisson sampling.
-          count = sampleGeneralPoissonCount(rng, prior, member, mission.durationDays, cond.family, cond.vulnerabilityCriteria, criteriaIndex, effectiveMult, thirdQtBetaAmps);
+          count = sampleGeneralPoissonCount(rng, prior, member, mission.durationDays, cond.family, cond.vulnerabilityCriteria, criteriaIndex, effectiveMult);
         }
       } else if (cond.processType === "space-adaptation-once") {
         // T24: once-per-mission cap — skip if this crew member already had this condition.
@@ -718,11 +820,15 @@ export function simulateIMM(opts: {
    */
   kindMultipliers?: Record<string, number>;
   /**
-   * Phase B (Sandal 2018 + Bell 2019): when true, activates third-quarter phenomenon
-   * mode — the conscientiousness β for psychiatric/behavioral conditions is amplified
-   * by THIRD_QUARTER_C_AMP (1.4×). Threaded into runIMMTrial. Default false.
+   * Phase 2 (peer review §3.4 / 2026-06-07): selection/training gradient.
+   * "screened-trained" (default behaviour) leaves psychiatric/behavioral baselines
+   * at the screened-cohort-calibrated kind_multipliers and DAMPENS the crew-level
+   * CSC/ATC coefficients (situational strength, A2). "unscreened-random" elevates
+   * psychiatric/behavioral λ (A1) and applies full trait coupling. The effect is
+   * gated to terrestrial-analog kinds, so leo-iss / K15 is byte-identical for any
+   * value. Default undefined → no effect.
    */
-  thirdQuarterMode?: boolean;
+  selectionContext?: SelectionContext;
 }): IMMOutcome {
   const { crew, mission, kit, trials, seed } = opts;
   const chiStar = opts.chiStar ?? 0.7;
@@ -738,9 +844,20 @@ export function simulateIMM(opts: {
   const criteriaIndex: ReadonlyMap<string, Criterion> = opts.criteria
     ? new Map(opts.criteria.map(c => [c.id, c]))
     : new Map();
-  // Phase A: crew-level safety-climate coefficient (Xu 2020 team min-C pathway).
-  // Returns 1.0 when no crew member has psych.conscientiousness scores → K15 safe.
-  const crewCSC = computeCrewSafetyClimateMultiplier(crew, criteriaIndex);
+  // Phase 2: selection/training gradient is gated to terrestrial-analog kinds.
+  // For leo-iss (and any non-analog kind) it is forced to undefined here, so the
+  // K15 reference path is byte-identical regardless of the caller's value.
+  const selectionContext: SelectionContext | undefined = isTerrestrialAnalog(mission.kind)
+    ? opts.selectionContext
+    : undefined;
+  // Phase A + Phase 3: crew-level safety-climate coefficients (Xu 2020 min-C;
+  // Clarke/Peeters/Bell min-teamwork). Both return 1.0 when no crew member has the
+  // relevant scores → K15 safe. A2 situational-strength dampening pulls them toward
+  // 1.0 for a screened-trained crew (mature program attenuates trait coupling).
+  const crewCSC = applySituationalStrength(
+    computeCrewSafetyClimateMultiplier(crew, criteriaIndex), selectionContext);
+  const crewATC = applySituationalStrength(
+    computeCrewTeamworkClimateMultiplier(crew, criteriaIndex), selectionContext);
   const chiStarPct = chiStar * 100;
   const rng = makeRng(seed);
   const L_hours = mission.durationDays * 24;
@@ -768,10 +885,12 @@ export function simulateIMM(opts: {
       kindMultipliers: effectiveKindMults,
       criteriaIndex,
       conditionFilter: opts.conditionFilter,
-      // Phase A: pre-computed crew safety-climate coefficient (1.0 for K15 crew).
+      // Phase A: pre-computed crew conscientiousness safety-climate coefficient (1.0 for K15 crew).
       crewSafetyClimateMultiplier: crewCSC,
-      // Phase B: third-quarter phenomenon mode (false by default → inert).
-      thirdQuarterMode: opts.thirdQuarterMode,
+      // Phase 3: pre-computed crew agreeableness/teamwork safety-climate coefficient (1.0 for K15 crew).
+      crewTeamworkClimateMultiplier: crewATC,
+      // Phase 2: selection/training gradient (gated to analog kinds above → undefined for leo-iss).
+      selectionContext,
     });
     tmes.push(r.tme);
     // CHI clamped at [0, 100] — QTL can exceed denom under pathological priors (v1 analogue of risk/simulate.ts §3.5 guard).

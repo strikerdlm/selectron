@@ -23,20 +23,22 @@
 // single-trait archetypes inherit that anchor so their gate verdict is
 // attributable to the named trait alone.
 //
-// ── What the engine actually shows at 90 days (3-seed × {3k,8k} sweep) ─────
-//   ΔTME vs avg:  emo +2.11…+2.41 | cog +0.94…+1.14 | mixed +1.18…+1.41
-//                 worst +4.05…+4.29 | consc −0.03…+0.07 (NULL — see below)
-//   avg vs screened: +0.93…+1.07 (pure vulnerability path; both pass gates)
-//   CHI worst vs screened: −0.73…−0.92
+// ── What the engine shows at 90 days ───────────────────────────────────────
+//   ΔTME vs avg:  emo strongest | cog moderate | mixed moderate | worst largest
+//                 consc ≈ +0.96 (MODERATE — crew safety-climate path, see below)
+//   avg vs screened: ~+1 (pure vulnerability path; both pass gates)
 //   pEVAC / pLOCL / MSP do NOT discriminate archetypes even at 90 days
 //   (evac tails are kit/treatment-dominated) — deliberately unasserted.
 //
-// Coupling counts behind the levers (verified in src/imm/conditions.ts):
+// Coupling pathways behind the levers (src/imm/conditions.ts + simulate.ts):
 //   emotional_stability 20 conditions + EID 3 (psych β = −0.4) → strongest;
-//   cognition 7 → moderate; conscientiousness 1 → near-null (the consc≈avg
-//   assertion is a REGRESSION CANARY: if conscientiousness coupling is ever
-//   expanded, that test fails on purpose so the change is acknowledged);
-//   technical_competence 0 → composite-only (see the 45d suite).
+//   cognition 7 → moderate; conscientiousness → MODERATE since 2026-06-06: the
+//   per-condition vulnerability path couples 1 condition, but the Phase A crew
+//   safety-climate path (Xu 2020 crew min-C) couples {behavioral, traumatic,
+//   musculoskeletal} at the crew level; 2026-06-07 Phase 3 adds a parallel
+//   agreeableness/teamwork (behavioral.teamwork) crew lever on the same families.
+//   The consc canary is now BAND-pinned (not null) so further accidental coupling
+//   expansion is still caught. technical_competence 0 → composite-only (45d suite).
 
 import { describe, it, expect, beforeAll } from "vitest";
 import { simulateIMM } from "../../src/imm/simulate";
@@ -172,8 +174,18 @@ describe("analog-90d · crew archetype comparison (mostly-unselected crews)", ()
     expect(R.cog.tme.mean).toBeGreaterThan(R.avg.tme.mean + 0.5);
   });
 
-  it("REGRESSION CANARY: low conscientiousness alone is a near-null risk lever (1 coupled condition) — expand coupling consciously, not accidentally", () => {
-    expect(Math.abs(R.consc.tme.mean - R.avg.tme.mean)).toBeLessThan(0.5);
+  it("REGRESSION CANARY: low conscientiousness is now a MODERATE crew-level lever via the safety-climate path — band-pinned so accidental further expansion still trips", () => {
+    // 2026-06-06 Phase A (crew safety-climate, Xu 2020 min-C) made crew minimum
+    // conscientiousness a deliberate λ lever on {behavioral, traumatic, musculoskeletal}
+    // — so the old "near-null" assertion is obsolete. 2026-06-07 Phase 3 adds a
+    // parallel agreeableness/teamwork lever, but this `consc` crew holds teamwork
+    // at the population midpoint (z=0 → ATC=1.0), so the consc-vs-avg gap is driven
+    // by the conscientiousness CSC path alone. Pin the gap to a band: it is no
+    // longer null (CSC is real) but must stay bounded — a larger gap means the
+    // conscientiousness coupling was expanded again and the change must be acknowledged.
+    const delta = R.consc.tme.mean - R.avg.tme.mean;
+    expect(delta).toBeGreaterThan(0.4);
+    expect(delta).toBeLessThan(1.6);
   });
 
   it("mixed pool (2 worst + 4 avg) lands between the average and worst crews", () => {

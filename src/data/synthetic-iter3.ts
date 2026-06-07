@@ -100,12 +100,25 @@ function buildTeamBlock(): NonNullable<PriorsJson["team"]> {
   return {
     crew_frailty_phi_samples: fitted?.crew_frailty_phi_samples ?? [2, 2.5, 3, 3.5, 4],
     member_frailty_phi: 4,
-    pi_unstable_base: 0.658, // Tu 2024: 133/202 crews unstable
+    pi_unstable_base: 0.658, // FIT: Tu 2024 latent-class split 133/202 crews unstable (conflict_fit.py)
     pi_unstable_samples: fitted?.pi_unstable_samples,
+    // alpha_fit < 0 is the TIME×SELECTION BRIDGE (peer review 2026-06-07 A3):
+    // a higher-fit crew (mean behavioral.teamwork z↑) lowers P(unstable class),
+    // so a selected/trained crew gets the flat trajectory while a random crew gets
+    // the back-loaded rising one (see src/risk/crew-state.ts drawTrialLatentState).
+    // OPERATOR-SUPPLIED tuning parameter — the latent-class SPLIT is Tu-2024-fit,
+    // but the fit→instability SLOPE is not separately identified; sensitivity-swept.
     alpha_fit: -0.5,
     sigma_log_beta: 0.3,     // ≈ ±35% β uncertainty (V&V sensitivity band)
+    // temporal_a / temporal_p shape the unstable-class back-loaded ramp
+    // g(u)=1+a·u^p. OPERATOR-SUPPLIED tuning parameters, NOT fit (conflict_fit.py
+    // docstring: "temporal_a/p ... filled in by the TS layer, not fit here"). λ_base
+    // was derived from Bell 2019 under a CONSTANT-hazard inversion, so the
+    // super-linearity (back-loading) is an assumption, not evidence. Reported as a
+    // modeled assumption and sensitivity-swept — never presented as evidence-based
+    // (peer review 2026-06-07 §3.5 / plan §4 C4).
     temporal_a: 2,
-    temporal_p: 2,           // back-loaded ramp
+    temporal_p: 2,           // back-loaded ramp (assumed shape; see note above)
     beta_het: 0.3,
     beta_weak: 0.4,
     dyad_ref_n: 6,
