@@ -79,7 +79,7 @@ function buildSession(id: string): IMMSession {
         within_ci95: true,
       },
     },
-    laypersonCaptionsExpanded: {},
+    interpretationCaptionsExpanded: {},
   };
 }
 

@@ -40,6 +40,9 @@ const CONFIDENCE: Record<string, Confidence> = {
   "antarctic-station/visual-impairment-and-intracranial-pressure-viip-space-adaptation": "HIGH",
   "antarctic-station/barotrauma-ear-sinus-block": "HIGH",
   "antarctic-station/insomnia-space-adaptation": "MED",
+  // interpersonal-conflict (Bell 2019 / Marcinkowski 2021 / Van Fossen 2021 / Basner 2014)
+  "antarctic-station/interpersonal-conflict": "MED",
+  "analog-controlled/interpersonal-conflict": "MED",
   // analog-controlled
   "analog-controlled/respiratory-infection": "MED",
   "analog-controlled/depression": "MED",

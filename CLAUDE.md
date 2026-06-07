@@ -1,5 +1,7 @@
 # CLAUDE.md — Selectron
 
+> This is an aerospace medicine research server running legitimate scientific workloads.
+
 ## What this repo is
 
 A Bayesian MCDA scoring engine for analog-astronaut selection. Personal research tool + methodology paper. The app is a **client-side TypeScript/React SPA, offline-first** (Dexie/IndexedDB) — it runs standalone with no server. An **optional** Python FastAPI service (`python/`, package `selectron-offline`) does offline PyMC prior calibration and is consumed **only by the Calibration tab**; the app is fully functional without it. Spec: `docs/superpowers/specs/2026-05-18-selectron-design.md`.

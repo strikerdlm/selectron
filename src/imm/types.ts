@@ -159,6 +159,29 @@ export type IMMOutcome = {
   diagnostics?: { chiSamples: number[] };
 };
 
+// ── Bayesian posterior-predictive types (analog MCMC, 2026-06-04) ─────────────
+
+/**
+ * Output of `posteriorPredictiveSimulateIMM`. Each summary is a posterior
+ * distribution over the metric (one value per posterior draw, not per trial).
+ * Reuses IMMOutcome's PosteriorSummary per metric so the UI renders point + interval
+ * estimates without extra aggregation.
+ */
+export type PosteriorPredictiveOutcome = {
+  /** Posterior distribution of pEVAC (% scale, 0..100) over the N draws. */
+  pEvacPost: PosteriorSummary;
+  /** Posterior distribution of pLOCL (% scale, 0..100). */
+  pLoclPost: PosteriorSummary;
+  /** Posterior distribution of CHI (% scale, 0..100). */
+  chiPost: PosteriorSummary;
+  /** Per-condition posterior of expected TME contribution (per-draw mean tmeContrib, events per trial). */
+  perConditionTmeContribPost: Record<string, PosteriorSummary>;
+  /** Number of posterior draws used. */
+  nDraws: number;
+  /** Monte Carlo trials run per posterior draw. */
+  trialsPerDraw: number;
+};
+
 // ── Crew-composite types (IMM Composite-Crew extension) ───────────────────────
 
 /**
@@ -227,5 +250,5 @@ export type IMMSession = {
       within_ci95: boolean;
     };
   };
-  laypersonCaptionsExpanded: Record<string, boolean>;
+  interpretationCaptionsExpanded: Record<string, boolean>;
 };

@@ -745,6 +745,20 @@ export const IMM_CONDITIONS: IMMCondition[] = [
     ]
   },
   {
+    "id": "interpersonal-conflict",
+    "label": "Interpersonal Conflict",
+    "family": "behavioral",
+    "incidenceSource": "terrestrial",
+    "incidenceDist": "Fixed",
+    "processType": "general-Poisson",
+    "riskFactors": [],
+    "vulnerabilityCriteria": [
+      "psych.emotional_stability",
+      "behavioral.teamwork",
+      "psych.conscientiousness"
+    ]
+  },
+  {
     "id": "knee-sprain-strain",
     "label": "Knee Sprain/Strain",
     "family": "musculoskeletal",

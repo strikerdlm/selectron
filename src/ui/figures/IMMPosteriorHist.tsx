@@ -214,7 +214,7 @@ export function IMMPosteriorHist({
       "Keenan et al. (2015) ICES-2015-123 [K15]. IMM Monte Carlo forward simulation, " +
       `${mission.label}.`,
     reproducibility: `seed=${seedHex}, trials=${trials.toLocaleString()}, commit=__COMMIT_SHA__`,
-    layperson:
+    interpretation:
       "These four panels show the spread of possible outcomes from the crew's simulated space " +
       "mission. Each curve represents how often the model predicts a particular level of total " +
       "medical events (TME), crew health index (CHI), probability of emergency evacuation " +

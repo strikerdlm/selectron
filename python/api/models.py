@@ -95,3 +95,14 @@ class ConditionsListResponse(BaseModel):
     conditions: list[dict]
     n_total: int
     n_fittable: int
+
+class PosteriorDraw(BaseModel):
+    condition_id: str
+    lambdas: list[float]
+
+
+class PosteriorDrawsResponse(BaseModel):
+    draws: list[PosteriorDraw]
+    n_draws: int
+    seed: int
+    kind: str | None = None

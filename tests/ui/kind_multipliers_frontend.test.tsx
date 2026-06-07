@@ -4,7 +4,7 @@
 //
 // Scope:
 //   1. missionKindContextLabel — returns the expected string for every kind.
-//   2. KindMultipliersTable — antarctic-station renders the 15 modulated
+//   2. KindMultipliersTable — antarctic-station renders the 16 modulated
 //      conditions sorted by |mult − 1| desc, with frostbite at the top.
 //   3. KindMultipliersTable — leo-iss renders nothing (no per-kind multipliers).
 //   4. KindMultipliersTable — analog-isolation renders nothing
@@ -121,15 +121,17 @@ describe("KindMultipliersTable empty kinds (no per-kind multipliers)", () => {
 // 2. KindMultipliersTable — antarctic-station sorted correctly
 // ────────────────────────────────────────────────────────────────────────────
 describe("KindMultipliersTable (antarctic-station)", () => {
-  it("renders 15 modulated conditions sorted by |mult − 1| desc; frostbite (5.00×) at the top, altitude-sickness (4.00×) second", () => {
+  it("renders 16 modulated conditions sorted by |mult − 1| desc; frostbite (5.00×) at the top, altitude-sickness (4.00×) second", () => {
     const { container } = render(
       <KindMultipliersTable kind={"antarctic-station" satisfies IMMMissionKind} />,
     );
     const rows = container.querySelectorAll("[data-testid='kind-mult-row']");
-    // 26 conditions modulated for antarctic-station after the 2026-06-04b
-    // analog-imm completion pass (research/analog_imm_model_proposal.md):
-    // 10 non-zero + 16 zeroed (all 10 space-adaptation + ARS + ammonia + 2 EVA-suit).
-    expect(rows.length).toBe(26);
+    // 27 conditions modulated for antarctic-station:
+    // - 15 original (10 nonzero + 5 zero)
+    // - 1 added by conflict/team layer (interpersonal-conflict 2.00×)
+    // - 11 added by analog-imm Phase 2a (spaceflight-only zero-out:
+    //   10 space-adaptation + ARS + ammonia + 2 EVA-suit; barotrauma un-zeroed)
+    expect(rows.length).toBe(27);
 
     // Frostbite has the largest |Δ| (5.00 − 1.00 = 4.00). It is not in
     // IMM_CONDITIONS (forward-compatible multiplier only; see dossier

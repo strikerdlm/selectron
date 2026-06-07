@@ -113,4 +113,58 @@ test.describe("Crew Composition view", () => {
     await page.waitForTimeout(300); // allow font fallback settle
     await expect(region).toHaveScreenshot("mission-kind-context.png", { maxDiffPixels: 100 });
   });
+
+  // CC-7: 2026-06-05 — I6 analog Bayesian MCMC posterior figure snapshot.
+  //
+  // Switches the mission picker to the 365-day campaign (antarctic-station),
+  // runs the simulation, and snapshots the I6 region. The figure body only
+  // mounts once the worker-offloaded posterior-predictive sweep reaches its
+  // "done" state, which requires the optional Python calibration API to be
+  // reachable. We therefore:
+  //   • HARD-assert only region visibility — the panel renders for every
+  //     antarctic/controlled run regardless of API state, so CI without the
+  //     API stays green (the panel shows its api-error message instead).
+  //   • SOFT-wait for the figure's `pp-pEvac` done-sentinel so that, when the
+  //     API IS live (as it was when this snapshot was captured locally), the
+  //     screenshot captures the real posterior figure rather than the
+  //     "fetching…"/"running…" spinner. The wait is non-throwing: if the
+  //     sentinel never appears (API down), the test still passes on the
+  //     region assertion.
+  //   • Use raw element.screenshot() (not toHaveScreenshot) so no comparison
+  //     baseline is created — the PNG would otherwise diff-fail across API
+  //     states (offline-first contract).
+  test("i6 analog posterior figure renders for antarctic mission", async ({ page }) => {
+    // The full 100k-trial worker sim + the posterior-predictive sweep can take
+    // well over the 60s default; allow generous headroom for this one test.
+    test.setTimeout(150_000);
+    await page.goto("/");
+    await page.getByRole("button", { name: /crew/i }).click();
+    await page.waitForTimeout(500);
+
+    // Mission picker is the first <select> (mission, IMM-49 preset crew, aggregator).
+    const missionSelect = page.locator("select").first();
+    await expect(missionSelect).toBeVisible();
+    await missionSelect.selectOption("antarctic-winter");
+
+    // Run the IMM Monte Carlo sim (button accessible name from its aria-label).
+    await page.getByRole("button", { name: /run IMM Monte Carlo simulation/i }).click();
+
+    // HARD assertion: the I6 panel must be visible for the antarctic kind.
+    // The panel lives inside the {outcome && …} block, so it only appears once
+    // the worker-offloaded full IMM sim (100k trials) completes — give it 60s.
+    const region = page.getByTestId("imm-i6-posterior");
+    await expect(region).toBeVisible({ timeout: 60_000 });
+
+    // SOFT wait: let the worker sweep finish so the snapshot captures the real
+    // figure when the calibration API is live. Non-throwing by design.
+    await page
+      .locator("[data-testid='pp-pEvac']")
+      .waitFor({ state: "visible", timeout: 30_000 })
+      .catch(() => {});
+    await page.waitForTimeout(800); // allow ECharts histogram to settle
+
+    await region.screenshot({
+      path: "tests/e2e/__snapshots__/phase3f.smoke.spec.ts/i6-analog-posterior.png",
+    });
+  });
 });

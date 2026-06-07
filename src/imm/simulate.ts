@@ -11,7 +11,42 @@ type Rng = () => number;
  */
 const LAMBDA_SPE_PER_DAY = 1.5e-3;
 
-import type { IMMCrewMember, IMMMission, IMMKitScenario, IMMPrior, IMMConditionFamily } from "./types";
+// ── Terrestrial analog guard ────────────────────────────────────────────────
+// Conditions in the 100-condition IMM catalog that are physically impossible
+// inside a 1-atm ground habitat with controlled ventilation (no microgravity,
+// no ionising-radiation flux, no pressurised EVA suit, no ECLSS).
+// Hard-excluded from activeConditions when mission.kind is a terrestrial kind.
+// A hard filter is necessary — kind_multipliers cannot suppress SPE-coupled
+// conditions because that branch explicitly bypasses the multiplier map
+// (see the SPE-coupled branch below). The filter also removes impossible
+// conditions from perConditionDrivers, which a zero-multiplier would not.
+const TERRESTRIAL_MISSION_KINDS = new Set<IMMMissionKind>([
+  "analog-controlled",
+  "antarctic-station",
+  "analog-isolation", // legacy kind literal; preserved for persisted Dexie sessions
+]);
+
+const SPACE_ONLY_PROCESS_TYPES = new Set<IMMProcessType>([
+  "space-adaptation-once", // microgravity fluid-shift adaptations
+  "EVA-coupled",           // pressurised-suit EVA operations
+  "SPE-coupled",           // solar particle events (blocked by atmosphere)
+  "SA-VIIP-late",          // long-duration microgravity VIIP
+]);
+
+// General-Poisson conditions that are specific to ISS/ECLSS infrastructure
+// and therefore impossible in analog habitats with standard ventilation.
+const ECLSS_CONDITION_IDS = new Set<string>([
+  "headache-co2-induced",       // ECLSS CO2 scrubber failure
+  "toxic-exposure-ammonia",     // ISS ammonia coolant loop
+  "barotrauma-ear-sinus-block", // EVA suit pressurisation
+]);
+
+/** True when the mission is a terrestrial analog (ground-based, 1 atm, no ECLSS). */
+export function isTerrestrialAnalog(kind: IMMMissionKind): boolean {
+  return TERRESTRIAL_MISSION_KINDS.has(kind);
+}
+
+import type { IMMCrewMember, IMMMission, IMMKitScenario, IMMPrior, IMMConditionFamily, IMMCondition, IMMMissionKind, IMMProcessType } from "./types";
 import { IMM_CONDITIONS } from "./conditions";
 import { loadIMMPriors } from "./priors";
 import { samplePoisson, sampleLognormal, sampleLognormalPoisson, sampleGammaPoisson, sampleBetaBernoulli, samplePoissonProcess } from "./incidence";
@@ -324,11 +359,21 @@ export function runIMMTrial(
   const tierBMult = opts.tierBMultiplier ?? 1.0;
   // IC-5: criteria index for Stage A z-scored vulnerability multiplier.
   const criteriaIndex: ReadonlyMap<string, Criterion> = opts.criteriaIndex ?? new Map();
-  // peer-review-2 §4.5: filter active conditions once per trial (not per-crew-member)
-  // so the overhead is O(|conditions|) rather than O(|conditions| × |crew|).
-  const activeConditions = opts.conditionFilter
-    ? IMM_CONDITIONS.filter(opts.conditionFilter)
-    : IMM_CONDITIONS;
+  // peer-review-2 §4.5 + 2026-06-05 terrestrial guard: filter active conditions
+  // once per trial (not per-crew-member) for O(|conditions|) overhead.
+  // For terrestrial analog missions, space-only processTypes and ECLSS-specific
+  // conditions are hard-excluded before the trial loop — kind_multipliers cannot
+  // reach SPE-coupled conditions (that branch bypasses the multiplier map), and
+  // a filter-level exclusion also removes impossible conditions from
+  // perConditionDrivers, which a zero-multiplier would not.
+  const isTerrestrialMission = TERRESTRIAL_MISSION_KINDS.has(mission.kind);
+  const activeConditions = IMM_CONDITIONS.filter((cond: IMMCondition) => {
+    if (isTerrestrialMission &&
+        (SPACE_ONLY_PROCESS_TYPES.has(cond.processType) || ECLSS_CONDITION_IDS.has(cond.id))) {
+      return false;
+    }
+    return opts.conditionFilter ? opts.conditionFilter(cond) : true;
+  });
 
   // Health-Support gating: scale each resource by the tier's per-delivery-class
   // deliverability before RAF. Identity for issHMS/unlimited (K15 invariant);
@@ -756,7 +801,14 @@ export function simulateIMM(opts: {
     }
   }
 
-  const drivers = IMM_CONDITIONS.map(c => ({
+  // Mirror the terrestrial guard used in runIMMTrial so that space-only conditions
+  // are also absent from perConditionDrivers (not just absent from the simulation).
+  const isTerrestrialForDrivers = TERRESTRIAL_MISSION_KINDS.has(mission.kind);
+  const driverConditions = isTerrestrialForDrivers
+    ? IMM_CONDITIONS.filter(c =>
+        !SPACE_ONLY_PROCESS_TYPES.has(c.processType) && !ECLSS_CONDITION_IDS.has(c.id))
+    : IMM_CONDITIONS;
+  const drivers = driverConditions.map(c => ({
     conditionId: c.id,
     pEvacContrib: (perConditionEvacSum[c.id] ?? 0) / trials,
     pLoclContrib: (perConditionLoclSum[c.id] ?? 0) / trials,

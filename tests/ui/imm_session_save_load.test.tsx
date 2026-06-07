@@ -108,7 +108,7 @@ async function seedSession(label = "fixture-session", chi = 91.3): Promise<strin
         within_ci95: false,
       },
     },
-    laypersonCaptionsExpanded: {},
+    interpretationCaptionsExpanded: {},
   });
 }
 

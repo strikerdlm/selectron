@@ -351,7 +351,7 @@ function fakeIMMSessionInput(
         within_ci95: true,
       },
     },
-    laypersonCaptionsExpanded: {},
+    interpretationCaptionsExpanded: {},
     ...overrides,
   };
 }

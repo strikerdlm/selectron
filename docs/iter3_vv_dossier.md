@@ -1,6 +1,6 @@
 # Iter-3 V&V Dossier — NASA-STD-7009 Eight Credibility Factors
 
-**Status:** living document. Last revised 2026-05-19 (Phase 3F closure; Phase 3A in-flight, Phase 3B blocked on Diego's T37 curation).
+**Status:** living document. Last revised 2026-06-05 (Phase 3F closure; Phase 3A in-flight, Phase 3B blocked on Diego's T37 curation).
 
 **Mandate:** Iter-3 spec §9 [W14, M18] requires the model to be assessed against the eight NASA-STD-7009a credibility factors. This dossier holds the per-factor evidence and identifies remaining gaps. Re-read on every Iter-3 sign-off step.
 
@@ -490,3 +490,313 @@ UI verification: `npm run dev` → open `/#crew-composition` → pick
 campaign" (badge: "Antarctic winter-over priors"). Run T=5,000 preview;
 the Antarctic run should show higher TME pressure and a different
 mission-success fraction than the controlled run.
+
+---
+
+## 8. Terrestrial analog guard (added 2026-06-05)
+
+### 8.1 Defect that triggered this revision
+
+Diego reported (2026-06-05): when running a 45-day analog mission in the
+IMM Calculator (CrewComposition view), `acute-radiation-syndrome` appeared
+as a contributor to pEVAC. This is physically impossible: ground-based
+analog habitats are shielded by Earth's atmosphere and magnetosphere, have
+no ECLSS installed, and run no pressurised EVA suit operations.
+
+Root cause: `simulateIMM()` ran all 100 IMM conditions regardless of
+`mission.kind`. The `kindMultipliers` approach could not suppress SPE-
+coupled conditions because that branch **explicitly bypasses the multiplier
+map** (design decision, lines 346-350 of `simulate.ts`). Furthermore,
+several `space-adaptation-once` conditions were not listed in the
+`kind_multipliers` JSON block for analog missions (multiplier defaulted to
+1.0), so microgravity adaptation syndromes were being simulated in a 1-atm
+controlled habitat.
+
+### 8.2 Fix — hard-filter in `runIMMTrial` and `simulateIMM`
+
+Two new filter sites in `src/imm/simulate.ts`:
+
+**Site 1 — `runIMMTrial` (lines ~294-308):** `activeConditions` now
+auto-excludes space-only conditions when `TERRESTRIAL_MISSION_KINDS.has(mission.kind)`:
+
+```
+TERRESTRIAL_MISSION_KINDS = { "analog-controlled", "antarctic-station", "analog-isolation" }
+
+Excluded by processType:
+  space-adaptation-once (9 conditions) — microgravity fluid-shift adaptations
+  EVA-coupled (3)  — pressurised-suit EVA (DCS, fingernail, paresthesias)
+  SPE-coupled (1)  — acute-radiation-syndrome (solar particle events; blocked by atmosphere)
+  SA-VIIP-late (1) — VIIP (long-duration microgravity)
+
+Excluded by explicit ID (general-Poisson, ECLSS/ISS infrastructure):
+  headache-co2-induced       — ECLSS CO2 scrubber failure
+  toxic-exposure-ammonia     — ISS ammonia coolant loop
+  barotrauma-ear-sinus-block — EVA suit pressurisation
+```
+
+Total: 17 conditions hard-excluded for terrestrial analog missions.
+
+**Site 2 — `simulateIMM` (lines ~712-718):** `perConditionDrivers` is
+built from the same terrestrial-filtered condition list so that excluded
+conditions do not appear as zero-contribution rows in the UI.
+
+An exported helper `isTerrestrialAnalog(kind: IMMMissionKind): boolean` is
+available for downstream code (e.g. UI hints, tests).
+
+### 8.3 Why hard filter, not kind_multipliers
+
+Two reasons make the multiplier approach insufficient:
+
+1. **SPE-coupled bypass**: the SPE-coupled branch of `runIMMTrial` (ARS)
+   uses `speEventTimes` pre-sampled outside the condition loop and
+   **explicitly skips kindMultipliers**. A zero-multiplier would have
+   no effect. The filter is the only way to reach this path.
+
+2. **perConditionDrivers integrity**: a zero-multiplier still allows
+   the condition to appear in the `perConditionDrivers` output with
+   zero contributions — a misleading data artefact. A filter-level
+   exclusion removes it cleanly.
+
+The `kind_multipliers = 0` entries for `headache-co2-induced`,
+`decompression-sickness-*`, `VIIP`, `barotrauma-ear-sinus-block`, and
+`insomnia-space-adaptation` in `imm-priors.json` are now redundant for
+analog missions (the hard filter takes precedence) but are retained as
+documentation of the design intent.
+
+### 8.4 K15 invariance
+
+The hard filter fires ONLY when `TERRESTRIAL_MISSION_KINDS.has(mission.kind)`.
+`leo-iss` is NOT in that set. K15 reference runs (`iss-6mo` / `iss-drm1` /
+`iss-drm2`) are bit-identical to the pre-change state. Verified by
+`tests/imm/validate_k15.test.ts` and `tests/imm/simulate.test.ts` (44/44).
+
+### 8.5 Test coverage
+
+Three new tests in `tests/imm/conditions.test.ts` (group "terrestrial analog guard"):
+
+1. `analog-controlled 45d`: none of the 17 space-only condition IDs appear
+   in `perConditionDrivers` after 500 trials.
+2. `antarctic-station 365d`: same assertion.
+3. `leo-iss 180d` negative control: `acute-radiation-syndrome` IS present
+   in `perConditionDrivers` — confirms the filter does not affect space missions.
+
+### 8.6 Impact on screened vs unscreened gap
+
+14 of the 17 excluded conditions carry `vulnerabilityCriteria` (mostly
+`physical.vo2max` + `psych.emotional_stability`). Removing them slightly
+reduces the TME gap between screened and unscreened crews for analog
+missions. However, the gap is dominated by psychiatric conditions (11× ratio)
+which are unaffected. Existing analog crew tests (`analog_45d_unscreened_crew.test.ts`,
+`analog_90d_crew_archetypes.test.ts`) continue to pass with existing margins.
+
+### 8.7 NASA-STD-7009A factor mapping update
+
+- **Factor 1 (Verification)**: 3 new regression tests prevent future
+  re-introduction of the ARS false-positive for analog missions.
+- **Factor 2 (Validation)**: analog mission outputs are now physically
+  credible — conditions impossible in the modelled environment no longer
+  contribute to pEVAC or perConditionDrivers.
+- **Factor 3 (Input Data Pedigree)**: `SPACE_ONLY_PROCESS_TYPES` and
+  `ECLSS_CONDITION_IDS` sets in `simulate.ts` document the physical
+  rationale for each exclusion inline.
+
+### 7.9 Posterior-predictive validation (2026-06-05)
+
+> Numbering note: this subsection is appended at the END of §7. The
+> "§7.4" label used in the originating plan was a stale guess written
+> before §7 grew to §7.8; §7.4 is already occupied (Antarctic pEVAC
+> cross-validation). This addendum is therefore filed as **§7.9**.
+
+This subsection validates the analog Bayesian MCMC posterior-predictive
+layer (`posteriorPredictiveSimulateIMM`, `src/imm/posterior-predictive.ts`)
+that propagates per-condition posterior λ uncertainty into the
+mission-level pEVAC / pLOCL / CHI estimates surfaced by figure I6.
+
+**Mechanism — composite kind-multiplier moment-matching.** The wrapper
+makes ZERO engine changes. For each posterior draw `d` and condition `cid`
+with posterior draw λ_d and prior point mean E[λ], it builds a per-draw
+composite multiplier
+
+```
+composite[cid] = (base[cid] ?? 1) × (λ_d / E[λ])
+```
+
+and passes it to the untouched `simulateIMM` via the existing
+`kindMultipliers` hook (`base` = the explicit override else the mission
+kind's `imm-priors.json` map). Because the engine samples λ with prior
+mean E[λ], the factor `λ_d / E[λ]` scales the engine's per-draw mean to
+λ_d while preserving the prior's relative dispersion. This is an explicit
+**moment-matching** approximation: the per-draw mean is scaled to the
+draw, prior dispersion is preserved. It is **NOT a clean
+epistemic/aleatory decomposition** — within a draw λ is re-sampled scaled
+each trial (not held fixed), so the within-draw variance still mixes
+parameter and sampling uncertainty. The label is set accordingly; we do
+not over-claim a variance partition.
+
+**Unbiasedness gate.** Because every λ_d is drawn from the condition's
+fitted Gamma/Lognormal posterior, E[λ_d] = E[λ]; the posterior-predictive
+GRAND mean should therefore agree with the point-prior `simulateIMM` mean
+up to a small Jensen gap (pEVAC is a nonlinear, saturating function of
+cumulative TME) plus Monte-Carlo noise. The gate test
+(`tests/imm/posterior_predictive.test.ts`, `describe("K15 unbiasedness")`)
+constructs every per-condition posterior from a symmetric ±40 %
+perturbation set `[0.6,0.7,0.8,0.9,1.1,1.2,1.3,1.4]` whose length (8)
+divides nDraws (64), so **E[draws] = E[λ] holds exactly** (asserted to
+1e-12 per condition before the run). On the K15 reference config
+(`iss-6mo` / `IMM_KITS.issHMS` / the file's 2-member crew fixture / seed
+`0xc0ffee`), nDraws = 64, trialsPerDraw = 500, all 99 Gamma/Lognormal
+conditions perturbed:
+
+| Quantity | Value |
+|---|---|
+| posterior-predictive grand mean pEVAC | **2.5438 %** |
+| point-prior mean pEVAC (`simulateIMM`, T = 16 000, same seed) | **2.4312 %** |
+| absolute delta | 0.1125 pp |
+| **relative delta** | **4.63 %** |
+
+Gate tolerance is set at **15 % relative**. The residual ~4.6 % is the
+moment-matching Jensen gap plus MC noise at these sample sizes —
+agreement is approximate, not exact, exactly as the nonlinearity
+predicts. The measured relDelta is **4.63 % at the canonical seed
+`0xc0ffee`**; an 8-seed sweep of this config spans **~1.1%–10.9%**, so
+the 15 % tolerance gives **~1.4× headroom against the observed worst
+case**. The gate is seed-locked to `0xc0ffee`, so CI is deterministic;
+the sweep characterizes durability against engine-internal RNG /
+draw-order changes. **Unbiasedness agreement does NOT prove the
+posterior is consumed** (a wrapper that ignored `posterior` would also
+agree on the mean); propagation is proven separately (below).
+
+**The widened interval IS the feature.** The point-prior pipeline reports
+a per-trial CI whose 0/1 evac flag is degenerate at the trial level
+(`simulateIMM` pEVAC ci90 = [0.000, 0.000] on this config — each trial is
+a single Bernoulli outcome, so the per-trial percentile interval collapses).
+The posterior-predictive ci90 is a different object: it is the spread of
+the per-DRAW metric means induced by evidence-base (posterior λ)
+uncertainty. Measured pEVAC ci90 = **[1.400, 4.000] → width 2.60 pp**
+around a 2.54 % mean. These two intervals measure different things — one
+is per-trial sampling noise, the other is posterior-predictive parameter
+spread — and the widened band is the realism this layer adds. (This
+particular width arises from the synthetic deterministic ±40 %
+perturbation used in the unbiasedness fixture; it is a propagation-
+magnitude demonstration, distinct from the production I6 figure, which
+consumes the API's real fitted Gamma/Lognormal draws — e.g. the
+antarctic-station snapshot shows pEVAC 8.9 % with 90 % CI [5.5, 12.0];
+this is a live-API rendering reported for illustration and is not a
+value verified by the test suite.)
+
+**Load-bearing propagation test.** The gate above is necessary but not
+sufficient; the propagation test (`tests/imm/posterior_predictive.test.ts`,
+"propagates posterior draws into per-condition TME and downstream CHI")
+elevates two high-incidence conditions (`acute-sinusitis`, `diarrhea`) to
+**5× their prior mean** and asserts (a) the per-condition TME contribution
+rises to **> 2×** the 1× baseline and (b) the downstream CHI strictly
+falls. This test **fails against any implementation that ignores
+`posterior`** — that is its purpose. A negative-control sibling
+("composes with explicit kindMultipliers") zeroes the base multiplier for
+the elevated condition and asserts its TME contribution collapses to
+exactly 0, confirming the composite `(base ?? 1) × (λ_d / E[λ])` path
+(0 × anything = 0) rather than a silent fall-through to the point prior.
+
+**Reproducers.**
+
+- Unbiasedness gate + propagation + negative control + contract errors:
+  `tests/imm/posterior_predictive.test.ts` (9 tests; the K15 unbiasedness
+  gate logs its measured delta and ci90 width to the console on each run).
+- Python posterior draws + determinism: `python/tests/test_posterior_module.py`,
+  `test_posterior_router.py`, `test_posterior_determinism.py` (10 tests;
+  the determinism test is a subprocess regression guard against the
+  PYTHONHASHSEED-randomized `hash()` defect, now CRC32-seeded).
+- I6 figure render: `tests/ui/analog_posterior_plot.test.tsx` (6 tests);
+  CrewComposition worker wiring + error-state discrimination:
+  `tests/ui/crew_composition_i6.test.tsx` (5 tests).
+
+**E2E note (honest).** The Playwright snapshot
+`tests/e2e/__snapshots__/phase3f.smoke.spec.ts/i6-analog-posterior.png`
+("i6 analog posterior figure renders for antarctic mission") was captured
+with the optional Python calibration API live locally — the PNG shows the
+REAL posterior figure (per-condition λ histograms + pEVAC/pLOCL/CHI cards
++ TME table). The test itself asserts ONLY region visibility, never
+posterior content: it soft-waits (non-throwing) for the figure's
+`pp-pEvac` done-sentinel so the live-API capture lands on the real figure,
+but hard-asserts only that the I6 panel is visible. In CI **without** the
+API, the panel degrades to its `api-error` state by design and the test
+still passes — the app's offline-first contract is preserved (the SPA is
+fully functional without the Python service; I6 is the only surface that
+consumes it, and it degrades gracefully).
+
+---
+
+## 9. Bayesian conflict/team layer — src/risk/ (added 2026-06-06)
+
+This section documents the validation of the Stage-B conflict/team Bayesian layer
+added to `src/risk/` (spec `docs/superpowers/specs/2026-06-06-selectron-conflict-team-bayesian-design.md`).
+The `src/imm/` NASA-IMM Calculator is entirely untouched.
+
+### 9.1 Substream determinism control
+
+**Design:** Four dedicated PRNG substreams per trial — SALT_LATENT (`0x00abcd04`),
+SALT_MEDICAL (`0x00abcd01`), SALT_PSYCH (`0x00abcd02`), SALT_CREW (`0x00abcd03`) — each
+derived as `makeRng((seed ^ SALT_X) >>> 0)`. Medical/physiologic conditions always read
+from `rngMedical`, independent of whether the conflict layer is active.
+
+**Test:** `tests/risk/determinism_control.test.ts` — 1 test asserting that per-condition
+QTL means for all physiologic and musculoskeletal conditions are **bit-identical** between
+a run with `SYNTHETIC_PRIORS.team` present and a run with `team: undefined`.
+Passes on the calibrated priors at `{ seed: 0xc0ffee, trials: 3000 }`.
+
+**Implication for V&V Factor 1 (Verification):** the medical incidence model's
+determinism guarantee — which underpins the K15 invariance canary in `src/imm/` — is
+provably unperturbed by the conflict/team engine at the bit level.
+
+### 9.2 PyMC-fit anchors (three identifiable parameters)
+
+Three parameters were fit from published aggregate statistics using PyMC NUTS
+(`python/src/selectron/conflict_fit.py`, seed `0xc0ffee & 0xFFFFFFFF`):
+
+| Parameter | Evidence anchor | Posterior (NUTS, 2000 draws) | Literature target |
+|---|---|---|---|
+| `π_unstable` | Tu 2024: 133/202 crews unstable | mean 0.656, 95% CI ~[0.59, 0.72] | 133/202 = 0.658 |
+| `λ_base` (per day) | Bell 2019: 71/72 teams ≥1 conflict by 40%/90d | mean 0.107/day | P(≥1 by 40%/90d) ≈ 0.978 |
+| `φ_crew` (frailty) | Basner 2014: 85% of conflicts from top-⅓ of crew | Gamma(2, 1.5) prior (weakly identified) | wide, mean 3.0 |
+
+`φ_crew` is explicitly disclosed as weakly identified — no published estimate of
+crew-level overdispersion (Basner n=2 of 6; Bell 2019 only team-level totals). The
+prior is intentionally wide. A future fit with raw dyadic-conflict time series would
+sharpen it.
+
+Numerical stability fix: `p40 = pm.math.clip(p40, 1e-6, 1−1e-6)` before the
+log-rate transform prevents explosion in the near-degenerate Beta(72, 2) posterior
+(`BELL2019_TEAMS=72, BELL2019_WITH_CONFLICT=71`).
+
+### 9.3 B5 Posterior-Predictive Checks (literature-anchored)
+
+`tests/risk/conflict_ppc.test.ts` — 3 checks on a 6-person HI-SEAS 90-day simulation
+(`{ seed: 0xc0ffee, trials: 8000, diagnostics: true }`):
+
+| Check | Literature anchor | Assertion | Result |
+|---|---|---|---|
+| Bell 2019 onset | P(≥1 conflict by 40% of mission) on neutral crew | `byPoint4 > 0.85` | PASS |
+| Tu 2024 latent class | Unstable fraction lower for high-fit (teamwork=5) vs low-fit (teamwork=1) crews | `frac(crew(5)) < frac(crew(1))` | PASS |
+| Basner concentration | Top member's share of attributed conflicts exceeds 1/n | `topShare > 1/6` | PASS |
+
+Scale note: the B5 checks use `behavioral.teamwork` scores on the `{min:1, max:5}` criterion
+scale. The plan spec cited out-of-scale values (9, 3); these were corrected to `(5, 1)` to
+match the actual criterion bounds.
+
+### 9.4 De-EVA validation
+
+Before this fix, `conflict-event` and `leadership-challenge` were `kind: "event"` — sampled
+via `sampleBinomial(rng, evaCount, p)`. Antarctic winter-over and Mars-500 have `evaCount=0`,
+producing zero conflict events on both missions despite 365-day durations. This was
+structurally incorrect: crew conflict is a function of confinement duration and interpersonal
+dynamics, not extravehicular activity.
+
+Fix: both conditions reclassified to `kind: "rate"`. Validated by
+`tests/risk/simulate_threepass.test.ts` test 1: "365-d Antarctic (evaCount=0) now produces
+> 0 team-condition QTL."
+
+### 9.5 Scope boundary
+
+`src/imm/` (the NASA-IMM Calculator, the manuscript's primary engine) is entirely untouched.
+The conflict/team layer lives exclusively in `src/risk/` (the Stage-B analog pipeline). The
+two pipelines are independent per CLAUDE.md: "do not refactor one in terms of the other."

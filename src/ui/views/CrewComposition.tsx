@@ -34,9 +34,23 @@ import { loadIMMPriors } from "../../imm/priors";
 import { KindMultipliersTable } from "../components/KindMultipliersTable";
 import { notify } from "../components/Toast";
 import { createIMMSession, recentIMMSessionsFor } from "../../db/repository";
-import type { IMMSession } from "../../imm/types";
+import type { IMMSession, PosteriorPredictiveOutcome } from "../../imm/types";
+import { getPosteriorDraws } from "@/api/calibration";
+import type { PosteriorDrawsResponse } from "@/api/calibration";
+import { IMMAnalogPosteriorPlot } from "../figures/IMMAnalogPosteriorPlot";
 
 type SimState = "idle" | "running" | "done" | "error";
+
+// I6 posterior-predictive state has two error variants so the panel can show an
+// actionable message: "api-error" means the fetch itself failed (Python API is
+// unreachable); "compute-error" means draws arrived but the worker sweep failed.
+type PpState = "idle" | "running" | "done" | "api-error" | "compute-error";
+
+// 2026-06-04 (I6): mission kinds that carry a `kind_multipliers` block in the
+// calibrated priors — the only kinds for which `/posterior/draws` returns
+// per-condition draws. For other kinds the endpoint returns empty draws and the
+// posterior figure adds nothing, so we skip the fetch+sim entirely.
+const POSTERIOR_KINDS = new Set(["antarctic-station", "analog-controlled"]);
 
 // ─── safe default score generation ───────────────────────────────────────────
 // Rules (from advisor):
@@ -311,6 +325,22 @@ export function CrewComposition() {
   const [previewOutcome, setPreviewOutcome] = useState<IMMOutcome | undefined>();
   const [previewState, setPreviewState] = useState<SimState>("idle");
 
+  // ── I6 (2026-06-04): analog Bayesian MCMC posterior-predictive ───────────
+  // Fetched per-condition posterior λ draws from the Python calibration API,
+  // then a worker-offloaded posterior-predictive sweep. Mirrors the preview
+  // effect's debounce + reqId + cleanup discipline below. State machine:
+  //   idle    — kind not eligible, no crew, or reset
+  //   running — fetch and/or worker sweep in flight
+  //   done    — draws fetched (+ outcome computed, unless draws were empty)
+  //   error   — Python API unreachable or worker threw
+  const [ppDraws, setPpDraws] = useState<PosteriorDrawsResponse | null>(null);
+  const [ppOutcome, setPpOutcome] = useState<PosteriorPredictiveOutcome | undefined>();
+  const [ppState, setPpState] = useState<PpState>("idle");
+  const [ppError, setPpError] = useState<string | undefined>();
+  const ppReqRef = useRef(0);
+  const ppAbortRef = useRef<AbortController | null>(null);
+  const ppWorkerRef = useRef<Worker | null>(null);
+
   // ── IMM-50: recent saved sessions for the load dropdown ─────────────────
   const [recentSessions, setRecentSessions] = useState<IMMSession[]>([]);
   const reloadRecentSessions = useCallback(async () => {
@@ -426,6 +456,99 @@ export function CrewComposition() {
       if (previewWorkerRef.current) { previewWorkerRef.current.terminate(); previewWorkerRef.current = null; }
     };
   }, [state.members, state.mission, state.kit, state.seed, state.chiStar]);
+
+  // ── I6 (2026-06-04): analog Bayesian MCMC posterior-predictive effect ─────
+  // Fetch per-condition posterior λ draws from the Python calibration API, then
+  // run a posterior-predictive Monte Carlo sweep in the worker (NEVER on the main
+  // thread — the sweep is nDraws × trialsPerDraw trials). Mirrors the preview
+  // effect above: debounced (400 ms), race-guarded (ppReqRef), cleanup-safe.
+  // Two extra teardowns over the preview effect: an AbortController for the fetch
+  // and the pp worker. `state.members` IS in the deps (stale-crew guard); the
+  // memoized `kindMultipliers` is stable per kind so it is safe as a dep.
+  useEffect(() => {
+    // Gate: only eligible kinds with a non-empty crew. Anything else resets to
+    // idle so a stale figure from a prior eligible mission does not linger.
+    if (!POSTERIOR_KINDS.has(state.mission.kind) || state.members.length === 0) {
+      setPpState("idle");
+      setPpDraws(null);
+      setPpOutcome(undefined);
+      return;
+    }
+    const reqId = ++ppReqRef.current;
+    setPpState("running");
+    setPpDraws(null);    // reset stale draws so phase detection is correct during fetch
+    setPpError(undefined);
+    const handle = setTimeout(() => {
+      // Abort any prior fetch and terminate any prior pp worker before starting.
+      if (ppAbortRef.current) { ppAbortRef.current.abort(); ppAbortRef.current = null; }
+      if (ppWorkerRef.current) { ppWorkerRef.current.terminate(); ppWorkerRef.current = null; }
+      const ac = new AbortController();
+      ppAbortRef.current = ac;
+      getPosteriorDraws({ kind: state.mission.kind, nDraws: 256, seed: state.seed, signal: ac.signal })
+        .then((resp) => {
+          if (reqId !== ppReqRef.current) return; // a newer request superseded us
+          setPpDraws(resp);
+          // No per-condition draws for this kind → the figure renders its own
+          // empty state; do not spawn a worker for nothing.
+          if (resp.draws.length === 0) {
+            setPpOutcome(undefined);
+            setPpState("done");
+            return;
+          }
+          // Map snake_case API draws → the engine's condition_id → λ[] shape.
+          const posterior = Object.fromEntries(resp.draws.map((d) => [d.condition_id, d.lambdas]));
+          let w: Worker;
+          try {
+            w = new Worker(new URL("../../workers/imm-simulate.worker.ts", import.meta.url), { type: "module" });
+          } catch (err) {
+            if (reqId === ppReqRef.current) {
+              setPpError((err as Error).message);
+              setPpState("compute-error");
+            }
+            return;
+          }
+          ppWorkerRef.current = w;
+          w.onmessage = (e: MessageEvent<{ ok: true; result: PosteriorPredictiveOutcome } | { ok: false; error: string }>) => {
+            if (reqId === ppReqRef.current) {
+              if (e.data.ok) { setPpOutcome(e.data.result); setPpState("done"); }
+              else { setPpError(e.data.error); setPpState("compute-error"); }
+            }
+            w.terminate();
+            if (ppWorkerRef.current === w) ppWorkerRef.current = null;
+          };
+          w.onerror = () => {
+            if (reqId === ppReqRef.current) setPpState("compute-error");
+            w.terminate();
+            if (ppWorkerRef.current === w) ppWorkerRef.current = null;
+          };
+          w.postMessage({
+            mode: "posterior-predictive",
+            opts: {
+              crew: state.members,
+              mission: state.mission,
+              kit: state.kit,
+              posterior,
+              nDraws: Math.min(64, resp.n_draws),
+              trialsPerDraw: 200,
+              seed: state.seed,
+              kindMultipliers,
+            },
+          });
+        })
+        .catch((err) => {
+          // AbortError fires on cleanup / supersede — silently ignore. Any other
+          // failure means the Python API is unreachable (offline-first contract:
+          // degrade gracefully rather than crash the view).
+          if ((err as Error).name === "AbortError") return;
+          if (reqId === ppReqRef.current) setPpState("api-error");
+        });
+    }, 400);
+    return () => {
+      clearTimeout(handle);
+      if (ppAbortRef.current) { ppAbortRef.current.abort(); ppAbortRef.current = null; }
+      if (ppWorkerRef.current) { ppWorkerRef.current.terminate(); ppWorkerRef.current = null; }
+    };
+  }, [state.members, state.mission, state.kit, state.seed, kindMultipliers]);
 
   function toggleMember(id: string) {
     setExpandedIds((prev) => {
@@ -568,6 +691,14 @@ export function CrewComposition() {
       if (previewWorkerRef.current) {
         previewWorkerRef.current.terminate();
         previewWorkerRef.current = null;
+      }
+      if (ppAbortRef.current) {
+        ppAbortRef.current.abort();
+        ppAbortRef.current = null;
+      }
+      if (ppWorkerRef.current) {
+        ppWorkerRef.current.terminate();
+        ppWorkerRef.current = null;
       }
     };
   }, []);
@@ -1084,26 +1215,6 @@ export function CrewComposition() {
             </div>
           )}
 
-          {/* 2026-06-04: per-(kind, condition) multiplier table. Rendered only
-              for kinds that actually carry a kind delta (analog-controlled /
-              antarctic-station). Kinds with no per-condition multipliers
-              (leo-iss, the legacy analog-isolation literal, future kinds) show
-              nothing here rather than an empty "base priors apply" panel. The
-              mount point carries a data-testid for the badge's "view
-              per-condition multipliers ↓" anchor to scroll to. */}
-          {hasKindMultipliers && (
-            <div
-              className="panel"
-              data-testid="kind-multipliers-mount"
-              id="kind-multipliers-mount"
-            >
-              <h3 className="label text-ink-1 uppercase tracking-cap mb-3">
-                Kind multipliers · {missionKindContextLabel(state.mission.kind)}
-              </h3>
-              <KindMultipliersTable kind={state.mission.kind} />
-            </div>
-          )}
-
           <div className="panel">
             <h3 className="label text-ink-1 uppercase tracking-cap mb-4">
               I1 · Headline
@@ -1166,8 +1277,84 @@ export function CrewComposition() {
               <IMMValidationCompare outcome={outcome} />
             </div>
           )}
+
         </div>
       )}
+
+      {/* ── Analog-mission context — NOT gated on `outcome` (2026-06-05). The
+          kind-multipliers table reads only the static calibrated priors, and
+          the I6 posterior layer consumes the calibration API + the worker
+          sweep driven by the pp effect above — both independent of the main
+          T=100k run. Previously these sat inside the figures region, so every
+          mission switch (which clears `outcome` via the stale-outcome guard)
+          blanked them until a fresh full run; observed live 2026-06-05. ── */}
+      <div className="flex flex-col gap-6 mt-4" role="region" aria-label="Analog mission context">
+
+        {/* 2026-06-04: per-(kind, condition) multiplier table. Mounted always
+            (not gated on outcome) so the user can read the active multiplier
+            context before running a sim. The mount point carries a data-testid
+            for the badge's "view per-condition multipliers ↓" anchor to scroll to. */}
+        <div
+          className="panel"
+          data-testid="kind-multipliers-mount"
+          id="kind-multipliers-mount"
+        >
+          <h3 className="label text-ink-1 uppercase tracking-cap mb-3">
+            Kind multipliers · {missionKindContextLabel(state.mission.kind)}
+          </h3>
+          <KindMultipliersTable kind={state.mission.kind} />
+        </div>
+
+        {/* I6 — analog Bayesian MCMC posterior, gated on the eligible kinds
+            (antarctic-station / analog-controlled) that carry a kind_multipliers
+            block in the calibrated priors. The draws are fetched from the optional
+            Python calibration API and the posterior-predictive sweep runs in the
+            worker; the panel degrades gracefully when the API is unreachable. */}
+        {POSTERIOR_KINDS.has(state.mission.kind) && (
+          <div className="panel" data-testid="imm-i6-posterior">
+            <h3 className="label text-ink-1 uppercase tracking-cap mb-4">
+              I6 · Analog Bayesian MCMC Posterior
+            </h3>
+            {ppState === "running" && !ppDraws && (
+              <p className="text-[11px] italic text-ink-3">
+                fetching posterior draws from Python calibration API…
+              </p>
+            )}
+            {ppState === "running" && ppDraws && (
+              <p className="text-[11px] italic text-ink-3">
+                running posterior-predictive sweep ({Math.min(64, ppDraws.n_draws)} draws × 200 trials per draw)…
+              </p>
+            )}
+            {ppState === "api-error" && (
+              <p className="text-[11px] italic text-ink-3">
+                Python calibration API unreachable — start it with{" "}
+                <code className="mono">cd python &amp;&amp; uvicorn api.main:app --reload</code>{" "}
+                to see posterior draws.
+              </p>
+            )}
+            {ppState === "compute-error" && (
+              <p className="text-[11px] italic text-ink-3">
+                posterior-predictive sweep failed{ppError ? `: ${ppError}` : " (unknown error)"}.
+              </p>
+            )}
+            {ppState === "done" && ppDraws && ppOutcome && (
+              <IMMAnalogPosteriorPlot
+                draws={ppDraws}
+                outcome={ppOutcome}
+                kind={state.mission.kind}
+                trialsPerDraw={ppOutcome.trialsPerDraw}
+              />
+            )}
+            {ppState === "done" && ppDraws && !ppOutcome && (
+              <p className="text-[11px] italic text-ink-3">
+                No per-condition posterior draws for kind "{state.mission.kind}" — this
+                is expected for mission kinds without a kind_multipliers block in the
+                calibrated priors.
+              </p>
+            )}
+          </div>
+        )}
+      </div>
 
       {/* IMM-50 / 2026-05-29: save / load / export toolbar.
        *   - Load dropdown is ALWAYS visible (loading a saved session brings in
@@ -1212,7 +1399,7 @@ export function CrewComposition() {
                     within_ci95: false,
                   },
                 },
-                laypersonCaptionsExpanded: {},
+                interpretationCaptionsExpanded: {},
               });
               notify(
                 outcome
