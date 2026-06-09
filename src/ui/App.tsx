@@ -89,7 +89,7 @@ export function App() {
               <span className="mono text-[13px] uppercase tracking-cap text-ink-1">
                 by <span className="text-ink-0">Diego Malpica MD</span>
               </span>
-              <span className="label text-signal">iter 03 · phase 3f</span>
+              <span className="label text-signal">v0.5.6 · NASA IMM + HSRB</span>
             </div>
             <div className="mono flex items-center gap-4 text-[13px] text-ink-2">
               <ThemeToggle />
@@ -222,7 +222,7 @@ export function App() {
         <footer className="mt-10 border-t border-line">
           <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-4 px-8 py-5">
             <div className="mono text-[12px] uppercase tracking-cap text-ink-3">
-              selectron · iter 03 · bayesian mcda + mission-risk monte carlo
+              selectron · v0.5.6 · bayesian mcda + mission-risk monte carlo
             </div>
             <div className="mono text-[12px] uppercase tracking-cap text-ink-3">
               <a

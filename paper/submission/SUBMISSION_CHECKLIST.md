@@ -2,7 +2,9 @@
 ## Advances in Space Research — Elsevier/COSPAR
 **ISSN:** 0273-1177 | **Portal:** https://www.editorialmanager.com/AISR (verify code at the live guide)
 **Track:** Subscription (no APC) unless OA elected
-**Prepared:** 2026-05-30 via `/asr-submit` skill (pandoc author–date Harvard build)
+**Prepared:** 2026-05-30 via `/asr-submit` skill (pandoc author–date Harvard build)  
+**Version of record:** Selectron v0.5.6 (matches `package.json`, `CITATION.cff`, README badge, and app chrome)
+**Source status:** `paper/manuscript.md` redacted and app-aligned on 2026-06-09; rebuild `submission/manuscript.docx` before upload.
 
 ---
 
@@ -14,7 +16,7 @@
 - [ ] ⚠️ **RESIDUAL RISK:** ASR dropped life-sciences-in-space (→ LSSR). An editor *could* read "analog-astronaut selection / crew medical risk" as life sciences and desk-reject/redirect. Mitigated by framing, but not eliminated. The cover letter's scope paragraph is the place to pre-empt this. LSSR is the fallback venue if redirected.
 
 ## Files in this submission/ folder (upload set)
-- [x] `manuscript.docx` — ASR format (TNR 12 pt, A4, single-column, double-spaced, continuous line numbers; author–date Harvard refs; running header). Rebuilt 2026-05-30.
+- [ ] `manuscript.docx` — rebuild from the redacted 2026-06-09 `paper/manuscript.md` source before upload (ASR format: TNR 12 pt, A4, single-column, double-spaced, continuous line numbers; author–date Harvard refs; running header).
 - [x] `cover-letter.docx` — short, scope + novelty; declaration-free.
 - [x] `highlights.docx` (+ `highlights.md` source) — 5 bullets, all ≤ 85 chars.
 - [x] `declaration-of-competing-interest.docx` — separate Elsevier declarations file ("I have nothing to declare").
@@ -22,11 +24,11 @@
 
 ## Manuscript content checks (PASS unless noted)
 - [x] Title concise, no unexplained abbreviations
-- [x] Abstract **241 words**, **unstructured** (≤ 250 ✓)
+- [x] Abstract **249 words**, **unstructured** (≤ 250 ✓)
 - [x] Keywords: **7** (within 1–7). WARN: several are multi-word — allowed (none use "and"/"of").
 - [x] Sections numbered (1. / 1.1 / 1.1.1); Abstract not numbered
 - [x] In-text citations **author–date (Harvard)**, 3+ authors → et al.
-- [x] Reference list alphabetical, **LTWA-abbreviated**, DOIs present (29 DOIs rendered), **0 note-field leakage** verified in the built docx
+- [x] Reference list alphabetical, **LTWA-abbreviated**, DOIs present (29 DOIs rendered); **0 note-field leakage** verified in the prior built docx and must be rechecked after the post-redaction rebuild
 - [x] **AI-declaration title FIXED** → "Declaration of generative AI and AI-assisted technologies in the **manuscript preparation process**", placed before References (§ Statements)
 - [x] Competing-interests section in manuscript + separate .docx
 - [x] Funding statement (no external funding)
@@ -37,6 +39,13 @@
 - [x] Figures cited in order; captions present; `[@fig:x]` → "Fig. N" resolved (Fig. 5 referenced as literal "Figure 5" in prose — intentional, faithful to source)
 - [x] Tables: editable, numbered, cited (6 tables)
 
+## Software/artifact verification
+- [x] Selectron version aligned across `package.json`, `package-lock.json`, `CITATION.cff`, README, app chrome, manuscript, and this checklist: **v0.5.6**
+- [x] `npm run typecheck` passed on 2026-06-09
+- [x] `npx vitest run tests/imm/conditions.test.ts` passed on 2026-06-09 (7/7)
+- [x] `npm run build` passed on 2026-06-09; Vite emitted only chunk/dynamic-import warnings
+- [ ] Full Playwright suite and optional Python calibration lane not rerun in this pass; rerun before final archive tagging if the upload package claims those lanes
+
 ## Figure resolution
 - [x] Line art / diagrams as **vector PDF**: Figure_1 (pipeline), Figure_2 (criterion matrix), Figure_5 (convergence), Figure_S1 (ESS table)
 - [x] Data halftones ≥ 300 dpi PNG: Figure_3 (1600px), Figure_4 (1600px), Figure_6 (1600px), Figure_7 (1600px) — adequate for single-column
@@ -45,6 +54,7 @@
 ---
 
 ## TODOs before final submission (human-only)
+- [ ] **Rebuild `submission/manuscript.docx`** from the redacted 2026-06-09 `paper/manuscript.md` source and verify line numbers, tables, references, and embedded figures in the rendered file.
 - [ ] **Mint the Zenodo DOI** and record the **figure-generation commit SHA**; replace the "DOI assigned upon archival" placeholders in the manuscript (§ Code availability) and cover letter.
 - [ ] **Suggested reviewers** — enter 3–5 in the portal (NOT the cover letter). Candidates: NASA IMM community (Antonsen, Myers, Kerstman/Walton), space-PRA / mission-risk modelers, MCDA methodologists. Verify institutional emails; exclude editorial-board members and recent co-authors.
 - [ ] **Complete the Elsevier declarations tool** in the portal (competing interests, funding, data availability, generative-AI, ethics) — the in-manuscript statements must match.

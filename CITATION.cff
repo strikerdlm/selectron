@@ -11,7 +11,7 @@ authors:
 license: MIT
 repository-code: "https://github.com/strikerdlm/selectron"
 url: "https://github.com/strikerdlm/selectron"
-version: "0.5.5"
+version: "0.5.6"
 date-released: "2026-05-29"
 preferred-citation:
   type: article

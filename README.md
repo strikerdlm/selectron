@@ -9,8 +9,8 @@
 ---
 
 ![status](https://img.shields.io/badge/status-v0.5.6%20%E2%80%94%20UI%2FUX%20hardening%20%2B%20interaction%20fixes-success)
-![tests](https://img.shields.io/badge/vitest-passing-success)
-![e2e](https://img.shields.io/badge/e2e-22%20Playwright-success)
+![verified](https://img.shields.io/badge/verified-2026--06--09-success)
+![build](https://img.shields.io/badge/typecheck%20%2B%20build-passing-success)
 ![typescript](https://img.shields.io/badge/TypeScript-5.5-3178c6?logo=typescript&logoColor=white)
 ![python](https://img.shields.io/badge/Python%20calibration-3.12-3776ab?logo=python&logoColor=white)
 ![vite](https://img.shields.io/badge/Vite-5.3-646cff?logo=vite&logoColor=white)
@@ -51,11 +51,13 @@ git clone https://github.com/strikerdlm/selectron.git
 cd selectron
 npm install
 npm run dev          # http://localhost:5173
-npm test             # vitest suite (355+ tests, includes K15 validation at T=100k)
-npm run e2e          # 13 Playwright tests (figure snapshots + smoke)
+npm test             # vitest suite, including K15 validation lanes
+npm run e2e          # Playwright browser checks
 npm run typecheck    # tsc --noEmit
 npm run build        # production bundle in dist/
 ```
+
+**Last local verification:** 2026-06-09. `npm run typecheck`, `npx vitest run tests/imm/conditions.test.ts`, and `npm run build` pass on the v0.5.6 source tree. The build emits only Vite chunk/dynamic-import warnings. The optional Python calibration lane and the full Playwright suite were not rerun in this pass.
 
 ### Python offline calibration (research tooling, optional)
 
@@ -391,20 +393,20 @@ CORS is pre-configured for the Vite dev server (`:5173`) and preview (`:4173`).
 - **Iter 1–3:** code-complete. Bayesian MCDA + NASA IMM Monte Carlo + HSRB LxC verdict all green.
 - **Iter 4 manuscript:** IMRaD draft complete; F1–F7 figure pipeline reproducible from `src/imm/`; 40/40 bibliography entries Crossref-verified; two internal peer-review passes applied (14/23 Tier-1 fixes). Ready for Advances in Space Research submission pending Zenodo DOI mint + cover-letter update.
 - **Iter 5 IMM Calculator:** DONE at v0.5.0. Phase 0 (100-condition catalog + 3-tier priors) DONE; Phase 1 (engine math, σ<5 % convergence) DONE; Phase 2 (data layer + CrewComposition UI + K15 validation gate) DONE; priors re-elicitation rev3-a through rev3-f + community/military pass 4 DONE (all 3 TME + unlimited CHI within K15 CI₉₅; 8 documented-divergent). Figures I1–I6 shipped (I6 = analog posterior, 2026-06-05); tornado/crew-heat/vulnerability-calibration figures engine-blocked (Phase 3 ML). Phase 3 ML layer (surrogate + vulnerability MLP) not started.
-- **Iter 6 Python offline calibration DONE** (v0.5.5): Full 12-task Python pipeline DONE. PyMC batch fit completed: 66 of 66 tier-B conditions merged (provenance `tierB-pymc`); 0 tier-C remain (100/100 conditions evidence-based: 66 tierB-pymc + 34 tierA-nasa). `tierB_multiplier` set to 1.0. K15: TME 97–99 (all scenarios). **FastAPI Calibration API** (`python/api/`) + **Calibration browser view** (`src/ui/views/Calibration.tsx`) + **TypeScript API client** (`src/api/calibration.ts`) DONE (v0.5.2). 9 new Playwright e2e tests. **rev3-f severity tuning DONE** — 32/32 persistent-impairment conditions updated against primary-source literature. **Analog/Antarctic passes 2+3 DONE** — herpes-zoster + nephrolithiasis upgraded tierA-nasa → tierB-pymc (analog epidemiology anchors). **Community/military calibration pass 4 DONE** (2026-05-27) — ankle-sprain 292.2→41.6, dental-abscess 1.2→4.2, UTI 2.9→10.1/1000/PY. Manuscript submission unblocked.
-- **Active branch:** `iter1-phase0` (carries all iteration history).
+- **Iter 6 Python offline calibration DONE** (v0.5.6 version of record; v0.5.5 calibration baseline): Full 12-task Python pipeline DONE. PyMC batch fit completed: 66 of 66 tier-B conditions merged (provenance `tierB-pymc`); 0 tier-C remain (100/100 conditions evidence-based: 66 tierB-pymc + 34 tierA-nasa). `tierB_multiplier` set to 1.0. K15: TME 97–99 (all scenarios). **FastAPI Calibration API** (`python/api/`) + **Calibration browser view** (`src/ui/views/Calibration.tsx`) + **TypeScript API client** (`src/api/calibration.ts`) DONE (v0.5.2). 9 new Playwright e2e tests. **rev3-f severity tuning DONE** — 32/32 persistent-impairment conditions updated against primary-source literature. **Analog/Antarctic passes 2+3 DONE** — herpes-zoster + nephrolithiasis upgraded tierA-nasa → tierB-pymc (analog epidemiology anchors). **Community/military calibration pass 4 DONE** (2026-05-27) — ankle-sprain 292.2→41.6, dental-abscess 1.2→4.2, UTI 2.9→10.1/1000/PY. Manuscript submission unblocked.
+- **Active branch:** `master` (carries the v0.5.6 submission-readiness alignment).
 
 The live resume tracker is [`STATUS.md`](STATUS.md). Citation metadata is in [`CITATION.cff`](CITATION.cff) (GitHub renders a "Cite this repository" button).
 
 ## What's left to do
 
-Two backlogs: **(A)** manuscript submission — manuscript/doc **sources** hardened, but **gated on remaining bug-fixes + software-readiness** (the rendered `paper/submission/*.docx` are rebuilt *last*); **(B)** engineering / bug-fixing (v0.5.6).
+Two backlogs: **(A)** manuscript submission — v0.5.6 sources are current, with the rendered ASR manuscript file to be rebuilt after the 2026-06-09 redaction pass and DOI / commit metadata still to be filled at final archive time; **(B)** engineering / deferred follow-up work.
 
 ### A. Manuscript submission (gated on software-readiness)
 
-> ⚠️ The rendered `paper/submission/manuscript.docx` + `cover-letter.docx` are **STALE** (built 2026-05-28, before the 2026-05-29 source hardening — old title, "aircrew" overreach, raw `__TOKEN__` placeholders). **Do not submit the current docx.** The rebuild is deferred until the software is ready. Full sequencing + the pre-build checklist live in [`STATUS.md`](STATUS.md).
+> The active ASR upload inventory is [`paper/submission/SUBMISSION_CHECKLIST.md`](paper/submission/SUBMISSION_CHECKLIST.md). The checklist is aligned to the v0.5.6 version of record; the redacted manuscript source is current, but `paper/submission/manuscript.docx` must be rebuilt before upload.
 
-1. **(Deferred — after software-ready)** Rebuild the submission package: `cd paper && make all`, then run the pre-build checklist in `STATUS.md` (build prereqs, `Figure S#` coverage, clean reference list, rendered-output verification).
+1. **Rebuild the rendered manuscript:** rebuild `paper/submission/manuscript.docx` from the redacted `paper/manuscript.md`, then re-run the ASR pre-upload checklist.
 2. **Mint Zenodo DOI** for the submission commit and record it + the figure-generation commit SHA in `paper/manuscript.md` §2.5 + Code-availability statement (the manuscript now carries clean editorial placeholders for both, filled at the submission commit).
 3. **Cover letter update** — reflect the current contributions (full IMM calibration: 100% evidence-based priors, K15 §II.A.9 sequential-phase clarification, rev3-f severity tuning 32/32).
 4. **Submit to Advances in Space Research portal** (Editorial Manager, `https://www.editorialmanager.com/AISR`). Manuscript + cover letter + Zenodo DOI + 7 main figures (separate files per ASR) + competing-interests declaration.
@@ -424,7 +426,7 @@ Two backlogs: **(A)** manuscript submission — manuscript/doc **sources** harde
 - **Calibration run persistence** — `CalibrationJobsProvider` keeps fit / validation / sensitivity runs alive (and their results) across Calibration-tab switches and page refreshes.
 - **Crew Composition** — manual crew config (size stepper, add / remove, editable member fields + mission duration), prominent live Mission-severity dashboard, config-only session saving + localStorage autosave; preset dropdown removed.
 - **Clarity** — "sharpness" relabelled "estimate precision" (+ tooltip); "how we scored" trace collapsible; health-support care-capability dashboard collapsed by default.
-- All green: typecheck 0; UI suite 72/72, risk + cache 128/128, calibration e2e 9/9, crew / health / phase3f e2e 17/17.
+- 2026-06-09 submission-readiness verification: `npm run typecheck`, `npx vitest run tests/imm/conditions.test.ts`, and `npm run build` pass. Earlier broader v0.5.6 lanes remain documented in `STATUS.md`; rerun the full Playwright and optional Python calibration lanes before final archive tagging.
 
 ### Done (v0.5.5 — all engineering iterations complete)
 
