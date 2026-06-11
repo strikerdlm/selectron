@@ -18,6 +18,7 @@ from selectron.fitter import (
     BASE_PRIOR_ALPHA,
     BASE_PRIOR_BETA,
 )
+from selectron.priors_io import get_tier_b_conditions, load_priors
 from selectron.writer import merge_fitted_priors
 
 
@@ -238,7 +239,7 @@ class TestFitAllTierB:
         )
         assert isinstance(report, BatchFitReport)
         assert report.n_skipped >= 3
-        assert report.n_total == 6
+        assert report.n_total == len(get_tier_b_conditions(load_priors()))
 
     def test_dry_run_does_not_fit(self) -> None:
         report = fit_all_tier_b(

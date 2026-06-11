@@ -15,6 +15,7 @@ import { echarts } from "./echarts-base";
 import { useFigureTheme } from "./useFigureTheme";
 import { FigureCaption } from "./FigureCaption";
 import type { IMMOutcome, PosteriorSummary } from "../../imm/types";
+import { FIGURE_GENERATION_COMMIT } from "../../version";
 
 // Okabe-Ito palette assignments per metric
 const COLORS = {
@@ -213,7 +214,7 @@ export function IMMPosteriorHist({
       "Antonsen et al. (2022) npj Microgravity 8(1) [A22, doi:10.1038/s41526-022-00193-9]; " +
       "Keenan et al. (2015) ICES-2015-123 [K15]. IMM Monte Carlo forward simulation, " +
       `${mission.label}.`,
-    reproducibility: `seed=${seedHex}, trials=${trials.toLocaleString()}, commit=__COMMIT_SHA__`,
+    reproducibility: `seed=${seedHex}, trials=${trials.toLocaleString()}, commit=${FIGURE_GENERATION_COMMIT}`,
     interpretation:
       "These four panels show the spread of possible outcomes from the crew's simulated space " +
       "mission. Each curve represents how often the model predicts a particular level of total " +

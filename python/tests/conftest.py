@@ -9,6 +9,19 @@ from typing import Any
 
 import pytest
 
+# PyTensor and matplotlib default to /root cache directories that are read-only
+# under the Codex sandbox. Set writable caches before test modules import PyMC.
+os.environ.setdefault("MPLCONFIGDIR", "/tmp/selectron-mplcache")
+_pytensor_flags = os.environ.get("PYTENSOR_FLAGS", "")
+if "base_compiledir" not in _pytensor_flags:
+    os.environ["PYTENSOR_FLAGS"] = (
+        f"base_compiledir=/tmp/selectron-pytensor,{_pytensor_flags}"
+        if _pytensor_flags
+        else "base_compiledir=/tmp/selectron-pytensor"
+    )
+Path(os.environ["MPLCONFIGDIR"]).mkdir(parents=True, exist_ok=True)
+Path("/tmp/selectron-pytensor").mkdir(parents=True, exist_ok=True)
+
 # ── Path constants ──────────────────────────────────────────────────────────
 REPO_ROOT = Path(__file__).resolve().parent.parent.parent  # /root/repos/Selectron
 PRIORS_PATH = REPO_ROOT / "src" / "data" / "imm-priors.json"

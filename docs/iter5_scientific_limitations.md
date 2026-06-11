@@ -25,13 +25,13 @@ These do not absolve the priors of the issues below.
 
 ## 2 · What the priors are
 
-`src/data/imm-priors.json` carries 100 conditions with three provenance tiers:
+`src/data/imm-priors.json` carries the 100-condition K15 reference catalog plus one source-cited analog behavioral extension (`interpersonal-conflict`), with three provenance tiers:
 
 | Tier | Count | Source character |
 |------|-------|------------------|
-| `tierA-nasa` | **37** | Directly attributed to a NASA-published IMM source (K15, M18, G12, TM21, S20, A22). Per-condition incidence numbers were elicited from these papers when explicit; otherwise from clinical-SME judgment guided by the paper. ISS-specific conditions (CO2 headache, VIIP, EVA-DCS) and conditions with corroborated but insufficient analog denominators remain here. Full list in `STATUS.md`. |
-| `tierB-pymc` | **63** | PyMC NUTS Gamma-Poisson posteriors fitted against primary-source terrestrial/analog epidemiology (analog missions, Antarctic, submarine, military, spaceflight). Provenance chain: evidence CSV → `fit_gamma_poisson()` → R-hat/ESS/divergence gate → `merge_fitted_priors()` → imm-priors.json. Includes rev3-f severity tuning (32/32 persistent-impairment conditions). |
-| `tierB-lit` | 0 | Fully migrated — all former tier-B-lit conditions either promoted to tierA-nasa, fitted to tierB-pymc, or reclassified. |
+| `tierA-nasa` | **34** | Directly attributed to a NASA-published IMM source (K15, M18, G12, TM21, S20, A22). Per-condition incidence numbers were elicited from these papers when explicit; otherwise from clinical-SME judgment guided by the paper. ISS-specific conditions (CO2 headache, VIIP, EVA-DCS) and conditions with corroborated but insufficient analog denominators remain here. Full list in `STATUS.md`. |
+| `tierB-pymc` | **66** | PyMC NUTS Gamma-Poisson posteriors fitted against primary-source terrestrial/analog epidemiology (analog missions, Antarctic, submarine, military, spaceflight). Provenance chain: evidence CSV → `fit_gamma_poisson()` → R-hat/ESS/divergence gate → `merge_fitted_priors()` → imm-priors.json. Includes rev3-f severity tuning (32/32 persistent-impairment K15 conditions). |
+| `tierB-lit` | **1** | Source-cited analog behavioral extension (`interpersonal-conflict`) retained as literature-anchored rather than PyMC-fitted because it is not represented in the proposal CSV evidence table. |
 | `tierC-synth` | 0 | Fully eliminated (2026-05-26). Final 2 conditions: acute-radiation-syndrome (literature-validated, Beta-Bernoulli retained) + smoke-inhalation (PyMC NUTS fit, Guibaud 2022). |
 
 The K15 Appendix lists the 100 conditions with their incidence-source category and distribution family but **does NOT publish per-condition numerical incidence rates**. Those live in NASA's internal iMED SQL database which is not externally accessible.

@@ -4,7 +4,7 @@
 **Track:** Subscription (no APC) unless OA elected
 **Prepared:** 2026-05-30 via `/asr-submit` skill (pandoc author–date Harvard build)  
 **Version of record:** Selectron v0.5.6 (matches `package.json`, `CITATION.cff`, README badge, and app chrome)
-**Source status:** `paper/manuscript.md` redacted and app-aligned on 2026-06-09; rebuild `submission/manuscript.docx` before upload.
+**Source status:** `paper/manuscript.md` redacted, app-aligned, and rebuilt on 2026-06-11; `submission/manuscript.docx` and `submission/cover-letter.docx` are current except for the final Zenodo DOI.
 
 ---
 
@@ -16,19 +16,19 @@
 - [ ] ⚠️ **RESIDUAL RISK:** ASR dropped life-sciences-in-space (→ LSSR). An editor *could* read "analog-astronaut selection / crew medical risk" as life sciences and desk-reject/redirect. Mitigated by framing, but not eliminated. The cover letter's scope paragraph is the place to pre-empt this. LSSR is the fallback venue if redirected.
 
 ## Files in this submission/ folder (upload set)
-- [ ] `manuscript.docx` — rebuild from the redacted 2026-06-09 `paper/manuscript.md` source before upload (ASR format: TNR 12 pt, A4, single-column, double-spaced, continuous line numbers; author–date Harvard refs; running header).
-- [x] `cover-letter.docx` — short, scope + novelty; declaration-free.
+- [x] `manuscript.docx` — rebuilt 2026-06-11 from current `paper/manuscript.md` source (ASR format: TNR 12 pt, A4, single-column, double-spaced, continuous line numbers; author–date Harvard refs; running header).
+- [x] `cover-letter.docx` — rebuilt 2026-06-11; short, scope + novelty; declaration-free.
 - [x] `highlights.docx` (+ `highlights.md` source) — 5 bullets, all ≤ 85 chars.
 - [x] `declaration-of-competing-interest.docx` — separate Elsevier declarations file ("I have nothing to declare").
 - [x] `figures/Figure_1.pdf … Figure_7` + `Figure_S1.pdf` — separate files; line art as **vector PDF** (1, 2, 5, S1), data plots as **PNG** (3, 4, 6, 7).
 
 ## Manuscript content checks (PASS unless noted)
 - [x] Title concise, no unexplained abbreviations
-- [x] Abstract **249 words**, **unstructured** (≤ 250 ✓)
+- [x] Abstract **242 words**, **unstructured** (≤ 250 ✓)
 - [x] Keywords: **7** (within 1–7). WARN: several are multi-word — allowed (none use "and"/"of").
 - [x] Sections numbered (1. / 1.1 / 1.1.1); Abstract not numbered
 - [x] In-text citations **author–date (Harvard)**, 3+ authors → et al.
-- [x] Reference list alphabetical, **LTWA-abbreviated**, DOIs present (29 DOIs rendered); **0 note-field leakage** verified in the prior built docx and must be rechecked after the post-redaction rebuild
+- [x] Reference list alphabetical, **LTWA-abbreviated**, DOIs present (29 DOIs rendered); **0 note-field leakage** rechecked after the 2026-06-11 rebuild
 - [x] **AI-declaration title FIXED** → "Declaration of generative AI and AI-assisted technologies in the **manuscript preparation process**", placed before References (§ Statements)
 - [x] Competing-interests section in manuscript + separate .docx
 - [x] Funding statement (no external funding)
@@ -41,10 +41,12 @@
 
 ## Software/artifact verification
 - [x] Selectron version aligned across `package.json`, `package-lock.json`, `CITATION.cff`, README, app chrome, manuscript, and this checklist: **v0.5.6**
-- [x] `npm run typecheck` passed on 2026-06-09
-- [x] `npx vitest run tests/imm/conditions.test.ts` passed on 2026-06-09 (7/7)
-- [x] `npm run build` passed on 2026-06-09; Vite emitted only chunk/dynamic-import warnings
-- [ ] Full Playwright suite and optional Python calibration lane not rerun in this pass; rerun before final archive tagging if the upload package claims those lanes
+- [x] `npm run verify:fast` passed on 2026-06-11 (`typecheck` + targeted Vitest; 38 tests)
+- [x] `npm run build` passed on 2026-06-11; Vite emitted only chunk/dynamic-import warnings
+- [x] Python calibration/API non-slow lane passed on 2026-06-11: `pytest -m "not slow"` → 71 passed, 14 slow deselected
+- [x] Calibration dry-run completed on 2026-06-11: 66 conditions skipped, 0 failed (`/tmp/selectron-calibration-dry-run/batch_report.json`)
+- [x] Targeted Crew Composition Playwright smoke passed on 2026-06-11: 4/4, using manual Vite server + `PLAYWRIGHT_SKIP_WEBSERVER=1` because the managed sandbox blocks Playwright's webServer health check and Chromium sandbox launch
+- [ ] Full Playwright suite not rerun in this pass; rerun before final archive tagging if the upload package claims full-browser coverage
 
 ## Figure resolution
 - [x] Line art / diagrams as **vector PDF**: Figure_1 (pipeline), Figure_2 (criterion matrix), Figure_5 (convergence), Figure_S1 (ESS table)
@@ -54,8 +56,8 @@
 ---
 
 ## TODOs before final submission (human-only)
-- [ ] **Rebuild `submission/manuscript.docx`** from the redacted 2026-06-09 `paper/manuscript.md` source and verify line numbers, tables, references, and embedded figures in the rendered file.
-- [ ] **Mint the Zenodo DOI** and record the **figure-generation commit SHA**; replace the "DOI assigned upon archival" placeholders in the manuscript (§ Code availability) and cover letter.
+- [x] **Rebuild `submission/manuscript.docx` and `submission/cover-letter.docx`** from the current 2026-06-11 sources and verify line numbers, tables, references, expected statements, and embedded figures in the rendered file.
+- [ ] **Mint the Zenodo DOI** and record it in the manuscript (§ Code availability) and cover letter. Refresh the **figure-generation commit SHA** only if the final archive commit changes figure-generating source.
 - [ ] **Suggested reviewers** — enter 3–5 in the portal (NOT the cover letter). Candidates: NASA IMM community (Antonsen, Myers, Kerstman/Walton), space-PRA / mission-risk modelers, MCDA methodologists. Verify institutional emails; exclude editorial-board members and recent co-authors.
 - [ ] **Complete the Elsevier declarations tool** in the portal (competing interests, funding, data availability, generative-AI, ethics) — the in-manuscript statements must match.
 - [ ] **Upload figures as SEPARATE files** (staged in `submission/figures/`) — do not rely on the embedded copies in the docx.

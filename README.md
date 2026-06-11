@@ -9,8 +9,6 @@
 ---
 
 ![status](https://img.shields.io/badge/status-v0.5.6%20%E2%80%94%20UI%2FUX%20hardening%20%2B%20interaction%20fixes-success)
-![verified](https://img.shields.io/badge/verified-2026--06--09-success)
-![build](https://img.shields.io/badge/typecheck%20%2B%20build-passing-success)
 ![typescript](https://img.shields.io/badge/TypeScript-5.5-3178c6?logo=typescript&logoColor=white)
 ![python](https://img.shields.io/badge/Python%20calibration-3.12-3776ab?logo=python&logoColor=white)
 ![vite](https://img.shields.io/badge/Vite-5.3-646cff?logo=vite&logoColor=white)
@@ -57,7 +55,7 @@ npm run typecheck    # tsc --noEmit
 npm run build        # production bundle in dist/
 ```
 
-**Last local verification:** 2026-06-09. `npm run typecheck`, `npx vitest run tests/imm/conditions.test.ts`, and `npm run build` pass on the v0.5.6 source tree. The build emits only Vite chunk/dynamic-import warnings. The optional Python calibration lane and the full Playwright suite were not rerun in this pass.
+**Last local verification:** 2026-06-11. `npm run verify:fast`, `npm run build`, and the Python non-slow calibration/API tests pass on the v0.5.6 source tree. The calibration dry-run completed with 66 conditions skipped and 0 failures; the targeted Crew Composition Playwright smoke passed 4/4 with the sandbox web-server workaround. The build emits only Vite chunk/dynamic-import warnings. The full Playwright suite was not rerun in this pass.
 
 ### Python offline calibration (research tooling, optional)
 
@@ -65,7 +63,8 @@ npm run build        # production bundle in dist/
 cd python
 python3 -m venv .venv && source .venv/bin/activate
 pip install -e ".[dev]"
-python -m selectron --dry-run   # 50 fast tests + 14 slow (PyMC NUTS + SA)
+pytest -m "not slow"            # fast calibration/API tests
+python -m selectron --dry-run --draws 100 --chains 1 --output-dir /tmp/selectron-calibration-dry-run
 ```
 
 **Windows (PowerShell):**
@@ -73,6 +72,7 @@ python -m selectron --dry-run   # 50 fast tests + 14 slow (PyMC NUTS + SA)
 cd python
 python -m venv .venv; .venv\Scripts\activate
 pip install -e ".[dev]"
+pytest -m "not slow"
 python -m selectron --dry-run
 ```
 
@@ -102,8 +102,8 @@ flowchart LR
     I2[Iter 2 ✓<br/>12 verified criteria<br/>3-tier scenarios<br/>multi-candidate comparison] --> I3
     I3[Iter 3 ✓<br/>NASA IMM Monte Carlo<br/>NASA HSRB LxC verdict<br/>mission risk + per-mission compare] --> I4
     I4[Iter 4 ✓<br/>IMRaD manuscript<br/>figures from src/<br/>journal submission] --> I5
-    I5[Iter 5 ✓<br/>IMM Calculator<br/>100 conditions × 3 kits<br/>K15 validation gate] --> I6
-    I6[Iter 6 ✓<br/>Python prior calibration<br/>FastAPI + Calibration UI<br/>66/66 tier-B PyMC fitted] --> MS
+    I5[Iter 5 ✓<br/>IMM Calculator<br/>100 K15 + 1 analog condition<br/>K15 validation gate] --> I6
+    I6[Iter 6 ✓<br/>Python prior calibration<br/>FastAPI + Calibration UI<br/>101 evidence-based priors] --> MS
     MS[Manuscript submission<br/>Advances in Space Research<br/>Zenodo DOI · cover letter<br/>100% evidence-based]
     classDef done fill:#16a34a,stroke:#15803d,color:#fff
     classDef active fill:#eab308,stroke:#a16207,color:#fff
@@ -120,7 +120,7 @@ flowchart LR
 
 **Iter 5 shipped** a full NASA-IMM-aligned probabilistic medical-risk calculator (`src/imm/`): 100 K15-appendix medical conditions × 3 kit scenarios (None / ISS HMS / Unlimited) × T=100 000 Monte Carlo trials; K15 §II.A.9-correct sequential-phase QTL (cp1+cp2+cp3); per-member vulnerability injection via Stage A z-scores; Crew Composition builder with binary clearance gates, per-criterion mini-figures, and Scite-verified citations; 5 IMM result figures (I1–I5) plus the NASA HSRB 5×5 Likelihood × Consequence matrix (JSC-66705 Rev A Fig. 4) rendered in the crew verdict panel; a formal K15 Table 1 reproduction gate (IMM-86: 26 validation assertions at T=100k; current state all 3 TME + unlimited CHI within K15 CI₉₅, 8 documented-divergent).
 
-**Iter 6 shipped** a complete Python offline calibration pipeline (`python/`) for research-grade prior elicitation: PyMC NUTS Gamma-Poisson fitter, K15 validator, atomic priors writer, Sobol/Morris sensitivity analysis. Evidence pass p-f (2026-05-25) converted 11 former Beta-Bernoulli tier-B conditions to Gamma-Poisson using terrestrial epidemiological base rates. **100 of 100 IMM conditions evidence-based** (34 tierA-nasa + 66 tierB-pymc); **0 tierC-synth remain**. The tier-C synthetic → tierB-pymc cleanup (p-h, 2026-05-26) upgraded 18 remaining tier-C conditions through MCP literature search agents (Consensus + Scite + paper-search + Firecrawl) across 4 evidence passes. **rev3-f severity tuning** (2026-05-26) updated 32/32 persistent-impairment conditions against 126 primary-source evidence rows. **Analog/Antarctic evidence passes 2+3** (2026-05-27): 14 new PubMed/PMC sources; herpes-zoster-reactivation-shingles (4.1→7.4/1000/PY, Zhang 2026 Antarctic anchor) and nephrolithiasis (3.7→10.0/1000/PY, Goodenow-Messman 2022, Lognormal→Gamma-Poisson) upgraded to tierB-pymc. **Community/military incidence calibration pass 4** (2026-05-27): three tierA-nasa priors revised against military training and community population data — ankle-sprain-strain (292.2→41.6/1000/PY DOWN 7×, Cameron 2010/Goodrich 2022), dental-abscess (1.2→4.2/1000/PY UP 3.4×, AFHTA 2018/Tissot 2023), urinary-tract-infection (2.9→10.1/1000/PY UP 3.5× for mixed-gender crew, DHA 2019/SIVIGILA 2023); all R-hat=1.000, ESS>3000; K15 TME post-pass-4: 97.81/98.06/98.84. A **FastAPI Calibration API** (`python/api/`) wraps the pipeline: `/health`, `/conditions`, `/fit`, `/validate`, `/sensitivity`. A **Calibration browser view** (`src/ui/views/Calibration.tsx`) provides three tabs — Conditions browser (provenance-filterable table), Batch Fit (PyMC NUTS with live job polling), and V&V (K15 validation gate + Sobol/Morris sensitivity). Calibration runs persist across tab switches and page refreshes via a root-level `CalibrationJobsProvider` (v0.5.6). A typed TypeScript client (`src/api/calibration.ts`) is the sole HTTP boundary.
+**Iter 6 shipped** a complete Python offline calibration pipeline (`python/`) for research-grade prior elicitation: PyMC NUTS Gamma-Poisson fitter, K15 validator, atomic priors writer, Sobol/Morris sensitivity analysis. Evidence pass p-f (2026-05-25) converted 11 former Beta-Bernoulli tier-B conditions to Gamma-Poisson using terrestrial epidemiological base rates. The current release carries **101 evidence-based priors**: 34 `tierA-nasa`, 66 `tierB-pymc`, and one source-cited `tierB-lit` analog behavioral extension (`interpersonal-conflict`); **0 tierC-synth remain**. The tier-C synthetic → tierB-pymc cleanup (p-h, 2026-05-26) upgraded 18 remaining tier-C conditions through MCP literature search agents (Consensus + Scite + paper-search + Firecrawl) across 4 evidence passes. **rev3-f severity tuning** (2026-05-26) updated 32/32 persistent-impairment K15 conditions against 126 primary-source evidence rows. **Analog/Antarctic evidence passes 2+3** (2026-05-27): 14 new PubMed/PMC sources; herpes-zoster-reactivation-shingles (4.1→7.4/1000/PY, Zhang 2026 Antarctic anchor) and nephrolithiasis (3.7→10.0/1000/PY, Goodenow-Messman 2022, Lognormal→Gamma-Poisson) upgraded to tierB-pymc. **Community/military incidence calibration pass 4** (2026-05-27): three tierA-nasa priors revised against military training and community population data — ankle-sprain-strain (292.2→41.6/1000/PY DOWN 7×, Cameron 2010/Goodrich 2022), dental-abscess (1.2→4.2/1000/PY UP 3.4×, AFHTA 2018/Tissot 2023), urinary-tract-infection (2.9→10.1/1000/PY UP 3.5× for mixed-gender crew, DHA 2019/SIVIGILA 2023); all R-hat=1.000, ESS>3000; K15 TME post-pass-4: 97.81/98.06/98.84. A **FastAPI Calibration API** (`python/api/`) wraps the pipeline: `/health`, `/conditions`, `/fit`, `/validate`, `/sensitivity`. A **Calibration browser view** (`src/ui/views/Calibration.tsx`) provides three tabs — Conditions browser (provenance-filterable table), Batch Fit (PyMC NUTS with live job polling), and V&V (K15 validation gate + Sobol/Morris sensitivity). Calibration runs persist across tab switches and page refreshes via a root-level `CalibrationJobsProvider` (v0.5.6). A typed TypeScript client (`src/api/calibration.ts`) is the sole HTTP boundary.
 
 The full plan lives in [`docs/superpowers/plans/`](docs/superpowers/plans/). Current resume tracker is [`STATUS.md`](STATUS.md).
 
@@ -208,7 +208,7 @@ selectron/
 │   │   │   ├── Analysis.tsx          # correlation/multivariate gallery (A1–A5; demo or live cohort)
 │   │   │   ├── Calibration.tsx      # 3-tab calibration view (Conditions / Batch Fit / V&V)
 │   │   │   └── calibration/
-│   │   │       ├── ConditionsPanel.tsx  # 100-condition browse table with provenance filter + sort
+│   │   │       ├── ConditionsPanel.tsx  # 101-condition browse table with provenance filter + sort
 │   │   │       ├── BatchFitPanel.tsx    # PyMC NUTS run form · live job polling · results table
 │   │   │       └── VVPanel.tsx          # V&V tab: K15 validation gate + Sobol/Morris sensitivity
 │   │   ├── wizard/            #   4-step wizard: Candidate → Criteria → Review → Mission/Sim
@@ -230,7 +230,7 @@ selectron/
 │   ├── db/                    #   Dexie v3 schema + repository (IndexedDB persistence; imm_sessions table)
 │   ├── data/
 │   │   ├── citations.ts       #   30-entry Scite-verified citation registry (20 confirmed, 3 DOIs replaced)
-│   │   ├── imm-priors.json    #   100-condition priors with tier-A/B/C provenance tags
+│   │   ├── imm-priors.json    #   101-condition priors with tier-A/B provenance tags
 │   │   └── ...                #   12 verified criteria · 5 analog missions · synthetic priors
 │   └── types/                 #   Criterion · Candidate · Posterior · AccessTier · risk types · IMMOutcome
 ├── tests/                     # vitest + Playwright (45+ files, 355+ tests)
@@ -246,7 +246,7 @@ selectron/
 │   ├── api/                   #   FastAPI Calibration API (localhost:8000)
 │   │   ├── main.py            #     app entry · CORS for Vite :5173/:4173
 │   │   ├── routers/
-│   │   │   ├── conditions.py  #       GET /conditions — 100-condition provenance catalogue
+│   │   │   ├── conditions.py  #       GET /conditions — 101-condition provenance catalogue
 │   │   │   ├── fit.py         #       POST /fit · GET /fit/{job_id} — async PyMC batch fit
 │   │   │   ├── validate.py    #       GET /validate — K15 Table 1 gate
 │   │   │   └── sensitivity.py #       GET /sensitivity — Sobol/Morris SA
@@ -349,7 +349,7 @@ The Calibration tab (top-nav, `view.kind === "calibration"`) connects to a FastA
 | Method | Path | Description |
 |---|---|---|
 | `GET` | `/health` | Liveness probe (`{"status":"ok","version":"0.1.0"}`) |
-| `GET` | `/conditions` | List all 100 conditions with `provenance`, `distribution`, `fittable`, `fitted` |
+| `GET` | `/conditions` | List all 101 conditions with `provenance`, `distribution`, `fittable`, `fitted` |
 | `POST` | `/fit` | Start an async PyMC NUTS batch-fit job; returns `job_id` immediately |
 | `GET` | `/fit/{job_id}` | Poll job status (`queued → running → done/failed`); `result` contains per-condition posterior α/β, λ mean, R-hat, ESS, divergences |
 | `GET` | `/validate` | Run K15 Table 1 gate against current `imm-priors.json` |
@@ -361,7 +361,7 @@ Background job lifecycle is managed by an in-memory `JobStore` (`python/api/job_
 
 Three tabs in `src/ui/views/Calibration.tsx`:
 
-- **Conditions** (`ConditionsPanel.tsx`) — filterable (by provenance: `tierA-nasa`, `tierB-lit`, `tierB-pymc`, `tierC-synth`, `user-custom`) + sortable (by condition ID or provenance) table of all 100 conditions with status badges (`Fitted` / `Fittable` / —).
+- **Conditions** (`ConditionsPanel.tsx`) — filterable (by provenance: `tierA-nasa`, `tierB-lit`, `tierB-pymc`, `tierC-synth`, `user-custom`) + sortable (by condition ID or provenance) table of all 101 conditions with status badges (`Fitted` / `Fittable` / —).
 - **Batch Fit** (`BatchFitPanel.tsx`) — configurable NUTS run (draws, chains, seed, optional condition filter). Starts a job, shows a live elapsed timer + status badge, polls until completion, and renders a results table with R-hat (green < 1.01 / amber otherwise), ESS, and divergence count.
 - **V&V** (`VVPanel.tsx`) — runs the K15 validation gate (3 scenarios × 4 metrics, within-CI₉₅ pass/fail) and Sobol/Morris sensitivity analysis (tornado figure + numeric indices) inline against the live `imm-priors.json`.
 
@@ -386,30 +386,29 @@ python -m uvicorn api.main:app --reload --port 8000
 
 CORS is pre-configured for the Vite dev server (`:5173`) and preview (`:4173`).
 
-**9 Playwright tests** (`tests/e2e/calibration.smoke.spec.ts`) cover: header render, 100-row conditions table, fitted/fittable badge counts, provenance filter, API-down error state, Batch Fit form, the V&V validation + sensitivity panels, and two screenshot snapshots.
+**9 Playwright tests** (`tests/e2e/calibration.smoke.spec.ts`) cover: header render, 101-row conditions table, fitted/fittable badge counts, provenance filter, API-down error state, Batch Fit form, the V&V validation + sensitivity panels, and two screenshot snapshots.
 
 ## Status
 
 - **Iter 1–3:** code-complete. Bayesian MCDA + NASA IMM Monte Carlo + HSRB LxC verdict all green.
-- **Iter 4 manuscript:** IMRaD draft complete; F1–F7 figure pipeline reproducible from `src/imm/`; 40/40 bibliography entries Crossref-verified; two internal peer-review passes applied (14/23 Tier-1 fixes). Ready for Advances in Space Research submission pending Zenodo DOI mint + cover-letter update.
-- **Iter 5 IMM Calculator:** DONE at v0.5.0. Phase 0 (100-condition catalog + 3-tier priors) DONE; Phase 1 (engine math, σ<5 % convergence) DONE; Phase 2 (data layer + CrewComposition UI + K15 validation gate) DONE; priors re-elicitation rev3-a through rev3-f + community/military pass 4 DONE (all 3 TME + unlimited CHI within K15 CI₉₅; 8 documented-divergent). Figures I1–I6 shipped (I6 = analog posterior, 2026-06-05); tornado/crew-heat/vulnerability-calibration figures engine-blocked (Phase 3 ML). Phase 3 ML layer (surrogate + vulnerability MLP) not started.
-- **Iter 6 Python offline calibration DONE** (v0.5.6 version of record; v0.5.5 calibration baseline): Full 12-task Python pipeline DONE. PyMC batch fit completed: 66 of 66 tier-B conditions merged (provenance `tierB-pymc`); 0 tier-C remain (100/100 conditions evidence-based: 66 tierB-pymc + 34 tierA-nasa). `tierB_multiplier` set to 1.0. K15: TME 97–99 (all scenarios). **FastAPI Calibration API** (`python/api/`) + **Calibration browser view** (`src/ui/views/Calibration.tsx`) + **TypeScript API client** (`src/api/calibration.ts`) DONE (v0.5.2). 9 new Playwright e2e tests. **rev3-f severity tuning DONE** — 32/32 persistent-impairment conditions updated against primary-source literature. **Analog/Antarctic passes 2+3 DONE** — herpes-zoster + nephrolithiasis upgraded tierA-nasa → tierB-pymc (analog epidemiology anchors). **Community/military calibration pass 4 DONE** (2026-05-27) — ankle-sprain 292.2→41.6, dental-abscess 1.2→4.2, UTI 2.9→10.1/1000/PY. Manuscript submission unblocked.
+- **Iter 4 manuscript:** IMRaD draft complete; F1–F7 figure pipeline reproducible from `src/imm/`; 40/40 bibliography entries Crossref-verified; two internal peer-review passes applied (14/23 Tier-1 fixes). Ready for Advances in Space Research submission pending Zenodo DOI mint and portal-only declarations/reviewer entry.
+- **Iter 5 IMM Calculator:** DONE at v0.5.0. Phase 0 (100-condition K15 catalog + 3-tier priors) DONE; Phase 1 (engine math, σ<5 % convergence) DONE; Phase 2 (data layer + CrewComposition UI + K15 validation gate) DONE; priors re-elicitation rev3-a through rev3-f + community/military pass 4 DONE (all 3 TME + unlimited CHI within K15 CI₉₅; 8 documented-divergent). Figures I1–I6 shipped (I6 = analog posterior, 2026-06-05); tornado/crew-heat/vulnerability-calibration figures engine-blocked (Phase 3 ML). Phase 3 ML layer (surrogate + vulnerability MLP) not started.
+- **Iter 6 Python offline calibration DONE** (v0.5.6 version of record; v0.5.5 calibration baseline): Full 12-task Python pipeline DONE. PyMC batch fit completed: 66 of 66 tier-B PyMC conditions merged (provenance `tierB-pymc`); 0 tier-C remain (101/101 current conditions evidence-based: 66 tierB-pymc + 34 tierA-nasa + 1 tierB-lit analog extension). `tierB_multiplier` set to 1.0. K15: TME 97–99 (all scenarios). **FastAPI Calibration API** (`python/api/`) + **Calibration browser view** (`src/ui/views/Calibration.tsx`) + **TypeScript API client** (`src/api/calibration.ts`) DONE (v0.5.2). 9 new Playwright e2e tests. **rev3-f severity tuning DONE** — 32/32 persistent-impairment K15 conditions updated against primary-source literature. **Analog/Antarctic passes 2+3 DONE** — herpes-zoster + nephrolithiasis upgraded tierA-nasa → tierB-pymc (analog epidemiology anchors). **Community/military calibration pass 4 DONE** (2026-05-27) — ankle-sprain 292.2→41.6, dental-abscess 1.2→4.2, UTI 2.9→10.1/1000/PY. Manuscript submission unblocked.
 - **Active branch:** `master` (carries the v0.5.6 submission-readiness alignment).
 
 The live resume tracker is [`STATUS.md`](STATUS.md). Citation metadata is in [`CITATION.cff`](CITATION.cff) (GitHub renders a "Cite this repository" button).
 
 ## What's left to do
 
-Two backlogs: **(A)** manuscript submission — v0.5.6 sources are current, with the rendered ASR manuscript file to be rebuilt after the 2026-06-09 redaction pass and DOI / commit metadata still to be filled at final archive time; **(B)** engineering / deferred follow-up work.
+Two backlogs: **(A)** manuscript submission — v0.5.6 sources and rendered ASR `.docx` files are current as of 2026-06-11, with only the Zenodo DOI / final archive metadata still to be filled at archive time; **(B)** engineering / deferred follow-up work.
 
 ### A. Manuscript submission (gated on software-readiness)
 
-> The active ASR upload inventory is [`paper/submission/SUBMISSION_CHECKLIST.md`](paper/submission/SUBMISSION_CHECKLIST.md). The checklist is aligned to the v0.5.6 version of record; the redacted manuscript source is current, but `paper/submission/manuscript.docx` must be rebuilt before upload.
+> The active ASR upload inventory is [`paper/submission/SUBMISSION_CHECKLIST.md`](paper/submission/SUBMISSION_CHECKLIST.md). The checklist is aligned to the v0.5.6 version of record; `paper/submission/manuscript.docx` and `paper/submission/cover-letter.docx` were rebuilt and checked on 2026-06-11.
 
-1. **Rebuild the rendered manuscript:** rebuild `paper/submission/manuscript.docx` from the redacted `paper/manuscript.md`, then re-run the ASR pre-upload checklist.
-2. **Mint Zenodo DOI** for the submission commit and record it + the figure-generation commit SHA in `paper/manuscript.md` §2.5 + Code-availability statement (the manuscript now carries clean editorial placeholders for both, filled at the submission commit).
-3. **Cover letter update** — reflect the current contributions (full IMM calibration: 100% evidence-based priors, K15 §II.A.9 sequential-phase clarification, rev3-f severity tuning 32/32).
-4. **Submit to Advances in Space Research portal** (Editorial Manager, `https://www.editorialmanager.com/AISR`). Manuscript + cover letter + Zenodo DOI + 7 main figures (separate files per ASR) + competing-interests declaration.
+1. **Mint Zenodo DOI** for the submission commit and record it in `paper/manuscript.md` §2.5 + Code-availability statement. Refresh the figure-generation commit marker only if the archive commit changes the figure-generating source.
+2. **Complete portal-only metadata** — suggested reviewers, Elsevier declarations, separate figure upload, and subscription vs open-access selection.
+3. **Submit to Advances in Space Research portal** (Editorial Manager, `https://www.editorialmanager.com/AISR`). Manuscript + cover letter + Zenodo DOI + 7 main figures (separate files per ASR) + competing-interests declaration.
 
 ### B. Engineering / deferred backlog (stable at v0.5.6)
 
@@ -426,11 +425,11 @@ Two backlogs: **(A)** manuscript submission — v0.5.6 sources are current, with
 - **Calibration run persistence** — `CalibrationJobsProvider` keeps fit / validation / sensitivity runs alive (and their results) across Calibration-tab switches and page refreshes.
 - **Crew Composition** — manual crew config (size stepper, add / remove, editable member fields + mission duration), prominent live Mission-severity dashboard, config-only session saving + localStorage autosave; preset dropdown removed.
 - **Clarity** — "sharpness" relabelled "estimate precision" (+ tooltip); "how we scored" trace collapsible; health-support care-capability dashboard collapsed by default.
-- 2026-06-09 submission-readiness verification: `npm run typecheck`, `npx vitest run tests/imm/conditions.test.ts`, and `npm run build` pass. Earlier broader v0.5.6 lanes remain documented in `STATUS.md`; rerun the full Playwright and optional Python calibration lanes before final archive tagging.
+- 2026-06-11 submission-readiness verification: `npm run verify:fast`, `npm run build`, Python `pytest -m "not slow"` (71 passed, 14 slow deselected), calibration dry-run (66 skipped, 0 failed), and targeted Crew Composition Playwright smoke (4/4) pass. Full Playwright was not rerun before this archive-prep pass.
 
 ### Done (v0.5.5 — all engineering iterations complete)
 
-- **PyMC batch fit** — all 66 tier-B conditions fitted via PyMC NUTS Gamma-Poisson, merged into `imm-priors.json`. 0 tierC-synth remain. `tierB_multiplier` set to 1.0. K15: 26/26 validation tests pass. **Analog/Antarctic evidence passes 2+3 + community/military pass 4**: herpes-zoster (4.1→7.4/1000/PY) + nephrolithiasis (3.7→10.0/1000/PY) + ankle-sprain/dental-abscess/UTI upgraded tierA-nasa → tierB-pymc; final provenance 34 tierA-nasa + 66 tierB-pymc.
+- **PyMC batch fit** — all 66 PyMC tier-B conditions fitted via PyMC NUTS Gamma-Poisson, merged into `imm-priors.json`; one source-cited tierB-lit analog extension is retained for `interpersonal-conflict`. 0 tierC-synth remain. `tierB_multiplier` set to 1.0. K15: 26/26 validation tests pass. **Analog/Antarctic evidence passes 2+3 + community/military pass 4**: herpes-zoster (4.1→7.4/1000/PY) + nephrolithiasis (3.7→10.0/1000/PY) + ankle-sprain/dental-abscess/UTI upgraded tierA-nasa → tierB-pymc; final provenance 34 tierA-nasa + 66 tierB-pymc + 1 tierB-lit.
 - **FastAPI Calibration API + Calibration browser UI** — 9 Playwright e2e tests.
 - **rev3-f severity tuning** — 32/32 persistent-impairment conditions from 126 evidence rows; 68 self-limiting at mode=0.
 - **simulate.test.ts provenance fix** (`dac6b19`) — 37/37 pass.

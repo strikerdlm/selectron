@@ -200,7 +200,7 @@ describe("rev3-d K15 per-event QTL (sequential phases, not concurrent)", () => {
   });
 
   it("rev3-e: cp3 contributes 0 when fi_cp3 = 0 (fully-resolving acute conditions)", () => {
-    // 68 of 100 conditions in imm-priors.json have treated.fi_cp3 = untreated.fi_cp3 = 0
+    // 68 K15 conditions in imm-priors.json have treated.fi_cp3 = untreated.fi_cp3 = 0
     // after the rev3-e per-condition audit. The QTL accumulator's `if (fi_cp3 > 0)`
     // guard means these contribute zero cp3 hours regardless of mission duration
     // or event time. Test guards against accidental reintroduction of cp3 charging
@@ -582,7 +582,7 @@ describe("priors-rev3-b tier multipliers", () => {
       crew: k15Crew, mission: issMission, kit: IMM_KITS.issHMS, trials: TR, seed: 0xc0ffee,
       tierAMultiplier: 1.0, tierBMultiplier: 0.5, tierCMultiplier: 1.0,
     }).tme.mean;
-    // Post-tierB-pymc migration: tier-B is 57/100 conditions and contributes
+    // Post-tierB-pymc migration: tier-B contributes
     // the majority of TME. Halving tier-B rates should drop TME meaningfully.
     expect(halved).toBeLessThan(baseline);
     expect(baseline - halved).toBeGreaterThan(15); // lower bound: at least 15 events

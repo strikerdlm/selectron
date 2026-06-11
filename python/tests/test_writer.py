@@ -111,7 +111,7 @@ class TestMergeFittedPriors:
         assert isinstance(report, WriterReport)
         assert "depression" in report.updated
         assert report.n_updated == 1
-        assert report.n_unchanged == 99
+        assert report.n_unchanged == len(load_priors(tmp_priors)["conditions"]) - 1
 
     def test_schema_version_preserved(
         self, tmp_priors: Path, sample_fit_result: FitResult

@@ -11,6 +11,9 @@
     "test:watch": "vitest",
     "typecheck": "tsc --noEmit",
     "e2e": "playwright test",
+    "verify:fast": "npm run typecheck && npx vitest run tests/imm/conditions.test.ts tests/ui/crew-composition.test.tsx tests/ui/imm_session_save_load.test.tsx tests/ui/imm_headline_card.test.tsx tests/ui/health-support.test.tsx",
+    "verify:paper": "npm run typecheck && npx vitest run tests/imm/conditions.test.ts && npm run build",
+    "verify:e2e": "playwright test",
     "calibrate:imm": "tsx scripts/calibrate_imm_priors.ts",
     "validate:imm": "tsx scripts/validate_imm.ts"
   },

@@ -95,7 +95,7 @@ const doc = new Document({
       }),
 
       // Body paragraph 2 — IMM
-      p('The IMM Calculator aligns to the NASA Integrated Medical Model of Keenan et al. (2015) and reproduces the K15 §II.A.9 sum-of-products per-event quality-time-lost formula across the canonical 100-condition K15 catalogue at T = 100,000 trials. All 100 per-condition priors are evidence-based (34 tier-A NASA-attributed, 66 tier-B PyMC NUTS-fitted from terrestrial, Antarctic, submarine, and military population epidemiological data across iterative calibration passes); zero synthetic placeholders remain. A two-panel condition-set sensitivity analysis demonstrates that the K15 reproduction is non-circular: the 34 NASA-sourced conditions alone produce issHMS CHI within K15\'s published CI₉₅, and the 66 independently-fitted tier-B conditions add evidence-based risk that is not back-calibrated against K15 aggregates.'),
+      p('The IMM Calculator aligns to the NASA Integrated Medical Model of Keenan et al. (2015) and reproduces the K15 §II.A.9 sum-of-products per-event quality-time-lost formula across the 100-condition K15 catalogue at T = 100,000 trials, with one disclosed source-cited analog behavioral extension (interpersonal-conflict) in the released app. All 101 current per-condition priors are evidence-based (34 tier-A NASA-attributed, 66 tier-B PyMC NUTS-fitted from terrestrial, Antarctic, submarine, and military population epidemiological data across iterative calibration passes, and one tier-B literature extension); zero synthetic placeholders remain. A two-panel condition-set sensitivity analysis demonstrates that the K15 reproduction is non-circular: the 34 NASA-sourced conditions alone produce issHMS CHI within K15\'s published CI₉₅, and the tier-B conditions add evidence-based risk that is not back-calibrated against K15 aggregates.'),
 
       // Body paragraph 3 — V&V
       p('Internal validation follows NASA-STD-7009A\'s first three credibility factors: closed-form Dirichlet moments, ESS, the Poisson-Gamma conjugate test, the verbatim JSC-66705 Figure 4 grid check, and the σ < 5% convergence rule at the NASA-canonical T = 100,000 trials per Myers (2018) and Antonsen (2022). Outcome validation against analog-mission incident catalogues is explicitly out-of-scope and disclosed as a limitation; the paper is framed as a methodology contribution, not an outcome-prediction study.'),
@@ -104,11 +104,11 @@ const doc = new Document({
       new Paragraph({
         spacing: { before: 0, after: 200, line: 360, lineRule: 'auto' },
         children: [
-          new TextRun({ text: 'The software artifact is MIT-licensed and Zenodo-archived (DOI ', font: FONT, size: BODY_HP }),
-          new TextRun({ text: 'assigned upon archival', font: FONT, size: BODY_HP, italics: true }),
-          new TextRun({ text: ') at the commit used to generate every figure. The repository at ', font: FONT, size: BODY_HP }),
+          new TextRun({ text: 'The software artifact is MIT-licensed and will be archived at Zenodo before portal upload; the DOI will be inserted into the manuscript at that final archive step. The current figure-generation commit marker is ', font: FONT, size: BODY_HP }),
+          new TextRun({ text: '538e16ccff94', font: FONT, size: BODY_HP }),
+          new TextRun({ text: ', and the repository at ', font: FONT, size: BODY_HP }),
           new TextRun({ text: 'github.com/strikerdlm/selectron', font: FONT, size: BODY_HP }),
-          new TextRun({ text: ' contains the full source, the test suite (355+ vitest + 20 Playwright tests), the V&V dossier, and reproducibility instructions.', font: FONT, size: BODY_HP }),
+          new TextRun({ text: ' contains the full source, the test suite, the V&V dossier, and reproducibility instructions.', font: FONT, size: BODY_HP }),
         ],
       }),
 

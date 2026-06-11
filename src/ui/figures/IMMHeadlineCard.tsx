@@ -17,6 +17,7 @@ import { echarts } from "./echarts-base";
 import { useFigureTheme } from "./useFigureTheme";
 import { FigureCaption } from "./FigureCaption";
 import type { IMMOutcome, PosteriorSummary } from "../../imm/types";
+import { FIGURE_GENERATION_COMMIT } from "../../version";
 
 // Okabe-Ito palette assignments per metric (match I2 IMMPosteriorHist exactly)
 const COLORS = {
@@ -267,7 +268,7 @@ export function IMMHeadlineCard({
       "(4-step IMM trial); Keenan et al. (2015) ICES-2015-123 [K15] (IMM framework). " +
       `Mission: ${missionLabel}.`,
     reproducibility:
-      `seed=${seedHex}, trials=${trials.toLocaleString()}, commit=__COMMIT_SHA__`,
+      `seed=${seedHex}, trials=${trials.toLocaleString()}, commit=${FIGURE_GENERATION_COMMIT}`,
     interpretation:
       "These four numbers summarise what happened across the simulated missions. " +
       "Total medical events (TME) counts how often any crew member needed medical " +

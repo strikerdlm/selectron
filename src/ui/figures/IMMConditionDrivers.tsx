@@ -24,6 +24,7 @@ import { useFigureTheme } from "./useFigureTheme";
 import { FigureCaption } from "./FigureCaption";
 import { IMM_CONDITIONS } from "../../imm/conditions";
 import type { IMMOutcome, IMMConditionFamily } from "../../imm/types";
+import { FIGURE_GENERATION_COMMIT } from "../../version";
 
 // Okabe-Ito 8-colour categorical palette (matches src/ui/figures/theme.ts).
 // Deterministic assignment per IMMConditionFamily — we reuse the same hex
@@ -314,11 +315,11 @@ export function IMMConditionDrivers({
     source:
       "Antonsen et al. (2022) npj Microgravity 8(1) [A22, doi:10.1038/s41526-022-00193-9] " +
       "— per-condition driver aggregation. " +
-      "Keenan et al. (2015) ICES-2015-123 [K15] — 100-condition IMM catalog " +
+      "Keenan et al. (2015) ICES-2015-123 [K15] — 100-condition IMM catalog plus analog extension " +
       "(src/imm/conditions.ts).",
     reproducibility:
       `seed=${seedHex}, trials=${trials.toLocaleString()}, topN=${topN}, ` +
-      `metric=${metric}, commit=__COMMIT_SHA__`,
+      `metric=${metric}, commit=${FIGURE_GENERATION_COMMIT}`,
     interpretation:
       "Out of 100 medical conditions modelled, only a handful drive most of the " +
       "simulated emergencies. This chart shows the worst offenders — the conditions " +

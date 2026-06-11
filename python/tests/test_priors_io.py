@@ -47,7 +47,8 @@ class TestLoadPriors:
         data = load_priors()
         assert data["schema_version"] == 1
         assert "conditions" in data
-        assert len(data["conditions"]) == 100
+        assert len(data["conditions"]) == 101
+        assert "interpersonal-conflict" in data["conditions"]
 
     def test_load_from_custom_path(self, tmp_priors: Path) -> None:
         data = load_priors(tmp_priors)
@@ -80,16 +81,19 @@ class TestSavePriors:
 
 
 class TestGetTierBConditions:
-    def test_returns_remaining_tierb_lit_conditions(self) -> None:
+    def test_returns_fittable_tier_b_gamma_poisson_conditions(self) -> None:
         data = load_priors()
         tier_b = get_tier_b_conditions(data)
-        assert len(tier_b) == 6
+        assert len(tier_b) == 66
+        assert "interpersonal-conflict" in tier_b
 
-    def test_all_have_tier_b_provenance(self) -> None:
+    def test_all_have_fittable_tier_b_provenance(self) -> None:
         data = load_priors()
         tier_b = get_tier_b_conditions(data)
         for cid, prior in tier_b.items():
-            assert prior["provenance"] == "tierB-lit", f"{cid} is not tierB-lit"
+            assert prior["provenance"] in {"tierB-lit", "tierB-pymc"}, (
+                f"{cid} is not fittable tier-B"
+            )
 
     def test_distribution_counts(self) -> None:
         data = load_priors()
@@ -102,7 +106,7 @@ class TestGetTierBConditions:
             1 for v in tier_b.values()
             if v["incidence"]["distribution"] == "Beta-Bernoulli"
         )
-        assert gamma_count == 6
+        assert gamma_count == len(tier_b)
         assert beta_count == 0
 
 

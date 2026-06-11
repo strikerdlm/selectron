@@ -20,7 +20,7 @@ function makeCrewMember(id: string, evaCount = 0): IMMCrewMember {
 }
 
 describe("IMM_CONDITIONS", () => {
-  it("contains the full K15 appendix catalog (95-100 conditions)", () => {
+  it("contains the full K15 appendix catalog plus analog extension", () => {
     expect(IMM_CONDITIONS.length).toBeGreaterThanOrEqual(95);
     expect(IMM_CONDITIONS.length).toBeLessThanOrEqual(102);
   });
