@@ -4,6 +4,7 @@ import { IMM_CONDITIONS } from "../../src/imm/conditions";
 import { simulateIMM } from "../../src/imm/simulate";
 import { IMM_KITS } from "../../src/imm/kits";
 import { IMM_MISSIONS } from "../../src/data/imm-missions";
+import type { IMMCrewMember } from "../../src/imm/types";
 
 describe("IMM_CONDITIONS", () => {
   it("contains the full K15 appendix catalog (95-100 conditions)", () => {
@@ -64,12 +65,22 @@ describe("terrestrial analog guard", () => {
     "headache-co2-induced","toxic-exposure-ammonia","barotrauma-ear-sinus-block",
   ]);
 
+  function makeLowRiskCrewMember(id: string, evaCount: number): IMMCrewMember {
+    return {
+      id,
+      sex: "male",
+      contacts: false,
+      crowns: false,
+      CAC_positive: false,
+      abdominal_surgery_history: false,
+      EVA_eligible: true,
+      EVA_count: evaCount,
+    };
+  }
+
   it("analog-controlled 45d: no space-specific condition appears as a driver", () => {
     const mission = IMM_MISSIONS.find(m => m.id === "analog-45d")!;
-    const crew = Array.from({ length: 6 }, (_, i) => ({
-      id: `m${i}`, name: `M${i}`,
-      EVA_eligible: true, EVA_count: 0,
-    }));
+    const crew = Array.from({ length: 6 }, (_, i) => makeLowRiskCrewMember(`m${i}`, 0));
     const out = simulateIMM({
       crew, mission, kit: IMM_KITS.none,
       trials: 500, seed: 0xc0ffee,
@@ -82,10 +93,7 @@ describe("terrestrial analog guard", () => {
 
   it("antarctic-station 365d: no space-specific condition appears as a driver", () => {
     const mission = IMM_MISSIONS.find(m => m.id === "antarctic-winter")!;
-    const crew = Array.from({ length: 12 }, (_, i) => ({
-      id: `m${i}`, name: `M${i}`,
-      EVA_eligible: true, EVA_count: 0,
-    }));
+    const crew = Array.from({ length: 12 }, (_, i) => makeLowRiskCrewMember(`m${i}`, 0));
     const out = simulateIMM({
       crew, mission, kit: IMM_KITS.none,
       trials: 500, seed: 0xc0ffee,
@@ -98,10 +106,9 @@ describe("terrestrial analog guard", () => {
 
   it("leo-iss 180d: ARS still active (hard filter must not fire for space missions)", () => {
     const mission = IMM_MISSIONS.find(m => m.id === "iss-6mo")!;
-    const crew = Array.from({ length: 6 }, (_, i) => ({
-      id: `m${i}`, name: `M${i}`,
-      EVA_eligible: true, EVA_count: mission.totalEVAs / mission.crewSize,
-    }));
+    const crew = Array.from({ length: 6 }, (_, i) =>
+      makeLowRiskCrewMember(`m${i}`, mission.totalEVAs / mission.crewSize)
+    );
     const out = simulateIMM({
       crew, mission, kit: IMM_KITS.issHMS,
       trials: 2000, seed: 0xc0ffee,
