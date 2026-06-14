@@ -104,14 +104,14 @@ flowchart LR
     I4[Iter 4 ✓<br/>IMRaD manuscript<br/>figures from src/<br/>journal submission] --> I5
     I5[Iter 5 ✓<br/>IMM Calculator<br/>100 K15 + 1 analog condition<br/>K15 validation gate] --> I6
     I6[Iter 6 ✓<br/>Python prior calibration<br/>FastAPI + Calibration UI<br/>101 evidence-based priors] --> MS
-    MS[Manuscript submission<br/>Advances in Space Research<br/>Zenodo DOI · cover letter<br/>100% evidence-based]
+    MS[Manuscript submission<br/>Acta Astronautica target<br/>Zenodo DOI · cover letter<br/>100% evidence-based]
     classDef done fill:#16a34a,stroke:#15803d,color:#fff
     classDef active fill:#eab308,stroke:#a16207,color:#fff
     class P0,I1,I2,I3,I4,I5,I6 done
     class MS active
 ```
 
-**Manuscript submission (Advances in Space Research, Elsevier/COSPAR) is the active priority.** All six engineering iterations are complete. npj Microgravity was dropped (fully OA, APC $3,790 unaffordable). The previous iterations shipped:
+**Manuscript submission (Acta Astronautica target; ASR retained as a previous/scope-risk package) is the active priority.** All six engineering iterations are complete. npj Microgravity was dropped (fully OA, APC $3,790 unaffordable). The previous iterations shipped:
 
 - **Iter 1** — vertical slice: Bayesian MCDA over 5 placeholder criteria, Mulberry32 PRNG, Marsaglia–Tsang Gamma, Dirichlet sampler with closed-form moment validation.
 - **Iter 2** — 12 evidence-grounded criteria with verified DOIs, 3-tier accessibility model (Minimum / Medium / Elite), tier-aware scale transforms.
@@ -391,7 +391,7 @@ CORS is pre-configured for the Vite dev server (`:5173`) and preview (`:4173`).
 ## Status
 
 - **Iter 1–3:** code-complete. Bayesian MCDA + NASA IMM Monte Carlo + HSRB LxC verdict all green.
-- **Iter 4 manuscript:** IMRaD draft complete; F1–F7 figure pipeline reproducible from `src/imm/`; 40/40 bibliography entries Crossref-verified; two internal peer-review passes applied (14/23 Tier-1 fixes). Ready for Advances in Space Research submission pending Zenodo DOI mint and portal-only declarations/reviewer entry.
+- **Iter 4 manuscript:** IMRaD draft complete; F1–F7 figure pipeline reproducible from `src/imm/`; 40/40 bibliography entries Crossref-verified; two internal peer-review passes applied (14/23 Tier-1 fixes). The current source is retargeted to Acta Astronautica with a method-first title and abstract; rendered DOCX files must be rebuilt before submission.
 - **Iter 5 IMM Calculator:** DONE at v0.5.0. Phase 0 (100-condition K15 catalog + 3-tier priors) DONE; Phase 1 (engine math, σ<5 % convergence) DONE; Phase 2 (data layer + CrewComposition UI + K15 validation gate) DONE; priors re-elicitation rev3-a through rev3-f + community/military pass 4 DONE (all 3 TME + unlimited CHI within K15 CI₉₅; 8 documented-divergent). Figures I1–I6 shipped (I6 = analog posterior, 2026-06-05); tornado/crew-heat/vulnerability-calibration figures engine-blocked (Phase 3 ML). Phase 3 ML layer (surrogate + vulnerability MLP) not started.
 - **Iter 6 Python offline calibration DONE** (v0.5.6 version of record; v0.5.5 calibration baseline): Full 12-task Python pipeline DONE. PyMC batch fit completed: 66 of 66 tier-B PyMC conditions merged (provenance `tierB-pymc`); 0 tier-C remain (101/101 current conditions evidence-based: 66 tierB-pymc + 34 tierA-nasa + 1 tierB-lit analog extension). `tierB_multiplier` set to 1.0. K15: TME 97–99 (all scenarios). **FastAPI Calibration API** (`python/api/`) + **Calibration browser view** (`src/ui/views/Calibration.tsx`) + **TypeScript API client** (`src/api/calibration.ts`) DONE (v0.5.2). 9 new Playwright e2e tests. **rev3-f severity tuning DONE** — 32/32 persistent-impairment K15 conditions updated against primary-source literature. **Analog/Antarctic passes 2+3 DONE** — herpes-zoster + nephrolithiasis upgraded tierA-nasa → tierB-pymc (analog epidemiology anchors). **Community/military calibration pass 4 DONE** (2026-05-27) — ankle-sprain 292.2→41.6, dental-abscess 1.2→4.2, UTI 2.9→10.1/1000/PY. Manuscript submission unblocked.
 - **Active branch:** `master` (carries the v0.5.6 submission-readiness alignment).
@@ -400,15 +400,15 @@ The live resume tracker is [`STATUS.md`](STATUS.md). Citation metadata is in [`C
 
 ## What's left to do
 
-Two backlogs: **(A)** manuscript submission — v0.5.6 sources and rendered ASR `.docx` files are current as of 2026-06-11, with only the Zenodo DOI / final archive metadata still to be filled at archive time; **(B)** engineering / deferred follow-up work.
+Two backlogs: **(A)** manuscript submission — v0.5.6 source is retargeted to Acta Astronautica, and the previously rendered ASR `.docx` files are stale after the 2026-06-14 source revision; **(B)** engineering / deferred follow-up work.
 
 ### A. Manuscript submission (gated on software-readiness)
 
-> The active ASR upload inventory is [`paper/submission/SUBMISSION_CHECKLIST.md`](paper/submission/SUBMISSION_CHECKLIST.md). The checklist is aligned to the v0.5.6 version of record; `paper/submission/manuscript.docx` and `paper/submission/cover-letter.docx` were rebuilt and checked on 2026-06-11.
+> The previous ASR upload inventory is [`paper/submission/SUBMISSION_CHECKLIST.md`](paper/submission/SUBMISSION_CHECKLIST.md). It is now marked stale because `paper/manuscript.md` was retargeted to Acta Astronautica on 2026-06-14. Do not upload `paper/submission/manuscript.docx` or `paper/submission/cover-letter.docx` until they are rebuilt from the current source.
 
 1. **Mint Zenodo DOI** for the submission commit and record it in `paper/manuscript.md` §2.5 + Code-availability statement. Refresh the figure-generation commit marker only if the archive commit changes the figure-generating source.
 2. **Complete portal-only metadata** — suggested reviewers, Elsevier declarations, separate figure upload, and subscription vs open-access selection.
-3. **Submit to Advances in Space Research portal** (Editorial Manager, `https://www.editorialmanager.com/AISR`). Manuscript + cover letter + Zenodo DOI + 7 main figures (separate files per ASR) + competing-interests declaration.
+3. **Submit through the selected journal portal after guide re-verification.** Manuscript + cover letter + Zenodo DOI + 7 main figures as separate files + competing-interests declaration.
 
 ### B. Engineering / deferred backlog (stable at v0.5.6)
 

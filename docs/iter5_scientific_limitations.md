@@ -1,7 +1,7 @@
 # Selectron — Scientific Limitations of the Current IMM Calibration
 
 **Created:** 2026-05-22 (post priors-rev3-b)
-**Last updated:** 2026-05-27 — analog/Antarctic evidence passes 2+3 + PyMC calibration; provenance 37+63+0; K15 all 3 scenarios pass
+**Last updated:** 2026-06-14 — manuscript-freeze cleanup; provenance 34+66+1; zero tier-C synthetic priors; K15 TME + unlimited CHI inter-model agreement retained
 **Status:** Living document — update on every priors revision or engine extension
 **Companion docs:** [`iter5_priors_rev3_strategy.md`](iter5_priors_rev3_strategy.md), [`iter3_vv_dossier.md`](iter3_vv_dossier.md) §5, [`future_features.md`](future_features.md)
 
@@ -50,23 +50,19 @@ The actual observed data (M18 Table 2: zero observed EVAC and zero observed LOCL
 
 This means: our K15 "reproduction" demonstrates that we can reproduce another model's outputs, not that we have validated against reality.
 
-### 3.2 The tier-B blanket multiplier is atheoretical (partially addressed in rev3-c)
+### 3.2 The tier-B blanket multiplier has been retired
 
-rev3-b set `global_calibration.tierB_multiplier = 0.55` — a single scalar that scales every tier-B condition's sampled incidence by 0.55. This was the simplest knob that brought aggregate TME within K15 CI₉₅ across all three scenarios.
+Earlier rev3-b calibration used a blanket `global_calibration.tierB_multiplier = 0.55` to pull aggregate total medical events into the K15 CI95 envelope. That scalar was a calibration aid, not a scientific claim about every tier-B condition.
 
-**It is not a scientific claim that every tier-B prior was elicited 1.8× too high.** Individual tier-B conditions are almost certainly over-elicited (a 1.8× scalar is too much) or under-elicited (it is not enough); the blanket multiplier moves the AGGREGATE to match while obscuring per-condition errors.
+The current manuscript-freeze prior file no longer relies on that blanket adjustment: tier-A, tier-B, and tier-C multipliers are all 1.0. The current aggregate fit comes from per-condition evidence passes and PyMC-fitted tier-B priors, not from a hidden global shrinkage factor.
 
-**rev3-c partial fix (2026-05-22):** 5 tier-B conditions were replaced with source-cited per-py rates derived from Earth-analog primary literature (Antarctic, Mars-500, SIRIUS-21, submarine, ISS WOTR15 — 27 primary citations total across 3 research-agent deliverables). The conditions calibrated: `dental-caries` (promoted to tier-A via G12 Bayesian chain), `late-insomnia`, `depression`, `respiratory-infection`, `skin-rash`. Plus source_ref enrichment on `dental-abscess`, `headache-co2-induced`, `back-pain-space-adaptation`. See [`research/_priors_rev3c_synthesis.md`](../research/_priors_rev3c_synthesis.md) for the consolidated table.
+Residual limitation: several tier-B conditions remain fitted from small-n, single-cohort, or proxy-condition evidence. The limitation is input-data pedigree, not an undisclosed multiplier. Those weaker priors are identified by their `source_ref` strings in `src/data/imm-priors.json` and should be audited per condition before any operational use.
 
-**Residual: 37 of 42 tier-B conditions still rely on the blanket multiplier as fallback.** They lack per-condition Earth-analog evidence (most are minor everyday medical events whose per-py rate is in NASA's proprietary iMED database, not published literature). Further per-condition calibration is iterative — each requires its own source verification.
+### 3.3 Reproducibility depends on the exact priors file
 
-### 3.3 The auto-load behaviour shifts RNG streams
+`simulateIMM` auto-loads `global_calibration.tierA/B/C_multiplier` defaults and `kind_multipliers` from `imm-priors.json`. The current tier multipliers are all 1.0, but the broader reproducibility rule remains: the same `(seed, priors-json-state)` pair gives the same output, while the same seed with a mutated priors file does not.
 
-`simulateIMM` auto-loads `global_calibration.tierA/B/C_multiplier` defaults from `imm-priors.json`. When any multiplier is ≠ 1.0, a `rng()` draw is consumed inside the multiplier path, shifting the RNG stream for all downstream Bernoulli samples (severity, p_evac, p_locl).
-
-**Reproducibility verification** (`scripts/validate_imm_explicit_baseline.ts`, 2026-05-22): calling `simulateIMM` with explicit `{tierA: 1, tierB: 1, tierC: 1}` reproduces the pre-rev3-b baseline numbers exactly to two decimal places, confirming the multiplier path is the only source of RNG-stream divergence.
-
-**Implication:** the same `(seed, priors-json-state)` pair gives the same output. The same `(seed, mutated-priors-json)` does not. Snapshot tests must include priors-json provenance.
+Snapshot tests and manuscript locks must therefore include the SHA-256 hash of `src/data/imm-priors.json`, not only the git commit and random seed.
 
 ### 3.4 Persistent-impairment classification is clinical-judgment-based
 
@@ -76,12 +72,12 @@ The rev3-e `fi_cp3` audit classified 68/100 conditions as fully-resolving (cp3 z
 
 The 'none' (no medical kit) scenario produces values that diverge from K15:
 
-| Metric | Selectron (2026-05-27, 37+63) | K15 'none' ref | Δ |
+| Metric | Selectron (current 34+66+1 prior set) | K15 'none' ref | Δ |
 |--------|--------------------------|-----------------|----|
-| TME    | 98.52  | 98.30  | +0.22 ✓ |
-| CHI    | 78.88  | 59.20  | +19.68 ✗ |
+| TME    | 97.8  | 98.30  | -0.5 ✓ |
+| CHI    | 79.1  | 59.20  | +19.9 ✗ |
 | pEVAC  | 12.52 % | 66.90 % | −54.38 ✗ |
-| pLOCL  | 0.24 % | 2.89 % | −2.65 ✗ |
+| pLOCL  | 0.25 % | 2.89 % | −2.64 ✗ |
 
 **Decision (2026-05-22): accept the divergence as a principled limitation.** Rationale:
 
@@ -113,13 +109,13 @@ These are out-of-scope **by design** as of 2026-05-22. The catalogued AMM/SMM Ma
 
 ## 5 · Validation status
 
-**IMM-86** — K15 Table 1 reproduction gate. **K15 all-3-scenario validation (2026-05-27, T=100k, seed 0xc0ffee, 37+63 provenance):**
+**IMM-86** — K15 Table 1 reproduction gate. **K15 all-3-scenario validation (T=100k, seed 0xc0ffee, current 34+66+1 provenance):**
 
 | Scenario | TME | ref | Δ | CHI | pEVAC | pLOCL |
 |---|---|---|---|---|---|---|
-| none | **98.52** | 98.30 | +0.22 ✓ | 78.88 | 12.52% | 0.24% |
-| issHMS | **98.73** | 106.00 | −7.27 (known) | 82.79 | 9.74% | 0.24% |
-| unlimited | **99.62** | 106.00 | −6.38 (known) | 95.23 | 1.78% | 0.17% |
+| none | **97.8** | 98.30 | -0.5 ✓ | 79.1 | 12.52% | 0.25% |
+| issHMS | **98.1** | 106.00 | -7.9 (known) | 82.8 | 9.65% | 0.23% |
+| unlimited | **98.8** | 106.00 | -7.2 (known) | 95.3 | 1.78% | 0.18% |
 
 All TME within K15 CI₉₅ ✓. CHI/pEVAC/pLOCL divergences are documented pre-existing limitations (§3.5). Written as a formal vitest gate at `tests/imm/validation_k15.test.ts` (13 tests, 3 scenarios × 4 metrics + 1 inventory). Documented-divergent metrics use wider brackets with `tracking` fields pointing at open backlog items. 37/37 simulate tests pass. Commit `04543d9`.
 
@@ -132,7 +128,7 @@ All TME within K15 CI₉₅ ✓. CHI/pEVAC/pLOCL divergences are documented pre-
 - **K-S marginal Dirichlet fit** (`tests/engine/dirichlet_ks.test.ts`): 3 marginal Beta fits at T=5000 pass K-S at α=0.05 (D < 0.019); 1 rejection of misspecified Beta(10,10). More discriminating than the lag-1 ESS diagnostic for the IID Gamma-normalization sampler.
 - **Gelman-Rubin R̂** (`tests/imm/rhat_convergence.test.ts`): 4 independent chains (seeds 0xc0ffee / 0xdeadbeef / 0x12345678 / 0xfeedface) × T=25k on issHMS. R̂(CHI) ≤ 1.01. Each chain individually satisfies the M18 σ<5% stability rule. Supplements the within-chain σ<5% with between-chain convergence proof.
 - **α₀ robustness panel** (`tests/engine/alpha0_robustness.test.ts`): Stage A posterior at α₀ ∈ {1, 10, 100} with heterogeneous candidate. CI₉₀ width monotonically decreasing (0.50 → 0.21 → 0.07). Closed-form mean matches MC within 2% at all three concentrations.
-- **Leave-calibrated-out sensitivity** (`tests/imm/validation_k15_loo.test.ts`): K15 reproduction with evidence-based conditions only (tier-A + source-cited tier-B). TME drops from ~100 → ~42; CHI rises from ~90% → ~97%. Demonstrates honest degradation when calibration-circular conditions are removed. (Test fixture reflects pre-2026-05-25 provenance snapshot; counts in test file may differ from current 37+63.)
+- **Leave-calibrated-out sensitivity** (`tests/imm/validation_k15_loo.test.ts`): K15 reproduction with evidence-based conditions only (tier-A + source-cited tier-B). TME drops from ~100 → ~42; CHI rises from ~90% → ~97%. Demonstrates honest degradation when calibration-circular conditions are removed. (Test fixture reflects a pre-2026-05-25 provenance snapshot; current manuscript-freeze provenance is 34 tierA-nasa + 66 tierB-pymc + 1 tierB-lit.)
 
 ---
 
@@ -141,7 +137,7 @@ All TME within K15 CI₉₅ ✓. CHI/pEVAC/pLOCL divergences are documented pre-
 - **Earth-based analog-mission planning** — assessing relative crew composition risk for MDRS / HI-SEAS / Mars-500 / SIRIUS / Antarctic winter-over / AMADEE / D-MARS / CHAPEA scenarios where the priors are closer to in-flight or terrestrial-analog observation
 - **LEO / ISS-baseline scenarios** — ISS 6 mo K15 reference; S20 DRM1/DRM2; analog-mission planners using ISS as the comparator
 - **Selection-criteria sensitivity analysis** — testing how different MCDA weight elicitations change ranking under the same posterior
-- **Methodology paper for the npj Microgravity / Aerospace Medicine venue** — the V&V approach (NASA-STD-7009A factors 1-3 explicit) is the publishable contribution; the priors are illustrative
+- **Methodology/software-validation paper** — the V&V approach (NASA-STD-7009A factors 1-3 explicit), Bayesian MCDA, K15 inter-model agreement, and HSRB mapping are the publishable contribution; the priors are evidence-based but not flight-validated
 - **Educational tool** — teaching the IMM Monte Carlo workflow, Bayesian MCDA, NASA HSRB LxC
 
 ## 7 · What Selectron is NOT appropriate for

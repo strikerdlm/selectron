@@ -39,12 +39,6 @@ A clinically significant interpersonal conflict episode experienced by an indivi
 - Two crewmembers accounted for 85% of perceived intra-crew conflicts
 - **Key anchor:** intra-crew conflict is rare; most conflict is crew↔mission-control. Confirms ISS-type setting has lower intra-crew conflict rate than analog.
 
-### Van Fossen et al. (2021) — Antarctic missions 1–18 months, Acta Astronautica
-- n=74 daily diaries; N=105 pre-mission surveys
-- Neuroticism (inverse of emotional stability) correlated with increased social conflict (r ≈ 0.30–0.45)
-- Conscientiousness associated with positive team attitudes and protection against depression
-- **Key anchor:** validates vulnerability criteria — emotional_stability and conscientiousness are appropriate predictors
-
 ### Palinkas & Suedfeld (2021) — Review, Neuroscience & Biobehavioral Reviews
 - 116 citations; comprehensive review of psychosocial issues in ICE environments
 - Interpersonal conflict listed among top 3 individual stressors alongside depression and cognitive performance decrements
@@ -93,7 +87,7 @@ Expected events per 6-person crew at ISS baseline:
 
 | Context | Multiplier | Rationale |
 |---|---|---|
-| `antarctic-station` | **2.0×** | High isolation, no real-time support, overwinter confinement (Bell et al., Van Fossen et al.) |
+| `antarctic-station` | **2.0×** | High isolation, no real-time support, overwinter confinement (Bell et al.; Palinkas & Suedfeld) |
 | `analog-controlled` | **1.5×** | Moderate isolation, climate-stable habitat, real-time support available |
 | `leo-iss` | 1.0 (default) | Calibration baseline |
 | `interplanetary-mars-future` | 1.0 (default) | No comms-delay conflict model yet; left at baseline |
@@ -134,9 +128,9 @@ Conflict mediation itself is non-pharmacological (behavioral countermeasure, no 
 
 | Criterion | Direction | Justification |
 |---|---|---|
-| `psych.emotional_stability` | High → protective | Neuroticism predicts social conflict; Van Fossen et al. (2021) r=0.30–0.45 |
+| `psych.emotional_stability` | High → protective | Low emotional stability is a general ICE psychosocial vulnerability marker; retained as a conservative vulnerability proxy pending condition-specific coefficient fitting |
 | `behavioral.teamwork` | High → protective | Poor team cohesion predicts conflict frequency and severity |
-| `psych.conscientiousness` | High → protective | Van Fossen et al. (2021): conscientiousness → positive team attitudes; also helps manage conflict constructively |
+| `psych.conscientiousness` | High → protective | Conscientiousness is retained as a conservative proxy for task reliability and conflict-management behavior, not as a condition-specific fitted coefficient |
 
 Note: adding `psych.conscientiousness` as a coupling criterion also addresses the known model weakness (1/100 conditions previously coupled to conscientiousness). This adds it as a second condition, expanding conscientiousness signal in the vulnerability path.
 
@@ -157,5 +151,4 @@ Note: adding `psych.conscientiousness` as a coupling criterion also addresses th
 - Bell, S. T., et al. (2019). What We Know About Team Dynamics for Long-Distance Space Missions. *Frontiers in Psychology*, 10, 1583.
 - Marcinkowski, M. A., et al. (2021). The nature of conflict for teams in isolated, confined, and extreme environments. *Acta Astronautica*, 188, 333–341.
 - Basner, M., et al. (2014). Psychological and Behavioral Changes during Confinement in a 520-Day Simulated Interplanetary Mission to Mars. *PLoS ONE*, 9(3), e93019.
-- Van Fossen, J. A., et al. (2021). Relationships between personality and social functioning, attitudes towards the team and mission, and well-being in an ICE environment. *Acta Astronautica*, 185, 411–419.
 - Palinkas, L. A., & Suedfeld, P. (2021). Psychosocial issues in isolated and confined extreme environments. *Neuroscience & Biobehavioral Reviews*, 126, 413–429.

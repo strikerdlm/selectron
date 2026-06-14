@@ -21,8 +21,8 @@ function makeCrewMember(id: string, evaCount = 0): IMMCrewMember {
 
 describe("IMM_CONDITIONS", () => {
   it("contains the full K15 appendix catalog plus analog extension", () => {
-    expect(IMM_CONDITIONS.length).toBeGreaterThanOrEqual(95);
-    expect(IMM_CONDITIONS.length).toBeLessThanOrEqual(102);
+    expect(IMM_CONDITIONS).toHaveLength(101);
+    expect(IMM_CONDITIONS.some((c) => c.id === "interpersonal-conflict")).toBe(true);
   });
 
   it("every condition has unique id, valid family, valid distribution", () => {

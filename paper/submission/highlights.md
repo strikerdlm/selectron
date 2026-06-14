@@ -1,4 +1,4 @@
-# Highlights — Advances in Space Research submission
+# Highlights — Selectron manuscript submission
 
 **Instructions:** 3–5 bullet points, ≤ 85 characters each (including spaces).
 

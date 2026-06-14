@@ -1,4 +1,4 @@
-# Pandoc build for Advances in Space Research submission
+# Pandoc build for the Elsevier-style manuscript submission draft
 # Usage: make           → build manuscript.docx
 #        make all       → build manuscript.docx + cover-letter.docx
 #        make clean     → remove generated docx in submission/

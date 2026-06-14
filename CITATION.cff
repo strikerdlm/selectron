@@ -1,5 +1,5 @@
 cff-version: 1.2.0
-title: "Selectron: From Mission Medical Risk to Crew Selection — A Reproducible NASA-IMM and HSRB Pipeline for Analog Astronauts"
+title: "Selectron: A Reproducible Bayesian Decision-Analysis and NASA-IMM/HSRB Risk-Mapping Pipeline"
 message: "If you use Selectron in academic work, please cite this software as below, plus the underlying NASA Integrated Medical Model papers listed in `references`."
 type: software
 authors:

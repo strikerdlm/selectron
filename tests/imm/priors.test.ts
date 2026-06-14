@@ -1,11 +1,74 @@
 import { describe, it, expect } from "vitest";
+import { createHash } from "node:crypto";
+import { readFileSync } from "node:fs";
 import { loadIMMPriors, validatePriorsJson } from "../../src/imm/priors";
+
+const PRIORS_PATH = "src/data/imm-priors.json";
+const REPRODUCIBILITY_LOCK_PATH = "paper/REPRODUCIBILITY_LOCK.json";
+const INTERPERSONAL_CONFLICT_EVIDENCE_PATH =
+  "research/evidence/2026-06-06_interpersonal-conflict_ICE-prior.md";
+const EXPECTED_PRIORS_SHA256 =
+  "e5989341ef5c5dba29eefe57999b4e3843dbbe3bb60964f9c5236bde9341267b";
+const EXPECTED_PROVENANCE_COUNTS: Record<string, number> = {
+  "tierA-nasa": 34,
+  "tierB-pymc": 66,
+  "tierB-lit": 1,
+};
+const DISALLOWED_FREEZE_TOKENS = [
+  /placeholder doi/i,
+  /doi_place/i,
+  /__doi/i,
+  /\bTBD\b/i,
+  /\bTODO\b/i,
+  /fill in/i,
+  /Van Fossen/i,
+];
+
+function countProvenance(): Record<string, number> {
+  const priors = loadIMMPriors();
+  const counts: Record<string, number> = {};
+  for (const prior of Object.values(priors.conditions)) {
+    counts[prior.provenance] = (counts[prior.provenance] ?? 0) + 1;
+  }
+  return counts;
+}
 
 describe("IMM priors", () => {
   it("loads imm-priors.json", () => {
     const priors = loadIMMPriors();
     expect(priors.schema_version).toBe(1);
-    expect(Object.keys(priors.conditions).length).toBeGreaterThanOrEqual(8);
+    expect(Object.keys(priors.conditions)).toHaveLength(101);
+  });
+
+  it("freezes manuscript-critical prior catalog counts and hash", () => {
+    const raw = readFileSync(PRIORS_PATH);
+    const hash = createHash("sha256").update(raw).digest("hex");
+    const counts = countProvenance();
+
+    expect(hash).toBe(EXPECTED_PRIORS_SHA256);
+    expect(counts).toEqual(EXPECTED_PROVENANCE_COUNTS);
+    expect(counts["tierC-synth"] ?? 0).toBe(0);
+  });
+
+  it("reproducibility lock matches the frozen prior catalog", () => {
+    const lock = JSON.parse(readFileSync(REPRODUCIBILITY_LOCK_PATH, "utf8")) as {
+      source_files: Record<
+        string,
+        {
+          sha256: string;
+          condition_count?: number;
+          provenance_counts?: Record<string, number>;
+        }
+      >;
+    };
+    const lockedPriors = lock.source_files[PRIORS_PATH];
+
+    expect(lockedPriors.sha256).toBe(EXPECTED_PRIORS_SHA256);
+    expect(lockedPriors.condition_count).toBe(101);
+    expect(lockedPriors.provenance_counts).toEqual({
+      ...EXPECTED_PROVENANCE_COUNTS,
+      "tierC-synth": 0,
+    });
   });
 
   it("every prior carries a provenance tag and source_ref", () => {
@@ -13,7 +76,19 @@ describe("IMM priors", () => {
     for (const [_id, p] of Object.entries(priors.conditions)) {
       expect(["tierA-nasa","tierB-lit","tierB-pymc","tierC-synth","user-custom"]).toContain(p.provenance);
       expect(typeof p.source_ref).toBe("string");
-      expect(p.source_ref.length).toBeGreaterThan(0);
+      expect(p.source_ref.trim().length).toBeGreaterThan(0);
+    }
+  });
+
+  it("manuscript-freeze source references contain no placeholder or removed citation tokens", () => {
+    const priorsRaw = readFileSync(PRIORS_PATH, "utf8");
+    const conflictEvidenceRaw = readFileSync(INTERPERSONAL_CONFLICT_EVIDENCE_PATH, "utf8");
+    for (const pattern of DISALLOWED_FREEZE_TOKENS) {
+      expect(priorsRaw, `imm-priors.json should not match ${pattern}`).not.toMatch(pattern);
+      expect(
+        conflictEvidenceRaw,
+        `interpersonal-conflict evidence should not match ${pattern}`
+      ).not.toMatch(pattern);
     }
   });
 

@@ -15,7 +15,8 @@
     "verify:paper": "npm run typecheck && npx vitest run tests/imm/conditions.test.ts && npm run build",
     "verify:e2e": "playwright test",
     "calibrate:imm": "tsx scripts/calibrate_imm_priors.ts",
-    "validate:imm": "tsx scripts/validate_imm.ts"
+    "validate:imm": "tsx scripts/validate_imm.ts",
+    "validate:imm:analog": "vitest run tests/imm/analog_45d_unscreened_crew.test.ts tests/imm/analog_90d_crew_archetypes.test.ts tests/imm/posterior_predictive.test.ts"
   },
   "dependencies": {
     "dexie": "^4.4.2",

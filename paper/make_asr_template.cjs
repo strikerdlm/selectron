@@ -1,6 +1,6 @@
 /**
  * Creates a pandoc reference.docx template formatted for
- * Advances in Space Research (Elsevier/COSPAR) submission:
+ * Elsevier-style manuscript submission:
  *   - A4 paper, 2.5 cm margins all around
  *   - 12 pt Times New Roman, double-spaced body
  *   - Numbered headings (1. / 1.1 / 1.1.1)
@@ -187,7 +187,7 @@ const emailPara = new Paragraph({
 const journalPara = new Paragraph({
   alignment: AlignmentType.CENTER,
   spacing: { before: 480, after: 0 },
-  children: [bodyRun('Submitted to: Advances in Space Research', { italics: true })],
+  children: [bodyRun('Submitted to: Acta Astronautica', { italics: true })],
 });
 
 const datePara = new Paragraph({

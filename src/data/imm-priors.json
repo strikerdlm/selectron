@@ -4157,7 +4157,7 @@
     "interpersonal-conflict": {
       "conditionId": "interpersonal-conflict",
       "provenance": "tierB-lit",
-      "source_ref": "research/evidence/2026-06-06_interpersonal-conflict_ICE-prior.md (Bell 2019 systematic review 72 sources: all analog crews ≥1 conflict by day 90; Basner 2014 Mars-500 520d weekly conflict questionnaire; Van Fossen 2021 Antarctic personality-conflict correlation; Marcinkowski 2021 ICE 4-type conflict typology. ISS baseline λ=0.000667/pd derived from P(crew≥1 clinically-significant event in 90d)=0.5 scaled ×0.5 for LEO mission-control support advantage. Antarctic/analog kind_multipliers 2.0×/1.5×.)",
+      "source_ref": "research/evidence/2026-06-06_interpersonal-conflict_ICE-prior.md (Bell 2019 systematic review 72 sources: all analog crews >=1 conflict by day 90; Basner 2014 Mars-500 520d weekly conflict questionnaire; Marcinkowski 2021 ICE 4-type conflict typology; Palinkas & Suedfeld 2021 ICE psychosocial review. ISS baseline lambda=0.000667/pd derived from P(crew>=1 clinically-significant event in 90d)=0.5 scaled x0.5 for LEO mission-control support advantage. Antarctic/analog kind_multipliers 2.0x/1.5x.)",
       "incidence": {
         "distribution": "Gamma-Poisson",
         "alpha": 2,

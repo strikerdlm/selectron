@@ -1,10 +1,10 @@
-**To:** The Editors, *Advances in Space Research*
+**To:** The Editors, *Acta Astronautica*
 **From:** Diego L. Malpica, MD — Direction of Aerospace Medicine, Colombian Aerospace Force (FAC), Bogotá, Colombia
-**Re:** Manuscript submission — *From Mission Medical Risk to Crew Selection: A Reproducible NASA-IMM and HSRB Pipeline for Analog Astronauts*
+**Re:** Manuscript submission — *A Reproducible Bayesian Decision-Analysis and NASA-IMM/HSRB Risk-Mapping Pipeline for Analog Astronaut Crew-Selection Research*
 
 Dear Editors,
 
-I am submitting the attached manuscript for consideration as an original research article in *Advances in Space Research*. The paper presents **Selectron**, a reproducible TypeScript pipeline that combines two methodological contributions for analog-astronaut selection:
+I am submitting the attached manuscript for consideration as an original research article in *Acta Astronautica*. The paper presents **Selectron**, a reproducible TypeScript pipeline that combines two methodological contributions for analog-astronaut crew-selection research:
 
 1. A Bayesian multi-criteria decision analysis (MCDA) pipeline that produces a posterior distribution over each candidate's total score with credible-interval rank semantics — to our knowledge the first *Bayesian* MCDA pipeline delivering per-candidate composite-score posteriors and rank credible intervals for analog-astronaut selection (deterministic and fuzzy MCDM for pilot/aircrew selection is established — e.g. Taylan et al., 2024 — but a Bayesian formulation coupled to a mission-risk model is not).
 2. A formal mapping from the Stage-B IMM-style mission-risk Monte Carlo posterior to NASA's institutional Human System Risk Board Likelihood × Consequence framework as published in JSC-66705 Revision A — the first such mapping for analog-mission programs.
@@ -15,7 +15,7 @@ Internal validation follows NASA-STD-7009A's first three credibility factors: cl
 
 The software artifact is MIT-licensed and will be archived at Zenodo before portal upload; the DOI will be inserted into the manuscript at that final archive step. The current figure-generation commit marker is `538e16ccff94`, and the repository at `github.com/strikerdlm/selectron` contains the full source, the test suite, the V&V dossier, and reproducibility instructions.
 
-The manuscript fits *Advances in Space Research*'s scope on (a) computational modeling of medical risk in spaceflight and analog environments, (b) probabilistic risk assessment methodology for crewed space missions, and (c) quantitative translation of NASA institutional frameworks (HSRB, JSC-66705 Rev A, NASA-STD-7009A) into reproducible, externally usable artifacts. The NASA IMM community — Antonsen et al. (2022), Myers et al. (2018), Keenan et al. (2015) — provides the methodological foundation; we extend that line of work into the analog-mission domain with a Bayesian selection pipeline coupled to a fully open-source IMM-aligned simulator.
+The manuscript fits *Acta Astronautica*'s broad space-systems and applied astronautics readership because its primary contribution is computational methodology: probabilistic decision analysis, NASA-IMM-aligned mission medical-risk simulation, and quantitative translation of NASA institutional risk frameworks (HSRB, JSC-66705 Rev A, NASA-STD-7009A) into a reproducible external artifact. The NASA IMM community — Antonsen et al. (2022), Myers et al. (2018), Keenan et al. (2015) — provides the methodological foundation; this work extends that line into analog-mission research while explicitly avoiding clinical, flight-certification, or operational selection claims.
 
 The manuscript is original work, has not been published elsewhere, and is not under consideration by any other journal. I am the sole author and declare no conflicts of interest. The work received no external funding. The submission complies with the journal's requirements: data availability, code availability, author contributions, funding, competing-interests, and ethics statements are included in the manuscript.
 

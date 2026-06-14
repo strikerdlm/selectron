@@ -1,5 +1,5 @@
 /**
- * Generates an ASR-formatted cover letter DOCX.
+ * Generates an Elsevier-style cover letter DOCX.
  */
 const {
   Document, Packer, Paragraph, TextRun,
@@ -46,10 +46,10 @@ const doc = new Document({
       p('Bogotá, Colombia'),
       p('dlmalpica@yahoo.com'),
       blank(),
-      p('2026-06-19'),
+      p('2026-06-14'),
       blank(),
-      p('To: The Editors, Advances in Space Research', { bold: true }),
-      p('Elsevier / COSPAR'),
+      p('To: The Editors, Acta Astronautica', { bold: true }),
+      p('Elsevier'),
       blank(),
 
       // Subject
@@ -58,7 +58,7 @@ const doc = new Document({
         children: [
           new TextRun({ text: 'Re: Manuscript submission — ', font: FONT, size: BODY_HP, bold: true }),
           new TextRun({
-            text: 'From Mission Medical Risk to Crew Selection: A Reproducible NASA-IMM and HSRB Pipeline for Analog Astronauts',
+            text: 'A Reproducible Bayesian Decision-Analysis and NASA-IMM/HSRB Risk-Mapping Pipeline for Analog Astronaut Crew-Selection Research',
             font: FONT, size: BODY_HP, bold: true, italics: true,
           }),
         ],
@@ -74,10 +74,10 @@ const doc = new Document({
         spacing: { before: 0, after: 200, line: 360, lineRule: 'auto' },
         children: [
           new TextRun({ text: 'I am submitting the attached manuscript for consideration as an original research article in ', font: FONT, size: BODY_HP }),
-          new TextRun({ text: 'Advances in Space Research', font: FONT, size: BODY_HP, italics: true }),
+          new TextRun({ text: 'Acta Astronautica', font: FONT, size: BODY_HP, italics: true }),
           new TextRun({ text: '. The paper presents ', font: FONT, size: BODY_HP }),
           new TextRun({ text: 'Selectron', font: FONT, size: BODY_HP, bold: true }),
-          new TextRun({ text: ', a reproducible TypeScript pipeline that combines two methodological contributions for analog-astronaut selection:', font: FONT, size: BODY_HP }),
+          new TextRun({ text: ', a reproducible TypeScript pipeline that combines two methodological contributions for analog-astronaut crew-selection research:', font: FONT, size: BODY_HP }),
         ],
       }),
 
@@ -113,7 +113,7 @@ const doc = new Document({
       }),
 
       // Scope alignment
-      p('The manuscript fits Advances in Space Research\'s scope on (a) computational modeling of medical risk in spaceflight and analog environments, (b) probabilistic risk assessment methodology for crewed space missions, and (c) quantitative translation of NASA institutional frameworks (HSRB, JSC-66705 Rev A, NASA-STD-7009A) into reproducible, externally usable artifacts. The NASA IMM community — Antonsen et al. (2022), Myers et al. (2018), Keenan et al. (2015) — provides the methodological foundation; we extend that line of work into the analog-mission domain with a Bayesian selection pipeline coupled to a fully open-source IMM-aligned simulator.'),
+      p('The manuscript fits Acta Astronautica\'s broad space-systems and applied astronautics readership because its primary contribution is computational methodology: probabilistic decision analysis, NASA-IMM-aligned mission medical-risk simulation, and quantitative translation of NASA institutional risk frameworks (HSRB, JSC-66705 Rev A, NASA-STD-7009A) into a reproducible external artifact. The NASA IMM community — Antonsen et al. (2022), Myers et al. (2018), Keenan et al. (2015) — provides the methodological foundation; this work extends that line into analog-mission research while explicitly avoiding clinical, flight-certification, or operational selection claims.'),
 
       // Ethics / declarations
       p('The manuscript is original work, has not been published elsewhere, and is not under consideration by any other journal. I am the sole author and declare no conflicts of interest. The work received no external funding. The submission complies with the journal\'s requirements: data availability, code availability, author contributions, funding, competing-interests, and ethics statements are included in the manuscript.'),
