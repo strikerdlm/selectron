@@ -1,0 +1,396 @@
+- generic [ref=e3]:
+  - banner [ref=e4]:
+    - generic [ref=e5]:
+      - generic [ref=e6]:
+        - heading "SELECTRON" [level=1] [ref=e7] [cursor=pointer]
+        - generic [ref=e8]: by Diego Malpica MD
+        - generic [ref=e9]: iter 03 · phase 3f
+      - generic [ref=e10]:
+        - button "Switch to light theme" [ref=e11] [cursor=pointer]:
+          - generic [ref=e12]: ☀
+          - generic [ref=e13]: light
+        - button "Candidates" [ref=e14] [cursor=pointer]
+        - button "Crew" [active] [ref=e15] [cursor=pointer]
+        - button "Calibration" [ref=e16] [cursor=pointer]
+        - button "Analysis" [ref=e17] [cursor=pointer]
+        - generic [ref=e20]: live
+        - generic [ref=e21]: utc 12:16:37Z
+        - generic [ref=e22]: build 2026-06-05.bayes
+        - generic [ref=e23]: seed 0xc0ffee
+  - main [ref=e24]:
+    - generic [ref=e171]:
+      - generic [ref=e172]:
+        - heading "Crew Composition" [level=2] [ref=e173]
+        - generic [ref=e174]: IMM · Stage A
+        - generic [ref=e175]: 365-day campaign · 6 members
+      - status [ref=e176]: "Crew composite: 53%, qualified."
+      - region "mission severity" [ref=e177]:
+        - generic [ref=e178]:
+          - generic [ref=e179]:
+            - generic [ref=e180]:
+              - generic [ref=e181]: Mission severity · live preview (T=5,000)
+              - generic [ref=e438]:
+                - generic [ref=e439]: "88.1"
+                - generic [ref=e440]: CHI %
+                - generic [ref=e441]: +5.3 vs ISS
+            - generic [ref=e442]:
+              - term [ref=e443]: mission success
+              - definition [ref=e444]: 87.2%
+              - term [ref=e445]: p(evacuation)
+              - definition [ref=e446]: 9.02%
+              - term [ref=e447]: scenario
+              - definition [ref=e448]: ISS Health Maintenance System
+          - generic [ref=e449]:
+            - generic [ref=e450]: L5 × C3 = 20
+            - generic [ref=e451]: HSRB red
+      - main "Crew Composition" [ref=e183]:
+        - region "Mission and kit configuration" [ref=e184]:
+          - generic [ref=e185]:
+            - heading "Mission" [level=3] [ref=e186]
+            - generic [ref=e187]:
+              - generic [ref=e188]: Profile
+              - combobox [ref=e189] [cursor=pointer]:
+                - option "ISS 6 month (K15 reference)"
+                - option "ISS DRM1 (S20)"
+                - option "ISS DRM2 (S20)"
+                - option "7-day campaign [controlled]"
+                - option "10-day campaign [controlled]"
+                - option "14-day campaign [controlled]"
+                - option "22-day campaign [controlled]"
+                - option "45-day campaign [controlled]"
+                - option "90-day campaign [controlled]"
+                - option "365-day campaign [Antarctic]" [selected]
+                - option "520-day campaign [controlled]"
+              - 'button "Context: Antarctic winter-over priors (Bhatia/Palinkas anchored)" [ref=e190] [cursor=pointer]': "Context: Antarctic winter-over priors (Bhatia/Palinkas anchored) ▾"
+              - group:
+                - generic "kind multiplier explanation" [ref=e191]
+            - generic [ref=e192]:
+              - term [ref=e193]: duration
+              - definition [ref=e194]:
+                - spinbutton "mission duration in days" [ref=e195]: "365"
+                - generic [ref=e196]: d
+              - term [ref=e197]: crew size
+              - definition [ref=e198]:
+                - button "remove one crew member" [ref=e199] [cursor=pointer]: −
+                - generic [ref=e200]: "6"
+                - button "add one crew member" [disabled] [ref=e201]: +
+                - generic [ref=e202]: (max 6)
+              - term [ref=e203]: EVAs
+              - definition [ref=e204]: 10Σ per-member
+            - generic [ref=e205]:
+              - generic [ref=e206]: Health Support (scenario)
+              - radiogroup "Health support tier" [ref=e207]:
+                - radio "None" [ref=e208] [cursor=pointer]:
+                  - generic [ref=e209]: Level of Care I
+                  - generic [ref=e210]: None
+                  - generic [ref=e211]:
+                    - generic [ref=e212]: audio
+                    - generic [ref=e213]: ·
+                    - generic [ref=e214]: no provider
+                - radio "Medium (Analog / Antarctic)" [ref=e215] [cursor=pointer]:
+                  - generic [ref=e216]: Level of Care II–III
+                  - generic [ref=e217]: Medium (Analog / Antarctic)
+                  - generic [ref=e218]:
+                    - generic [ref=e219]: video telemed
+                    - generic [ref=e220]: ·
+                    - generic [ref=e221]: physician
+                - radio "ISS (HMS)" [checked] [ref=e222] [cursor=pointer]:
+                  - generic [ref=e223]: Level of Care IV
+                  - generic [ref=e224]: ISS (HMS)
+                  - generic [ref=e225]:
+                    - generic [ref=e226]: video telemed
+                    - generic [ref=e227]: ·
+                    - generic [ref=e228]: CMO
+                - radio "Unlimited" [ref=e229] [cursor=pointer]:
+                  - generic [ref=e230]: Level of Care V
+                  - generic [ref=e231]: Unlimited
+                  - generic [ref=e232]:
+                    - generic [ref=e233]: video telemed
+                    - generic [ref=e234]: ·
+                    - generic [ref=e235]: physician
+              - generic [ref=e236]:
+                - button "Care capability ISS (HMS)" [ref=e237] [cursor=pointer]:
+                  - generic [ref=e238]:
+                    - generic [ref=e239]: ▸
+                    - text: Care capability
+                  - generic [ref=e240]: ISS (HMS)
+                - paragraph [ref=e241]: "Telemedicine: video · meds 8/8 · procedures 4/4 deliverable"
+            - generic [ref=e242]:
+              - heading "Simulation" [level=4] [ref=e243]
+              - generic [ref=e244]:
+                - generic [ref=e245]: "χ* (mission success threshold): 0.70"
+                - slider "chi-star mission success threshold" [ref=e246] [cursor=pointer]: "0.7"
+              - generic [ref=e247]:
+                - generic [ref=e248]: "trials: 100,000"
+                - slider "simulation trial count" [ref=e249] [cursor=pointer]: "100000"
+        - region "Crew members" [ref=e250]:
+          - generic [ref=e251]:
+            - heading "Crew Members(6)" [level=3] [ref=e252]:
+              - text: Crew Members
+              - generic [ref=e253]: (6)
+            - generic [ref=e254]:
+              - button "add crew member" [disabled] [ref=e255]: + add
+              - button "expand all" [ref=e256] [cursor=pointer]
+          - generic [ref=e258]:
+            - button "Alpha — qualified, composite 72%" [ref=e259] [cursor=pointer]:
+              - generic [ref=e260]:
+                - generic "gate passed" [ref=e261]
+                - generic [ref=e262]: Alpha
+                - generic [ref=e263]: male · 4 EVA
+              - generic [ref=e264]:
+                - generic [ref=e265]: 72%
+                - generic [ref=e266]: ›
+            - button "remove crew member Alpha" [ref=e267] [cursor=pointer]: ×
+          - generic [ref=e269]:
+            - button "Bravo — qualified, composite 68%" [ref=e270] [cursor=pointer]:
+              - generic [ref=e271]:
+                - generic "gate passed" [ref=e272]
+                - generic [ref=e273]: Bravo
+                - generic [ref=e274]: female · 3 EVA
+              - generic [ref=e275]:
+                - generic [ref=e276]: 68%
+                - generic [ref=e277]: ›
+            - button "remove crew member Bravo" [ref=e278] [cursor=pointer]: ×
+          - generic [ref=e280]:
+            - button "Charlie — qualified, composite 64%" [ref=e281] [cursor=pointer]:
+              - generic [ref=e282]:
+                - generic "gate passed" [ref=e283]
+                - generic [ref=e284]: Charlie
+                - generic [ref=e285]: male · 2 EVA
+              - generic [ref=e286]:
+                - generic [ref=e287]: 64%
+                - generic [ref=e288]: ›
+            - button "remove crew member Charlie" [ref=e289] [cursor=pointer]: ×
+          - generic [ref=e291]:
+            - button "Delta — qualified, composite 61%" [ref=e292] [cursor=pointer]:
+              - generic [ref=e293]:
+                - generic "gate passed" [ref=e294]
+                - generic [ref=e295]: Delta
+                - generic [ref=e296]: female · no EVA
+              - generic [ref=e297]:
+                - generic [ref=e298]: 61%
+                - generic [ref=e299]: ›
+            - button "remove crew member Delta" [ref=e300] [cursor=pointer]: ×
+          - generic [ref=e302]:
+            - button "Echo — qualified, composite 57%" [ref=e303] [cursor=pointer]:
+              - generic [ref=e304]:
+                - generic "gate passed" [ref=e305]
+                - generic [ref=e306]: Echo
+                - generic [ref=e307]: male · 1 EVA
+              - generic [ref=e308]:
+                - generic [ref=e309]: 57%
+                - generic [ref=e310]: ›
+            - button "remove crew member Echo" [ref=e311] [cursor=pointer]: ×
+          - generic [ref=e313]:
+            - button "Foxtrot — qualified, composite 53%" [ref=e314] [cursor=pointer]:
+              - generic [ref=e315]:
+                - generic "gate passed" [ref=e316]
+                - generic [ref=e317]: Foxtrot
+                - generic [ref=e318]: female · no EVA
+              - generic [ref=e319]:
+                - generic [ref=e320]: 53%
+                - generic [ref=e321]: ›
+            - button "remove crew member Foxtrot" [ref=e322] [cursor=pointer]: ×
+        - region "Crew composite and simulation results" [ref=e323]:
+          - generic [ref=e324]:
+            - generic [ref=e325]:
+              - heading "Crew Composite" [level=3] [ref=e326]
+              - generic [ref=e327]: ✓ qualified
+            - generic [ref=e328]:
+              - generic [ref=e329]: "53"
+              - generic [ref=e330]: / 100
+            - generic [ref=e333]:
+              - generic [ref=e334]: Aggregation method
+              - combobox "Aggregation method" [ref=e335] [cursor=pointer]:
+                - option "Arithmetic mean"
+                - option "Worst-link (min)" [selected]
+                - option "Geometric mean"
+            - generic [ref=e336]: weakest · Foxtrot
+            - button "run IMM Monte Carlo simulation" [ref=e337] [cursor=pointer]: ▶ run simulation
+      - region "Analog mission context" [ref=e338]:
+        - generic [ref=e339]:
+          - 'heading "Kind multipliers · Context: Antarctic winter-over priors (Bhatia/Palinkas anchored)" [level=3] [ref=e340]'
+          - generic [ref=e341]:
+            - table [ref=e342]:
+              - rowgroup [ref=e343]:
+                - row "condition multiplier evidence conf." [ref=e344]:
+                  - columnheader "condition" [ref=e345]
+                  - columnheader "multiplier" [ref=e346]
+                  - columnheader "evidence" [ref=e347]
+                  - columnheader "conf." [ref=e348]
+              - rowgroup [ref=e349]:
+                - row "frostbite 5.00× — LOW" [ref=e350]:
+                  - cell "frostbite" [ref=e351]
+                  - cell "5.00×" [ref=e352]
+                  - cell "—" [ref=e353]
+                  - cell "LOW" [ref=e354]
+                - row "Altitude Sickness 4.00× python/outputs/fitted_priors/altitude-sickness/altitude-sickness.json LOW" [ref=e355]:
+                  - cell "Altitude Sickness" [ref=e356]
+                  - cell "4.00×" [ref=e357]
+                  - cell "python/outputs/fitted_priors/altitude-sickness/altitude-sickness.json" [ref=e358]
+                  - cell "LOW" [ref=e359]
+                - row "hypoxia-related-headache 2.00× — LOW" [ref=e360]:
+                  - cell "hypoxia-related-headache" [ref=e361]
+                  - cell "2.00×" [ref=e362]
+                  - cell "—" [ref=e363]
+                  - cell "LOW" [ref=e364]
+                - row "seasonal-affective-disorder 2.00× — LOW" [ref=e365]:
+                  - cell "seasonal-affective-disorder" [ref=e366]
+                  - cell "2.00×" [ref=e367]
+                  - cell "—" [ref=e368]
+                  - cell "LOW" [ref=e369]
+                - 'row "Headache (CO2 induced) 0.00× research/imm_sources/methods/M18_myers_2018_imm_validation.md#headache-co2-induced; Whitmire 2015 WOTR15 (65% crewmembers / 6mo mission with CO2-related headache complaint, supports current tier-A rate); rev3-e (2026-05-22): treated.fi_cp3 = untreated.fi_cp3 = 0 — condition fully resolves over 180d analog/LEO timeframe regardless of treatment (clinically defensible per K15 §II.A.5 ''permanent impairment for remainder of mission'' definition: acute self-limiting condition leaves no persistent impairment) HIGH" [ref=e370]':
+                  - cell "Headache (CO2 induced)" [ref=e371]
+                  - cell "0.00×" [ref=e372]
+                  - 'cell "research/imm_sources/methods/M18_myers_2018_imm_validation.md#headache-co2-induced; Whitmire 2015 WOTR15 (65% crewmembers / 6mo mission with CO2-related headache complaint, supports current tier-A rate); rev3-e (2026-05-22): treated.fi_cp3 = untreated.fi_cp3 = 0 — condition fully resolves over 180d analog/LEO timeframe regardless of treatment (clinically defensible per K15 §II.A.5 ''permanent impairment for remainder of mission'' definition: acute self-limiting condition leaves no persistent impairment)" [ref=e373]'
+                  - cell "HIGH" [ref=e374]
+                - 'row "Decompression Sickness Secondary to Extravehicular Activity 0.00× research/imm_sources/zotero_imm/antonsen-2021-comparison-of-health-and-performance.md#table-4; rev3-f (2026-05-26T15:22:15Z): severity tuned against persistent-impairment literature — treated mean=0.31, n_treated=3, n_untreated=0 HIGH" [ref=e375]':
+                  - cell "Decompression Sickness Secondary to Extravehicular Activity" [ref=e376]
+                  - cell "0.00×" [ref=e377]
+                  - 'cell "research/imm_sources/zotero_imm/antonsen-2021-comparison-of-health-and-performance.md#table-4; rev3-f (2026-05-26T15:22:15Z): severity tuned against persistent-impairment literature — treated mean=0.31, n_treated=3, n_untreated=0" [ref=e378]'
+                  - cell "HIGH" [ref=e379]
+                - 'row "Visual Impairment and Intracranial Pressure (VIIP)(space adaptation) 0.00× research/imm_sources/validation/S20_walton_kerstman_2020_iss_quantification.md#viip; rev3-f (2026-05-26T15:22:15Z): severity tuned against persistent-impairment literature — treated mean=0.79, n_treated=5, n_untreated=0 HIGH" [ref=e380]':
+                  - cell "Visual Impairment and Intracranial Pressure (VIIP)(space adaptation)" [ref=e381]
+                  - cell "0.00×" [ref=e382]
+                  - 'cell "research/imm_sources/validation/S20_walton_kerstman_2020_iss_quantification.md#viip; rev3-f (2026-05-26T15:22:15Z): severity tuned against persistent-impairment literature — treated mean=0.79, n_treated=5, n_untreated=0" [ref=e383]'
+                  - cell "HIGH" [ref=e384]
+                - row "Barotrauma (ear/sinus block) 0.00× python/outputs/fitted_priors/barotrauma-ear-sinus-block/barotrauma-ear-sinus-block.json HIGH" [ref=e385]:
+                  - cell "Barotrauma (ear/sinus block)" [ref=e386]
+                  - cell "0.00×" [ref=e387]
+                  - cell "python/outputs/fitted_priors/barotrauma-ear-sinus-block/barotrauma-ear-sinus-block.json" [ref=e388]
+                  - cell "HIGH" [ref=e389]
+                - row "Insomnia (space adaptation) 0.00× python/outputs/fitted_priors_run1/insomnia-space-adaptation/insomnia-space-adaptation.json HIGH" [ref=e390]:
+                  - cell "Insomnia (space adaptation)" [ref=e391]
+                  - cell "0.00×" [ref=e392]
+                  - cell "python/outputs/fitted_priors_run1/insomnia-space-adaptation/insomnia-space-adaptation.json" [ref=e393]
+                  - cell "HIGH" [ref=e394]
+                - row "Gastroenteritis 0.10× python/outputs/fitted_priors_run1/gastroenteritis/gastroenteritis.json LOW" [ref=e395]:
+                  - cell "Gastroenteritis" [ref=e396]
+                  - cell "0.10×" [ref=e397]
+                  - cell "python/outputs/fitted_priors_run1/gastroenteritis/gastroenteritis.json" [ref=e398]
+                  - cell "LOW" [ref=e399]
+                - row "Respiratory Infection 0.20× python/outputs/fitted_priors_run1/respiratory-infection/respiratory-infection.json MED" [ref=e400]:
+                  - cell "Respiratory Infection" [ref=e401]
+                  - cell "0.20×" [ref=e402]
+                  - cell "python/outputs/fitted_priors_run1/respiratory-infection/respiratory-infection.json" [ref=e403]
+                  - cell "MED" [ref=e404]
+                - row "Skin Rash 0.33× python/outputs/fitted_priors_run1/skin-rash/skin-rash.json MED" [ref=e405]:
+                  - cell "Skin Rash" [ref=e406]
+                  - cell "0.33×" [ref=e407]
+                  - cell "python/outputs/fitted_priors_run1/skin-rash/skin-rash.json" [ref=e408]
+                  - cell "MED" [ref=e409]
+                - row "Depression 0.50× python/outputs/fitted_priors_run1/depression/depression.json HIGH" [ref=e410]:
+                  - cell "Depression" [ref=e411]
+                  - cell "0.50×" [ref=e412]
+                  - cell "python/outputs/fitted_priors_run1/depression/depression.json" [ref=e413]
+                  - cell "HIGH" [ref=e414]
+                - 'row "Anxiety 1.50× research/evidence_extracted/incidence_rates.proposals_p-j.md (Kang 2022: 7 diagnosed mental disorders in 88 Korean Antarctic winterers over 1 year; PyMC Gamma-Poisson posterior, R-hat=1.000, ESS=3520) MED" [ref=e415]':
+                  - cell "Anxiety" [ref=e416]
+                  - cell "1.50×" [ref=e417]
+                  - 'cell "research/evidence_extracted/incidence_rates.proposals_p-j.md (Kang 2022: 7 diagnosed mental disorders in 88 Korean Antarctic winterers over 1 year; PyMC Gamma-Poisson posterior, R-hat=1.000, ESS=3520)" [ref=e418]'
+                  - cell "MED" [ref=e419]
+                - 'row "Late Insomnia 1.50× research/imm_sources/validation/S20_walton_kerstman_2020_iss_quantification.md#late-insomnia; research/imm_sources/methods/M18_myers_2018_imm_validation.md#late-insomnia; enriched 2026-05-22 with Basner 2014 Mars-500 (1/6 crew chronic insomnia over 520d = 0.117 events/py), Fedyay 2023 SIRIUS-21 sleep-disturbance prevalence, Whitmire 2015 WOTR15 ISS sleep-aid use 45-50% of crewmembers; see research/_priors_rev3c_synthesis.md#2.2; rev3-e (2026-05-22): treated.fi_cp3 = untreated.fi_cp3 = 0 — condition fully resolves over 180d analog/LEO timeframe regardless of treatment (clinically defensible per K15 §II.A.5 ''permanent impairment for remainder of mission'' definition: acute self-limiting condition leaves no persistent impairment) MED" [ref=e420]':
+                  - cell "Late Insomnia" [ref=e421]
+                  - cell "1.50×" [ref=e422]
+                  - 'cell "research/imm_sources/validation/S20_walton_kerstman_2020_iss_quantification.md#late-insomnia; research/imm_sources/methods/M18_myers_2018_imm_validation.md#late-insomnia; enriched 2026-05-22 with Basner 2014 Mars-500 (1/6 crew chronic insomnia over 520d = 0.117 events/py), Fedyay 2023 SIRIUS-21 sleep-disturbance prevalence, Whitmire 2015 WOTR15 ISS sleep-aid use 45-50% of crewmembers; see research/_priors_rev3c_synthesis.md#2.2; rev3-e (2026-05-22): treated.fi_cp3 = untreated.fi_cp3 = 0 — condition fully resolves over 180d analog/LEO timeframe regardless of treatment (clinically defensible per K15 §II.A.5 ''permanent impairment for remainder of mission'' definition: acute self-limiting condition leaves no persistent impairment)" [ref=e423]'
+                  - cell "MED" [ref=e424]
+            - paragraph [ref=e425]:
+              - text: "Source:"
+              - code [ref=e426]: imm-priors.json::global_calibration.kind_multipliers[antarctic-station]
+              - text: +
+              - code [ref=e427]: research/evidence_extracted/antarctic_kind_multipliers.md
+        - generic [ref=e428]:
+          - heading "I6 · Analog Bayesian MCMC Posterior" [level=3] [ref=e429]
+          - generic [ref=e452]:
+            - generic [ref=e453]:
+              - generic [ref=e454]:
+                - paragraph [ref=e455]: pEVAC
+                - paragraph [ref=e456]: 8.9%
+                - paragraph [ref=e457]: 90% CI [5.5, 12.0]% σ=2.08
+              - generic [ref=e458]:
+                - paragraph [ref=e459]: pLOCL
+                - paragraph [ref=e460]: 0.4%
+                - paragraph [ref=e461]: 90% CI [0.0, 1.0]% σ=0.43
+              - generic [ref=e462]:
+                - paragraph [ref=e463]: CHI
+                - paragraph [ref=e464]: 87.6%
+                - paragraph [ref=e465]: 90% CI [86.7, 88.4]% σ=0.52
+            - paragraph [ref=e467]: Per-condition posterior λ (events/person-day)
+            - generic [ref=e487]:
+              - paragraph [ref=e488]: Top conditions by expected TME contribution (events/trial)
+              - table [ref=e489]:
+                - rowgroup [ref=e490]:
+                  - row "Condition Mean 90% CI σ" [ref=e491]:
+                    - columnheader "Condition" [ref=e492]
+                    - columnheader "Mean" [ref=e493]
+                    - columnheader "90% CI" [ref=e494]
+                    - columnheader "σ" [ref=e495]
+                - rowgroup [ref=e496]:
+                  - row "altitude-sickness 93.8104 [84.2650, 103.3650] 6.3225" [ref=e497]:
+                    - cell "altitude-sickness" [ref=e498]
+                    - cell "93.8104" [ref=e499]
+                    - cell "[84.2650, 103.3650]" [ref=e500]
+                    - cell "6.3225" [ref=e501]
+                  - row "acute-sinusitis 21.2512 [20.1950, 21.9650] 0.5196" [ref=e502]:
+                    - cell "acute-sinusitis" [ref=e503]
+                    - cell "21.2512" [ref=e504]
+                    - cell "[20.1950, 21.9650]" [ref=e505]
+                    - cell "0.5196" [ref=e506]
+                  - row "diarrhea 9.5436 [9.0600, 9.9750] 0.2613" [ref=e507]:
+                    - cell "diarrhea" [ref=e508]
+                    - cell "9.5436" [ref=e509]
+                    - cell "[9.0600, 9.9750]" [ref=e510]
+                    - cell "0.2613" [ref=e511]
+                  - row "skin-abrasion 7.7598 [7.3350, 8.1200] 0.2652" [ref=e512]:
+                    - cell "skin-abrasion" [ref=e513]
+                    - cell "7.7598" [ref=e514]
+                    - cell "[7.3350, 8.1200]" [ref=e515]
+                    - cell "0.2652" [ref=e516]
+                  - row "headache-late 6.3756 [6.0700, 6.7650] 0.1994" [ref=e517]:
+                    - cell "headache-late" [ref=e518]
+                    - cell "6.3756" [ref=e519]
+                    - cell "[6.0700, 6.7650]" [ref=e520]
+                    - cell "0.1994" [ref=e521]
+                  - row "skin-laceration 5.8303 [5.5550, 6.1800] 0.2100" [ref=e522]:
+                    - cell "skin-laceration" [ref=e523]
+                    - cell "5.8303" [ref=e524]
+                    - cell "[5.5550, 6.1800]" [ref=e525]
+                    - cell "0.2100" [ref=e526]
+                  - row "influenza 3.0004 [2.7500, 3.2200] 0.1499" [ref=e527]:
+                    - cell "influenza" [ref=e528]
+                    - cell "3.0004" [ref=e529]
+                    - cell "[2.7500, 3.2200]" [ref=e530]
+                    - cell "0.1499" [ref=e531]
+                  - row "eye-abrasion-foreign-body 2.5852 [2.3700, 2.8500] 0.1394" [ref=e532]:
+                    - cell "eye-abrasion-foreign-body" [ref=e533]
+                    - cell "2.5852" [ref=e534]
+                    - cell "[2.3700, 2.8500]" [ref=e535]
+                    - cell "0.1394" [ref=e536]
+                  - row "mouth-ulcer 2.1142 [1.9550, 2.3050] 0.1021" [ref=e537]:
+                    - cell "mouth-ulcer" [ref=e538]
+                    - cell "2.1142" [ref=e539]
+                    - cell "[1.9550, 2.3050]" [ref=e540]
+                    - cell "0.1021" [ref=e541]
+                  - row "otitis-media 2.0264 [1.8750, 2.2150] 0.1103" [ref=e542]:
+                    - cell "otitis-media" [ref=e543]
+                    - cell "2.0264" [ref=e544]
+                    - cell "[1.8750, 2.2150]" [ref=e545]
+                    - cell "0.1103" [ref=e546]
+            - generic [ref=e548]:
+              - paragraph [ref=e549]:
+                - generic [ref=e550]: Figure I6
+                - text: "| Bayesian posterior-predictive summary for kind \"antarctic-station\": 200 Monte Carlo trials × 64 posterior draws."
+              - button "expand methodology ▾" [ref=e551] [cursor=pointer]
+      - region "save load export" [ref=e431]:
+        - heading "Session" [level=3] [ref=e432]
+        - generic "The working crew, mission, kit, and sim settings auto-save locally and restore on refresh." [ref=e433]: autosaved · config only (no run yet)
+        - button "Save current IMM session" [ref=e434] [cursor=pointer]: 💾 Save
+        - generic [ref=e435]: Load recent IMM session
+        - combobox "Load recent IMM session" [ref=e436]:
+          - option "— select session —" [selected]
+        - button "Export current IMM session as JSON" [ref=e437] [cursor=pointer]: ⬇ Export JSON
+  - contentinfo [ref=e160]:
+    - generic [ref=e161]:
+      - generic [ref=e162]: selectron · iter 03 · bayesian mcda + mission-risk monte carlo
+      - link "github.com/strikerdlm/selectron ↗" [ref=e164] [cursor=pointer]:
+        - /url: https://github.com/strikerdlm/selectron

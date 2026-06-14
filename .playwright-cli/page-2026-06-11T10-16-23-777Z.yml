@@ -1,0 +1,144 @@
+- generic [ref=e4]:
+  - banner [ref=e5]:
+    - generic [ref=e6]:
+      - generic [ref=e7]:
+        - heading "SELECTRON" [level=1] [ref=e8] [cursor=pointer]
+        - generic [ref=e9]: by Diego Malpica MD
+        - generic [ref=e10]: v0.5.6 · NASA IMM + HSRB
+      - generic [ref=e11]:
+        - button "Switch to light theme" [ref=e12] [cursor=pointer]:
+          - generic [ref=e13]: ☀
+          - generic [ref=e14]: light
+        - button "Candidates" [ref=e15] [cursor=pointer]
+        - button "Crew" [ref=e16] [cursor=pointer]
+        - button "Calibration" [ref=e17] [cursor=pointer]
+        - button "Analysis" [ref=e18] [cursor=pointer]
+        - generic [ref=e21]: live
+        - generic [ref=e22]: utc 10:16:23Z
+        - generic [ref=e23]: build 2026-06-11.bayes
+        - generic [ref=e24]: seed 0xc0ffee
+  - main [ref=e25]:
+    - generic [ref=e26]:
+      - generic [ref=e28]: no sims yet — run one from a candidate to populate this chart
+      - generic [ref=e29]:
+        - generic [ref=e30]:
+          - button "+ New candidate" [ref=e31] [cursor=pointer]
+          - button "Generate synthetic" [ref=e32] [cursor=pointer]
+          - button "Export" [ref=e33] [cursor=pointer]
+          - generic [ref=e34] [cursor=pointer]: Import
+        - generic [ref=e35]:
+          - generic [ref=e36]:
+            - generic [ref=e37]: total 6
+            - generic [ref=e38]: ·
+            - generic [ref=e39]: draft 6
+            - generic [ref=e40]: ·
+            - generic [ref=e41]: ready 0
+          - generic [ref=e42]:
+            - generic [ref=e43]: filter
+            - combobox [ref=e44] [cursor=pointer]:
+              - option "All" [selected]
+              - option "Draft"
+              - option "Ready"
+      - generic [ref=e45]:
+        - button "charlie-demo draft CHI — updated 22s 32c12f… sim More options" [ref=e166] [cursor=pointer]:
+          - generic [ref=e47]:
+            - generic [ref=e49]: charlie-demo
+            - generic [ref=e50]: draft
+          - generic [ref=e52]:
+            - generic [ref=e53]:
+              - generic [ref=e54]: CHI
+              - generic [ref=e55]: —
+            - generic [ref=e56]:
+              - generic [ref=e57]: updated
+              - generic [ref=e58]: 22s
+          - generic [ref=e59]:
+            - generic [ref=e60]: 32c12f…
+            - generic [ref=e61]:
+              - button "sim" [ref=e62]
+              - button "More options" [ref=e64]: ⋯
+        - button "charlie-demo draft CHI — updated 22s 3702a2… sim More options" [ref=e167] [cursor=pointer]:
+          - generic [ref=e66]:
+            - generic [ref=e68]: charlie-demo
+            - generic [ref=e69]: draft
+          - generic [ref=e71]:
+            - generic [ref=e72]:
+              - generic [ref=e73]: CHI
+              - generic [ref=e74]: —
+            - generic [ref=e75]:
+              - generic [ref=e76]: updated
+              - generic [ref=e77]: 22s
+          - generic [ref=e78]:
+            - generic [ref=e79]: 3702a2…
+            - generic [ref=e80]:
+              - button "sim" [ref=e81]
+              - button "More options" [ref=e83]: ⋯
+        - button "bravo-demo draft CHI — updated 22s 31da10… sim More options" [ref=e168] [cursor=pointer]:
+          - generic [ref=e85]:
+            - generic [ref=e87]: bravo-demo
+            - generic [ref=e88]: draft
+          - generic [ref=e90]:
+            - generic [ref=e91]:
+              - generic [ref=e92]: CHI
+              - generic [ref=e93]: —
+            - generic [ref=e94]:
+              - generic [ref=e95]: updated
+              - generic [ref=e96]: 22s
+          - generic [ref=e97]:
+            - generic [ref=e98]: 31da10…
+            - generic [ref=e99]:
+              - button "sim" [ref=e100]
+              - button "More options" [ref=e102]: ⋯
+        - button "bravo-demo draft CHI — updated 22s 7743ea… sim More options" [ref=e169] [cursor=pointer]:
+          - generic [ref=e104]:
+            - generic [ref=e106]: bravo-demo
+            - generic [ref=e107]: draft
+          - generic [ref=e109]:
+            - generic [ref=e110]:
+              - generic [ref=e111]: CHI
+              - generic [ref=e112]: —
+            - generic [ref=e113]:
+              - generic [ref=e114]: updated
+              - generic [ref=e115]: 22s
+          - generic [ref=e116]:
+            - generic [ref=e117]: 7743ea…
+            - generic [ref=e118]:
+              - button "sim" [ref=e119]
+              - button "More options" [ref=e121]: ⋯
+        - button "alpha-demo draft CHI — updated 22s d02ac5… sim More options" [ref=e170] [cursor=pointer]:
+          - generic [ref=e123]:
+            - generic [ref=e125]: alpha-demo
+            - generic [ref=e126]: draft
+          - generic [ref=e128]:
+            - generic [ref=e129]:
+              - generic [ref=e130]: CHI
+              - generic [ref=e131]: —
+            - generic [ref=e132]:
+              - generic [ref=e133]: updated
+              - generic [ref=e134]: 22s
+          - generic [ref=e135]:
+            - generic [ref=e136]: d02ac5…
+            - generic [ref=e137]:
+              - button "sim" [ref=e138]
+              - button "More options" [ref=e140]: ⋯
+        - button "alpha-demo draft CHI — updated 22s 2ea891… sim More options" [ref=e171] [cursor=pointer]:
+          - generic [ref=e142]:
+            - generic [ref=e144]: alpha-demo
+            - generic [ref=e145]: draft
+          - generic [ref=e147]:
+            - generic [ref=e148]:
+              - generic [ref=e149]: CHI
+              - generic [ref=e150]: —
+            - generic [ref=e151]:
+              - generic [ref=e152]: updated
+              - generic [ref=e153]: 22s
+          - generic [ref=e154]:
+            - generic [ref=e155]: 2ea891…
+            - generic [ref=e156]:
+              - button "sim" [ref=e157]
+              - button "More options" [ref=e159]: ⋯
+      - generic [ref=e160]: sorted by updated · desc
+  - contentinfo [ref=e161]:
+    - generic [ref=e162]:
+      - generic [ref=e163]: selectron · v0.5.6 · bayesian mcda + mission-risk monte carlo
+      - link "github.com/strikerdlm/selectron ↗" [ref=e165] [cursor=pointer]:
+        - /url: https://github.com/strikerdlm/selectron

@@ -1,0 +1,234 @@
+- generic [ref=e3]:
+  - banner [ref=e4]:
+    - generic [ref=e5]:
+      - generic [ref=e6]:
+        - heading "SELECTRON" [level=1] [ref=e7] [cursor=pointer]
+        - generic [ref=e8]: by Diego Malpica MD
+        - generic [ref=e9]: iter 03 · phase 3f
+      - generic [ref=e10]:
+        - button "Switch to light theme" [ref=e11] [cursor=pointer]:
+          - generic [ref=e12]: ☀
+          - generic [ref=e13]: light
+        - button "Candidates" [ref=e14] [cursor=pointer]
+        - button "Crew" [ref=e15] [cursor=pointer]
+        - button "Calibration" [ref=e16] [cursor=pointer]
+        - button "Analysis" [ref=e17] [cursor=pointer]
+        - generic [ref=e20]: live
+        - generic [ref=e21]: utc 11:35:05Z
+        - generic [ref=e22]: build 2026-06-05.bayes
+        - generic [ref=e23]: seed 0xc0ffee
+  - main [ref=e24]:
+    - generic [ref=e165]:
+      - generic [ref=e166]:
+        - heading "Crew Composition" [level=2] [ref=e167]
+        - generic [ref=e168]: IMM · Stage A
+        - generic [ref=e169]: 90-day campaign · 6 members
+      - status [ref=e170]: "Crew composite: 53%, qualified."
+      - region "mission severity" [ref=e171]:
+        - generic [ref=e172]:
+          - generic [ref=e173]:
+            - generic [ref=e174]:
+              - generic [ref=e175]: Mission severity · live preview (T=5,000)
+              - generic [ref=e339]:
+                - generic [ref=e340]: "96.5"
+                - generic [ref=e341]: CHI %
+                - generic [ref=e342]: +13.7 vs ISS
+            - generic [ref=e343]:
+              - term [ref=e344]: mission success
+              - definition [ref=e345]: 98.4%
+              - term [ref=e346]: p(evacuation)
+              - definition [ref=e347]: 1.46%
+              - term [ref=e348]: scenario
+              - definition [ref=e349]: ISS Health Maintenance System
+          - generic [ref=e350]:
+            - generic [ref=e351]: L4 × C2 = 13
+            - generic [ref=e352]: HSRB yellow
+      - main "Crew Composition" [ref=e177]:
+        - region "Mission and kit configuration" [ref=e178]:
+          - generic [ref=e179]:
+            - heading "Mission" [level=3] [ref=e180]
+            - generic [ref=e181]:
+              - generic [ref=e182]: Profile
+              - combobox [ref=e183] [cursor=pointer]:
+                - option "ISS 6 month (K15 reference)"
+                - option "ISS DRM1 (S20)"
+                - option "ISS DRM2 (S20)"
+                - option "7-day campaign [controlled]"
+                - option "10-day campaign [controlled]"
+                - option "14-day campaign [controlled]"
+                - option "22-day campaign [controlled]"
+                - option "45-day campaign [controlled]"
+                - option "90-day campaign [controlled]" [selected]
+                - option "365-day campaign [Antarctic]"
+                - option "520-day campaign [controlled]"
+              - 'button "Context: Controlled-habitat priors" [active] [ref=e784] [cursor=pointer]': "Context: Controlled-habitat priors ▾"
+              - group [ref=e777]:
+                - generic "kind multiplier explanation" [ref=e185]
+                - paragraph [ref=e778]:
+                  - text: Per-(mission-kind, condition) multipliers from Bhatia 2012, Palinkas 2004, Pattarini 2016, Hong 2022, Peřina 2024, and Nirwan 2022 modulate the base prior
+                  - emphasis [ref=e779]: after
+                  - text: the tier-A/B/C multiplier and
+                  - emphasis [ref=e780]: before
+                  - text: risk-factor and Stage-A multipliers. The label above names the active prior-calibration context; the table below the L×C verdict lists the per-condition multipliers with citations and confidence.
+                - paragraph [ref=e781]:
+                  - text: See
+                  - code [ref=e782]: research/evidence_extracted/antarctic_kind_multipliers.md
+                  - text: for the full derivation table.
+                - link "View per-condition multipliers ↓" [ref=e783] [cursor=pointer]:
+                  - /url: "#kind-multipliers-mount"
+            - generic [ref=e186]:
+              - term [ref=e187]: duration
+              - definition [ref=e188]:
+                - spinbutton "mission duration in days" [ref=e189]: "90"
+                - generic [ref=e190]: d
+              - term [ref=e191]: crew size
+              - definition [ref=e192]:
+                - button "remove one crew member" [ref=e193] [cursor=pointer]: −
+                - generic [ref=e194]: "6"
+                - button "add one crew member" [disabled] [ref=e195]: +
+                - generic [ref=e196]: (max 6)
+              - term [ref=e197]: EVAs
+              - definition [ref=e198]: 10Σ per-member
+            - generic [ref=e199]:
+              - generic [ref=e200]: Health Support (scenario)
+              - radiogroup "Health support tier" [ref=e201]:
+                - radio "None" [ref=e202] [cursor=pointer]:
+                  - generic [ref=e203]: Level of Care I
+                  - generic [ref=e204]: None
+                  - generic [ref=e205]:
+                    - generic [ref=e206]: audio
+                    - generic [ref=e207]: ·
+                    - generic [ref=e208]: no provider
+                - radio "Medium (Analog / Antarctic)" [ref=e209] [cursor=pointer]:
+                  - generic [ref=e210]: Level of Care II–III
+                  - generic [ref=e211]: Medium (Analog / Antarctic)
+                  - generic [ref=e212]:
+                    - generic [ref=e213]: video telemed
+                    - generic [ref=e214]: ·
+                    - generic [ref=e215]: physician
+                - radio "ISS (HMS)" [checked] [ref=e216] [cursor=pointer]:
+                  - generic [ref=e217]: Level of Care IV
+                  - generic [ref=e218]: ISS (HMS)
+                  - generic [ref=e219]:
+                    - generic [ref=e220]: video telemed
+                    - generic [ref=e221]: ·
+                    - generic [ref=e222]: CMO
+                - radio "Unlimited" [ref=e223] [cursor=pointer]:
+                  - generic [ref=e224]: Level of Care V
+                  - generic [ref=e225]: Unlimited
+                  - generic [ref=e226]:
+                    - generic [ref=e227]: video telemed
+                    - generic [ref=e228]: ·
+                    - generic [ref=e229]: physician
+              - generic [ref=e230]:
+                - button "Care capability ISS (HMS)" [ref=e231] [cursor=pointer]:
+                  - generic [ref=e232]:
+                    - generic [ref=e233]: ▸
+                    - text: Care capability
+                  - generic [ref=e234]: ISS (HMS)
+                - paragraph [ref=e235]: "Telemedicine: video · meds 8/8 · procedures 4/4 deliverable"
+            - generic [ref=e236]:
+              - heading "Simulation" [level=4] [ref=e237]
+              - generic [ref=e238]:
+                - generic [ref=e239]: "χ* (mission success threshold): 0.70"
+                - slider "chi-star mission success threshold" [ref=e240] [cursor=pointer]: "0.7"
+              - generic [ref=e241]:
+                - generic [ref=e242]: "trials: 100,000"
+                - slider "simulation trial count" [ref=e243] [cursor=pointer]: "100000"
+        - region "Crew members" [ref=e244]:
+          - generic [ref=e245]:
+            - heading "Crew Members(6)" [level=3] [ref=e246]:
+              - text: Crew Members
+              - generic [ref=e247]: (6)
+            - generic [ref=e248]:
+              - button "add crew member" [disabled] [ref=e249]: + add
+              - button "expand all" [ref=e250] [cursor=pointer]
+          - generic [ref=e252]:
+            - button "Alpha — qualified, composite 72%" [ref=e253] [cursor=pointer]:
+              - generic [ref=e254]:
+                - generic "gate passed" [ref=e255]
+                - generic [ref=e256]: Alpha
+                - generic [ref=e257]: male · 4 EVA
+              - generic [ref=e258]:
+                - generic [ref=e259]: 72%
+                - generic [ref=e260]: ›
+            - button "remove crew member Alpha" [ref=e261] [cursor=pointer]: ×
+          - generic [ref=e263]:
+            - button "Bravo — qualified, composite 68%" [ref=e264] [cursor=pointer]:
+              - generic [ref=e265]:
+                - generic "gate passed" [ref=e266]
+                - generic [ref=e267]: Bravo
+                - generic [ref=e268]: female · 3 EVA
+              - generic [ref=e269]:
+                - generic [ref=e270]: 68%
+                - generic [ref=e271]: ›
+            - button "remove crew member Bravo" [ref=e272] [cursor=pointer]: ×
+          - generic [ref=e274]:
+            - button "Charlie — qualified, composite 64%" [ref=e275] [cursor=pointer]:
+              - generic [ref=e276]:
+                - generic "gate passed" [ref=e277]
+                - generic [ref=e278]: Charlie
+                - generic [ref=e279]: male · 2 EVA
+              - generic [ref=e280]:
+                - generic [ref=e281]: 64%
+                - generic [ref=e282]: ›
+            - button "remove crew member Charlie" [ref=e283] [cursor=pointer]: ×
+          - generic [ref=e285]:
+            - button "Delta — qualified, composite 61%" [ref=e286] [cursor=pointer]:
+              - generic [ref=e287]:
+                - generic "gate passed" [ref=e288]
+                - generic [ref=e289]: Delta
+                - generic [ref=e290]: female · no EVA
+              - generic [ref=e291]:
+                - generic [ref=e292]: 61%
+                - generic [ref=e293]: ›
+            - button "remove crew member Delta" [ref=e294] [cursor=pointer]: ×
+          - generic [ref=e296]:
+            - button "Echo — qualified, composite 57%" [ref=e297] [cursor=pointer]:
+              - generic [ref=e298]:
+                - generic "gate passed" [ref=e299]
+                - generic [ref=e300]: Echo
+                - generic [ref=e301]: male · 1 EVA
+              - generic [ref=e302]:
+                - generic [ref=e303]: 57%
+                - generic [ref=e304]: ›
+            - button "remove crew member Echo" [ref=e305] [cursor=pointer]: ×
+          - generic [ref=e307]:
+            - button "Foxtrot — qualified, composite 53%" [ref=e308] [cursor=pointer]:
+              - generic [ref=e309]:
+                - generic "gate passed" [ref=e310]
+                - generic [ref=e311]: Foxtrot
+                - generic [ref=e312]: female · no EVA
+              - generic [ref=e313]:
+                - generic [ref=e314]: 53%
+                - generic [ref=e315]: ›
+            - button "remove crew member Foxtrot" [ref=e316] [cursor=pointer]: ×
+        - region "Crew composite and simulation results" [ref=e317]:
+          - generic [ref=e318]:
+            - generic [ref=e319]:
+              - heading "Crew Composite" [level=3] [ref=e320]
+              - generic [ref=e321]: ✓ qualified
+            - generic [ref=e322]:
+              - generic [ref=e323]: "53"
+              - generic [ref=e324]: / 100
+            - generic [ref=e327]:
+              - generic [ref=e328]: Aggregation method
+              - combobox "Aggregation method" [ref=e329] [cursor=pointer]:
+                - option "Arithmetic mean"
+                - option "Worst-link (min)" [selected]
+                - option "Geometric mean"
+            - generic [ref=e330]: weakest · Foxtrot
+            - button "run IMM Monte Carlo simulation" [ref=e331] [cursor=pointer]: ▶ run simulation
+      - region "save load export" [ref=e332]:
+        - heading "Session" [level=3] [ref=e333]
+        - generic "The working crew, mission, kit, and sim settings auto-save locally and restore on refresh." [ref=e334]: autosaved · config only (no run yet)
+        - button "Save current IMM session" [ref=e335] [cursor=pointer]: 💾 Save
+        - generic [ref=e336]: Load recent IMM session
+        - combobox "Load recent IMM session" [ref=e337]:
+          - option "— select session —" [selected]
+        - button "Export current IMM session as JSON" [ref=e338] [cursor=pointer]: ⬇ Export JSON
+  - contentinfo [ref=e160]:
+    - generic [ref=e161]:
+      - generic [ref=e162]: selectron · iter 03 · bayesian mcda + mission-risk monte carlo
+      - link "github.com/strikerdlm/selectron ↗" [ref=e164] [cursor=pointer]:
+        - /url: https://github.com/strikerdlm/selectron
