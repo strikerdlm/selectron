@@ -1,5 +1,0 @@
-# Scratch caches from the Zotero → OCR pipeline.
-# Keep the final markdowns + INDEX + build script under version control;
-# the raw PDFs and untreated OCR outputs are re-derivable from Zotero.
-pdfs_tmp/
-_ocr_raw/

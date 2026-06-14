@@ -1,7 +1,0 @@
-# Raw PDFs and OCR intermediates are local caches; do not commit.
-# Commit only the YAML-frontmattered markdown.
-*.pdf
-_ocr_raw/
-_pdfs_tmp/
-__pycache__/
-*.pyc
