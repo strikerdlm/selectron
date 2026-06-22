@@ -110,6 +110,66 @@ export type IMMMission = {
   crewSize: number;
   totalEVAs: number;
   evaSchedule: number[];
+  /**
+   * Structured analog context. Required for analog-facing scientific runs so
+   * results are conditional on documented habitat, operations, autonomy, and
+   * medical-support assumptions rather than duration alone.
+   */
+  profile?: AnalogMissionProfile;
+};
+
+export type AnalogMissionProfile = {
+  habitat: {
+    name: string;
+    usableVolumeM3PerCrew?: number;
+    privacyLevel: "none" | "shared" | "partial" | "private";
+    sleepingArrangement: "shared" | "partitioned" | "private";
+  };
+  environment: {
+    setting: "controlled-habitat" | "antarctic-station" | "field-analog" | "leo-reference";
+    altitudeM?: number;
+    hypoxia: "none" | "mild" | "moderate" | "severe";
+    temperatureExposure: "controlled" | "cold" | "heat" | "variable";
+    outsideExposure: "none" | "limited" | "routine" | "high";
+  };
+  operations: {
+    autonomyLevel: "low" | "moderate" | "high";
+    workload: "low" | "moderate" | "high" | "surge";
+    shiftDesign: "day-shift" | "rotating" | "continuous-ops";
+    circadianLightControl: "natural" | "scheduled" | "limited" | "polar";
+    researchBurden: "low" | "moderate" | "high";
+  };
+  communication: {
+    delaySec: number;
+    schedule: "continuous" | "scheduled" | "delayed-windowed";
+    missionControl: "none" | "local" | "remote" | "remote-delayed";
+    supportTeam: "minimal" | "standard" | "full";
+  };
+  logistics: {
+    resupply: "none" | "limited" | "scheduled" | "available";
+    foodConstraint: "low" | "moderate" | "high";
+    hygieneConstraint: "low" | "moderate" | "high";
+  };
+  medicalSupport: {
+    provider: CareProvider;
+    telemedicine: Telemedicine;
+    evacuationTimeHours?: number;
+    emergencyProcedures: "basic" | "documented" | "rehearsed";
+    countermeasureLevel: "none" | "basic" | "analog" | "station";
+  };
+  crew: {
+    roleStructure: "minimal" | "defined" | "mission-like";
+    priorAcquaintance: "unknown" | "none" | "partial" | "high";
+    languageCulture: "homogeneous" | "mixed" | "international";
+    trainingLevel: "minimal" | "standard" | "extensive";
+  };
+  eva: {
+    type: "none" | "habitat-egress" | "terrain-field" | "polar-field" | "iss-reference";
+    terrain: "none" | "indoor" | "desert" | "volcanic" | "ice" | "orbital";
+    equipmentHazard: "low" | "moderate" | "high";
+  };
+  evidenceGrade: "development" | "scenario" | "adjudicated" | "validated";
+  citations: string[];
 };
 
 export type Telemedicine = "none" | "audio" | "video";
@@ -159,26 +219,26 @@ export type IMMOutcome = {
   diagnostics?: { chiSamples: number[] };
 };
 
-// ── Bayesian posterior-predictive types (analog MCMC, 2026-06-04) ─────────────
+// ── Prior-uncertainty predictive types ───────────────────────────────────────
 
 /**
- * Output of `posteriorPredictiveSimulateIMM`. Each summary is a posterior
- * distribution over the metric (one value per posterior draw, not per trial).
+ * Output of `posteriorPredictiveSimulateIMM`. Each summary is a predictive
+ * distribution over the metric (one value per parameter draw, not per trial).
  * Reuses IMMOutcome's PosteriorSummary per metric so the UI renders point + interval
  * estimates without extra aggregation.
  */
 export type PosteriorPredictiveOutcome = {
-  /** Posterior distribution of pEVAC (% scale, 0..100) over the N draws. */
+  /** Predictive distribution of pEVAC (% scale, 0..100) over the N draws. */
   pEvacPost: PosteriorSummary;
-  /** Posterior distribution of pLOCL (% scale, 0..100). */
+  /** Predictive distribution of pLOCL (% scale, 0..100). */
   pLoclPost: PosteriorSummary;
-  /** Posterior distribution of CHI (% scale, 0..100). */
+  /** Predictive distribution of CHI (% scale, 0..100). */
   chiPost: PosteriorSummary;
-  /** Per-condition posterior of expected TME contribution (per-draw mean tmeContrib, events per trial). */
+  /** Per-condition predictive expected TME contribution (per-draw mean tmeContrib, events per trial). */
   perConditionTmeContribPost: Record<string, PosteriorSummary>;
-  /** Number of posterior draws used. */
+  /** Number of parameter draws used. */
   nDraws: number;
-  /** Monte Carlo trials run per posterior draw. */
+  /** Monte Carlo trials run per parameter draw. */
   trialsPerDraw: number;
 };
 
@@ -243,6 +303,7 @@ export type IMMSession = {
    * Loading such a session restores the setup; the user then runs it.
    */
   outcomes: IMMOutcome | null;
+  couplingMode?: VulnerabilityCouplingMode;
   validation: {
     vsK15Table1: {
       delta_tme: number; delta_chi: number;
@@ -252,3 +313,5 @@ export type IMMSession = {
   };
   interpretationCaptionsExpanded: Record<string, boolean>;
 };
+
+export type VulnerabilityCouplingMode = "off" | "scenario";

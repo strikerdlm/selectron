@@ -13,6 +13,7 @@ from selectron.condition_mapping import map_proposal_id
 _REPO_ROOT = Path(__file__).resolve().parent.parent.parent.parent  # up to Selectron/
 _DEFAULT_PRIORS_PATH = _REPO_ROOT / "src" / "data" / "imm-priors.json"
 _PROPOSALS_DIR = _REPO_ROOT / "research" / "evidence_extracted"
+_ACCEPTED_LEDGER = _PROPOSALS_DIR / "evidence_ledger.csv"
 _PROPOSAL_FILES = [
     "incidence_rates.proposals_p-a.csv",
     "incidence_rates.proposals_p-b.csv",
@@ -141,4 +142,58 @@ def load_evidence_proposals(
                     }
                 )
 
+    return rows
+
+
+def load_accepted_evidence(
+    ledger_path: Path | None = None,
+) -> list[dict[str, Any]]:
+    """Load accepted, independently adjudicated evidence rows.
+
+    Proposal CSVs are intentionally excluded from this release-scientific path.
+    Rows enter fitting only when status == accepted and the extraction has both
+    extractor and verifier fields populated.
+    """
+    p = ledger_path or _ACCEPTED_LEDGER
+    if not p.exists():
+        return []
+
+    rows: list[dict[str, Any]] = []
+    with open(p, newline="") as f:
+        reader = csv.DictReader(f)
+        for row in reader:
+            if row.get("status", "").strip().lower() != "accepted":
+                continue
+            if not row.get("extractor") or not row.get("verifier"):
+                continue
+
+            def _parse_int(val: str) -> int:
+                return int(val.removeprefix("EST:").strip())
+
+            condition_id = row["condition_id"]
+            rows.append(
+                {
+                    "condition_id": condition_id,
+                    "mapped_prior_id": row.get("mapped_prior_id") or map_proposal_id(condition_id),
+                    "person_days": _parse_int(row["person_days"]),
+                    "events": _parse_int(row["events"]),
+                    "study_slug": row["study_slug"],
+                    "study_doi": row.get("study_doi", ""),
+                    "mission_type": row.get("mission_type", ""),
+                    "endpoint_definition": row.get("endpoint_definition", ""),
+                    "numerator": row.get("numerator", row.get("events", "")),
+                    "denominator": row.get("denominator", ""),
+                    "exposure_time": row.get("exposure_time", ""),
+                    "repeated_measure_structure": row.get("repeated_measure_structure", ""),
+                    "extraction_quote": row.get("extraction_quote", ""),
+                    "extractor": row.get("extractor", ""),
+                    "verifier": row.get("verifier", ""),
+                    "risk_of_bias": row.get("risk_of_bias", ""),
+                    "transportability": row.get("transportability", ""),
+                    "transformation": row.get("transformation", ""),
+                    "uncertainty_distribution": row.get("uncertainty_distribution", ""),
+                    "model_version": row.get("model_version", ""),
+                    "notes": row.get("notes", ""),
+                }
+            )
     return rows

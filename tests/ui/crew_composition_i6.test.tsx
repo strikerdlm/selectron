@@ -1,5 +1,5 @@
 // @vitest-environment jsdom
-// I6 (2026-06-04) — RTL tests for the analog Bayesian MCMC posterior panel wired
+// I6 (2026-06-04) — RTL tests for the analog predictive-uncertainty panel wired
 // into the CrewComposition view.
 //
 // Test strategy (mirrors tests/ui/imm_session_save_load.test.tsx, the blessed
@@ -8,14 +8,14 @@
 //   1. The I6 panel lives inside the `{outcome && (...)}` figures region, so we
 //      must drive a main Monte Carlo run to populate `outcome`. We click
 //      "▶ run IMM Monte Carlo simulation" with a stubbed global Worker — same as
-//      the save/load suite. The stubbed worker also handles the posterior-predictive
+//      the save/load suite. The stubbed worker also handles the predictive
 //      message (mode "posterior-predictive").
 //
 //   2. The global Worker is shared by THREE call sites in the view: the debounced
-//      preview, the main run, and the I6 posterior-predictive sweep. The fake
+//      preview, the main run, and the I6 predictive sweep. The fake
 //      branches on `payload.mode`: it replies with a canned PosteriorPredictiveOutcome
 //      for "posterior-predictive" payloads (and captures the payload so we can assert
-//      the snake_case → engine posterior map), and with a canned IMMOutcome for the
+//      the snake_case → engine parameter-draw map), and with a canned IMMOutcome for the
 //      legacy preview/main payloads.
 //
 //   3. The I6 effect is debounced 400 ms, so we use REAL timers and `findBy*`
@@ -91,7 +91,7 @@ function fakeOutcome(): IMMOutcome {
   };
 }
 
-// Canned posterior-predictive outcome the fake pp worker returns.
+// Canned predictive outcome the fake pp worker returns.
 const PP_OUTCOME: PosteriorPredictiveOutcome = {
   pEvacPost: summary(5.1),
   pLoclPost: summary(0.6),
@@ -154,7 +154,7 @@ function seedPersistedState(missionId: string): void {
 
 // ── Worker mock (branches on mode) ──────────────────────────────────────────
 // CrewComposition constructs a worker for the preview, the main run, and the I6
-// posterior-predictive sweep — all via the same global `Worker`. We branch on
+// predictive sweep — all via the same global `Worker`. We branch on
 // `payload.mode`: posterior-predictive replies with PP_OUTCOME (and captures the
 // payload); everything else (preview/main legacy payloads) replies with an IMMOutcome.
 
@@ -231,8 +231,8 @@ async function runMainSim() {
   });
 }
 
-describe("CrewComposition · I6 analog Bayesian MCMC posterior", () => {
-  it("antarctic mission: fetches posterior draws, threads the snake_case map into the worker, and renders the I6 panel", async () => {
+describe("CrewComposition · I6 analog predictive uncertainty", () => {
+  it("antarctic mission: fetches parameter draws, threads the snake_case map into the worker, and renders the I6 panel", async () => {
     seedPersistedState("antarctic-winter"); // kind antarctic-station
     renderWithDb();
     await waitForReady();
@@ -252,7 +252,7 @@ describe("CrewComposition · I6 analog Bayesian MCMC posterior", () => {
     expect(panel).toBeDefined();
     expect(await screen.findByTestId("pp-pEvac", undefined, { timeout: 3000 })).toBeDefined();
 
-    // (2) THE regression that matters: the pp worker payload carries the posterior
+    // (2) THE regression that matters: the pp worker payload carries the parameter-draw
     // map with BOTH condition ids mapped from snake_case (draws reach the wrapper).
     const pp = FakeWorker.lastPpPayload!;
     expect(pp).not.toBeNull();
@@ -266,21 +266,19 @@ describe("CrewComposition · I6 analog Bayesian MCMC posterior", () => {
     expect(pp.opts.nDraws).toBe(8); // min(64, n_draws=8)
   });
 
-  it("leo-iss mission: never fetches posterior draws and renders no I6 panel", async () => {
-    seedPersistedState("iss-6mo"); // kind leo-iss — not in POSTERIOR_KINDS
+  it("persisted leo-iss mission migrates to the analog default and fetches parameter draws", async () => {
+    seedPersistedState("iss-6mo"); // old saved benchmark mission should not remain active
     renderWithDb();
     await waitForReady();
     await runMainSim();
 
-    // Wait past the 400 ms debounce window to prove the fetch was never scheduled
-    // (the gate's early-return happens before the timer is set, so a 0 ms wait
-    // would pass even on a regression).
-    await act(async () => {
-      await new Promise((r) => setTimeout(r, 500));
+    await vi.waitFor(() => {
+      expect(getPosteriorDrawsMock).toHaveBeenCalled();
     });
+    const callArg = getPosteriorDrawsMock.mock.calls[0][0];
+    expect(callArg.kind).toBe("analog-controlled");
 
-    expect(getPosteriorDrawsMock).not.toHaveBeenCalled();
-    expect(screen.queryByTestId("imm-i6-posterior")).toBeNull();
+    expect(await screen.findByTestId("imm-i6-posterior", undefined, { timeout: 3000 })).toBeDefined();
   });
 
   it("fetch rejection → api-error: I6 panel shows the API-unreachable note", async () => {
@@ -315,7 +313,7 @@ describe("CrewComposition · I6 analog Bayesian MCMC posterior", () => {
     await screen.findByTestId("imm-i6-posterior", undefined, { timeout: 3000 });
     // The panel should display the "no per-condition draws" message.
     expect(
-      await screen.findByText(/no per-condition posterior draws/i, undefined, { timeout: 3000 }),
+      await screen.findByText(/no per-condition parameter draws/i, undefined, { timeout: 3000 }),
     ).toBeDefined();
     // No pp worker payload should have been posted (early return before spawning worker).
     expect(FakeWorker.lastPpPayload).toBeNull();
@@ -331,7 +329,7 @@ describe("CrewComposition · I6 analog Bayesian MCMC posterior", () => {
     await screen.findByTestId("imm-i6-posterior", undefined, { timeout: 3000 });
     // The panel should display the compute-error note containing the worker error string.
     expect(
-      await screen.findByText(/posterior-predictive sweep failed.*boom/i, undefined, { timeout: 3000 }),
+      await screen.findByText(/predictive sweep failed.*boom/i, undefined, { timeout: 3000 }),
     ).toBeDefined();
   });
 });
@@ -355,7 +353,7 @@ describe("CrewComposition · analog surfaces render pre-run", () => {
       await screen.findByTestId("kind-multipliers-mount", undefined, { timeout: 3000 }),
     ).toBeDefined();
 
-    // I6 panel mounts pre-run and the posterior-predictive figure renders
+    // I6 panel mounts pre-run and the predictive figure renders
     // (400 ms debounce → mocked fetch → pp worker reply, all under findBy).
     expect(
       await screen.findByTestId("imm-i6-posterior", undefined, { timeout: 3000 }),
@@ -364,8 +362,8 @@ describe("CrewComposition · analog surfaces render pre-run", () => {
     expect(getPosteriorDrawsMock).toHaveBeenCalled();
   });
 
-  it("leo-iss mission, no completed run: table mounts (empty state) but I6 stays kind-gated", async () => {
-    seedPersistedState("iss-6mo"); // kind leo-iss — POSTERIOR_KINDS gate must still hold
+  it("persisted leo-iss mission, no completed run: migrates to analog default and mounts I6", async () => {
+    seedPersistedState("iss-6mo");
     renderWithDb();
     await waitForReady();
 
@@ -373,12 +371,10 @@ describe("CrewComposition · analog surfaces render pre-run", () => {
       await screen.findByTestId("kind-multipliers-mount", undefined, { timeout: 3000 }),
     ).toBeDefined();
 
-    // Wait past the 400 ms debounce window so a regression that schedules the
-    // fetch (and mounts the panel) would be caught.
-    await act(async () => {
-      await new Promise((r) => setTimeout(r, 500));
+    await vi.waitFor(() => {
+      expect(getPosteriorDrawsMock).toHaveBeenCalled();
     });
-    expect(screen.queryByTestId("imm-i6-posterior")).toBeNull();
-    expect(getPosteriorDrawsMock).not.toHaveBeenCalled();
+    expect(getPosteriorDrawsMock.mock.calls[0][0].kind).toBe("analog-controlled");
+    expect(await screen.findByTestId("imm-i6-posterior", undefined, { timeout: 3000 })).toBeDefined();
   });
 });

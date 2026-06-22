@@ -17,6 +17,7 @@ from selectron.priors_io import (
     load_priors,
     save_priors,
     get_tier_b_conditions,
+    load_accepted_evidence,
     load_evidence_proposals,
 )
 
@@ -131,3 +132,31 @@ class TestLoadEvidenceProposals:
             assert required.issubset(r.keys()), f"Missing columns in {r}"
             assert isinstance(r["person_days"], int)
             assert isinstance(r["events"], int)
+
+
+class TestLoadAcceptedEvidence:
+    def test_filters_to_accepted_independently_verified_rows(self, tmp_path: Path) -> None:
+        ledger = tmp_path / "evidence_ledger.csv"
+        ledger.write_text(
+            "status,condition_id,mapped_prior_id,mission_type,study_doi,study_slug,"
+            "endpoint_definition,numerator,denominator,person_days,events,exposure_time,"
+            "repeated_measure_structure,extraction_quote,extractor,verifier,risk_of_bias,"
+            "transportability,transformation,uncertainty_distribution,model_version,notes\n"
+            "accepted,depression,,analog-controlled,10.1/demo,demo-study,events,2,10,1000,2,1000,"
+            "participant-level,table 1,alice,bob,moderate,partial,none,gamma,v0.6,\n"
+            "subagent-proposal,skin-rash,,analog-controlled,,proposal-study,events,1,5,500,1,500,"
+            "unclear,estimate,alice,bob,high,low,none,gamma,v0.6,\n"
+            "accepted,respiratory-infection,,analog-controlled,,unverified,events,1,5,500,1,500,"
+            "participant-level,table 2,alice,,moderate,partial,none,gamma,v0.6,\n"
+        )
+
+        rows = load_accepted_evidence(ledger)
+
+        assert len(rows) == 1
+        assert rows[0]["condition_id"] == "depression"
+        assert rows[0]["mapped_prior_id"] == "depression"
+        assert rows[0]["person_days"] == 1000
+        assert rows[0]["events"] == 2
+
+    def test_missing_ledger_returns_empty_list(self, tmp_path: Path) -> None:
+        assert load_accepted_evidence(tmp_path / "missing.csv") == []

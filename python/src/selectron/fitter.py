@@ -179,7 +179,13 @@ def fit_gamma_poisson(
 
 # ── Batch fitting ───────────────────────────────────────────────────────────
 
-from selectron.priors_io import load_priors, get_tier_b_conditions, get_tier_c_conditions, load_evidence_proposals
+from selectron.priors_io import (
+    load_priors,
+    get_tier_b_conditions,
+    get_tier_c_conditions,
+    load_accepted_evidence,
+    load_evidence_proposals,
+)
 
 
 @dataclass
@@ -215,11 +221,18 @@ def fit_all_tier_b(
     output_dir: Path | None = None,
     dry_run: bool = False,
     condition_filter: str | None = None,
+    evidence_source: str = "accepted",
 ) -> BatchFitReport:
     """Fit all (or one) tier-B conditions that have evidence data."""
+    if evidence_source not in {"accepted", "proposals"}:
+        raise ValueError("evidence_source must be 'accepted' or 'proposals'")
     priors_data = load_priors()
     tier_b = get_tier_b_conditions(priors_data)
-    evidence = load_evidence_proposals()
+    evidence = (
+        load_evidence_proposals()
+        if evidence_source == "proposals"
+        else load_accepted_evidence()
+    )
 
     evidence_by_condition: dict[str, list[dict[str, Any]]] = {}
     for row in evidence:
@@ -243,7 +256,7 @@ def fit_all_tier_b(
 
         obs_rows = evidence_by_condition.get(cond_id, [])
         if not obs_rows:
-            skipped[cond_id] = "No evidence data in proposal CSVs"
+            skipped[cond_id] = f"No {evidence_source} evidence data"
             continue
 
         if dry_run:
@@ -301,11 +314,18 @@ def fit_all_tier_c(
     output_dir: Path | None = None,
     dry_run: bool = False,
     condition_filter: str | None = None,
+    evidence_source: str = "accepted",
 ) -> BatchFitReport:
     """Fit all (or one) tier-C conditions that have evidence data."""
+    if evidence_source not in {"accepted", "proposals"}:
+        raise ValueError("evidence_source must be 'accepted' or 'proposals'")
     priors_data = load_priors()
     tier_c = get_tier_c_conditions(priors_data)
-    evidence = load_evidence_proposals()
+    evidence = (
+        load_evidence_proposals()
+        if evidence_source == "proposals"
+        else load_accepted_evidence()
+    )
 
     evidence_by_condition: dict[str, list[dict[str, Any]]] = {}
     for row in evidence:
@@ -329,7 +349,7 @@ def fit_all_tier_c(
 
         obs_rows = evidence_by_condition.get(cond_id, [])
         if not obs_rows:
-            skipped[cond_id] = "No evidence data in proposal CSVs"
+            skipped[cond_id] = f"No {evidence_source} evidence data"
             continue
 
         if dry_run:

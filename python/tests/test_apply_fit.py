@@ -71,12 +71,34 @@ def test_main_dry_run_does_not_merge(tmp_path: Path):
     mock_report.n_failed = 0
     mock_report.n_skipped = 0
 
-    with patch("apply_fit.fit_all_tier_b", return_value=mock_report), \
+    with patch("apply_fit.fit_all_tier_b", return_value=mock_report) as mock_fit, \
          patch("apply_fit.merge_fitted_priors") as mock_merge, \
          patch("sys.argv", ["apply_fit.py", "--dry-run"]):
         apply_fit.main()
 
+    mock_fit.assert_called_once()
+    assert mock_fit.call_args.kwargs["evidence_source"] == "accepted"
     mock_merge.assert_not_called()
+
+
+def test_main_allow_proposals_uses_exploratory_source(tmp_path: Path):
+    """Proposal CSVs are reachable only through the explicit exploratory flag."""
+    from selectron.fitter import BatchFitReport
+    mock_report = MagicMock(spec=BatchFitReport)
+    mock_report.fitted = {}
+    mock_report.failed = {}
+    mock_report.skipped = {}
+    mock_report.n_fitted = 0
+    mock_report.n_failed = 0
+    mock_report.n_skipped = 0
+
+    with patch("apply_fit.fit_all_tier_b", return_value=mock_report) as mock_fit, \
+         patch("apply_fit.merge_fitted_priors"), \
+         patch("sys.argv", ["apply_fit.py", "--dry-run", "--allow-proposals"]):
+        apply_fit.main()
+
+    mock_fit.assert_called_once()
+    assert mock_fit.call_args.kwargs["evidence_source"] == "proposals"
 
 
 def test_main_failed_conditions_write_diagnostics(tmp_path: Path):

@@ -1,4 +1,4 @@
-// F1 PosteriorPlot — Bayesian-MCDA posterior over total score.
+// F1 PosteriorPlot — uncertain-weight MCDA score distribution.
 //
 // Upgraded from src/ui/components/PosteriorPlot.tsx (Iter-1 component) via /echarts skill (T80).
 // The old component is preserved at src/ui/components/PosteriorPlot.tsx until T81 (cleanup).
@@ -167,7 +167,7 @@ export function PosteriorPlot({ posterior, seed = 0xc0ffee, alias = "—", acces
 
     series: [
       {
-        name: "score posterior",
+        name: "score distribution",
         type: "bar",
         data: counts,
         barCategoryGap: "8%",

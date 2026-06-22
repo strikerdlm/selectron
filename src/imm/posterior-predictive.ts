@@ -1,10 +1,10 @@
 // src/imm/posterior-predictive.ts
 //
-// posteriorPredictiveSimulateIMM — posterior-predictive Monte Carlo wrapper
-// around simulateIMM. Given fitted per-condition posterior λ draws, it runs
-// T' trials per draw and summarizes each metric as a posterior distribution.
+// posteriorPredictiveSimulateIMM — predictive Monte Carlo wrapper around
+// simulateIMM. Given fitted per-condition λ parameter draws, it runs T' trials
+// per draw and summarizes each metric as a predictive distribution.
 //
-// ── How the posterior is threaded into the engine (zero engine changes) ───────
+// ── How parameter draws are threaded into the engine ─────────────────────────
 // simulateIMM already accepts `kindMultipliers?: Record<string, number>` — a
 // per-condition multiplier applied at the λ-sampling site, where an explicit
 // override REPLACES the auto-loaded per-kind map and any missing condition key
@@ -12,7 +12,7 @@
 // per-draw composite multiplier map and pass it as `kindMultipliers`, so the
 // engine (and therefore the K15 invariance canary) stays byte-identical.
 //
-// For draw d, condition cid with posterior draw λ_d and prior point mean E[λ]:
+// For draw d, condition cid with parameter draw λ_d and prior point mean E[λ]:
 //
 //     composite[cid] = (base[cid] ?? 1) * (λ_d / E[λ])
 //
@@ -24,10 +24,10 @@
 // shape propagation).
 //
 // ── What the resulting interval is (and is not) ───────────────────────────────
-// Each λ_d is drawn from the condition's fitted Gamma/Lognormal posterior.
+// Each λ_d is drawn from the condition's stored Gamma/Lognormal prior fit.
 // Because E[λ_d] = E[λ], the grand mean over draws stays unbiased versus the
 // point-prior pipeline; the spread of per-draw metric means is a moment-matched
-// POSTERIOR-PREDICTIVE interval. It is NOT a clean epistemic/aleatory
+// predictive interval. It is NOT a clean epistemic/aleatory
 // decomposition — within a draw λ is not held fixed (the engine re-samples it
 // each trial, scaled), so the within-draw variance still mixes parameter and
 // sampling uncertainty. Label it accordingly; do not over-claim.
@@ -38,6 +38,7 @@ import type {
   IMMMission,
   PosteriorPredictiveOutcome,
   PosteriorSummary,
+  VulnerabilityCouplingMode,
 } from "./types";
 import { simulateIMM } from "./simulate";
 import { loadIMMPriors } from "./priors";
@@ -47,7 +48,7 @@ export type PosteriorPredictiveOpts = {
   mission: IMMMission;
   kit: IMMKitScenario;
   /**
-   * Per-condition posterior λ draws (conditionId → samples, each length >= nDraws).
+   * Per-condition λ draws (conditionId → samples, each length >= nDraws).
    * Engine-level shape; the UI maps the API's PosteriorDrawsResponse into this
    * (condition_id → lambdas). Conditions absent here keep their point prior.
    */
@@ -60,6 +61,7 @@ export type PosteriorPredictiveOpts = {
   tierAMultiplier?: number;
   tierBMultiplier?: number;
   tierCMultiplier?: number;
+  vulnerabilityCouplingMode?: VulnerabilityCouplingMode;
 };
 
 /**
@@ -67,7 +69,7 @@ export type PosteriorPredictiveOpts = {
  * Percentiles use a sorted copy with floor indices clamped to [0, n-1].
  * n === 0 → all zeros. `sd` is the population standard deviation.
  *
- * NOTE: duplicates the engine's private posteriorSummary — engine file is frozen
+ * NOTE: duplicates the engine's private summary helper — engine file is frozen
  * under the K15 invariance canary for this plan; dedup deferred.
  *
  * Small-n note: with nearest-rank floor indices, ci90/ci95 degenerate toward the
@@ -121,7 +123,7 @@ function priorPointMean(conditionId: string): number | null {
 }
 
 /**
- * Run a posterior-predictive Monte Carlo over fitted per-condition λ posteriors.
+ * Run a predictive Monte Carlo over fitted per-condition λ draws.
  * Pure over the seeded engine — determinism comes from `seed` only (no
  * Date.now / Math.random). Each draw gets a decorrelated sub-seed.
  */
@@ -203,6 +205,7 @@ export function posteriorPredictiveSimulateIMM(
       tierAMultiplier: opts.tierAMultiplier,
       tierBMultiplier: opts.tierBMultiplier,
       tierCMultiplier: opts.tierCMultiplier,
+      vulnerabilityCouplingMode: opts.vulnerabilityCouplingMode ?? "off",
     });
 
     pEvacByDraw.push(out.pEvac.mean);

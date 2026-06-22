@@ -55,6 +55,11 @@ def main() -> int:
     parser.add_argument("--dry-run", action="store_true")
     parser.add_argument("--condition", default=None, help="Fit a single condition by ID")
     parser.add_argument("--tier", choices=["B", "C"], default="B", help="Tier to fit (B=tierB-lit, C=tierC-synth)")
+    parser.add_argument(
+        "--allow-proposals",
+        action="store_true",
+        help="Exploratory only: fit from proposal CSVs instead of accepted evidence ledger",
+    )
     args = parser.parse_args()
 
     if args.tier == "B":
@@ -66,6 +71,7 @@ def main() -> int:
             seed=42,
             condition_filter=args.condition,
             dry_run=args.dry_run,
+            evidence_source="proposals" if args.allow_proposals else "accepted",
         )
     else:
         logger.info("Running tier-C fit (dry_run=%s, condition_filter=%s)", args.dry_run, args.condition)
@@ -76,6 +82,7 @@ def main() -> int:
             seed=42,
             condition_filter=args.condition,
             dry_run=args.dry_run,
+            evidence_source="proposals" if args.allow_proposals else "accepted",
         )
 
     logger.info(

@@ -114,11 +114,11 @@ test.describe("Crew Composition view", () => {
     await expect(region).toHaveScreenshot("mission-kind-context.png", { maxDiffPixels: 100 });
   });
 
-  // CC-7: 2026-06-05 — I6 analog Bayesian MCMC posterior figure snapshot.
+  // CC-7: 2026-06-05 — I6 analog predictive-uncertainty figure snapshot.
   //
   // Switches the mission picker to the 365-day campaign (antarctic-station),
   // runs the simulation, and snapshots the I6 region. The figure body only
-  // mounts once the worker-offloaded posterior-predictive sweep reaches its
+  // mounts once the worker-offloaded predictive sweep reaches its
   // "done" state, which requires the optional Python calibration API to be
   // reachable. We therefore:
   //   • HARD-assert only region visibility — the panel renders for every
@@ -126,15 +126,15 @@ test.describe("Crew Composition view", () => {
   //     API stays green (the panel shows its api-error message instead).
   //   • SOFT-wait for the figure's `pp-pEvac` done-sentinel so that, when the
   //     API IS live (as it was when this snapshot was captured locally), the
-  //     screenshot captures the real posterior figure rather than the
+  //     screenshot captures the real predictive figure rather than the
   //     "fetching…"/"running…" spinner. The wait is non-throwing: if the
   //     sentinel never appears (API down), the test still passes on the
   //     region assertion.
   //   • Use raw element.screenshot() (not toHaveScreenshot) so no comparison
   //     baseline is created — the PNG would otherwise diff-fail across API
   //     states (offline-first contract).
-  test("i6 analog posterior figure renders for antarctic mission", async ({ page }) => {
-    // The full 100k-trial worker sim + the posterior-predictive sweep can take
+  test("i6 analog predictive figure renders for antarctic mission", async ({ page }) => {
+    // The full 100k-trial worker sim + the predictive sweep can take
     // well over the 60s default; allow generous headroom for this one test.
     test.setTimeout(150_000);
     await page.goto("/");

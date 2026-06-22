@@ -1,4 +1,4 @@
-// F2 RiskHistogram — CHI posterior distribution histogram.
+// F2 RiskHistogram — CHI Monte Carlo distribution histogram.
 //
 // Upgraded from src/ui/components/RiskHistogram.tsx (Iter-1 component) via /echarts skill (T79).
 // The old component is preserved at src/ui/components/RiskHistogram.tsx until T81 (cleanup).

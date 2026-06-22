@@ -14,11 +14,8 @@ const SEED_SAMPLER = 0xc0ffee;
 export function StepReview() {
   const { candidate, criterionEntries, setStep, markStepCompleted, accessTier } = useWizard();
 
-  // Only the criteria available at the user's chosen tier feed the posterior +
-  // table + radar. Tier-1 Posterior is a K=8 Dirichlet vs Tier-3 K=12 — the
-  // mean weight per criterion is 1/K (not 1/12) when computed against the
-  // tier-active subset, so a Tier-1 Selectron answer is internally honest about
-  // which tests it actually measured.
+  // The construct set is stable across tiers; tiers change the assessment
+  // instrument fidelity shown upstream, not the criteria included here.
   const visibleCriteria = useMemo(
     () => PLACEHOLDER_CRITERIA.filter((c) => isCriterionAvailableAtTier(c.minimumTier, accessTier)),
     [accessTier],
@@ -40,46 +37,46 @@ export function StepReview() {
     return m;
   }, [criterionEntries, visibleCriteria]);
 
-  // Fill any missing criterion scores with the criterion minimum so scoreCandidate
-  // never throws E_BAD_SCORE (incomplete wizard state is valid during review).
-  const scoresForEngine = useMemo(() => {
-    const m: Record<string, number> = {};
-    for (const c of visibleCriteria) {
-      m[c.id] = scores[c.id] ?? c.scale.min;
-    }
-    return m;
-  }, [scores, visibleCriteria]);
+  const missingCriteria = useMemo(
+    () => visibleCriteria.filter((c) => scores[c.id] === undefined),
+    [scores, visibleCriteria],
+  );
+  const isComplete = missingCriteria.length === 0;
 
   const candidateForEngine = useMemo(
     () => ({
       id: candidate?.id ?? "",
       alias: candidate?.alias ?? "—",
-      scores: scoresForEngine,
+      scores,
     }),
-    [candidate, scoresForEngine],
+    [candidate, scores],
   );
 
   const posterior = useMemo(
     () =>
-      scoreCandidate({
-        candidate: candidateForEngine,
-        criteria: visibleCriteria,
-        alpha: visibleCriteria.map(() => 1),
-        iterations: ITERATIONS,
-        seed: SEED_SAMPLER,
-      }),
-    [candidateForEngine, visibleCriteria],
+      isComplete
+        ? scoreCandidate({
+            candidate: candidateForEngine,
+            criteria: visibleCriteria,
+            alpha: visibleCriteria.map(() => 1),
+            iterations: ITERATIONS,
+            seed: SEED_SAMPLER,
+          })
+        : null,
+    [candidateForEngine, visibleCriteria, isComplete],
   );
 
   const radarData = useMemo(
     () =>
-      visibleCriteria.map((c) => {
-        const raw = scores[c.id] ?? c.scale.min;
-        const z = normalizeScore(raw, c.scale, c.higherIsBetter);
-        const weight = 1 / visibleCriteria.length;
-        return { criterionId: c.id, label: c.label, contribution: weight * z };
-      }),
-    [scores, visibleCriteria],
+      isComplete
+        ? visibleCriteria.map((c) => {
+            const raw = scores[c.id]!;
+            const z = normalizeScore(raw, c.scale, c.higherIsBetter);
+            const weight = 1 / visibleCriteria.length;
+            return { criterionId: c.id, label: c.label, contribution: weight * z };
+          })
+        : [],
+    [scores, visibleCriteria, isComplete],
   );
 
   return (
@@ -122,10 +119,17 @@ export function StepReview() {
           </button>
           <button
             onClick={() => {
+              if (!isComplete) return;
               markStepCompleted(2);
               setStep(3);
             }}
-            className="mono uppercase tracking-cap text-[13px] px-4 py-2 border border-signal text-signal hover:bg-signal/10 rounded-md"
+            disabled={!isComplete}
+            className={
+              "mono uppercase tracking-cap text-[13px] px-4 py-2 border rounded-md " +
+              (isComplete
+                ? "border-signal text-signal hover:bg-signal/10"
+                : "border-line text-ink-3 cursor-not-allowed")
+            }
           >
             next →
           </button>
@@ -133,28 +137,46 @@ export function StepReview() {
       </section>
 
       <aside className="lg:col-span-5 space-y-4">
-        <div className="panel p-6">
-          <PosteriorPlot posterior={posterior} seed={SEED_SAMPLER} alias={candidate?.alias ?? "—"} accessTier={accessTier} />
-        </div>
-        <ScoreCard posterior={posterior} alias={candidate?.alias ?? "—"} />
-        <div className="panel p-6">
-          <ScoreBreakdownRadar data={radarData} />
-        </div>
+        {posterior ? (
+          <>
+            <div className="panel p-6">
+              <PosteriorPlot posterior={posterior} seed={SEED_SAMPLER} alias={candidate?.alias ?? "—"} accessTier={accessTier} />
+            </div>
+            <ScoreCard posterior={posterior} alias={candidate?.alias ?? "—"} />
+          </>
+        ) : (
+          <div className="panel p-6">
+            <h3 className="label text-ink-1 uppercase tracking-cap">Incomplete record</h3>
+            <p className="mt-3 text-sm text-ink-2 leading-relaxed">
+              Complete all tier-active criterion scores before calculating the uncertain-weight MCDA distribution.
+            </p>
+            <p className="mono mt-3 text-[12px] text-ink-3">
+              missing · {missingCriteria.map((c) => c.label).join(" · ")}
+            </p>
+          </div>
+        )}
+        {posterior && (
+          <div className="panel p-6">
+            <ScoreBreakdownRadar data={radarData} />
+          </div>
+        )}
       </aside>
     </div>
 
     {/* CALCULATION TRACE — Diego scope expansion 2026-05-19: educational
         step-by-step walkthrough of Stage-A MCDA scoring, with lay layer. */}
-    <section>
-      <MCDACalculationTrace
-        posterior={posterior}
-        criteria={visibleCriteria}
-        scores={scoresForEngine}
-        alias={candidate?.alias ?? "—"}
-        seed={SEED_SAMPLER}
-        accessTier={accessTier}
-      />
-    </section>
+    {posterior && (
+      <section>
+        <MCDACalculationTrace
+          posterior={posterior}
+          criteria={visibleCriteria}
+          scores={scores}
+          alias={candidate?.alias ?? "—"}
+          seed={SEED_SAMPLER}
+          accessTier={accessTier}
+        />
+      </section>
+    )}
     </div>
   );
 }

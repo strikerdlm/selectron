@@ -39,12 +39,11 @@
 //       screened control),
 //   (2) the Stage-A composite is materially lower (the technical-competence
 //       path),
-//   (3) skipping selection measurably degrades 45-day mission risk via the
-//       vulnerability path: TME↑, CHI↓, mission success↓,
-//   (4) negative control / teeth: WITHOUT a criteria catalog the engine
-//       cannot see stageAScores, and the two crews' runs are bit-identical
-//       (same seed) — proving (3) is driven by the criteria coupling, not by
-//       fixture noise.
+//   (3) default scientific mode quarantines Stage-A-to-incidence coupling, so
+//       the two crews' runs are bit-identical even when criteria are supplied,
+//   (4) explicit scenario mode measurably degrades 45-day mission risk via the
+//       vulnerability path: TME↑, CHI↓. Scenario mode demonstrates an assumed
+//       effect; it is not treated as validated analog prediction.
 
 import { describe, it, expect } from "vitest";
 import { simulateIMM } from "../../src/imm/simulate";
@@ -144,7 +143,29 @@ describe("analog-45d · unscreened high-risk crew (no Stage-A selection)", () =>
     expect(bad.compositeScore).toBeLessThan(good.compositeScore);
   });
 
-  it("skipping selection measurably elevates 45-day mission risk via the vulnerability path (TME↑, CHI↓, MSP↓)", () => {
+  it("default scientific mode ignores Stage-A incidence coupling even when criteria are supplied", () => {
+    const screened = simulateIMM({
+      crew: screenedCrew,
+      mission,
+      kit,
+      trials: 500,
+      seed: SEED,
+      criteria: PLACEHOLDER_CRITERIA,
+    });
+    const unscreened = simulateIMM({
+      crew: unscreenedCrew,
+      mission,
+      kit,
+      trials: 500,
+      seed: SEED,
+      criteria: PLACEHOLDER_CRITERIA,
+    });
+    expect(Math.abs(screened.tme.mean - unscreened.tme.mean)).toBeLessThan(1e-12);
+    expect(Math.abs(screened.chi.mean - unscreened.chi.mean)).toBeLessThan(1e-12);
+    expect(Math.abs(screened.pEvac.mean - unscreened.pEvac.mean)).toBeLessThan(1e-12);
+  });
+
+  it("scenario mode elevates 45-day mission risk via the vulnerability path (TME↑, CHI↓)", () => {
     const screened = simulateIMM({
       crew: screenedCrew,
       mission,
@@ -152,6 +173,7 @@ describe("analog-45d · unscreened high-risk crew (no Stage-A selection)", () =>
       trials: TRIALS,
       seed: SEED,
       criteria: PLACEHOLDER_CRITERIA,
+      vulnerabilityCouplingMode: "scenario",
     });
     const unscreened = simulateIMM({
       crew: unscreenedCrew,
@@ -160,6 +182,7 @@ describe("analog-45d · unscreened high-risk crew (no Stage-A selection)", () =>
       trials: TRIALS,
       seed: SEED,
       criteria: PLACEHOLDER_CRITERIA,
+      vulnerabilityCouplingMode: "scenario",
     });
 
     // Low emotional stability + low conscientiousness → z < 0 on the coupled
@@ -177,9 +200,9 @@ describe("analog-45d · unscreened high-risk crew (no Stage-A selection)", () =>
     expect(unscreened.chi.mean).toBeLessThan(screened.chi.mean - 0.1);
   });
 
-  it("negative control: without a criteria catalog the engine cannot see stageAScores — both crews bit-identical", () => {
-    const a = simulateIMM({ crew: screenedCrew, mission, kit, trials: 500, seed: SEED });
-    const b = simulateIMM({ crew: unscreenedCrew, mission, kit, trials: 500, seed: SEED });
+  it("negative control: without a criteria catalog scenario mode cannot see stageAScores — both crews bit-identical", () => {
+    const a = simulateIMM({ crew: screenedCrew, mission, kit, trials: 500, seed: SEED, vulnerabilityCouplingMode: "scenario" });
+    const b = simulateIMM({ crew: unscreenedCrew, mission, kit, trials: 500, seed: SEED, vulnerabilityCouplingMode: "scenario" });
     expect(Math.abs(a.tme.mean - b.tme.mean)).toBeLessThan(1e-12);
     expect(Math.abs(a.chi.mean - b.chi.mean)).toBeLessThan(1e-12);
     expect(Math.abs(a.pEvac.mean - b.pEvac.mean)).toBeLessThan(1e-12);
@@ -203,7 +226,7 @@ describe("analog-22d · same unscreened crew (22-day campaign)", () => {
     expect(mission22.crewSize).toBe(6);
   });
 
-  it("skipping selection elevates 22-day mission risk via the vulnerability path (TME↑, CHI↓)", () => {
+  it("scenario mode elevates 22-day mission risk via the vulnerability path (TME↑, CHI↓)", () => {
     const screened = simulateIMM({
       crew: screenedCrew,
       mission: mission22,
@@ -211,6 +234,7 @@ describe("analog-22d · same unscreened crew (22-day campaign)", () => {
       trials: TRIALS,
       seed: SEED,
       criteria: PLACEHOLDER_CRITERIA,
+      vulnerabilityCouplingMode: "scenario",
     });
     const unscreened = simulateIMM({
       crew: unscreenedCrew,
@@ -219,6 +243,7 @@ describe("analog-22d · same unscreened crew (22-day campaign)", () => {
       trials: TRIALS,
       seed: SEED,
       criteria: PLACEHOLDER_CRITERIA,
+      vulnerabilityCouplingMode: "scenario",
     });
 
     expect(unscreened.tme.mean).toBeGreaterThan(screened.tme.mean + 0.7);
@@ -233,6 +258,7 @@ describe("analog-22d · same unscreened crew (22-day campaign)", () => {
       trials: TRIALS,
       seed: SEED,
       criteria: PLACEHOLDER_CRITERIA,
+      vulnerabilityCouplingMode: "scenario",
     });
     const u45 = simulateIMM({
       crew: unscreenedCrew,
@@ -241,6 +267,7 @@ describe("analog-22d · same unscreened crew (22-day campaign)", () => {
       trials: TRIALS,
       seed: SEED,
       criteria: PLACEHOLDER_CRITERIA,
+      vulnerabilityCouplingMode: "scenario",
     });
     // General-Poisson incidence scales with durationDays (rev3-b duration
     // scaling), so 22-day TME must sit well below 45-day TME for the same

@@ -46,7 +46,7 @@ export function isTerrestrialAnalog(kind: IMMMissionKind): boolean {
   return TERRESTRIAL_MISSION_KINDS.has(kind);
 }
 
-import type { IMMCrewMember, IMMMission, IMMKitScenario, IMMPrior, IMMConditionFamily, IMMCondition, IMMMissionKind, IMMProcessType } from "./types";
+import type { IMMCrewMember, IMMMission, IMMKitScenario, IMMPrior, IMMConditionFamily, IMMCondition, IMMMissionKind, IMMProcessType, VulnerabilityCouplingMode } from "./types";
 import { IMM_CONDITIONS } from "./conditions";
 import { loadIMMPriors } from "./priors";
 import { samplePoisson, sampleLognormal, sampleLognormalPoisson, sampleGammaPoisson, sampleBetaBernoulli, samplePoissonProcess } from "./incidence";
@@ -54,9 +54,6 @@ import { applyVulnerabilityMultiplier } from "../risk/incidence";
 import { zScoreAgainstScale } from "../engine/normalize-cohort";
 import { sampleGamma } from "../engine/gamma";
 import { sampleSeverity } from "./severity";
-// concurrentFI is exported from ./outcomes but not used in the per-event QTL
-// loop (which uses sequential phase summation per K15 §II.A.9). Kept exported
-// for the deferred cross-event v1.1 enhancement.
 import { sampleBetaPert } from "./outcomes";
 import { interpolateBetaPertByRAF } from "./treatment";
 import { computeRAF } from "./kits";
@@ -102,6 +99,20 @@ type Occurrence = {
   };
 };
 
+type PendingOccurrence = {
+  condition: IMMCondition;
+  prior: IMMPrior;
+  crewIndex: number;
+  timeDays: number;
+};
+
+type ImpairmentInterval = {
+  crewIndex: number;
+  startHours: number;
+  endHours: number;
+  fi: number;
+};
+
 export type IMMTrialResult = {
   tme: number;
   qtl: number;             // Quality time lost (sum of f_total × dt across crew)
@@ -133,10 +144,8 @@ export type IMMTrialOpts = {
   tierAMultiplier?: number;
   tierBMultiplier?: number;
   /**
-   * IC-5: Optional criteria index for Stage A z-scored vulnerability multiplier.
-   * When provided, per-member stageAScores are z-scored and applied as an
-   * additional lambda multiplier for conditions with non-empty vulnerabilityCriteria.
-   * Missing when simulateIMM is called without a criteria catalog.
+   * Optional criteria index for scenario-mode Stage A vulnerability multipliers.
+   * Ignored unless vulnerabilityCouplingMode === "scenario".
    */
   criteriaIndex?: ReadonlyMap<string, Criterion>;
   /**
@@ -160,6 +169,7 @@ export type IMMTrialOpts = {
    * the caller does not thread an explicit map. Tests can override directly.
    */
   kindMultipliers?: Record<string, number>;
+  vulnerabilityCouplingMode?: VulnerabilityCouplingMode;
 };
 
 /**
@@ -175,11 +185,8 @@ export type IMMTrialOpts = {
  * Returns modifiedLambda = applyVulnerabilityMultiplier(baseLambda, beta, z).
  * Falls through to baseLambda when no criteria are present or no stageAScores.
  *
- * 58 of the 100 production conditions now carry vulnerabilityCriteria, so this
- * path is active whenever a crew member supplies stageAScores. It falls through to
- * the unmodified baseLambda for crews without Stage-A scores — e.g. the K15
- * reference crew used in all reported validation and figure runs, which is why
- * those runs reproduce the uncoupled NASA iMED model (manuscript §2.3, §4.4).
+ * This function is only called with a non-empty criteria index in explicit
+ * scenario mode. Default scientific runs leave incidence unchanged by Stage A.
  */
 export function applyStageAVulnerabilityMultiplier(
   baseLambda: number,
@@ -209,6 +216,84 @@ export function applyStageAVulnerabilityMultiplier(
   return applyVulnerabilityMultiplier(baseLambda, beta, z);
 }
 
+function sampleTerminalOutcome(rng: Rng, pEvac: number, pLocl: number): { evac: 0 | 1; locl: 0 | 1 } {
+  const loclP = Math.max(0, Math.min(1, pLocl));
+  const evacP = Math.max(0, Math.min(1 - loclP, pEvac));
+  const u = rng();
+  if (u < loclP) return { evac: 0, locl: 1 };
+  if (u < loclP + evacP) return { evac: 1, locl: 0 };
+  return { evac: 0, locl: 0 };
+}
+
+function eventTimeFor(rng: Rng, cond: IMMCondition, mission: IMMMission, eventIndex: number): number {
+  if (cond.processType === "space-adaptation-once") {
+    return sampleBetaPert(rng, 0, 2.5, 5);
+  }
+  if (cond.processType === "SA-VIIP-late") {
+    return sampleBetaPert(rng, 0, mission.durationDays / 2, mission.durationDays);
+  }
+  if (cond.processType === "EVA-coupled") {
+    return mission.evaSchedule[eventIndex % Math.max(1, mission.evaSchedule.length)] ?? rng() * mission.durationDays;
+  }
+  // Homogeneous-hazard default for ordinary medical conditions.
+  return rng() * mission.durationDays;
+}
+
+function addIntervalsForOccurrence(
+  o: Occurrence,
+  missionDurationHours: number,
+  intervals: ImpairmentInterval[],
+): void {
+  const eventStartHours = o.timeDays * 24;
+  const remainingFromEvent = Math.max(0, missionDurationHours - eventStartHours);
+  const dtCp1 = Math.min(o.outcomes.dt_cp1_hours, remainingFromEvent);
+  const cp1End = eventStartHours + dtCp1;
+  if (dtCp1 > 0 && o.outcomes.fi_cp1 > 0) {
+    intervals.push({ crewIndex: o.crewIndex, startHours: eventStartHours, endHours: cp1End, fi: o.outcomes.fi_cp1 });
+  }
+
+  const remainingAfterCp1 = Math.max(0, missionDurationHours - cp1End);
+  const dtCp2 = Math.min(o.outcomes.dt_cp2_hours, remainingAfterCp1);
+  const cp2End = cp1End + dtCp2;
+  if (dtCp2 > 0 && o.outcomes.fi_cp2 > 0) {
+    intervals.push({ crewIndex: o.crewIndex, startHours: cp1End, endHours: cp2End, fi: o.outcomes.fi_cp2 });
+  }
+
+  if (o.outcomes.fi_cp3 > 0) {
+    const cp3Duration = Math.max(0, missionDurationHours - cp2End);
+    if (cp3Duration > 0) {
+      intervals.push({ crewIndex: o.crewIndex, startHours: cp2End, endHours: missionDurationHours, fi: o.outcomes.fi_cp3 });
+    }
+  }
+}
+
+function integrateOverlappingIntervals(intervals: ImpairmentInterval[], missionDurationHours: number, crewSize: number): number {
+  let qtl = 0;
+  for (let cIdx = 0; cIdx < crewSize; cIdx++) {
+    const memberIntervals = intervals
+      .filter((i) => i.crewIndex === cIdx && i.endHours > i.startHours && i.fi > 0)
+      .map((i) => ({
+        startHours: Math.max(0, Math.min(missionDurationHours, i.startHours)),
+        endHours: Math.max(0, Math.min(missionDurationHours, i.endHours)),
+        fi: Math.max(0, Math.min(1, i.fi)),
+      }))
+      .filter((i) => i.endHours > i.startHours);
+    if (memberIntervals.length === 0) continue;
+    const cuts = Array.from(new Set(memberIntervals.flatMap((i) => [i.startHours, i.endHours]))).sort((a, b) => a - b);
+    for (let k = 0; k < cuts.length - 1; k++) {
+      const start = cuts[k];
+      const end = cuts[k + 1];
+      if (end <= start) continue;
+      let survival = 1;
+      for (const i of memberIntervals) {
+        if (i.startHours < end && i.endHours > start) survival *= (1 - i.fi);
+      }
+      qtl += (1 - survival) * (end - start);
+    }
+  }
+  return qtl;
+}
+
 /** Exported for testability — internal helper. */
 export function applyRiskFactorMultiplier(baseLambda: number, member: IMMCrewMember, prior: IMMPrior): number {
   let lambda = baseLambda;
@@ -229,7 +314,7 @@ export function applyRiskFactorMultiplier(baseLambda: number, member: IMMCrewMem
  * The count must be scaled by mission duration before Poisson sampling:
  *   1. Draw λ_per_day from the prior's hierarchical distribution.
  *   2. Apply per-person risk-factor multipliers to λ_per_day.
- *   3. IC-5: Apply Stage A z-scored vulnerability multiplier (if criteriaIndex provided).
+ *   3. Apply Stage A z-scored vulnerability multiplier only in scenario mode.
  *   4. Sample Poisson(λ_modulated × durationDays).
  *
  * Beta-Bernoulli and Fixed distributions retain their existing semantics and are
@@ -289,8 +374,13 @@ export function runIMMTrial(
   // priors-rev3-b: Tier-A and Tier-B global multipliers (default 1.0).
   const tierAMult = opts.tierAMultiplier ?? 1.0;
   const tierBMult = opts.tierBMultiplier ?? 1.0;
-  // IC-5: criteria index for Stage A z-scored vulnerability multiplier.
-  const criteriaIndex: ReadonlyMap<string, Criterion> = opts.criteriaIndex ?? new Map();
+  // Analog-audit correction: Stage-A-to-incidence coupling is scenario analysis
+  // only. Scientific/default mode ignores stageAScores even when a caller passes
+  // a criteria catalog for UI or trace purposes.
+  const criteriaIndex: ReadonlyMap<string, Criterion> =
+    opts.vulnerabilityCouplingMode === "scenario"
+      ? opts.criteriaIndex ?? new Map()
+      : new Map();
   // peer-review-2 §4.5 + 2026-06-05 terrestrial guard: filter active conditions
   // once per trial (not per-crew-member) for O(|conditions|) overhead.
   // For terrestrial analog missions, space-only processTypes and ECLSS-specific
@@ -311,6 +401,7 @@ export function runIMMTrial(
   // deliverability before RAF. Identity for issHMS/unlimited (K15 invariant);
   // only bites for none/medium. See src/imm/health-support.ts.
   const availableResources: Record<string, number> = gateAvailable(kit.resources, kit.scenarioId);
+  const pendingOccurrences: PendingOccurrence[] = [];
   const occurrences: Occurrence[] = [];
   const earlyTerminated = new Set<number>();
   const rafHistory: Array<{ conditionId: string; raf: number }> = [];
@@ -324,7 +415,6 @@ export function runIMMTrial(
 
   for (let cIdx = 0; cIdx < crew.length; cIdx++) {
     const member = crew[cIdx];
-    if (earlyTerminated.has(cIdx)) continue;
 
     for (const cond of activeConditions) {
       const prior = priors.conditions[cond.id];
@@ -353,7 +443,7 @@ export function runIMMTrial(
       if (cond.processType === "general-Poisson") {
         if (prior.incidence.distribution === "Fixed") {
           // Fixed: lambda_fixed is a per-person-day rate; scale by duration, then apply RFM.
-          // IC-5: apply Stage A vulnerability multiplier on top of RFM.
+          // Scenario mode: apply Stage A vulnerability multiplier on top of RFM.
           // rev3-b-followup: tierMult applied to λ directly (variance-preserving).
           // 2026-06-04: kindMult threaded into effectiveMult.
           const baseLambdaPerDay = prior.incidence.lambda_fixed!;
@@ -362,7 +452,7 @@ export function runIMMTrial(
           count = samplePoisson(rng, modLambdaPerDay * mission.durationDays * effectiveMult);
         } else {
           // Gamma-Poisson / Lognormal-Poisson: draw λ/day from hierarchical prior, apply RFM,
-          // IC-5 Stage A multiplier, then scale by mission duration before Poisson sampling.
+          // optional scenario Stage A multiplier, then scale by mission duration before Poisson sampling.
           count = sampleGeneralPoissonCount(rng, prior, member, mission.durationDays, cond.family, cond.vulnerabilityCriteria, criteriaIndex, effectiveMult);
         }
       } else if (cond.processType === "space-adaptation-once") {
@@ -397,29 +487,8 @@ export function runIMMTrial(
         const arsAlpha = prior.incidence.alpha ?? 2;
         const arsBeta  = prior.incidence.beta  ?? 18;
         for (const speTime of speEventTimes) {
-          if (earlyTerminated.has(cIdx)) break;
           if (sampleBetaBernoulli(rng, arsAlpha, arsBeta) === 1) {
-            const severity = sampleSeverity(rng, prior.severity.worst_case_prob_alpha, prior.severity.worst_case_prob_beta);
-            const raf = computeRAF(prior.required_resources, availableResources);
-            const fi_cp1 = sampleBetaPert(rng, ...Object.values(interpolateBetaPertByRAF(prior.treated.fi_cp1, prior.untreated.fi_cp1, raf)) as [number, number, number]);
-            const dt_cp1 = sampleBetaPert(rng, ...Object.values(interpolateBetaPertByRAF(prior.treated.dt_cp1_hours, prior.untreated.dt_cp1_hours, raf)) as [number, number, number]);
-            const fi_cp2 = sampleBetaPert(rng, ...Object.values(interpolateBetaPertByRAF(prior.treated.fi_cp2, prior.untreated.fi_cp2, raf)) as [number, number, number]);
-            const dt_cp2 = sampleBetaPert(rng, ...Object.values(interpolateBetaPertByRAF(prior.treated.dt_cp2_hours, prior.untreated.dt_cp2_hours, raf)) as [number, number, number]);
-            const fi_cp3 = sampleBetaPert(rng, ...Object.values(interpolateBetaPertByRAF(prior.treated.fi_cp3, prior.untreated.fi_cp3, raf)) as [number, number, number]);
-            const p_evac = sampleBetaPert(rng, ...Object.values(interpolateBetaPertByRAF(prior.treated.p_evac, prior.untreated.p_evac, raf)) as [number, number, number]);
-            const p_locl = sampleBetaPert(rng, ...Object.values(interpolateBetaPertByRAF(prior.treated.p_locl, prior.untreated.p_locl, raf)) as [number, number, number]);
-            const evacSampled: 0 | 1 = rng() < p_evac ? 1 : 0;
-            const loclSampled: 0 | 1 = rng() < p_locl ? 1 : 0;
-            occurrences.push({
-              conditionId: cond.id, crewIndex: cIdx, timeDays: speTime, severity, raf,
-              evacSampled, loclSampled,
-              outcomes: { fi_cp1, dt_cp1_hours: dt_cp1, fi_cp2, dt_cp2_hours: dt_cp2, fi_cp3, p_evac, p_locl },
-            });
-            for (const [k, q] of Object.entries(prior.required_resources)) {
-              availableResources[k] = Math.max(0, (availableResources[k] ?? 0) - q * raf);
-            }
-            if (evacSampled) earlyTerminated.add(cIdx);
-            if (loclSampled) earlyTerminated.add(cIdx);
+            pendingOccurrences.push({ condition: cond, prior, crewIndex: cIdx, timeDays: speTime });
           }
         }
         count = 0; // SPE occurrences created directly above; skip the generic loop
@@ -444,45 +513,42 @@ export function runIMMTrial(
       // See docs/iter5_priors_rev3_strategy.md §8 and docs/iter5_scientific_limitations.md §3.3
       // for the rationale.
 
-      // T24: Compute time-of-occurrence based on condition process type.
-      // space-adaptation-once: peak day 2.5, range 0–5 (early adaptation window).
-      // SA-VIIP-late: uniform over full mission (half-mission peak per spec).
-      // All others: timeDays = 0 (no temporal tracking in v1).
-      let condTimeDays = 0;
-      if (cond.processType === "space-adaptation-once") {
-        condTimeDays = sampleBetaPert(rng, 0, 2.5, 5);
-      } else if (cond.processType === "SA-VIIP-late") {
-        condTimeDays = sampleBetaPert(rng, 0, mission.durationDays / 2, mission.durationDays);
-      }
-
       for (let e = 0; e < count; e++) {
-        if (earlyTerminated.has(cIdx)) break;
-        const severity = sampleSeverity(rng, prior.severity.worst_case_prob_alpha, prior.severity.worst_case_prob_beta);
-        const raf = computeRAF(prior.required_resources, availableResources);
-        if (opts.traceRAF) rafHistory.push({ conditionId: cond.id, raf });
-        const fi_cp1 = sampleBetaPert(rng, ...Object.values(interpolateBetaPertByRAF(prior.treated.fi_cp1, prior.untreated.fi_cp1, raf)) as [number, number, number]);
-        const dt_cp1 = sampleBetaPert(rng, ...Object.values(interpolateBetaPertByRAF(prior.treated.dt_cp1_hours, prior.untreated.dt_cp1_hours, raf)) as [number, number, number]);
-        const fi_cp2 = sampleBetaPert(rng, ...Object.values(interpolateBetaPertByRAF(prior.treated.fi_cp2, prior.untreated.fi_cp2, raf)) as [number, number, number]);
-        const dt_cp2 = sampleBetaPert(rng, ...Object.values(interpolateBetaPertByRAF(prior.treated.dt_cp2_hours, prior.untreated.dt_cp2_hours, raf)) as [number, number, number]);
-        const fi_cp3 = sampleBetaPert(rng, ...Object.values(interpolateBetaPertByRAF(prior.treated.fi_cp3, prior.untreated.fi_cp3, raf)) as [number, number, number]);
-        const p_evac = sampleBetaPert(rng, ...Object.values(interpolateBetaPertByRAF(prior.treated.p_evac, prior.untreated.p_evac, raf)) as [number, number, number]);
-        const p_locl = sampleBetaPert(rng, ...Object.values(interpolateBetaPertByRAF(prior.treated.p_locl, prior.untreated.p_locl, raf)) as [number, number, number]);
-        const evacSampled: 0 | 1 = rng() < p_evac ? 1 : 0;
-        const loclSampled: 0 | 1 = rng() < p_locl ? 1 : 0;
-        occurrences.push({
-          conditionId: cond.id, crewIndex: cIdx, timeDays: condTimeDays, severity, raf,
-          evacSampled, loclSampled,
-          outcomes: { fi_cp1, dt_cp1_hours: dt_cp1, fi_cp2, dt_cp2_hours: dt_cp2, fi_cp3, p_evac, p_locl },
+        pendingOccurrences.push({
+          condition: cond,
+          prior,
+          crewIndex: cIdx,
+          timeDays: eventTimeFor(rng, cond, mission, e),
         });
-        // Decrement resources by RAF × required
-        for (const [k, q] of Object.entries(prior.required_resources)) {
-          const used = q * raf;
-          availableResources[k] = Math.max(0, (availableResources[k] ?? 0) - used);
-        }
-        if (evacSampled) earlyTerminated.add(cIdx);
-        if (loclSampled) earlyTerminated.add(cIdx);
       }
     }
+  }
+
+  pendingOccurrences.sort((a, b) => a.timeDays - b.timeDays || a.crewIndex - b.crewIndex || a.condition.id.localeCompare(b.condition.id));
+  for (const pending of pendingOccurrences) {
+    if (earlyTerminated.has(pending.crewIndex)) continue;
+    const { condition: cond, prior } = pending;
+    const severity = sampleSeverity(rng, prior.severity.worst_case_prob_alpha, prior.severity.worst_case_prob_beta);
+    const raf = computeRAF(prior.required_resources, availableResources);
+    if (opts.traceRAF) rafHistory.push({ conditionId: cond.id, raf });
+    const fi_cp1 = sampleBetaPert(rng, ...Object.values(interpolateBetaPertByRAF(prior.treated.fi_cp1, prior.untreated.fi_cp1, raf)) as [number, number, number]);
+    const dt_cp1 = sampleBetaPert(rng, ...Object.values(interpolateBetaPertByRAF(prior.treated.dt_cp1_hours, prior.untreated.dt_cp1_hours, raf)) as [number, number, number]);
+    const fi_cp2 = sampleBetaPert(rng, ...Object.values(interpolateBetaPertByRAF(prior.treated.fi_cp2, prior.untreated.fi_cp2, raf)) as [number, number, number]);
+    const dt_cp2 = sampleBetaPert(rng, ...Object.values(interpolateBetaPertByRAF(prior.treated.dt_cp2_hours, prior.untreated.dt_cp2_hours, raf)) as [number, number, number]);
+    const fi_cp3 = sampleBetaPert(rng, ...Object.values(interpolateBetaPertByRAF(prior.treated.fi_cp3, prior.untreated.fi_cp3, raf)) as [number, number, number]);
+    const p_evac = sampleBetaPert(rng, ...Object.values(interpolateBetaPertByRAF(prior.treated.p_evac, prior.untreated.p_evac, raf)) as [number, number, number]);
+    const p_locl = sampleBetaPert(rng, ...Object.values(interpolateBetaPertByRAF(prior.treated.p_locl, prior.untreated.p_locl, raf)) as [number, number, number]);
+    const terminal = sampleTerminalOutcome(rng, p_evac, p_locl);
+    occurrences.push({
+      conditionId: cond.id, crewIndex: pending.crewIndex, timeDays: pending.timeDays, severity, raf,
+      evacSampled: terminal.evac, loclSampled: terminal.locl,
+      outcomes: { fi_cp1, dt_cp1_hours: dt_cp1, fi_cp2, dt_cp2_hours: dt_cp2, fi_cp3, p_evac, p_locl },
+    });
+    for (const [k, q] of Object.entries(prior.required_resources)) {
+      const used = q * raf;
+      availableResources[k] = Math.max(0, (availableResources[k] ?? 0) - used);
+    }
+    if (terminal.evac || terminal.locl) earlyTerminated.add(pending.crewIndex);
   }
 
   // Aggregate trial outputs
@@ -519,39 +585,16 @@ export function runIMMTrial(
   // their current Beta-Pert distributions.
   //
   // cp3 charges fi_cp3 × (mission_end_hours − event_end_hours), clamped at 0.
-  // For events with timeDays = 0 (general-Poisson default) this is essentially
-  // the entire remaining mission. For SPE events and space-adaptation events
-  // (which sample timeDays from a Beta-Pert), the cp3 charge is reduced by the
-  // event's onset time.
-  //
-  // Cross-event concurrent FI (overlapping events from DIFFERENT conditions on the
-  // same crewmember composed via concurrentFI) remains the v1.1 enhancement — it
-  // requires a per-crewmember timeline integration of impairment intervals.
-  // Currently events from different conditions are treated as non-overlapping in time.
+  // General-Poisson events now receive sampled onset times, all events are
+  // processed chronologically for resource consumption, and overlapping
+  // impairment intervals are integrated per crewmember via concurrent FI.
   // peer-review-2 Issue 11: clamp cp1 + cp2 durations to remaining mission hours
   // so late-mission events don't over-count QTL beyond the mission end. cp3 was
   // already clamped; this extends the same discipline to cp1 and cp2.
   const missionDurationHours = mission.durationDays * 24;
-  let qtl = 0;
-  for (const o of occurrences) {
-    const eventStartHours = o.timeDays * 24;
-    const remainingFromEvent = Math.max(0, missionDurationHours - eventStartHours);
-    // cp1 cannot extend past mission end.
-    const dt_cp1_clamped = Math.min(o.outcomes.dt_cp1_hours, remainingFromEvent);
-    const remainingAfterCp1 = Math.max(0, remainingFromEvent - dt_cp1_clamped);
-    // cp2 starts after cp1 finishes; clamp to whatever mission time is left.
-    const dt_cp2_clamped = Math.min(o.outcomes.dt_cp2_hours, remainingAfterCp1);
-    qtl += o.outcomes.fi_cp1 * dt_cp1_clamped +
-           o.outcomes.fi_cp2 * dt_cp2_clamped;
-    // cp3: permanent impairment from end of cp2 to end of mission. For most
-    // conditions fi_cp3 = 0 (rev3-e per-condition audit). Only persistent-
-    // impairment conditions (32 of 100) contribute non-zero cp3 QTL.
-    if (o.outcomes.fi_cp3 > 0) {
-      const cp3StartHours = eventStartHours + dt_cp1_clamped + dt_cp2_clamped;
-      const cp3DurationHours = Math.max(0, missionDurationHours - cp3StartHours);
-      qtl += o.outcomes.fi_cp3 * cp3DurationHours;
-    }
-  }
+  const intervals: ImpairmentInterval[] = [];
+  for (const o of occurrences) addIntervalsForOccurrence(o, missionDurationHours, intervals);
+  const qtl = integrateOverlappingIntervals(intervals, missionDurationHours, crew.length);
 
   // T25: EVAC/LOCL aggregation uses per-event Bernoulli samples (not 0.5 threshold).
   // evacSampled/loclSampled are set once per occurrence above and reused here.
@@ -611,12 +654,11 @@ export function simulateIMM(opts: {
    */
   chiStar?: number;
   /**
-   * IC-5: Optional criteria catalog for Stage A z-scored vulnerability multiplier.
-   * When provided, per-member stageAScores are z-scored and applied as an
-   * additional Poisson lambda multiplier for conditions with non-empty
-   * vulnerabilityCriteria. Built as a ReadonlyMap before the trial loop.
+   * Optional criteria catalog for Stage A z-scored vulnerability multipliers.
+   * Ignored unless vulnerabilityCouplingMode === "scenario".
    */
   criteria?: readonly Criterion[];
+  vulnerabilityCouplingMode?: VulnerabilityCouplingMode;
   /**
    * When true, returns per-trial CHI samples (percent scale) in
    * `outcome.diagnostics.chiSamples`. Used by R-hat convergence tests.
@@ -678,6 +720,7 @@ export function simulateIMM(opts: {
       // 2026-06-04: thread the resolved per-(kind, condition) multiplier map.
       // Empty object / missing keys → 1.0 fallthrough in runIMMTrial.
       kindMultipliers: effectiveKindMults,
+      vulnerabilityCouplingMode: opts.vulnerabilityCouplingMode ?? "off",
       criteriaIndex,
       conditionFilter: opts.conditionFilter,
     });

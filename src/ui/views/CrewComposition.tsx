@@ -9,7 +9,7 @@
 // Commit 5: polish + a11y.
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import type { IMMCrewMember, CrewCompositeMethod, IMMOutcome } from "../../imm/types";
+import type { IMMCrewMember, CrewCompositeMethod, IMMOutcome, VulnerabilityCouplingMode } from "../../imm/types";
 import { PLACEHOLDER_CRITERIA } from "../../data/placeholder-criteria";
 import { ACTIVE_MISSIONS } from "../../data/imm-missions";
 import type { IMMMission } from "../../imm/types";
@@ -17,7 +17,6 @@ import { IMM_KITS } from "../../imm/kits";
 import type { IMMKitScenario } from "../../imm/types";
 import { HealthSupportTierPicker } from "../health/HealthSupportTierPicker";
 import { HealthSupportBreakdown } from "../health/HealthSupportBreakdown";
-import { ISS_HMS_BASELINE_CHI } from "../../imm/health-support";
 import { aggregateCrewComposite } from "../../imm/composite";
 import { evaluateCrewGates } from "../../imm/crew-gates";
 import { CrewMemberCard } from "../components/CrewMemberCard";
@@ -28,8 +27,6 @@ import { IMMPosteriorHist } from "../figures/IMMPosteriorHist";
 import { IMMConditionDrivers } from "../figures/IMMConditionDrivers";
 import { IMMConvergencePlot } from "../figures/IMMConvergencePlot";
 import { IMMValidationCompare } from "../figures/IMMValidationCompare";
-import { LxCMatrix } from "../figures/LxCMatrix";
-import { assessIMMLxC } from "../../imm/lxc";
 import { loadIMMPriors } from "../../imm/priors";
 import { KindMultipliersTable } from "../components/KindMultipliersTable";
 import { notify } from "../components/Toast";
@@ -41,15 +38,15 @@ import { IMMAnalogPosteriorPlot } from "../figures/IMMAnalogPosteriorPlot";
 
 type SimState = "idle" | "running" | "done" | "error";
 
-// I6 posterior-predictive state has two error variants so the panel can show an
+// I6 predictive-uncertainty state has two error variants so the panel can show an
 // actionable message: "api-error" means the fetch itself failed (Python API is
 // unreachable); "compute-error" means draws arrived but the worker sweep failed.
 type PpState = "idle" | "running" | "done" | "api-error" | "compute-error";
 
 // 2026-06-04 (I6): mission kinds that carry a `kind_multipliers` block in the
 // calibrated priors — the only kinds for which `/posterior/draws` returns
-// per-condition draws. For other kinds the endpoint returns empty draws and the
-// posterior figure adds nothing, so we skip the fetch+sim entirely.
+// per-condition parameter draws. For other kinds the endpoint returns empty
+// draws and the uncertainty figure adds nothing, so we skip the fetch+sim entirely.
 const POSTERIOR_KINDS = new Set(["antarctic-station", "analog-controlled"]);
 
 // ─── safe default score generation ───────────────────────────────────────────
@@ -127,13 +124,13 @@ const INITIAL_CREW: IMMCrewMember[] = [
 
 /**
  * 2026-06-04 mission-kind context label. Surfaces the active prior-calibration
- * context so the user knows whether the engine is running ISS-K15 priors,
- * controlled-habitat priors, or Antarctic winter-over priors. Each label maps
+ * context so the user knows whether the engine is running controlled-habitat
+ * priors or Antarctic winter-over priors. Each label maps
  * 1-to-1 to a key in `imm-priors.json::global_calibration.kind_multipliers`.
  */
 function missionKindContextLabel(kind: import("../../imm/types").IMMMissionKind): string {
   switch (kind) {
-    case "leo-iss":         return "Context: ISS-calibrated priors (K15 reference)";
+    case "leo-iss":         return "Context: ISS developer benchmark";
     case "analog-controlled": return "Context: Controlled-habitat priors";
     case "antarctic-station": return "Context: Antarctic winter-over priors (Bhatia/Palinkas anchored)";
     case "analog-isolation":  return "Context: legacy analog (no kind multiplier; 1.0 fallthrough)";
@@ -144,8 +141,7 @@ function missionKindContextLabel(kind: import("../../imm/types").IMMMissionKind)
 
 /**
  * 2026-06-04 short label for the kind suffix appended to mission options
- * in the picker. Returns null for the default `leo-iss` kind (no suffix).
- * Mirrors the `kind_multipliers` keys in `imm-priors.json`.
+ * in the picker. Mirrors the `kind_multipliers` keys in `imm-priors.json`.
  */
 function kindShortLabel(kind: import("../../imm/types").IMMMissionKind): string | null {
   switch (kind) {
@@ -171,39 +167,6 @@ function useKindMultipliers(kind: import("../../imm/types").IMMMissionKind): Rec
   );
 }
 
-/**
- * 2026-06-04: short summary of the kind multiplier effect for the active
- * mission kind, rendered as a small badge beside the L×C matrix. Counts
- * rows in three buckets (elevated, suppressed, zeroed) and returns a
- * one-line string. The L×C cells themselves remain the published NASA
- * HSRB values — the delta badge is informational, not a verdict change.
- */
-function kindDeltaSummary(
-  kind: import("../../imm/types").IMMMissionKind,
-  map: Record<string, number>,
-): string {
-  if (kind === "leo-iss") return "K15 reference (no kind delta)";
-  if (kind === "analog-isolation") return "legacy kind — no kind delta applied";
-  if (kind === "lunar-artemis-future" || kind === "interplanetary-mars-future") {
-    return "future kind — not yet modeled";
-  }
-  let elevated = 0;
-  let suppressed = 0;
-  let zeroed = 0;
-  for (const [k, v] of Object.entries(map)) {
-    if (k.startsWith("_")) continue;
-    if (typeof v !== "number" || !Number.isFinite(v)) continue;
-    if (v === 0) zeroed++;
-    else if (v > 1) elevated++;
-    else if (v < 1) suppressed++;
-  }
-  const parts: string[] = [];
-  if (elevated > 0) parts.push(`${elevated} elevated`);
-  if (suppressed > 0) parts.push(`${suppressed} suppressed`);
-  if (zeroed > 0) parts.push(`${zeroed} ECLSS-specific zeroed`);
-  return `Kind delta: ${parts.length === 0 ? "no effect" : parts.join(" · ")}`;
-}
-
 interface CrewState {
   members: IMMCrewMember[];
   mission: IMMMission;
@@ -212,16 +175,18 @@ interface CrewState {
   seed: number;
   aggregator: CrewCompositeMethod;
   chiStar: number;
+  couplingMode: VulnerabilityCouplingMode;
 }
 
 const INITIAL_STATE: CrewState = {
   members: INITIAL_CREW,
-  mission: ACTIVE_MISSIONS[0], // iss-6mo (K15 reference) — first active mission
-  kit: IMM_KITS.issHMS,
+  mission: ACTIVE_MISSIONS[0],
+  kit: IMM_KITS.medium,
   trials: 100_000,
   seed: 0xc0ffee,
   aggregator: "worst-link",
   chiStar: 0.7,
+  couplingMode: "off",
 };
 
 // ─── localStorage autosave (Diego 2026-05-29) ────────────────────────────────
@@ -243,6 +208,7 @@ function persistCrewState(s: CrewState): void {
         seed: s.seed,
         aggregator: s.aggregator,
         chiStar: s.chiStar,
+        couplingMode: s.couplingMode,
       }),
     );
   } catch {
@@ -262,18 +228,22 @@ function loadPersistedCrewState(): CrewState | null {
       seed: number;
       aggregator: CrewCompositeMethod;
       chiStar: number;
+      couplingMode: VulnerabilityCouplingMode;
     }>;
     if (!Array.isArray(p.members) || !p.mission) return null;
     const kit =
-      IMM_KITS[(p.kitScenarioId ?? "issHMS") as keyof typeof IMM_KITS] ?? IMM_KITS.issHMS;
+      IMM_KITS[(p.kitScenarioId ?? "medium") as keyof typeof IMM_KITS] ?? IMM_KITS.medium;
+    const mission =
+      ACTIVE_MISSIONS.find((m) => m.id === p.mission?.id) ?? INITIAL_STATE.mission;
     return {
       members: p.members,
-      mission: p.mission,
+      mission,
       kit,
       trials: p.trials ?? INITIAL_STATE.trials,
       seed: p.seed ?? INITIAL_STATE.seed,
       aggregator: p.aggregator ?? INITIAL_STATE.aggregator,
       chiStar: p.chiStar ?? INITIAL_STATE.chiStar,
+      couplingMode: p.couplingMode ?? INITIAL_STATE.couplingMode,
     };
   } catch {
     return null;
@@ -318,16 +288,16 @@ export function CrewComposition() {
   const [outcome, setOutcome] = useState<IMMOutcome | undefined>();
   const workerRef = useRef<Worker | null>(null);
 
-  // ── live severity preview (spec §7.3): a fast T=5,000 sim for the selected
+  // ── live outcome preview (spec §7.3): a fast T=5,000 sim for the selected
   // tier so the readout updates without waiting for the authoritative T=100,000 run.
   const previewWorkerRef = useRef<Worker | null>(null);
   const previewReqRef = useRef(0);
   const [previewOutcome, setPreviewOutcome] = useState<IMMOutcome | undefined>();
   const [previewState, setPreviewState] = useState<SimState>("idle");
 
-  // ── I6 (2026-06-04): analog Bayesian MCMC posterior-predictive ───────────
-  // Fetched per-condition posterior λ draws from the Python calibration API,
-  // then a worker-offloaded posterior-predictive sweep. Mirrors the preview
+  // ── I6 (2026-06-04): analog prior-uncertainty predictive sweep ───────────
+  // Fetched per-condition λ draws from the Python calibration API,
+  // then a worker-offloaded predictive sweep. Mirrors the preview
   // effect's debounce + reqId + cleanup discipline below. State machine:
   //   idle    — kind not eligible, no crew, or reset
   //   running — fetch and/or worker sweep in flight
@@ -374,30 +344,14 @@ export function CrewComposition() {
     [state.members],
   );
 
-  // ── derived HSRB LxC verdict (drives the NASA-standard risk colour) ──────
-  // Computed off the IMM outcome + crew gate so it auto-updates whenever
-  // either changes. Returns undefined while no sim has been run.
-  const lxc = useMemo(
-    () => (outcome ? assessIMMLxC(outcome, gateResult) : undefined),
-    [outcome, gateResult],
-  );
-
-  // Preview LxC verdict from the fast preview outcome.
-  const previewLxc = useMemo(
-    () => (previewOutcome ? assessIMMLxC(previewOutcome, gateResult) : undefined),
-    [previewOutcome, gateResult],
-  );
-
   // 2026-06-04: per-(mission-kind, condition) multiplier map for the active
   // mission. Read once per mission change. Used by:
   //   - the I3 `IMMConditionDrivers` chart (per-row kind pill + sort bias)
-  //   - the L×C panel "kind delta" badge
-  //   - the KindMultipliersTable mounted in the verdict area
+  //   - the KindMultipliersTable mounted in the outcome area
   const kindMultipliers = useKindMultipliers(state.mission.kind);
 
-  // The severity readout prefers the authoritative full-sim outcome; otherwise the preview.
+  // The outcome readout prefers the authoritative full-sim outcome; otherwise the preview.
   const readoutOutcome = outcome ?? previewOutcome;
-  const readoutLxc = outcome ? lxc : previewLxc;
   const readoutIsPreview = !outcome && previewOutcome !== undefined;
 
   // Auto-run a debounced T=5,000 preview whenever the tier / mission / crew / seed /
@@ -434,17 +388,18 @@ export function CrewComposition() {
       w.postMessage({
         crew: state.members, mission: state.mission, kit: state.kit,
         trials: 5000, seed: state.seed, chiStar: state.chiStar, criteria: PLACEHOLDER_CRITERIA,
+        vulnerabilityCouplingMode: state.couplingMode,
       });
     }, 400);
     return () => {
       clearTimeout(handle);
       if (previewWorkerRef.current) { previewWorkerRef.current.terminate(); previewWorkerRef.current = null; }
     };
-  }, [state.members, state.mission, state.kit, state.seed, state.chiStar]);
+  }, [state.members, state.mission, state.kit, state.seed, state.chiStar, state.couplingMode]);
 
-  // ── I6 (2026-06-04): analog Bayesian MCMC posterior-predictive effect ─────
-  // Fetch per-condition posterior λ draws from the Python calibration API, then
-  // run a posterior-predictive Monte Carlo sweep in the worker (NEVER on the main
+  // ── I6 (2026-06-04): analog prior-uncertainty predictive effect ───────────
+  // Fetch per-condition λ draws from the Python calibration API, then
+  // run a predictive Monte Carlo sweep in the worker (NEVER on the main
   // thread — the sweep is nDraws × trialsPerDraw trials). Mirrors the preview
   // effect above: debounced (400 ms), race-guarded (ppReqRef), cleanup-safe.
   // Two extra teardowns over the preview effect: an AbortController for the fetch
@@ -517,6 +472,7 @@ export function CrewComposition() {
               trialsPerDraw: 200,
               seed: state.seed,
               kindMultipliers,
+              vulnerabilityCouplingMode: state.couplingMode,
             },
           });
         })
@@ -533,7 +489,7 @@ export function CrewComposition() {
       if (ppAbortRef.current) { ppAbortRef.current.abort(); ppAbortRef.current = null; }
       if (ppWorkerRef.current) { ppWorkerRef.current.terminate(); ppWorkerRef.current = null; }
     };
-  }, [state.members, state.mission, state.kit, state.seed, kindMultipliers]);
+  }, [state.members, state.mission, state.kit, state.seed, state.couplingMode, kindMultipliers]);
 
   function toggleMember(id: string) {
     setExpandedIds((prev) => {
@@ -663,8 +619,9 @@ export function CrewComposition() {
       seed: state.seed,
       chiStar: state.chiStar,
       criteria: PLACEHOLDER_CRITERIA,
+      vulnerabilityCouplingMode: state.couplingMode,
     });
-  }, [simState, state.members, state.mission, state.kit, state.trials, state.seed, state.chiStar]);
+  }, [simState, state.members, state.mission, state.kit, state.trials, state.seed, state.chiStar, state.couplingMode]);
 
   // ── worker cleanup on unmount ───────────────────────────────────────────
   useEffect(() => {
@@ -715,49 +672,43 @@ export function CrewComposition() {
           : ""}
       </div>
 
-      {/* ── Mission severity — prominent live dashboard (Diego 2026-05-29) ───
+      {/* ── Analog outcome estimate — prominent live dashboard ──────────────
            The headline output. Updates live from the T=5,000 preview as you
            configure crew / mission / scenario; replaced by the authoritative
            T=100,000 run when one is present. */}
       {(() => {
-        const sev = readoutLxc ? (readoutLxc.color === "gray" ? "red" : readoutLxc.color) : null;
-        const textCls =
-          sev === "red" ? "text-red-500" : sev === "yellow" ? "text-amber-400" : "text-go";
-        const chipCls =
-          sev === "red" ? "bg-red-500/15 text-red-300"
-          : sev === "yellow" ? "bg-amber-400/15 text-amber-300"
-          : "bg-go/15 text-go";
-        const delta = readoutOutcome ? readoutOutcome.chi.mean - ISS_HMS_BASELINE_CHI : 0;
+        const dutyHoursLost = readoutOutcome
+          ? ((100 - readoutOutcome.chi.mean) / 100) * state.mission.durationDays * 24 * state.members.length
+          : 0;
         return (
           <div
-            className={"panel border-l-4 " +
-              (sev === "red" ? "border-l-red-500" : sev === "yellow" ? "border-l-amber-400" : sev === "green" ? "border-l-go" : "border-l-line")}
+            className="panel border-l-4 border-l-signal"
             role="region"
-            aria-label="mission severity"
+            aria-label="analog mission outcome estimate"
           >
             <div className="flex flex-wrap items-center justify-between gap-x-8 gap-y-4">
               <div className="flex flex-wrap items-center gap-x-8 gap-y-3">
                 <div className="flex flex-col gap-0.5">
                   <span className="label text-[12px] text-ink-2 uppercase tracking-cap">
-                    Mission severity
+                    Analog outcome estimate
                     {readoutIsPreview ? " · live preview (T=5,000)" : readoutOutcome ? " · full run" : ""}
                   </span>
                   {readoutOutcome ? (
                     <div className="flex items-baseline gap-2">
-                      <span className={"display text-5xl leading-none tabular-nums " + textCls}>
+                      <span className="display text-5xl leading-none tabular-nums text-ink-0">
                         {readoutOutcome.chi.mean.toFixed(1)}
                       </span>
                       <span className="mono text-xs text-ink-2">CHI %</span>
                       <span className="mono text-[13px] text-ink-3 ml-1">
-                        {delta >= 0 ? "+" : "−"}{Math.abs(delta).toFixed(1)} vs ISS
+                        {dutyHoursLost.toFixed(0)} duty hours lost
                       </span>
                     </div>
                   ) : (
                     <span className="mono text-sm text-ink-3">
                       {state.members.length === 0
-                        ? "add crew members to estimate severity"
+                        ? "add crew members to estimate outcomes"
                         : previewState === "running"
-                          ? "estimating severity (T=5,000)…"
+                          ? "estimating outcomes (T=5,000)…"
                           : "configure the crew, then run the simulation"}
                     </span>
                   )}
@@ -766,20 +717,32 @@ export function CrewComposition() {
                   <dl className="mono text-[13px] text-ink-2 grid grid-cols-[auto_auto] gap-x-3 gap-y-0.5">
                     <dt className="text-ink-3">mission success</dt>
                     <dd className="tabular-nums text-right text-ink-1">{readoutOutcome.missionSuccess.mean.toFixed(1)}%</dd>
+                    <dt className="text-ink-3">medical events</dt>
+                    <dd className="tabular-nums text-right text-ink-1">{readoutOutcome.tme.mean.toFixed(2)}</dd>
                     <dt className="text-ink-3">p(evacuation)</dt>
                     <dd className="tabular-nums text-right text-ink-1">{readoutOutcome.pEvac.mean.toFixed(2)}%</dd>
+                    <dt className="text-ink-3">p(loss of life)</dt>
+                    <dd className="tabular-nums text-right text-ink-1">{readoutOutcome.pLocl.mean.toFixed(2)}%</dd>
                     <dt className="text-ink-3">scenario</dt>
                     <dd className="text-right text-ink-1">{state.kit.label}</dd>
                   </dl>
                 )}
               </div>
-              {readoutLxc && (
+              {readoutOutcome && (
                 <div className="flex flex-col items-end gap-1.5">
-                  <span className={"display text-3xl tabular-nums " + textCls}>
-                    L{readoutLxc.likelihood} × C{readoutLxc.consequence} = {readoutLxc.score}
+                  <span className="mono uppercase tracking-cap text-[11px] text-ink-3">
+                    evidence grade
                   </span>
-                  <span className={"mono uppercase tracking-cap text-xs px-2 py-1 rounded " + chipCls}>
-                    HSRB {sev}
+                  <span className="mono uppercase tracking-cap text-xs px-2 py-1 rounded bg-signal/10 text-signal">
+                    {state.mission.profile?.evidenceGrade ?? "development"}
+                  </span>
+                  {gateResult.crewVerdict === "disqualified" && (
+                    <span className="mono text-xs text-red-300">
+                      gate review required: {gateResult.disqualifiedMemberIds.join(", ")}
+                    </span>
+                  )}
+                  <span className="mono text-[11px] text-ink-3">
+                    trait coupling: {state.couplingMode === "scenario" ? "scenario" : "off"}
                   </span>
                 </div>
               )}
@@ -830,7 +793,7 @@ export function CrewComposition() {
               </select>
               {/* 2026-06-04 mission-kind context badge. A `<button>` toggling a
                   `<details>` so the user can expand to read the multiplier
-                  explanation + the per-condition table below the verdict.
+                  explanation + the per-condition table below the outcome area.
                   data-testid="mission-kind-context" is preserved from the
                   earlier commit so existing tests still find it. */}
               <button
@@ -864,10 +827,10 @@ export function CrewComposition() {
                   Palinkas 2004, Pattarini 2016, Hong 2022, Peřina 2024, and
                   Nirwan 2022 modulate the base prior <em>after</em> the
                   tier-A/B/C multiplier and <em>before</em> risk-factor and
-                  Stage-A multipliers. The label above names the active
-                  prior-calibration context; the table below the L×C
-                  verdict lists the per-condition multipliers with citations
-                  and confidence.
+                  scenario trait-coupling multipliers when enabled. The label
+                  above names the active prior-calibration context; the table
+                  below lists the per-condition multipliers with citations and
+                  confidence.
                 </p>
                 <p className="mt-1 text-ink-3">
                   See <code>research/evidence_extracted/antarctic_kind_multipliers.md</code>{" "}
@@ -934,8 +897,8 @@ export function CrewComposition() {
               </dd>
             </dl>
 
-            {/* Health-support scenario selector. The severity it drives is shown
-                in the prominent Mission-severity dashboard at the top of the page;
+            {/* Health-support scenario selector. The outcome estimate it drives is shown
+                in the prominent analog-outcome dashboard at the top of the page;
                 the per-item Care-capability breakdown below is collapsed by default. */}
             <div className="flex flex-col gap-1.5">
               <label className="label text-[12px] text-ink-2 uppercase tracking-cap">Health Support (scenario)</label>
@@ -962,6 +925,36 @@ export function CrewComposition() {
                   onChange={(e) => setState((s) => ({ ...s, chiStar: parseFloat(e.target.value) }))}
                   aria-label="chi-star mission success threshold"
                 />
+              </div>
+
+              <div className="flex items-center justify-between gap-3 border border-line/60 rounded px-3 py-2">
+                <div className="flex flex-col">
+                  <span className="mono text-[12px] text-ink-2">Trait coupling</span>
+                  <span className="mono text-[10px] text-ink-3">
+                    {state.couplingMode === "scenario" ? "scenario analysis" : "off for scientific mode"}
+                  </span>
+                </div>
+                <button
+                  type="button"
+                  role="switch"
+                  aria-checked={state.couplingMode === "scenario"}
+                  className={
+                    "mono text-[11px] uppercase tracking-cap px-2 py-1 rounded border " +
+                    (state.couplingMode === "scenario"
+                      ? "border-amber-400 text-amber-300 bg-amber-400/10"
+                      : "border-line text-ink-2")
+                  }
+                  onClick={() => {
+                    setState((s) => ({
+                      ...s,
+                      couplingMode: s.couplingMode === "scenario" ? "off" : "scenario",
+                    }));
+                    setOutcome(undefined);
+                    setSimState("idle");
+                  }}
+                >
+                  {state.couplingMode === "scenario" ? "scenario" : "off"}
+                </button>
               </div>
 
               <div className="flex flex-col gap-1">
@@ -1097,101 +1090,6 @@ export function CrewComposition() {
             kitScenarioId={state.kit.scenarioId}
           />
 
-          {/* HSRB LxC verdict — NASA JSC-66705 Rev A standard, headline above all figures. */}
-          {lxc && (
-            <div
-              className="panel"
-              role="status"
-              aria-label={`HSRB risk verdict ${lxc.color} L${lxc.likelihood} times C${lxc.consequence} score ${lxc.score}`}
-            >
-              <div className="flex items-baseline justify-between flex-wrap gap-2 mb-4">
-                <h3 className="label text-ink-1 uppercase tracking-cap">
-                  NASA HSRB · LxC verdict (JSC-66705 Rev A)
-                </h3>
-                <div className="flex items-baseline gap-3 flex-wrap">
-                  {/* 2026-06-04: kind-delta badge. Informational; the L×C cells
-                      remain the published NASA HSRB values. The badge tells
-                      the user how many conditions the kind multiplier has
-                      elevated / suppressed / zeroed for this mission. */}
-                  <span
-                    className="mono text-[10px] uppercase tracking-cap text-ink-3
-                               border border-line/60 rounded px-2 py-0.5"
-                    data-testid="kind-delta-badge"
-                    title="informational only — the L×C matrix cells remain the published NASA HSRB values"
-                  >
-                    {kindDeltaSummary(state.mission.kind, kindMultipliers)}
-                  </span>
-                  <span className="mono text-[10px] uppercase tracking-cap text-ink-3">
-                    JSC-66705 Rev A · Fig. 4
-                  </span>
-                </div>
-              </div>
-              <div className="flex items-baseline gap-6 flex-wrap">
-                <span
-                  className={
-                    "display text-4xl tabular-nums " +
-                    (lxc.color === "red"    ? "text-red-500"  :
-                     lxc.color === "yellow" ? "text-amber-400" :
-                                              "text-go")
-                  }
-                >
-                  L{lxc.likelihood} × C{lxc.consequence} = {lxc.score}
-                </span>
-                <span
-                  className={
-                    "mono uppercase tracking-cap text-xs px-2 py-1 rounded " +
-                    (lxc.color === "red"    ? "bg-red-500/15 text-red-300"  :
-                     lxc.color === "yellow" ? "bg-amber-400/15 text-amber-300" :
-                                              "bg-go/15 text-go")
-                  }
-                >
-                  {lxc.color}
-                </span>
-                {lxc.disqualified && (
-                  <span className="mono text-xs text-red-300">
-                    {lxc.reason}
-                  </span>
-                )}
-              </div>
-
-              {/* 5×5 Likelihood × Consequence matrix — same visualization as the
-                  Stage-B Sim page (CHIExplainer): matrix left, drivers right. */}
-              <div className="grid grid-cols-1 md:grid-cols-[minmax(260px,360px)_1fr] gap-5 items-start mt-5">
-                <LxCMatrix assessment={lxc} />
-
-                <div className="space-y-3 text-sm text-ink-1 leading-relaxed">
-                  <div>
-                    <span className="mono text-[10px] uppercase tracking-cap text-ink-3">
-                      likelihood · L{lxc.likelihood} ({lxc.likelihoodLabel})
-                    </span>
-                    <p className="mt-1">
-                      <span className="mono text-ink-0">
-                        pFailure = {(100 * lxc.pMissionFailure).toFixed(2)} %
-                      </span>{" "}
-                      — {lxc.likelihoodDefinition}
-                    </p>
-                  </div>
-                  <div>
-                    <span className="mono text-[10px] uppercase tracking-cap text-ink-3">
-                      consequence · C{lxc.consequence} ({lxc.consequenceLabel})
-                    </span>
-                    <p className="mt-1">
-                      <span className="mono text-ink-0">
-                        fraction crew-days lost = {(100 * lxc.fractionLost).toFixed(2)} %
-                      </span>{" "}
-                      — {lxc.consequenceDefinition}
-                    </p>
-                  </div>
-                </div>
-              </div>
-
-              <p className="mono text-[12px] text-ink-3 mt-4 border-t border-line/40 pt-2">
-                pFailure = 1 − missionSuccess (failure ⇔ any of EVAC, LOCL, CHI &lt; χ*).
-                fractionLost = 1 − CHI/100 (NASA JSC-66705 §3.2.4).
-              </p>
-            </div>
-          )}
-
           <div className="panel">
             <h3 className="label text-ink-1 uppercase tracking-cap mb-4">
               I1 · Headline
@@ -1282,36 +1180,36 @@ export function CrewComposition() {
           <KindMultipliersTable kind={state.mission.kind} />
         </div>
 
-        {/* I6 — analog Bayesian MCMC posterior, gated on the eligible kinds
+        {/* I6 — analog predictive incidence uncertainty, gated on the eligible kinds
             (antarctic-station / analog-controlled) that carry a kind_multipliers
             block in the calibrated priors. The draws are fetched from the optional
-            Python calibration API and the posterior-predictive sweep runs in the
+            Python calibration API and the predictive sweep runs in the
             worker; the panel degrades gracefully when the API is unreachable. */}
         {POSTERIOR_KINDS.has(state.mission.kind) && (
           <div className="panel" data-testid="imm-i6-posterior">
             <h3 className="label text-ink-1 uppercase tracking-cap mb-4">
-              I6 · Analog Bayesian MCMC Posterior
+              I6 · Predictive Incidence Uncertainty
             </h3>
             {ppState === "running" && !ppDraws && (
               <p className="text-[11px] italic text-ink-3">
-                fetching posterior draws from Python calibration API…
+                fetching parameter draws from Python calibration API…
               </p>
             )}
             {ppState === "running" && ppDraws && (
               <p className="text-[11px] italic text-ink-3">
-                running posterior-predictive sweep ({Math.min(64, ppDraws.n_draws)} draws × 200 trials per draw)…
+                running predictive sweep ({Math.min(64, ppDraws.n_draws)} draws × 200 trials per draw)…
               </p>
             )}
             {ppState === "api-error" && (
               <p className="text-[11px] italic text-ink-3">
                 Python calibration API unreachable — start it with{" "}
                 <code className="mono">cd python &amp;&amp; uvicorn api.main:app --reload</code>{" "}
-                to see posterior draws.
+                to see parameter draws.
               </p>
             )}
             {ppState === "compute-error" && (
               <p className="text-[11px] italic text-ink-3">
-                posterior-predictive sweep failed{ppError ? `: ${ppError}` : " (unknown error)"}.
+                predictive sweep failed{ppError ? `: ${ppError}` : " (unknown error)"}.
               </p>
             )}
             {ppState === "done" && ppDraws && ppOutcome && (
@@ -1324,7 +1222,7 @@ export function CrewComposition() {
             )}
             {ppState === "done" && ppDraws && !ppOutcome && (
               <p className="text-[11px] italic text-ink-3">
-                No per-condition posterior draws for kind "{state.mission.kind}" — this
+                No per-condition parameter draws for kind "{state.mission.kind}" — this
                 is expected for mission kinds without a kind_multipliers block in the
                 calibrated priors.
               </p>
@@ -1370,6 +1268,7 @@ export function CrewComposition() {
                 vulnerabilityMode: "boolean-flags",
                 engine: "monte-carlo",
                 outcomes: outcome ?? null,
+                couplingMode: state.couplingMode,
                 validation: {
                   vsK15Table1: {
                     delta_tme: 0, delta_chi: 0, delta_pEvac: 0, delta_pLocl: 0,

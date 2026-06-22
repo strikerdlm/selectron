@@ -1,4 +1,4 @@
-// I6 IMMAnalogPosteriorPlot — per-condition posterior λ histograms + scenario-conditioned
+// I6 IMMAnalogPosteriorPlot — per-condition λ draw histograms + scenario-conditioned
 // pEVAC / pLOCL / CHI posterior metric cards.
 //
 // Data sources (three independent):
@@ -185,28 +185,27 @@ export function IMMAnalogPosteriorPlot({ draws, outcome, kind, trialsPerDraw }: 
   // Caption
   const captionBlock: CaptionBlock = {
     figureId: "I6",
-    oneLine: `Bayesian posterior-predictive summary for kind "${kind}": ${trialsPerDraw.toLocaleString()} Monte Carlo trials × ${outcome.nDraws} posterior draws.`,
+    oneLine: `Prior-uncertainty predictive summary for kind "${kind}": ${trialsPerDraw.toLocaleString()} Monte Carlo trials × ${outcome.nDraws} parameter draws.`,
     methods:
-      "The Python /posterior/draws endpoint serves analytic posterior draws sampled from " +
-      "the fitted Gamma-Poisson (or Lognormal-Poisson) priors for each condition. " +
+      "The Python /posterior/draws endpoint serves Gamma-Poisson or Lognormal-Poisson parameter draws already stored in the fitted priors for each condition. " +
       "For each draw the frontend runs trialsPerDraw Monte Carlo trials via composite " +
       "kind-multipliers (moment-matched: per-draw mean scaled to the draw, prior dispersion " +
       "preserved). The spread of per-draw metric means constitutes a moment-matched " +
-      "posterior-predictive interval — this is NOT a clean epistemic/aleatory decomposition " +
+      "predictive interval — this is NOT a clean epistemic/aleatory decomposition " +
       "but rather a propagation of prior uncertainty through the simulation. " +
-      "Per-condition histograms show the raw λ samples from the posterior draws (events/person-day). " +
-      "The TME contribution table reports the posterior of the per-draw mean expected TME " +
+      "Per-condition histograms show the raw λ samples from the parameter draws (events/person-day). " +
+      "The TME contribution table reports the distribution of the per-draw mean expected TME " +
       "contribution per condition (events/trial), sorted by mean descending.",
     source:
       "Antonsen et al. (2022) npj Microgravity 8(1) [doi:10.1038/s41526-022-00193-9]; " +
       "Keenan et al. (2015) ICES-2015-123 [K15]. " +
-      "PyMC NUTS posterior calibration (59/59 tier-B conditions), Selectron Calibration API.",
+      "Fitted Selectron prior draws, Selectron Calibration API.",
     reproducibility: `kind=${kind}, nDraws=${outcome.nDraws}, trialsPerDraw=${trialsPerDraw}, seed=${draws.seed}`,
     interpretation:
       "This figure shows how uncertain the model is about each astronaut crew's medical risk " +
       "for a given mission type. The three metric cards (pEVAC, pLOCL, CHI) show the most " +
       "likely outcome and the range of plausible values (90% interval). The small histograms " +
-      "show how the per-condition incidence rates (λ) vary across the Bayesian posterior — " +
+      "show how the per-condition incidence rates (λ) vary across stored parameter draws — " +
       "wider histograms mean more uncertainty about that condition's true rate. The table " +
       "ranks conditions by their expected contribution to total medical events. Conditions " +
       "with higher means are the biggest drivers of mission risk for this kind of mission.",
@@ -239,7 +238,7 @@ export function IMMAnalogPosteriorPlot({ draws, outcome, kind, trialsPerDraw }: 
       {/* ── Per-condition λ small-multiples ── */}
       <div>
         <p className="text-[10px] uppercase tracking-cap text-ink-2 mb-2">
-          Per-condition posterior λ (events/person-day)
+          Per-condition λ draws (events/person-day)
         </p>
         {histDraws.length === 0 ? (
           <p className="text-[11px] italic text-ink-3">

@@ -8,10 +8,9 @@ import { isCriterionAvailableAtTier, TIER_LABEL } from "@/types";
 export function StepCriteria() {
   const { criterionEntries, accessTier, markStepCompleted, setStep } = useWizard();
 
-  // Filter to ONLY the criteria available at the user's chosen tier.
-  // scope-expansion-3 follow-up (Diego 2026-05-19): "when I change the minimum,
-  // medium and elite, the tests do not change. Can we fix that it only displays
-  // the needed tests for the minimum, the medium and the Elite."
+  // Analog-audit correction: tiers change instrument fidelity, not construct
+  // inclusion. `isCriterionAvailableAtTier` now keeps the construct set stable
+  // so Dirichlet mean weights do not change simply because K changed by tier.
   const visibleCriteria = useMemo(
     () => PLACEHOLDER_CRITERIA.filter((c) => isCriterionAvailableAtTier(c.minimumTier, accessTier)),
     [accessTier],
@@ -39,8 +38,6 @@ export function StepCriteria() {
     return { ok, partial, empty };
   }, [visibleCriteria, byId]);
 
-  const hiddenCount = PLACEHOLDER_CRITERIA.length - visibleCriteria.length;
-
   const anyEmpty = counts.empty > 0;
   const anyPartial = counts.partial > 0;
   const allOk = !anyEmpty && !anyPartial;
@@ -56,14 +53,9 @@ export function StepCriteria() {
             <span className="text-ink-3"> · {visibleCriteria.length} of {PLACEHOLDER_CRITERIA.length} criteria</span>
           </span>
         </div>
-        {hiddenCount > 0 && (
-          <p className="mono mt-2 text-[12px] text-ink-3 leading-relaxed">
-            tier <span className="text-signal">{TIER_LABEL[accessTier]}</span> shows{" "}
-            {visibleCriteria.length} criteria. <span className="text-ink-2">{hiddenCount}</span> additional{" "}
-            {hiddenCount === 1 ? "criterion is" : "criteria are"} available at higher tiers
-            (switch the Scenario above to see them).
-          </p>
-        )}
+        <p className="mono mt-2 text-[12px] text-ink-3 leading-relaxed">
+          tier <span className="text-signal">{TIER_LABEL[accessTier]}</span> uses tier-specific instruments while preserving the same construct set.
+        </p>
       </div>
 
       {visibleCriteria.map((c, i) => (

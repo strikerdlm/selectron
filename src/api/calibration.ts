@@ -212,12 +212,12 @@ export function getSensitivityStatus(jobId: string): Promise<JobStatusResponse> 
   return _fetch<JobStatusResponse>(`/sensitivity/${encodeURIComponent(jobId)}`);
 }
 
-// ── Posterior draws (analog MCMC posterior, 2026-06-04) ──────────────────────
+// ── Parameter draws for prior-uncertainty propagation ────────────────────────
 
-/** One condition's posterior λ samples, wire-faithful to the FastAPI response. */
+/** One condition's λ samples, wire-faithful to the FastAPI response. */
 export interface PosteriorDraw {
   condition_id: string;
-  /** Posterior λ values (non-negative; >0 for Gamma/Lognormal conditions), length === n_draws. */
+  /** λ values (non-negative; >0 for Gamma/Lognormal conditions), length === n_draws. */
   lambdas: number[];
 }
 
@@ -229,7 +229,7 @@ export interface PosteriorDrawsResponse {
 }
 
 /**
- * Fetch per-condition Bayesian posterior λ samples for an analog mission
+ * Fetch per-condition λ samples for prior-uncertainty propagation in an analog mission
  * context. `kind` filters to conditions in the priors' kind_multipliers
  * block; omit for all Gamma/Lognormal-Poisson conditions.
  */

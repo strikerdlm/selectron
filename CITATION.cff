@@ -1,9 +1,9 @@
 cff-version: 1.2.0
-title: "Selectron: A Reproducible Bayesian Decision-Analysis and NASA-IMM/HSRB Risk-Mapping Pipeline"
+title: "Selectron: uncertain-weight MCDA and analog mission simulation prototype for space-analog crew-selection research"
 message: "If you use Selectron in academic work, please cite this software as below, plus the underlying NASA Integrated Medical Model papers listed in `references`."
 type: software
 authors:
-  - family-names: "Malpica"
+  - family-names: "Malpica Hincapie"
     given-names: "Diego L."
     affiliation: "Dirección de Medicina Aeroespacial, Fuerza Aeroespacial Colombiana (FAC)"
     email: "dlmalpica@yahoo.com"
@@ -11,17 +11,17 @@ authors:
 license: MIT
 repository-code: "https://github.com/strikerdlm/selectron"
 url: "https://github.com/strikerdlm/selectron"
+doi: "10.5281/zenodo.20693257"
 version: "0.5.6"
 date-released: "2026-05-29"
 keywords:
-  - "analog astronaut selection"
-  - "Bayesian MCDA"
-  - "NASA HSRB"
-  - "NASA IMM"
+  - "space-analog crew selection"
+  - "uncertain-weight MCDA"
+  - "analog mission simulation"
+  - "scenario analysis"
+  - "NASA IMM benchmark"
   - "Integrated Medical Model"
-  - "probabilistic risk assessment"
-  - "Likelihood × Consequence"
-  - "JSC-66705"
+  - "probabilistic multi-criteria decision analysis"
   - "Monte Carlo"
   - "Crew Health Index"
   - "aerospace medicine"

@@ -8,9 +8,7 @@ import { evaluateGates } from "@/engine/gates";
 import { RiskCard } from "@/ui/components/RiskCard";
 import { RiskHistogram } from "@/ui/figures/RiskHistogram";
 import { ConditionContribution } from "@/ui/figures/ConditionContribution";
-import { MissionComparison } from "@/ui/figures/MissionComparison";
 import { IMMCalculationTrace } from "@/ui/figures/CalculationTrace";
-import { CHIExplainer } from "@/ui/figures/CHIExplainer";
 import type { AccessTier, GateResult } from "@/types";
 import { ACCESS_TIERS } from "@/types";
 import { isCriterionAvailableAtTier } from "@/types/scenario";
@@ -125,17 +123,19 @@ export function Sim({
         </section>
       </div>
 
-      {/* CHI EXPLAINER — Diego scope expansion 2026-05-19: define CHI and
-          interpret this specific run for the mission. Lives directly below the
-          headline RiskCard + RiskHistogram row.
-          gate (optional) is passed so assessLxC can apply the disqualified override
-          and the DISQUALIFIED banner is shown when a candidate fails a clearance gate. */}
-      <CHIExplainer
-        posterior={latest.posterior}
-        chiStar={latest.chiStar}
-        missionId={latest.missionId}
-        gate={gate ?? undefined}
-      />
+      <section className="panel p-6">
+        <h2 className="label text-ink-1 uppercase tracking-cap">Analog outcome summary</h2>
+        <dl className="mono mt-4 grid grid-cols-2 gap-x-6 gap-y-2 text-[13px] md:grid-cols-4">
+          <dt className="text-ink-3">CHI</dt>
+          <dd className="text-ink-0 tabular-nums">{(100 * latest.posterior.chi.mean).toFixed(1)}%</dd>
+          <dt className="text-ink-3">p(early interruption)</dt>
+          <dd className="text-ink-0 tabular-nums">{(100 * latest.posterior.pEarlyTermination.mean).toFixed(1)}%</dd>
+          <dt className="text-ink-3">lost crew-days</dt>
+          <dd className="text-ink-0 tabular-nums">{latest.posterior.expectedLostCrewDays.mean.toFixed(1)}</dd>
+          <dt className="text-ink-3">gate status</dt>
+          <dd className="text-ink-0">{gate?.verdict ?? "not evaluated"}</dd>
+        </dl>
+      </section>
 
       {/* CALCULATION TRACE — Diego scope expansion 2026-05-19: priority on
           showing how we got to the probability, with educational lay layer. */}
@@ -165,15 +165,6 @@ export function Sim({
             priorsVersion={latest.priorsVersion}
           />
         </section>
-        {mission && (
-          <section className="lg:col-span-12">
-            <MissionComparison
-              candidateId={candidateId}
-              accessTier={sessionTier}
-              gate={gate ?? undefined}
-            />
-          </section>
-        )}
       </div>
 
       <button

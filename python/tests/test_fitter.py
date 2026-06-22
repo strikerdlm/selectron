@@ -250,6 +250,18 @@ class TestFitAllTierB:
             dry_run=True,
         )
         assert report.n_fitted == 0
+        assert all(reason == "No accepted evidence data" for reason in report.skipped.values())
+
+    def test_rejects_unknown_evidence_source(self) -> None:
+        with pytest.raises(ValueError, match="evidence_source"):
+            fit_all_tier_b(
+                draws=100,
+                tune=50,
+                chains=1,
+                seed=42,
+                dry_run=True,
+                evidence_source="proposal",
+            )
 
     @pytest.mark.slow
     def test_fits_remaining_tierb_lit_from_proposals(self) -> None:
@@ -259,6 +271,7 @@ class TestFitAllTierB:
             chains=2,
             seed=42,
             dry_run=False,
+            evidence_source="proposals",
         )
         # Post-PyMC merge: only 6 tierB-lit remain (3 excluded outliers + 3 unfitted).
         # 3 excluded outliers have evidence and should be fitted or failed.

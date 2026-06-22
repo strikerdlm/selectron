@@ -199,9 +199,9 @@ export function IMMValidationCompare({
       `Blue = within CI₉₅; amber = outside. ${badges.join(" | ")}.`,
     methods:
       "Dumbbell chart: gray dot = K15 Table 1 issHMS reference value; colored dot = " +
-      "run posterior mean. Connecting bar tinted green (run > reference) or vermillion " +
+      "run Monte Carlo mean. Connecting bar tinted green (run > reference) or vermillion " +
       "(run < reference). CI₉₅ badge: blue if K15 reference falls within the run's 95% " +
-      "credible interval, amber otherwise. Reference scenario: ISS 6-month / 6-crew / " +
+      "simulation interval, amber otherwise. Reference scenario: ISS 6-month / 6-crew / " +
       "issHMS medical kit (K15 Table 1, Keenan et al. 2015 ICES-2015-123).",
     source:
       "Keenan et al. (2015) [K15] ICES-2015-123 Table 1 — issHMS scenario " +

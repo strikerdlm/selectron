@@ -1,8 +1,8 @@
 // tests/imm/posterior_predictive.test.ts
 //
-// Tests for posteriorPredictiveSimulateIMM — the posterior-predictive Monte
-// Carlo wrapper around simulateIMM. The wrapper threads per-condition posterior
-// λ draws into the engine as per-draw composite kind-multipliers (moment-matched
+// Tests for posteriorPredictiveSimulateIMM — the predictive Monte Carlo wrapper
+// around simulateIMM. The wrapper threads per-condition λ draws into the engine
+// as per-draw composite kind-multipliers (moment-matched
 // to λ_d / E[λ]) with ZERO engine changes, so the K15 invariance canary holds.
 //
 // TDD: these were written before posterior-predictive.ts existed (module-not-found
@@ -45,7 +45,7 @@ function priorMeanLambda(cid: string): number {
   throw new Error(`no point mean for ${cid} (${inc.distribution})`);
 }
 
-/** Build a length-n posterior draws array of constant value `lambda`. */
+/** Build a length-n parameter-draw array of constant value `lambda`. */
 function constDraws(lambda: number, n: number): number[] {
   return Array.from({ length: n }, () => lambda);
 }
@@ -106,11 +106,11 @@ describe("posteriorPredictiveSimulateIMM", () => {
   // diarrhea ~1605/1000PY) by 5× their prior mean and confirm both the
   // per-condition TME contribution AND a downstream metric (CHI) move.
   //
-  // This MUST fail against any implementation that ignores `posterior` — that
+  // This MUST fail against any implementation that ignores the parameter-draw map — that
   // is the test's purpose. The empirical probe (kit=none, iss-6mo, 2 crew,
   // nDraws 8 × trialsPerDraw 200) gave: sinTme A≈3.55→B≈17.5 (ratio ~4.9),
   // CHI A≈80.1→B≈69.0 (Δ≈-11). Both margins dwarf MC noise at these sizes.
-  it("propagates posterior draws into per-condition TME and downstream CHI", () => {
+  it("propagates parameter draws into per-condition TME and downstream CHI", () => {
     const CID = "acute-sinusitis";
     const conds = [CID, "diarrhea"];
     const nDraws = 8;
@@ -135,7 +135,7 @@ describe("posteriorPredictiveSimulateIMM", () => {
     // The point-prior (1×) run must already register events on this condition,
     // so the ratio below is meaningful.
     expect(A.perConditionTmeContribPost[CID].mean).toBeGreaterThan(0);
-    // 5× the posterior mean → > 2× the TME contribution (margin, not exact 5×).
+    // 5× the parameter-draw mean → > 2× the TME contribution (margin, not exact 5×).
     expect(B.perConditionTmeContribPost[CID].mean).toBeGreaterThan(
       2 * A.perConditionTmeContribPost[CID].mean,
     );
@@ -215,10 +215,10 @@ describe("posteriorPredictiveSimulateIMM", () => {
 
 // ── K15 unbiasedness ──────────────────────────────────────────────────────────
 //
-// Because every per-condition posterior here is constructed so that E[draws] = m
+// Because every per-condition draw set here is constructed so that E[draws] = m
 // (the prior point mean) EXACTLY — a symmetric ±40% perturbation set whose length
 // (8) divides nDraws (64) — the moment-matching composite multiplier λ_d / E[λ]
-// has unit mean by construction. The posterior-predictive GRAND mean over draws
+// has unit mean by construction. The predictive GRAND mean over draws
 // should therefore agree with the point-prior simulateIMM mean up to (a) a small
 // positive Jensen gap — pEvac is a nonlinear, saturating function of cumulative
 // TME, and within each draw λ is re-sampled scaled, so E[f(λ)] ≠ f(E[λ]) — and
@@ -227,7 +227,7 @@ describe("posteriorPredictiveSimulateIMM", () => {
 // MEASURED on the K15 reference config (iss-6mo / issHMS / file crew fixture /
 // seed 0xc0ffee), nDraws=64, trialsPerDraw=500, point trials=16000, all 99
 // Gamma/Lognormal-Poisson conditions perturbed:
-//   posterior-predictive grand mean pEvac = 2.5438 %
+//   predictive grand mean pEvac = 2.5438 %
 //   point-prior            mean pEvac      = 2.4312 %
 //   absolute delta = 0.1125 pp   relative delta = 4.63 %
 //   pEvacPost ci90 = [1.400, 4.000]  →  width 2.60 pp  (cited in V&V §7.9)
@@ -236,7 +236,7 @@ describe("posteriorPredictiveSimulateIMM", () => {
 // TOLERANCE: 15 % relative. The gate is an UNBIASEDNESS check (the two pipelines
 // share a central estimate), NOT a propagation check — propagation is proven by
 // the load-bearing 5×→>2× test above. Agreement here does not prove the
-// posterior is consumed; the widened ci90 (here 2.60 pp around a 2.5 % mean) is
+// parameter draws are consumed; the widened ci90 (here 2.60 pp around a 2.5 % mean) is
 // the actual feature.
 //
 // DURABILITY NOTE: measured relDelta is 4.63 % at the canonical seed 0xc0ffee.
@@ -245,7 +245,7 @@ describe("posteriorPredictiveSimulateIMM", () => {
 // 0xc0ffee, so CI is deterministic; the sweep characterizes durability against
 // engine-internal RNG / draw-order changes.
 describe("K15 unbiasedness", () => {
-  it("posterior-predictive grand mean agrees with point-prior mean within 15%", () => {
+  it("predictive grand mean agrees with point-prior mean within 15%", () => {
     const PERTURB = [0.6, 0.7, 0.8, 0.9, 1.1, 1.2, 1.3, 1.4]; // length 8, mean exactly 1.0
     const nDraws = 64; // 64 / 8 = 8 → E[draws] = m EXACTLY for every condition
     const trialsPerDraw = 500;
@@ -282,7 +282,7 @@ describe("K15 unbiasedness", () => {
     const relDelta = Math.abs(ppMean - ptMean) / ptMean;
     const ci90Width = pp.pEvacPost.ci90[1] - pp.pEvacPost.ci90[0];
 
-    // Record the feature (widened posterior-predictive interval) for §7.9.
+    // Record the feature (widened predictive interval) for §7.9.
     // eslint-disable-next-line no-console
     console.log(
       `[K15 unbiasedness] pp pEvac mean=${ppMean.toFixed(4)}% point mean=${ptMean.toFixed(4)}% ` +

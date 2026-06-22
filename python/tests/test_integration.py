@@ -22,6 +22,7 @@ class TestFullPipeline:
             chains=2,
             seed=42,
             dry_run=False,
+            evidence_source="proposals",
         )
         # Depression may land in fitted (converged) or failed (not converged with small draws)
         assert "depression" in report.fitted or "depression" in report.failed

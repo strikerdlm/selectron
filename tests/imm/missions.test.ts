@@ -1,6 +1,6 @@
 // tests/imm/missions.test.ts
 import { describe, it, expect } from "vitest";
-import { IMM_MISSIONS } from "../../src/data/imm-missions";
+import { ACTIVE_MISSIONS, BENCHMARK_MISSIONS, IMM_MISSIONS } from "../../src/data/imm-missions";
 
 describe("IMM_MISSIONS", () => {
   it("includes K15 ISS 6mo reference", () => {
@@ -25,5 +25,12 @@ describe("IMM_MISSIONS", () => {
     for (const id of expectedIds) {
       expect(IMM_MISSIONS.find(m => m.id === id)).toBeDefined();
     }
+  });
+
+  it("uses analog missions as the active operational default set", () => {
+    expect(ACTIVE_MISSIONS.length).toBeGreaterThan(0);
+    expect(ACTIVE_MISSIONS.every((m) => m.kind !== "leo-iss")).toBe(true);
+    expect(ACTIVE_MISSIONS.every((m) => m.profile)).toBe(true);
+    expect(BENCHMARK_MISSIONS.some((m) => m.id === "iss-6mo")).toBe(true);
   });
 });

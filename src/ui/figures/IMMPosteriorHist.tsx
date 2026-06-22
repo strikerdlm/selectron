@@ -1,4 +1,4 @@
-// I2 IMMPosteriorHist — 4-panel small-multiples for IMM posterior distributions.
+// I2 IMMPosteriorHist — 4-panel small-multiples for IMM Monte Carlo summaries.
 //
 // Renders parametric Gaussian PDF curves (not histograms of raw samples) for
 // TME, CHI, pEVAC, and pLOCL based on PosteriorSummary (mean + sd).
@@ -202,11 +202,11 @@ export function IMMPosteriorHist({
 
   const captionBlock = {
     figureId: "I2",
-    oneLine: `Posterior distributions for TME / CHI / pEVAC / pLOCL after T=${trials.toLocaleString()} IMM Monte Carlo trials on ${mission.label}.`,
+    oneLine: `Monte Carlo summary distributions for TME / CHI / pEVAC / pLOCL after T=${trials.toLocaleString()} IMM trials on ${mission.label}.`,
     methods:
       "Parametric Gaussian approximation: each panel renders the normal PDF N(μ, σ²) derived " +
       "from the PosteriorSummary (mean ± sd). Per CLT the T-trial means are approximately " +
-      "Gaussian; this approximation is faithful for T ≥ 10 000. CI₉₀ shaded; posterior mean " +
+      "Gaussian; this approximation is faithful for T ≥ 10 000. CI₉₀ shaded; Monte Carlo mean " +
       "overlaid as dashed line. When sd = 0 (degenerate/deterministic outcome) a vertical " +
       "spike is shown with σ = 1e-6 regularisation. Per-trial samples are not stored in " +
       "IMMOutcome — use the raw trial arrays from simulateIMM if kernel density is required.",

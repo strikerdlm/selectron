@@ -1,7 +1,7 @@
 // I1 IMMHeadlineCard — at-a-glance hero composite for an IMM Monte Carlo run.
 //
 // Layout: 4 large stat cards (TME / CHI / pEVAC / pLOCL), one row, each card
-// showing the posterior mean as the headline number plus a CI₉₅ whisker.
+// showing the Monte Carlo mean as the headline number plus a CI₉₅ whisker.
 // Below the grid: a slim inline row for Mission Success Probability (MSP),
 // followed by a small σ(CHI) convergence sparkline (the "did this run converge?"
 // glance — full diagnostic lives in I4).
@@ -39,7 +39,7 @@ function fmtPct(x: number): string {
 
 // ── CI₉₅ whisker ─────────────────────────────────────────────────────────────
 // A styled div, NOT ECharts. Renders a thin horizontal bar with a tick at the
-// posterior mean and the CI₉₅ low/high values as monospaced labels at the
+// Monte Carlo mean and the CI₉₅ low/high values as monospaced labels at the
 // extremes. Width-normalised so the visual range is anchored to the CI₉₅ span,
 // not the absolute scale (per-card local frame; the absolute axis lives in I2).
 type WhiskerProps = {
@@ -257,8 +257,8 @@ export function IMMHeadlineCard({
       `after T=${trials.toLocaleString()} IMM Monte Carlo trials on ${missionLabel}.`,
     methods:
       "Hero composite: four stat cards (TME, CHI, pEVAC, pLOCL) plus a Mission " +
-      "Success Probability (MSP) row. Each headline number is the posterior mean " +
-      "across T Monte Carlo trials; the whisker below shows the 95% credible " +
+      "Success Probability (MSP) row. Each headline number is the Monte Carlo mean " +
+      "across T trials; the whisker below shows the 95% simulation " +
       "interval (CI₉₅) span with a tick at the mean. MSP is the joint probability " +
       "P(no LOCL ∧ no EVAC ∧ CHI ≥ χ*). The σ(CHI) sparkline at the bottom is the " +
       "convergence glance: a flat trajectory near zero indicates a converged run; " +

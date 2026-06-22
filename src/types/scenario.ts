@@ -1,18 +1,13 @@
-// scope-expansion-3 (2026-05-19): accessibility tier for a Selectron candidate's
-// selection-battery realisation. Tier 1 = low-resource analog program (free /
-// open-source instruments on commodity hardware); Tier 2 = mid-budget research
-// centre with commercial computerised tools; Tier 3 = real spaceflight / NASA-
-// grade program with hardware-gated clinical instruments.
+// scope-expansion-3 (2026-05-19), revised for analog-only audit (2026-06-22):
+// accessibility tier for a Selectron candidate's selection-battery realisation.
+// Tier 1 = low-resource analog program; Tier 2 = mid-budget research centre;
+// Tier 3 = agency-grade/specialist instrumentation.
 //
-// Tier changes BOTH which criteria the wizard shows AND which instrument
-// measures each visible criterion (with any scale transformation):
-//
-//   - Tier 1 (Minimum) — 8 DIY-feasible criteria (the "core" battery)
-//   - Tier 2 (Medium)  — 10 criteria (adds 2 commercial-license tests)
-//   - Tier 3 (Elite)   — 12 criteria (adds 2 specialist-hardware/clinician tests)
-//
-// The per-criterion `minimumTier` field in src/types/criterion.ts gates the
-// filter; isCriterionAvailableAtTier(min, current) is the runtime check.
+// Tier now changes instrument fidelity, not the construct set. A Minimum-tier
+// candidate and an Elite-tier candidate should still be scored on the same
+// constructs unless a criterion truly lacks a tier instrument. This avoids the
+// old behavior where adding a higher-tier instrument changed every active
+// Dirichlet mean weight from 1/K to a different 1/K solely because K changed.
 //
 // See research/2026-05-19_test_battery_tiers.md for the per-criterion × per-
 // tier instrument table.
@@ -44,12 +39,10 @@ export const TIER_ORDINAL: Record<AccessTier, number> = {
 };
 
 export function isCriterionAvailableAtTier(
-  minimumTier: AccessTier | undefined,
-  currentTier: AccessTier,
+  _minimumTier: AccessTier | undefined,
+  _currentTier: AccessTier,
 ): boolean {
-  const required = TIER_ORDINAL[minimumTier ?? "minimum"];
-  const have = TIER_ORDINAL[currentTier];
-  return have >= required;
+  return true;
 }
 
 export const TIER_LONG_DESCRIPTION: Record<AccessTier, string> = {

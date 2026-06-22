@@ -1,4 +1,40 @@
-# `incidence_rates.csv` — schema
+# Evidence extraction schemas
+
+## `evidence_ledger.csv` — accepted release-fitting input
+
+Only rows in this file with `status=accepted`, a named `extractor`, and a named
+`verifier` may feed release/scientific prior fitting.
+
+| Column | Type | Description |
+|---|---|---|
+| status | enum | `accepted`, `rejected`, or `proposal`. Only `accepted` enters fitting. |
+| condition_id | string | Extracted endpoint condition identifier. |
+| mapped_prior_id | string | IMM prior condition id used by `src/data/imm-priors.json`. |
+| mission_type | string | Analog/site/mission context. |
+| study_doi | string | DOI or persistent identifier when available. |
+| study_slug | string | Source markdown slug or persistent source key. |
+| endpoint_definition | string | Exact endpoint definition used for the numerator. |
+| numerator | string | Source numerator before any transformation. |
+| denominator | string | Source denominator before any transformation. |
+| person_days | integer | Exposure time used by the Poisson fit. |
+| events | integer | Event count used by the Poisson fit. |
+| exposure_time | string | How exposure was measured or derived. |
+| repeated_measure_structure | string | Independent events, repeated measures, person-level, team-level, etc. |
+| extraction_quote | string | Verbatim source quotation or table cell locator. |
+| extractor | string | Person who extracted the row. |
+| verifier | string | Independent verifier/adjudicator. |
+| risk_of_bias | string | Risk-of-bias assessment. |
+| transportability | string | Population/context transportability assessment. |
+| transformation | string | Any transformation from source endpoint to model endpoint. |
+| uncertainty_distribution | string | Distribution or uncertainty model assigned to the parameter. |
+| model_version | string | Model/release version using the row. |
+| notes | string | Free text caveats. |
+
+## `incidence_rates.csv` / `incidence_rates.proposals*.csv` — proposal schema
+
+These files are proposal-stage extraction workspaces. They must not feed
+release priors unless rows are independently adjudicated and copied into
+`evidence_ledger.csv` as `accepted`.
 
 | Column | Type | Description |
 |---|---|---|

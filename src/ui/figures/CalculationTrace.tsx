@@ -1,5 +1,5 @@
 // Diego scope expansion 2026-05-19: step-by-step calculation viewer.
-// Renders the math behind Stage A (Bayesian MCDA) or Stage B (IMM forward MC)
+// Renders the math behind Stage A (uncertain-weight MCDA) or Stage B (IMM forward MC)
 // as a vertical chain of steps. Each step has:
 //   - title + scientific notation
 //   - the concrete numbers from THIS candidate's data
@@ -162,7 +162,7 @@ function mcdaSteps(args: {
     },
     {
       n: 2,
-      title: "Draw a weight vector from the Dirichlet prior",
+      title: "Draw a criterion-weight vector from the uncertain-weight prior",
       equation: (
         <span>
           w ~ Dirichlet(α{sub("1")}, …, α{sub("K")}), α{sub("k")} = 1 for all k
@@ -175,7 +175,7 @@ function mcdaSteps(args: {
         </span>
       ),
       lay:
-        "We don't know in advance which test matters most for this mission, so we let the model consider all weightings consistent with the data. The Dirichlet distribution is the natural way to sample probability-vectors — vectors of positive numbers that sum to 1. Using α = (1, …, 1) says 'no prior preference': every reasonable weighting is equally plausible before we look at the data.",
+        "The current app does not learn criterion weights from expert or outcome data. It samples plausible positive weight vectors that sum to 1 from an explicit Dirichlet prior. Using α = (1, …, 1) says 'no prior preference' across criteria.",
       citation: {
         id: "A6 methodology precedents",
         label: "Bayesian MCDA — Dirichlet weight prior",
@@ -198,7 +198,7 @@ function mcdaSteps(args: {
         </span>
       ),
       lay:
-        "For each draw of the weight vector, we multiply each criterion's z-score by its weight and add them up. The result is one possible 'total score' for the candidate. Different weight draws give different totals — that spread is what makes the posterior a distribution, not a single number.",
+        "For each draw of the weight vector, we multiply each criterion's z-score by its weight and add them up. The result is one possible total score for the candidate. Different weight draws give different totals; that spread is an assumed-priority sensitivity distribution, not a learned posterior.",
       citation: {
         id: "Iter-1 spec §3.3",
         label: "Selectron MCDA scoring engine",
@@ -206,7 +206,7 @@ function mcdaSteps(args: {
     },
     {
       n: 4,
-      title: "Repeat thousands of draws → posterior distribution over total score",
+      title: "Repeat thousands of draws → induced distribution over total score",
       equation: (
         <span>
           {`{ S`}
@@ -216,17 +216,17 @@ function mcdaSteps(args: {
       ),
       concrete: (
         <span>
-          posterior mean μ = {fmt(posterior.mean, 3)} · CI₉₀ = [
+          MCDA mean μ = {fmt(posterior.mean, 3)} · interval₉₀ = [
           {fmt(posterior.ci90[0], 3)}, {fmt(posterior.ci90[1], 3)}] · CI₉₅ = [
-          {fmt(posterior.ci95[0], 3)}, {fmt(posterior.ci95[1], 3)}] · ESS ={" "}
+          {fmt(posterior.ci95[0], 3)}, {fmt(posterior.ci95[1], 3)}] · draws ={" "}
           {posterior.ess.toFixed(0)}
         </span>
       ),
       lay:
-        "By drawing many weight vectors and computing the total score each time, we build a histogram of all the scores the candidate could plausibly receive. The width of that histogram tells us how robust the ranking is: a narrow band means most weightings agree, a wide band means the answer is sensitive to which criteria you prioritize. The 90% credible interval is the central band that holds 90% of the draws.",
+        "By drawing many weight vectors and computing the total score each time, we build a histogram of scores induced by the assumed weight uncertainty. The width of that histogram tells us how sensitive the score is to criterion priorities. It is not a learned posterior over candidate suitability.",
       citation: {
-        id: "MCMC convergence — [G12] §4",
-        label: "Posterior summary statistics + effective sample size",
+        id: "Monte Carlo score propagation — [G12] §4",
+        label: "Uncertain-weight MCDA summary statistics",
       },
     },
   ];
@@ -318,13 +318,13 @@ export function MCDACalculationTrace(props: {
             tier · {TIER_LABEL[props.accessTier]}
           </span>
           <span className="mono text-[10px] uppercase tracking-cap text-ink-2">
-            stage a · bayesian mcda
+            stage a · uncertain-weight mcda
           </span>
         </>
       }
       intro={
         <>
-          The total-score posterior on the right is the output of these four steps. Each
+          The total-score distribution on the right is the output of these four steps. Each
           step shows the math, the concrete numbers, and a plain-English explanation
           below the equation.
         </>
@@ -492,10 +492,10 @@ function immSteps(args: {
         </span>
       ),
       lay:
-        "One trial captures one possible mission. We re-run with fresh randomness many thousand times to see the full range of outcomes. The 90% credible interval is the band that holds 90% of the trials. pEarlyTermination is the fraction of trials where the crew health dropped below the 'should-end-mission' threshold χ*. It's the closest number we have to 'how likely is this mission to fail'.",
+        "One trial captures one possible mission. We re-run with fresh randomness many thousand times to see the full range of outcomes. The 90% simulation interval is the band that holds 90% of the trials. pEarlyTermination is the fraction of trials where the crew health dropped below the 'should-end-mission' threshold χ*. It's the closest number we have to 'how likely is this mission to fail'.",
       citation: {
         id: "Iter-3 spec §3.5 / [G12] convergence",
-        label: "Monte-Carlo posterior + early-termination probability",
+        label: "Monte Carlo summary + early-termination probability",
       },
     },
   ];
