@@ -52,7 +52,7 @@ Before submission, ensure the following are present:
 - Competing interests declaration file.
 - Supplemental files, if used.
 - Reproducibility lock file.
-- Zenodo/software DOI once minted.
+- Zenodo/software DOI: `10.5281/zenodo.20693257`.
 
 For Selectron, maintain:
 
@@ -343,7 +343,7 @@ Required examples:
 
 For Selectron:
 
-- Add the Zenodo software citation once minted.
+- Add the Zenodo software citation: `https://doi.org/10.5281/zenodo.20693257`.
 - Cite `paper/REPRODUCIBILITY_LOCK.json` only if treated as a dataset/software artifact; otherwise discuss it in Code availability.
 - Replace Harvard/author-date rendering with numbered Acta style before final submission.
 
@@ -647,7 +647,7 @@ Before calling the manuscript submission-ready, verify:
 - [ ] CRediT author-contributions statement exists.
 - [ ] Ethics statement exists.
 - [ ] Data availability statement exists.
-- [ ] Code availability statement includes the final Zenodo DOI.
+- [x] Code availability statement includes the final Zenodo DOI.
 - [ ] Generative AI declaration exists if applicable.
 - [ ] `paper/REPRODUCIBILITY_LOCK.json` is current.
 - [ ] `src/data/imm-priors.json` hash in the lock matches the file.

@@ -104,7 +104,7 @@ const doc = new Document({
       new Paragraph({
         spacing: { before: 0, after: 200, line: 360, lineRule: 'auto' },
         children: [
-          new TextRun({ text: 'The software artifact is MIT-licensed and will be archived at Zenodo before portal upload; the DOI will be inserted into the manuscript at that final archive step. The current figure-generation commit marker is ', font: FONT, size: BODY_HP }),
+          new TextRun({ text: 'The software artifact is MIT-licensed and archived on Zenodo at https://doi.org/10.5281/zenodo.20693257. The current figure-generation commit marker is ', font: FONT, size: BODY_HP }),
           new TextRun({ text: '538e16ccff94', font: FONT, size: BODY_HP }),
           new TextRun({ text: ', and the repository at ', font: FONT, size: BODY_HP }),
           new TextRun({ text: 'github.com/strikerdlm/selectron', font: FONT, size: BODY_HP }),

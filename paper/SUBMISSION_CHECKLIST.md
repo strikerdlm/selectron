@@ -9,7 +9,8 @@
 > **The ASR checklist is preserved at
 > [`submission/SUBMISSION_CHECKLIST.md`](submission/SUBMISSION_CHECKLIST.md), but it is
 > marked stale.** Rebuild journal-specific files from `paper/manuscript.md` after
-> the final target journal, Zenodo DOI, and reproducibility lock are frozen.
+> the final target journal and reproducibility lock are frozen. The public
+> Selectron Zenodo DOI is `10.5281/zenodo.20693257`.
 >
 > The earlier npj-specific content is preserved in git history; it is intentionally
 > not reproduced here to avoid presenting stale (Vancouver-style, structured-abstract,

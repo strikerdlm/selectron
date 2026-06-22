@@ -4,7 +4,7 @@
 **Track:** Subscription (no APC) unless OA elected
 **Prepared:** 2026-05-30 via `/asr-submit` skill (pandoc author–date Harvard build)  
 **Version of record:** Selectron v0.5.6 (matches `package.json`, `CITATION.cff`, README badge, and app chrome)
-**Current status:** **STALE after 2026-06-14 source revision. Do not upload the rendered DOCX files.** `paper/manuscript.md` now targets Acta Astronautica with a method-first title and safer abstract. The prior ASR rendered files in this folder were rebuilt on 2026-06-11 from an older source state and must be regenerated only after the final journal target, Zenodo DOI, figure-generation commit, and reproducibility lock are frozen.
+**Current status:** **STALE after 2026-06-14 source revision and DOI insertion. Do not upload the rendered DOCX files.** `paper/manuscript.md` now targets Acta Astronautica with a method-first title, safer abstract, and Zenodo DOI `10.5281/zenodo.20693257`. The prior ASR rendered files in this folder were rebuilt on 2026-06-11 from an older source state and must be regenerated only after the final journal target, figure-generation commit, and reproducibility lock are frozen.
 
 ---
 
@@ -57,7 +57,7 @@
 
 ## TODOs before final submission (human-only)
 - [ ] **Rebuild `submission/manuscript.docx` and `submission/cover-letter.docx`** from the current Acta-target source and verify line numbers, tables, references, expected statements, and embedded figures in the rendered file.
-- [ ] **Mint the Zenodo DOI** and record it in the manuscript (§ Code availability) and cover letter. Refresh the **figure-generation commit SHA** only if the final archive commit changes figure-generating source.
+- [x] **Zenodo DOI recorded** in source files: `10.5281/zenodo.20693257` (`https://doi.org/10.5281/zenodo.20693257`). Refresh the **figure-generation commit SHA** only if the final archive commit changes figure-generating source.
 - [ ] **Suggested reviewers** — enter 3–5 in the portal (NOT the cover letter). Candidates: NASA IMM community (Antonsen, Myers, Kerstman/Walton), space-PRA / mission-risk modelers, MCDA methodologists. Verify institutional emails; exclude editorial-board members and recent co-authors.
 - [ ] **Complete the Elsevier declarations tool** in the portal (competing interests, funding, data availability, generative-AI, ethics) — the in-manuscript statements must match.
 - [ ] **Upload figures as SEPARATE files** (staged in `submission/figures/`) — do not rely on the embedded copies in the docx.
