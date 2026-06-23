@@ -8,7 +8,7 @@
 
 ---
 
-![status](https://img.shields.io/badge/status-Acta%20source%20freeze%20%2B%20submission%20prep-success)
+![status](https://img.shields.io/badge/status-post--audit%20methods%20rewrite-success)
 ![version](https://img.shields.io/badge/version%20of%20record-v0.5.6-blue)
 ![typescript](https://img.shields.io/badge/TypeScript-5.5-3178c6?logo=typescript&logoColor=white)
 ![python](https://img.shields.io/badge/Python%20calibration-3.12-3776ab?logo=python&logoColor=white)
@@ -43,7 +43,7 @@ The public repository is `https://github.com/strikerdlm/selectron`. The public s
 
 ## Current State
 
-`STATUS.md` is the live tracker. As of **2026-06-23**, the active application branch has been retargeted to space-analog missions only. The Wizard stops at Stage-A candidate scoring and hands off to Crew Composition for team-level scenario analysis. Crew Composition defaults to analog mission profiles, default-off trait-to-incidence coupling, and analog outcome estimates. ISS remains available as a developer benchmark, not as the primary analog workflow.
+`STATUS.md` is the live tracker. As of **2026-06-23**, commit `7caad1007e44e3e5aff4c8b41de74e6fda6a2f7c` closes the active workflow split identified by the fix-implementation audit. The Wizard stops at Stage-A candidate scoring and hands off to Crew Composition for team-level scenario analysis. Crew Composition defaults to analog mission profiles, default-off trait-to-incidence coupling, and analog outcome estimates. ISS remains available as a developer benchmark, not as the primary analog workflow.
 
 Evidence status is machine-readable at `research/evidence_extracted/evidence_status.json` and can be regenerated with:
 
@@ -53,7 +53,7 @@ npm run evidence:status -- --write
 
 Current status: `acceptedCount = 0`, `proposalRefCount = 7`, `releasePriorsAdjudicated = false`. Do not describe release priors as accepted-ledger-derived until independently adjudicated rows are added.
 
-The rendered files in `paper/submission/manuscript.docx` and `paper/submission/cover-letter.docx` are stale because they were rebuilt on 2026-06-11 before later Acta-source and analog-only implementation revisions. Rebuild them before any journal upload.
+The active manuscript package lives in `strikerdlm/manuscripts` and was rewritten as a methods/software paper in commit `368e488351428a602b72fe9b177238c8fb1f2b13`. Generated Acta DOCX files in that package were rebuilt from the corrected markdown. The older `paper/submission/*.docx` files in this app repository remain stale and should not be uploaded.
 
 The current prior catalog is locked by `tests/imm/priors.test.ts`:
 
@@ -248,6 +248,7 @@ The current reproducibility contract is split across code, tests, and manuscript
 
 Last recorded verification in `STATUS.md`:
 
+- **2026-06-23**: `npm run typecheck` passed; `npm run build` passed with Vite chunk warnings only; `npm run validate:imm` passed; `npm run validate:imm:analog` passed (26/26); targeted guards/database/evidence tests passed (29/29); `npm run evidence:status` passed with `releasePriorsAdjudicated=false`; `python3 scripts/apply_fit.py --dry-run` failed closed with exit 2 because the accepted ledger has zero accepted rows; `git diff --check` passed.
 - **2026-06-22**: `npm run typecheck` passed; `npm run build` passed with Vite warnings only; targeted IMM/UI vitest suites passed; Python accepted-evidence/fitter tests passed in `python/.venv`; Playwright crew-workflow smoke passed via the sandbox workaround.
 - **2026-06-11**: `npm run verify:fast` passed, `npm run build` passed with Vite chunk/dynamic-import warnings only, Python `pytest -m "not slow"` passed with 71 passed / 14 slow deselected, calibration dry-run completed with 66 skipped / 0 failed, and targeted Crew Composition Playwright smoke passed 4/4 through the sandbox workaround.
 - **2026-06-14**: manuscript source and prior-catalog freeze controls were updated. Rebuild the rendered submission package and rerun the recorded verification lanes before upload.
@@ -257,7 +258,8 @@ Last recorded verification in `STATUS.md`:
 - K15 reproduction is inter-model agreement against NASA IMM publications, not validation against observed analog-mission clinical outcomes.
 - Eight K15 metrics remain documented-divergent; all three TME values and unlimited-kit CHI are in the accepted K15 CI95 bracket.
 - Outcome parameters for pEVAC and pLOCL are less mature than incidence priors. A closed-form rescale improved some scenarios but was reverted because it degraded the operational ISS HMS pathway.
-- Three tier-B conditions use proxy anchors because condition-specific isolated-mission incidence rates were not found.
+- The accepted analog evidence ledger currently has zero accepted rows; seven current priors still cite proposal-stage extraction files.
+- Some tier-B conditions use proxy anchors because condition-specific isolated-mission incidence rates were not found.
 - Stage-A-to-Stage-B vulnerability coupling is implemented and tested only as explicit scenario analysis. It is off by default in the analog scientific workflow.
 - The active evidence ledger currently contains schema and quarantine controls; proposal-stage extraction files do not feed release priors unless adjudicated into accepted ledger rows.
 - Mars and Artemis need separate structural model work and are intentionally deferred.
