@@ -6,7 +6,8 @@ export type SelectronErrorCode =
   | "E_SAMPLER_DIVERGED"
   | "E_BAD_MISSION"
   | "E_BAD_CONDITION"
-  | "E_BAD_PRIOR";
+  | "E_BAD_PRIOR"
+  | "E_BAD_SCENARIO_CONTROL";
 
 export class SelectronError extends Error {
   readonly code: SelectronErrorCode;

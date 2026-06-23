@@ -1,5 +1,6 @@
 // src/imm/simulate.ts
 import { makeRng } from "../engine/prng";
+import { SelectronError } from "../engine/errors";
 import type { IMMOutcome, PosteriorSummary } from "./types";
 // Rng inlined — prng.ts does not export this type (matches incidence.ts convention)
 type Rng = () => number;
@@ -207,7 +208,11 @@ export function applyStageAVulnerabilityMultiplier(
 
   const beta: Record<string, number> = {};
   const z: Record<string, number> = {};
-  const safeScale = Number.isFinite(familyBetaScale) && familyBetaScale >= 0 ? familyBetaScale : 1.0;
+  // F9: fail closed. An invalid scale (NaN/negative) yields 0 effect (no
+  // coupling), never a silent fallback to 1.0 (full assumed coupling). The
+  // public simulateIMM API validates familyBetaScale before reaching here, so
+  // this is defense-in-depth for direct callers of this exported helper.
+  const safeScale = Number.isFinite(familyBetaScale) && familyBetaScale >= 0 ? familyBetaScale : 0;
   const familyBeta = (FAMILY_BETA[family] ?? FAMILY_BETA_DEFAULT) * safeScale;
 
   for (const cid of vulnerabilityCriteria) {
@@ -409,13 +414,17 @@ export function runIMMTrial(
     opts.vulnerabilityCouplingMode === "scenario"
       ? opts.criteriaIndex ?? new Map()
       : new Map();
+  // F9: in scenario mode an invalid scale fails closed to 0 (no coupling
+  // effect) rather than silently defaulting to 1.0 (full assumed coupling).
+  // The public simulateIMM API validates before reaching here; this is
+  // defense-in-depth for direct callers of runIMMTrial.
   const familyBetaScale =
     opts.vulnerabilityCouplingMode === "scenario" &&
     opts.familyBetaScale !== undefined &&
     Number.isFinite(opts.familyBetaScale) &&
     opts.familyBetaScale >= 0
       ? opts.familyBetaScale
-      : 1.0;
+      : (opts.vulnerabilityCouplingMode === "scenario" ? 0 : 1.0);
   // peer-review-2 §4.5 + 2026-06-05 terrestrial guard: filter active conditions
   // once per trial (not per-crew-member) for O(|conditions|) overhead.
   // For terrestrial analog missions, space-only processTypes and ECLSS-specific
@@ -719,6 +728,48 @@ export function simulateIMM(opts: {
 }): IMMOutcome {
   const { crew, mission, kit, trials, seed } = opts;
   const chiStar = opts.chiStar ?? 0.7;
+  // F9: fail-closed input validation. The UI constrains most of these, but the
+  // public simulation API must not silently accept invalid scenario controls.
+  // A negative/non-finite familyBetaScale previously fell back to 1.0 (full
+  // assumed coupling), masking invalid input as a strong scientific assumption;
+  // it now throws. Kit resources may be +Infinity (the "unlimited" kit), but
+  // never NaN or negative; multipliers/scales must be finite and non-negative.
+  const _bad = (msg: string, details?: Record<string, unknown>) =>
+    new SelectronError("E_BAD_SCENARIO_CONTROL", msg, details);
+  if (!Number.isInteger(trials) || trials <= 0) {
+    throw _bad(`trials must be a positive integer, got ${trials}`, { trials });
+  }
+  if (!Array.isArray(crew) || crew.length === 0) {
+    throw _bad("crew must be a non-empty array", { crewLength: crew?.length });
+  }
+  if (!Number.isFinite(mission.durationDays) || mission.durationDays <= 0) {
+    throw _bad(`mission.durationDays must be positive and finite, got ${mission.durationDays}`, { durationDays: mission.durationDays });
+  }
+  if (!Number.isFinite(chiStar) || chiStar < 0 || chiStar > 1) {
+    throw _bad(`chiStar must be within [0, 1], got ${chiStar}`, { chiStar });
+  }
+  if (opts.familyBetaScale !== undefined) {
+    const s = opts.familyBetaScale;
+    if (!Number.isFinite(s) || s < 0) {
+      throw _bad(`familyBetaScale must be a finite non-negative number, got ${s}`, { familyBetaScale: s });
+    }
+  }
+  for (const [k, q] of Object.entries(kit.resources ?? {})) {
+    // +Infinity is allowed (unlimited kit); NaN and negatives are not.
+    if (Number.isNaN(q) || q < 0) {
+      throw _bad(`kit.resources[${k}] must be non-negative (Infinity allowed for unlimited), got ${q}`, { key: k, value: q });
+    }
+  }
+  for (const [k, m] of Object.entries(opts.kindMultipliers ?? {})) {
+    if (!Number.isFinite(m) || m < 0) {
+      throw _bad(`kindMultipliers[${k}] must be finite and non-negative, got ${m}`, { key: k, value: m });
+    }
+  }
+  for (const [name, m] of [["tierAMultiplier", opts.tierAMultiplier], ["tierBMultiplier", opts.tierBMultiplier], ["tierCMultiplier", opts.tierCMultiplier]] as const) {
+    if (m !== undefined && (!Number.isFinite(m) || m < 0)) {
+      throw _bad(`${name} must be finite and non-negative, got ${m}`, { name, value: m });
+    }
+  }
   // priors-rev3-b: read global_calibration defaults for tier multipliers.
   const globalCal = loadIMMPriors().global_calibration;
   // 2026-06-04: kind_multipliers auto-load. Caller's explicit override wins;

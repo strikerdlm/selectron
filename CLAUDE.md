@@ -14,7 +14,7 @@ Four-iteration spiral, plus two post-spiral iterations:
 2. **Iter 2** — literature-driven criteria + multi-candidate comparison.
 3. **Iter 3** — sensitivity analysis + prior elicitation.
 4. **Iter 4** — paper draft.
-5. **Iter 5** — IMM Calculator (100 conditions × 3 kits, K15 validation gate).
+5. **Iter 5** — IMM Calculator (100 conditions × 3 kits, K15 reference-model regression).
 6. **Iter 6** — Python offline calibration + FastAPI + Calibration UI (59/59 tier-B PyMC fitted, 100% evidence-based).
 
 **Manuscript submission (Advances in Space Research, Elsevier/COSPAR) is the active priority.** All engineering iterations are complete. npj Microgravity dropped — APC $3,790 unaffordable.
@@ -47,11 +47,11 @@ npx vitest run -t "K15 invariance"
 
 `tests/imm/calibration.test.ts` runs a 100k-trial K15 sim (~15 min) inside the suite — narrow to a single file while iterating rather than re-running everything.
 
-IMM prior calibration and the K15 validation gate are TypeScript scripts (the canonical entrypoints):
+IMM prior calibration and the K15 reference-model regression are TypeScript scripts (the canonical entrypoints):
 
 ```bash
 npm run calibrate:imm   # tsx scripts/calibrate_imm_priors.ts
-npm run validate:imm    # tsx scripts/validate_imm.ts  (K15 validation gate)
+npm run validate:imm    # tsx scripts/validate_imm.ts  (K15 reference-model regression)
 ```
 
 Optional Python calibration service — needed **only** by the Calibration tab; run from `python/`:

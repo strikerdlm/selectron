@@ -13,7 +13,10 @@ repository-code: "https://github.com/strikerdlm/selectron"
 url: "https://github.com/strikerdlm/selectron"
 doi: "10.5281/zenodo.20693257"
 version: "0.6.0-rebaseline.0"
-date-released: "2026-06-23"
+# date-released intentionally omitted: 0.6.0-rebaseline.0 is an active
+# development version, not a tagged/archived release. Restore this field
+# only when the rebaseline source freeze is tagged and the Zenodo archive
+# is updated to that exact version.
 keywords:
   - "space-analog crew selection"
   - "uncertain-weight MCDA"

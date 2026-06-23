@@ -51,16 +51,20 @@ const POSTERIOR_KINDS = new Set(["antarctic-station", "analog-controlled"]);
 const ACTIVE_CRITERIA = ACTIVE_CRITERION_CATALOG.criteria;
 
 // ─── safe default score generation ───────────────────────────────────────────
-// Rules (from advisor):
-//   - higherIsBetter=true,  no gate  → scale.min + fraction*(scale.max - scale.min)
-//   - higherIsBetter=false, no gate  → scale.min + fraction*(scale.max - scale.min)
-//     (lower raw = better for reversed scales)
+// For every criterion, `fraction` ∈ [0, 1] is the archetype's intended
+// normalized goodness (0 = weakest, 1 = strongest). The raw value is mapped so
+// that increasing the fraction ALWAYS increases normalized goodness, regardless
+// of scale direction:
+//   - higherIsBetter=true   → raw = scale.min + fraction*(scale.max - scale.min)
+//   - higherIsBetter=false  → raw = scale.max - fraction*(scale.max - scale.min)
+//     (e.g. PVT-B RT, BDI-II: a higher fraction yields a lower raw = better)
+// Gate overrides:
 //   - psych.mmpi2rf_eid (fail-if-above:65)  → always use 35 (well below 65 gate)
-//   - cognitive.nasa_cognition_battery (fail-if-below:-2.0) → use value >= -1.0
+//   - cognitive.nasa_cognition_battery (fail-if-below:-2.0) → use value >= -1.5
 //
 // Six archetypes vary fraction [0.55 … 0.85] so worst-link, mean, and
 // geometric-mean all produce distinguishable crew composites.
-function defaultScores(fractions: Record<string, number>): Record<string, number> {
+export function defaultScores(fractions: Record<string, number>): Record<string, number> {
   const scores: Record<string, number> = {};
   for (const c of ACTIVE_CRITERIA) {
     // Gate overrides take precedence
@@ -77,7 +81,9 @@ function defaultScores(fractions: Record<string, number>): Record<string, number
       continue;
     }
     const f = fractions[c.id] ?? fractions["default"] ?? 0.65;
-    scores[c.id] = c.scale.min + f * (c.scale.max - c.scale.min);
+    scores[c.id] = c.higherIsBetter
+      ? c.scale.min + f * (c.scale.max - c.scale.min)
+      : c.scale.max - f * (c.scale.max - c.scale.min);
   }
   return scores;
 }

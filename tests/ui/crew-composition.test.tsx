@@ -8,23 +8,17 @@ import { render, fireEvent, cleanup } from "@testing-library/react";
 import { aggregateCrewComposite } from "@/imm/composite";
 import { evaluateCrewGates } from "@/imm/crew-gates";
 import { PLACEHOLDER_CRITERIA } from "@/data/placeholder-criteria";
+import { defaultScores } from "@/ui/views/CrewComposition";
 import { PerScoreCard } from "@/ui/components/PerScoreCard";
 import type { IMMCrewMember } from "@/imm/types";
 
 afterEach(cleanup);
 
-// Minimal safe crew for tests (all gate-passing defaults)
+// Minimal safe crew for tests (all gate-passing defaults). Uses the production
+// defaultScores so the test crew cannot drift from the real archetype formula
+// (including the higherIsBetter branch for reversed-scale criteria).
 function makeMember(id: string, fraction: number): IMMCrewMember {
-  const scores: Record<string, number> = {};
-  for (const c of PLACEHOLDER_CRITERIA) {
-    if (c.id === "psych.mmpi2rf_eid") {
-      scores[c.id] = 35; // safe low T-score (gate: fail-if-above:65)
-    } else if (c.id === "cognitive.nasa_cognition_battery") {
-      scores[c.id] = Math.max(-1.5, c.scale.min + fraction * (c.scale.max - c.scale.min));
-    } else {
-      scores[c.id] = c.scale.min + fraction * (c.scale.max - c.scale.min);
-    }
-  }
+  const scores = defaultScores({ default: fraction });
   return {
     id,
     sex: "male",

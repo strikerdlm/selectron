@@ -1,4 +1,17 @@
-"""K15 Table 1 validation gate."""
+"""K15 Table 1 reference-model regression.
+
+This module compares Selectron's IMM output against the NASA K15 Table 1
+reference values. It reports two independent statuses per metric:
+
+  * K15 agreement — observed value is inside the K15 published CI₉₅.
+  * Internal regression — observed value is inside a frozen regression
+    envelope that captures the current (documented-divergent) state.
+
+The regression envelope is NOT a validation or acceptance criterion. A metric
+that is outside the K15 CI₉₅ but inside its regression envelope is "regression
+stable · K15 divergent" — it must never be reported as an unqualified PASS.
+Only `within_ci95` (true K15 agreement) is a scientific agreement signal.
+"""
 
 from __future__ import annotations
 
@@ -54,22 +67,31 @@ _SCENARIO_RESOURCES: dict[str, dict[str, Any]] = {
     "unlimited": _UNLIMITED_RESOURCES,
 }
 
-_K15_ACCEPTED_BRACKETS_PATH = (
-    Path(__file__).resolve().parents[3] / "src" / "data" / "k15-accepted-brackets.json"
+_K15_REGRESSION_BRACKETS_PATH = (
+    Path(__file__).resolve().parents[3] / "src" / "data" / "k15-regression-brackets.json"
 )
 
 
-def _load_k15_accepted_brackets() -> dict[str, dict[str, dict[str, Any]]]:
-    with open(_K15_ACCEPTED_BRACKETS_PATH) as f:
+def _load_k15_regression_brackets() -> dict[str, dict[str, dict[str, Any]]]:
+    with open(_K15_REGRESSION_BRACKETS_PATH) as f:
         return json.load(f)
 
 
-_K15_ACCEPTED_BRACKETS = _load_k15_accepted_brackets()
+_K15_REGRESSION_BRACKETS = _load_k15_regression_brackets()
 
 
 @dataclass
 class MetricResult:
-    """Result of comparing one metric against K15."""
+    """Result of comparing one metric against the K15 reference model.
+
+    Two independent statuses are carried:
+
+    * ``within_ci95`` — K15 agreement: observed is inside the K15 published
+      CI₉₅. This is the only scientific agreement signal.
+    * ``within_regression_envelope`` — internal regression: observed is inside
+      a frozen regression envelope capturing the current divergent state.
+      A metric can be regression-stable while K15-divergent.
+    """
 
     metric: str
     scenario: str
@@ -78,15 +100,15 @@ class MetricResult:
     ci95: tuple[float, float]
     delta: float
     within_ci95: bool
-    accepted: tuple[float, float]
+    regression: tuple[float, float]
     k15_status: str
-    within_accepted: bool
+    within_regression_envelope: bool
     tracking: str = ""
 
 
 @dataclass
 class K15ValidationReport:
-    """Full K15 validation report."""
+    """Full K15 reference-model regression report."""
 
     timestamp: str = ""
     trials: int = 0
@@ -107,23 +129,34 @@ class K15ValidationReport:
 
     def to_markdown(self) -> str:
         lines = [
-            "# K15 Validation Report",
+            "# K15 Reference-Model Regression Report",
             "",
             f"**Timestamp:** {self.timestamp}",
             f"**Trials:** {self.trials:,}",
             f"**Seed:** 0x{self.seed:X}",
-            f"**Metrics within CI95:** {self.n_within_ci95}/{self.n_total}",
+            f"**Metrics within K15 CI₉₅:** {self.n_within_ci95}/{self.n_total}",
             "",
-            "| Scenario | Metric | Observed | Reference | CI95 | Accepted | Delta | Status |",
-            "|----------|--------|----------|-----------|------|----------|-------|--------|",
+            ("Two independent statuses are reported per metric. `within_ci95` is the "
+             "only scientific agreement signal; `regression` is a frozen internal "
+             "envelope. A metric outside the K15 CI₉₅ but inside its regression "
+             "envelope is *regression stable · K15 divergent* — not a pass."),
+            "",
+            "| Scenario | Metric | Observed | Reference | CI95 | Regression | Delta | K15 agreement | Regression |",
+            "|----------|--------|----------|-----------|------|------------|-------|---------------|-------------|",
         ]
         for m in self.metrics:
-            status = "PASS" if m.within_accepted else "FAIL"
+            if m.within_ci95:
+                k15_agreement = "within CI₉₅"
+            else:
+                k15_agreement = "outside CI₉₅"
+            regression_status = (
+                "stable" if m.within_regression_envelope else "drift"
+            )
             lines.append(
                 f"| {m.scenario} | {m.metric} | {m.observed:.2f} | "
                 f"{m.reference:.2f} | [{m.ci95[0]:.2f}, {m.ci95[1]:.2f}] | "
-                f"[{m.accepted[0]:.2f}, {m.accepted[1]:.2f}] | "
-                f"{m.delta:+.2f} | {status} ({m.k15_status}) |"
+                f"[{m.regression[0]:.2f}, {m.regression[1]:.2f}] | "
+                f"{m.delta:+.2f} | {k15_agreement} | {regression_status} ({m.k15_status}) |"
             )
         lines.append("")
         return "\n".join(lines)
@@ -137,7 +170,7 @@ def validate_k15(
     priors_path: Path | None = None,
     output_dir: Path | None = None,
 ) -> K15ValidationReport:
-    """Run K15 validation gate on current priors."""
+    """Run K15 reference-model regression on current priors."""
     if scenarios is None:
         scenarios = ["none", "issHMS", "unlimited"]
 
@@ -176,9 +209,9 @@ def validate_k15(
             ci_bounds = getattr(ci, metric_to_ci_key[metric])
             delta = observed - ref_val
             within = ci_bounds[0] <= observed <= ci_bounds[1]
-            accepted_meta = _K15_ACCEPTED_BRACKETS[scenario][metric]
-            accepted = tuple(accepted_meta["accepted"])
-            within_accepted = accepted[0] <= observed <= accepted[1]
+            regression_meta = _K15_REGRESSION_BRACKETS[scenario][metric]
+            regression = tuple(regression_meta["regression"])
+            within_regression_envelope = regression[0] <= observed <= regression[1]
 
             report.metrics.append(MetricResult(
                 metric=metric,
@@ -188,10 +221,10 @@ def validate_k15(
                 ci95=ci_bounds,
                 delta=delta,
                 within_ci95=within,
-                accepted=accepted,
-                k15_status=accepted_meta["status"],
-                within_accepted=within_accepted,
-                tracking=accepted_meta.get("tracking", ""),
+                regression=regression,
+                k15_status=regression_meta["status"],
+                within_regression_envelope=within_regression_envelope,
+                tracking=regression_meta.get("tracking", ""),
             ))
 
     report.n_total = len(report.metrics)

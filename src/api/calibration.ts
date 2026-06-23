@@ -136,12 +136,12 @@ export interface MetricResult {
   reference: number;
   ci95_low: number;
   ci95_high: number;
-  accepted_low: number;
-  accepted_high: number;
+  regression_low: number;
+  regression_high: number;
   delta: number;
   within_ci95: boolean;
   k15_status: string;
-  within_accepted: boolean;
+  within_regression_envelope: boolean;
   tracking: string;
 }
 

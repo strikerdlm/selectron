@@ -17,21 +17,37 @@ function fmtDuration(ms: number): string {
 }
 
 function StatusBadge({ metric }: { metric: MetricResult }) {
-  const pass = metric.within_accepted ?? metric.within_ci95;
-  const label = metric.k15_status === "within-k15-ci95" ? "K15 CI95" : "accepted";
-  return pass ? (
-    <span
-      className="mono text-[12px] uppercase tracking-cap text-go"
-      title={metric.tracking || "Observed value is inside the accepted regression bracket."}
-    >
-      {label}
-    </span>
-  ) : (
+  // Two independent statuses. Green is reserved for true K15 agreement
+  // (within_ci95). A documented-divergent metric that is still inside its
+  // frozen regression envelope is "regression stable · K15 divergent" —
+  // amber, never an unqualified pass. Drift outside the envelope is a
+  // regression failure.
+  if (metric.within_ci95) {
+    return (
+      <span
+        className="mono text-[12px] uppercase tracking-cap text-go"
+        title={metric.tracking || "Observed value is inside the K15 published CI₉₅."}
+      >
+        K15 CI95
+      </span>
+    );
+  }
+  if (metric.within_regression_envelope) {
+    return (
+      <span
+        className="mono text-[12px] uppercase tracking-cap text-warn"
+        title={metric.tracking || "Observed value is outside the K15 CI₉₅ but inside the frozen regression envelope."}
+      >
+        regression stable · K15 divergent
+      </span>
+    );
+  }
+  return (
     <span
       className="mono text-[12px] uppercase tracking-cap text-warn"
-      title={metric.tracking || "Observed value is outside the accepted regression bracket."}
+      title={metric.tracking || "Observed value drifted outside the frozen regression envelope."}
     >
-      outside
+      regression drift
     </span>
   );
 }
@@ -124,9 +140,16 @@ function ValidationSection() {
   return (
     <div className="space-y-5">
       <div className="flex items-baseline gap-x-3">
-        <h3 className="display text-xl text-ink-0 tracking-tight">K15 Validation Gate</h3>
+        <h3 className="display text-xl text-ink-0 tracking-tight">K15 Reference-Model Regression</h3>
         <span className="label text-ink-3">3 scenarios × 4 metrics</span>
       </div>
+      <p className="text-sm text-ink-2 max-w-4xl">
+        Each metric reports two independent statuses. <span className="text-go">K15 CI95</span> means
+        the observed value is inside the NASA published interval — the only scientific agreement
+        signal. <span className="text-warn">regression stable · K15 divergent</span> means the value
+        is outside the K15 interval but inside a frozen internal envelope that captures the current
+        divergent state; it is a regression guard, not a validation pass. <span className="text-warn">regression drift</span> means the value left that envelope and should be investigated.
+      </p>
 
       <div className="flex flex-wrap items-end gap-4">
         <div className="flex flex-col gap-1">
@@ -188,8 +211,8 @@ function ValidationSection() {
           <div className="flex items-baseline gap-x-3">
             <h4 className="display text-lg text-ink-0 tracking-tight">Results</h4>
             <SummaryBadge
-              label="accepted brackets"
-              n={result.metrics.filter((m) => m.within_accepted ?? m.within_ci95).length}
+              label="regression stable"
+              n={result.metrics.filter((m) => m.within_regression_envelope).length}
               total={result.n_total}
             />
             <SummaryBadge label="within K15 CI₉₅" n={result.n_within_ci95} total={result.n_total} />
@@ -202,7 +225,7 @@ function ValidationSection() {
             <table className="w-full text-left border-collapse">
               <thead>
                 <tr className="border-b border-line">
-                  {["Metric", "Observed", "K15 Ref", "K15 CI₉₅", "Accepted", "Δ", "Status"].map((h) => (
+                  {["Metric", "Observed", "K15 Ref", "K15 CI₉₅", "Regression", "Δ", "Status"].map((h) => (
                     <th key={h} className="label px-3 py-2 text-ink-3 sticky top-0 bg-bg-1">{h}</th>
                   ))}
                 </tr>
@@ -218,8 +241,8 @@ function ValidationSection() {
                       </td>
                     </tr>,
                     ...metrics.map((m) => {
-                      const acceptedLow = m.accepted_low ?? m.ci95_low;
-                      const acceptedHigh = m.accepted_high ?? m.ci95_high;
+                      const regressionLow = m.regression_low ?? m.ci95_low;
+                      const regressionHigh = m.regression_high ?? m.ci95_high;
                       return (
                         <tr key={`${scenario}-${m.metric}`} className="border-b border-line/50 hover:bg-bg-2/50 transition-colors">
                           <td className="px-3 py-2 mono text-[13px] text-ink-0">{m.metric}</td>
@@ -229,7 +252,7 @@ function ValidationSection() {
                             [{m.ci95_low.toFixed(2)}, {m.ci95_high.toFixed(2)}]
                           </td>
                           <td className="px-3 py-2 mono text-[13px] text-ink-2">
-                            [{acceptedLow.toFixed(2)}, {acceptedHigh.toFixed(2)}]
+                            [{regressionLow.toFixed(2)}, {regressionHigh.toFixed(2)}]
                           </td>
                           <td className="px-3 py-2 mono text-[13px] text-ink-1">{m.delta >= 0 ? "+" : ""}{m.delta.toFixed(2)}</td>
                           <td className="px-3 py-2"><StatusBadge metric={m} /></td>

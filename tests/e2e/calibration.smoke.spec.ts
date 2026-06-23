@@ -72,7 +72,7 @@ test.describe("Calibration view — Python API integration", () => {
     await page.click("button:has-text('V&V')");
     await expect(page.locator("h3:has-text('Evidence Ledger Status')")).toBeVisible();
     await expect(page.locator("text=unadjudicated")).toBeVisible();
-    await expect(page.locator("h3:has-text('K15 Validation Gate')")).toBeVisible();
+    await expect(page.locator("h3:has-text('K15 Reference-Model Regression')")).toBeVisible();
     await expect(page.locator("h3:has-text('Sensitivity Analysis')")).toBeVisible();
   });
 

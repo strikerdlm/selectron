@@ -53,12 +53,12 @@ class MetricResult(BaseModel):
     reference: float
     ci95_low: float
     ci95_high: float
-    accepted_low: float
-    accepted_high: float
+    regression_low: float
+    regression_high: float
     delta: float
     within_ci95: bool
     k15_status: str
-    within_accepted: bool
+    within_regression_envelope: bool
     tracking: str
 
 class ValidateResponse(BaseModel):

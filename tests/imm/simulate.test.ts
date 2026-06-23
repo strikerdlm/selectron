@@ -2,6 +2,7 @@
 import { describe, it, expect, vi, afterEach } from "vitest";
 import { runIMMTrial, applyRiskFactorMultiplier, simulateIMM } from "../../src/imm/simulate";
 import { makeRng } from "../../src/engine/prng";
+import { SelectronError } from "../../src/engine/errors";
 import { IMM_KITS } from "../../src/imm/kits";
 import { IMM_MISSIONS } from "../../src/data/imm-missions";
 import type { IMMMission, IMMCrewMember } from "../../src/imm/types";
@@ -887,5 +888,64 @@ describe("kind_multipliers: per-(kind, condition) incidence modulation", () => {
       kindMultipliers: {},  // 1.0 fallthrough
     });
     expect(Math.abs(legacy.tme.mean - explicitOnes.tme.mean)).toBeLessThan(1e-9);
+  });
+});
+
+// ── F9: fail-closed scenario-control validation ─────────────────────────────
+// The public simulateIMM API must reject invalid scenario controls with a
+// typed SelectronError instead of silently coercing them. The most important
+// case is familyBetaScale: a negative/non-finite value previously fell back to
+// 1.0 (full assumed coupling), masking invalid input as a strong assumption.
+describe("F9: simulateIMM fail-closed input validation", () => {
+  const base = { crew: oneCrew, mission: oneDayMission, kit: IMM_KITS.none, trials: 100, seed: 0xc0ffee };
+
+  it("accepts a valid call (sanity)", () => {
+    expect(() => simulateIMM(base)).not.toThrow();
+  });
+
+  it("rejects non-positive / non-integer trials", () => {
+    expect(() => simulateIMM({ ...base, trials: 0 })).toThrowError(SelectronError);
+    expect(() => simulateIMM({ ...base, trials: -5 })).toThrowError(SelectronError);
+    expect(() => simulateIMM({ ...base, trials: 1.5 })).toThrowError(SelectronError);
+  });
+
+  it("rejects an empty crew", () => {
+    expect(() => simulateIMM({ ...base, crew: [] })).toThrowError(SelectronError);
+  });
+
+  it("rejects non-positive / non-finite duration", () => {
+    const badMission = { ...oneDayMission, durationDays: 0 };
+    expect(() => simulateIMM({ ...base, mission: badMission })).toThrowError(SelectronError);
+    const infMission = { ...oneDayMission, durationDays: Infinity };
+    expect(() => simulateIMM({ ...base, mission: infMission })).toThrowError(SelectronError);
+  });
+
+  it("rejects chiStar outside [0, 1]", () => {
+    expect(() => simulateIMM({ ...base, chiStar: 1.5 })).toThrowError(SelectronError);
+    expect(() => simulateIMM({ ...base, chiStar: -0.1 })).toThrowError(SelectronError);
+  });
+
+  it("rejects negative / non-finite familyBetaScale (fail closed, not fallback to 1.0)", () => {
+    expect(() => simulateIMM({ ...base, familyBetaScale: -0.4 })).toThrowError(SelectronError);
+    expect(() => simulateIMM({ ...base, familyBetaScale: NaN })).toThrowError(SelectronError);
+    expect(() => simulateIMM({ ...base, familyBetaScale: Infinity })).toThrowError(SelectronError);
+    // zero (no coupling effect) is a valid scenario control and must pass
+    expect(() => simulateIMM({ ...base, familyBetaScale: 0 })).not.toThrow();
+  });
+
+  it("rejects NaN / negative kit resources but allows +Infinity (unlimited kit)", () => {
+    const nanKit = { ...IMM_KITS.none, resources: { "antibiotic": NaN } };
+    expect(() => simulateIMM({ ...base, kit: nanKit })).toThrowError(SelectronError);
+    const negKit = { ...IMM_KITS.none, resources: { "antibiotic": -3 } };
+    expect(() => simulateIMM({ ...base, kit: negKit })).toThrowError(SelectronError);
+    // Unlimited kit uses +Infinity and must remain valid.
+    expect(() => simulateIMM({ ...base, kit: IMM_KITS.unlimited })).not.toThrow();
+  });
+
+  it("rejects negative / non-finite kindMultipliers and tier multipliers", () => {
+    expect(() => simulateIMM({ ...base, kindMultipliers: { "uti": -1 } })).toThrowError(SelectronError);
+    expect(() => simulateIMM({ ...base, kindMultipliers: { "uti": Infinity } })).toThrowError(SelectronError);
+    expect(() => simulateIMM({ ...base, tierBMultiplier: -0.5 })).toThrowError(SelectronError);
+    expect(() => simulateIMM({ ...base, tierBMultiplier: NaN })).toThrowError(SelectronError);
   });
 });

@@ -1,11 +1,11 @@
 // tests/imm/validation_k15.test.ts
 //
-// IMM-86 — K15 Table 1 reproduction validation gate.
+// IMM-86 — K15 Table 1 reference-model regression.
 //
 // Runs simulateIMM at T=100 000 for each of the three K15 scenarios
 // (none / issHMS / unlimited) on the K15 reference crew (iss-6mo, 6-person),
 // and asserts that each of the 4 IMM outputs (TME, CHI, pEVAC, pLOCL) falls
-// inside its "accepted bracket".
+// inside its frozen regression envelope.
 //
 // Two kinds of bracket per metric:
 //
@@ -18,12 +18,14 @@
 //       the K15 CI₉₅. Each such bracket carries a `tracking` field with
 //       the open backlog item that owns the gap.
 //
-// Why "accepted brackets" rather than `expect.fail` on divergent metrics:
+// Why "regression envelopes" rather than `expect.fail` on divergent metrics:
 // using a wider bracket gives us a regression guard in BOTH directions —
 // if a future change accidentally worsens a documented-divergent metric
 // (moves it FURTHER from K15) the test fails; if a future change accidentally
 // improves it (moves it INTO K15 CI₉₅) the test still passes (a tightening
-// of the bracket is a follow-up curation step, not a regression).
+// of the bracket is a follow-up curation step, not a regression). These are
+// internal regression envelopes, NOT validation or acceptance criteria; only
+// the within_ci95 assertions (where present) are scientific agreement signals.
 //
 // K15 reference values + CI₉₅ brackets are inlined here (NOT imported from
 // src/imm/calibration.ts, which would pull in node:fs unnecessarily for a
@@ -31,7 +33,7 @@
 // K15_TABLE1_REF in src/imm/calibration.ts; the CI₉₅ brackets match the
 // verbatim K15 paper §III ranges captured in
 // research/imm_sources/architecture/K15_keenan_2015_imm_probabilistic_simulation.md.
-// Accepted regression brackets are loaded from src/data/k15-accepted-brackets.json,
+// Regression brackets are loaded from src/data/k15-regression-brackets.json,
 // which is also consumed by the Python validator and calibration UI.
 //
 // Current accepted state (peer-review R4, 2026-05-29):
@@ -65,7 +67,7 @@ import { describe, it, expect, beforeAll } from "vitest";
 import { simulateIMM } from "../../src/imm/simulate";
 import { IMM_KITS } from "../../src/imm/kits";
 import { IMM_MISSIONS } from "../../src/data/imm-missions";
-import k15AcceptedBrackets from "../../src/data/k15-accepted-brackets.json";
+import k15RegressionBrackets from "../../src/data/k15-regression-brackets.json";
 import type { IMMOutcome, IMMCrewMember } from "../../src/imm/types";
 
 // ── K15 reference values + CI₉₅ brackets (verbatim from Keenan 2015 §III) ──
@@ -91,14 +93,15 @@ const K15 = {
   },
 } as const;
 
-// ── ACCEPTED BRACKETS (the gate this test enforces) ────────────────────────
+// ── REGRESSION BRACKETS (the gate this test enforces) ────────────────────────
 // For each (scenario × metric) pair: [lo, hi] the observed value must fall
 // inside. Either the K15 CI₉₅ (when Selectron reproduces it) or a wider
-// bracket documented to cover the current divergent state.
+// bracket documented to cover the current divergent state. These brackets
+// are internal regression envelopes, NOT validation or acceptance criteria.
 
 type Bracket = {
   status: "within-k15-ci95" | "documented-divergent";
-  accepted: [number, number];
+  regression: [number, number];
   tracking?: string; // open backlog item that owns the divergence
 };
 
@@ -112,33 +115,33 @@ const METRIC_JSON_KEYS = {
   pLocl: "p_locl",
 } as const;
 
-function acceptedBracket(scenario: ScenarioId, metric: MetricKey): Bracket {
-  const raw = k15AcceptedBrackets[scenario][METRIC_JSON_KEYS[metric]];
+function regressionBracket(scenario: ScenarioId, metric: MetricKey): Bracket {
+  const raw = k15RegressionBrackets[scenario][METRIC_JSON_KEYS[metric]];
   return {
     status: raw.status as Bracket["status"],
-    accepted: raw.accepted as [number, number],
+    regression: raw.regression as [number, number],
     tracking: raw.tracking,
   };
 }
 
-const ACCEPTED: Record<keyof typeof K15, Record<"tme" | "chi" | "pEvac" | "pLocl", Bracket>> = {
+const REGRESSION: Record<keyof typeof K15, Record<"tme" | "chi" | "pEvac" | "pLocl", Bracket>> = {
   none: {
-    tme: acceptedBracket("none", "tme"),
-    chi: acceptedBracket("none", "chi"),
-    pEvac: acceptedBracket("none", "pEvac"),
-    pLocl: acceptedBracket("none", "pLocl"),
+    tme: regressionBracket("none", "tme"),
+    chi: regressionBracket("none", "chi"),
+    pEvac: regressionBracket("none", "pEvac"),
+    pLocl: regressionBracket("none", "pLocl"),
   },
   issHMS: {
-    tme: acceptedBracket("issHMS", "tme"),
-    chi: acceptedBracket("issHMS", "chi"),
-    pEvac: acceptedBracket("issHMS", "pEvac"),
-    pLocl: acceptedBracket("issHMS", "pLocl"),
+    tme: regressionBracket("issHMS", "tme"),
+    chi: regressionBracket("issHMS", "chi"),
+    pEvac: regressionBracket("issHMS", "pEvac"),
+    pLocl: regressionBracket("issHMS", "pLocl"),
   },
   unlimited: {
-    tme: acceptedBracket("unlimited", "tme"),
-    chi: acceptedBracket("unlimited", "chi"),
-    pEvac: acceptedBracket("unlimited", "pEvac"),
-    pLocl: acceptedBracket("unlimited", "pLocl"),
+    tme: regressionBracket("unlimited", "tme"),
+    chi: regressionBracket("unlimited", "chi"),
+    pEvac: regressionBracket("unlimited", "pEvac"),
+    pLocl: regressionBracket("unlimited", "pLocl"),
   },
 };
 
@@ -164,7 +167,7 @@ const SCENARIO_TIMEOUT_MS = 300_000; // 5 min per scenario beforeAll
 function runScenarioTests(scenarioId: keyof typeof K15) {
   describe(`IMM-86 · K15 Table 1 reproduction · ${scenarioId} scenario`, () => {
     let outcome: IMMOutcome;
-    const acc = ACCEPTED[scenarioId];
+    const acc = REGRESSION[scenarioId];
 
     beforeAll(async () => {
       const kit = IMM_KITS[scenarioId];
@@ -177,28 +180,28 @@ function runScenarioTests(scenarioId: keyof typeof K15) {
       });
     }, SCENARIO_TIMEOUT_MS);
 
-    it(`TME within accepted bracket [${acc.tme.accepted[0]}, ${acc.tme.accepted[1]}] (${acc.tme.status})`, () => {
+    it(`TME within regression bracket [${acc.tme.regression[0]}, ${acc.tme.regression[1]}] (${acc.tme.status})`, () => {
       const v = outcome.tme.mean;
-      expect(v).toBeGreaterThanOrEqual(acc.tme.accepted[0]);
-      expect(v).toBeLessThanOrEqual(acc.tme.accepted[1]);
+      expect(v).toBeGreaterThanOrEqual(acc.tme.regression[0]);
+      expect(v).toBeLessThanOrEqual(acc.tme.regression[1]);
     });
 
-    it(`CHI within accepted bracket [${acc.chi.accepted[0]}, ${acc.chi.accepted[1]}] (${acc.chi.status})`, () => {
+    it(`CHI within regression bracket [${acc.chi.regression[0]}, ${acc.chi.regression[1]}] (${acc.chi.status})`, () => {
       const v = outcome.chi.mean;
-      expect(v).toBeGreaterThanOrEqual(acc.chi.accepted[0]);
-      expect(v).toBeLessThanOrEqual(acc.chi.accepted[1]);
+      expect(v).toBeGreaterThanOrEqual(acc.chi.regression[0]);
+      expect(v).toBeLessThanOrEqual(acc.chi.regression[1]);
     });
 
-    it(`pEVAC within accepted bracket [${acc.pEvac.accepted[0]}, ${acc.pEvac.accepted[1]}]% (${acc.pEvac.status})`, () => {
+    it(`pEVAC within regression bracket [${acc.pEvac.regression[0]}, ${acc.pEvac.regression[1]}]% (${acc.pEvac.status})`, () => {
       const v = outcome.pEvac.mean;
-      expect(v).toBeGreaterThanOrEqual(acc.pEvac.accepted[0]);
-      expect(v).toBeLessThanOrEqual(acc.pEvac.accepted[1]);
+      expect(v).toBeGreaterThanOrEqual(acc.pEvac.regression[0]);
+      expect(v).toBeLessThanOrEqual(acc.pEvac.regression[1]);
     });
 
-    it(`pLOCL within accepted bracket [${acc.pLocl.accepted[0]}, ${acc.pLocl.accepted[1]}]% (${acc.pLocl.status})`, () => {
+    it(`pLOCL within regression bracket [${acc.pLocl.regression[0]}, ${acc.pLocl.regression[1]}]% (${acc.pLocl.status})`, () => {
       const v = outcome.pLocl.mean;
-      expect(v).toBeGreaterThanOrEqual(acc.pLocl.accepted[0]);
-      expect(v).toBeLessThanOrEqual(acc.pLocl.accepted[1]);
+      expect(v).toBeGreaterThanOrEqual(acc.pLocl.regression[0]);
+      expect(v).toBeLessThanOrEqual(acc.pLocl.regression[1]);
     });
 
     // peer-review-2 Issue 5: CI₉₅-width assertions as regression fingerprint
@@ -284,8 +287,8 @@ describe("IMM-86 · gate inventory", () => {
     let within = 0, divergent = 0;
     for (const sc of ["none", "issHMS", "unlimited"] as const) {
       for (const m of ["tme", "chi", "pEvac", "pLocl"] as const) {
-        if (ACCEPTED[sc][m].status === "within-k15-ci95") within += 1;
-        else                                              divergent += 1;
+        if (REGRESSION[sc][m].status === "within-k15-ci95") within += 1;
+        else                                                divergent += 1;
       }
     }
     expect(within).toBe(4);
