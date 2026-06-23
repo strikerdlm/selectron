@@ -5,7 +5,7 @@ import {
 } from "../../src/imm/health-support";
 import { simulateIMM } from "../../src/imm/simulate";
 import { K15_REFERENCE_CREW } from "../../src/imm/calibration";
-import { ACTIVE_MISSIONS } from "../../src/data/imm-missions";
+import { IMM_MISSIONS } from "../../src/data/imm-missions";
 
 describe("health-support delivery-class gating", () => {
   it("is the identity transform for issHMS (K15 invariant)", () => {
@@ -53,7 +53,9 @@ describe("health-support delivery-class gating", () => {
 });
 
 describe("health-support engine integration", () => {
-  const iss6 = ACTIVE_MISSIONS.find((m) => m.id === "iss-6mo")!;
+  // iss-6mo is the K15 reference benchmark (kind: leo-iss). It is excluded
+  // from ACTIVE_MISSIONS (analog-only), so source it from IMM_MISSIONS.
+  const iss6 = IMM_MISSIONS.find((m) => m.id === "iss-6mo")!;
 
   it("issHMS TME is unchanged by gating (identity → K15 safe)", () => {
     const out = simulateIMM({

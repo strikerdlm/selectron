@@ -331,6 +331,25 @@ export type IMMSession = {
    */
   outcomes: IMMOutcome | null;
   couplingMode?: VulnerabilityCouplingMode;
+  /**
+   * F3: full simulation-assumption provenance. Every saved result records the
+   * operative controls that generated it so a reloaded session cannot be
+   * silently re-run under different assumptions. All fields optional for
+   * backward compatibility with pre-existing Dexie rows.
+   */
+  familyBetaScale?: number;
+  chiStar?: number;
+  aggregator?: CrewCompositeMethod;
+  criterionCatalogId?: string;
+  criterionCatalogVersion?: string;
+  /** SHA-256 over the canonical JSON of the loaded prior set at save time. */
+  priorsHash?: string;
+  /** SHA-256 over the active kind_multipliers block at save time. */
+  kindMultiplierHash?: string;
+  /** Frozen evidence-ledger status snapshot (F4) — the operative coverage. */
+  evidenceStatusSnapshot?: import("./provenance").EvidenceStatusSnapshot;
+  /** Selectron software version at save time (src/version.ts). */
+  softwareVersion?: string;
   validation: {
     vsK15Table1: {
       delta_tme: number; delta_chi: number;

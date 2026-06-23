@@ -200,25 +200,74 @@ export function buildEvidenceStatus(root = REPO_ROOT): EvidenceStatus {
   };
 }
 
+/** Frontend summary written to src/data/evidence-status.json. Key order is
+ *  load-bearing: `--check` compares canonical JSON, so this must match the
+ *  order previously written by `--write`. `generatedAt` is the only non-
+ *  deterministic field and is carried from the committed file on check. */
+function buildFrontendSummary(status: EvidenceStatus, generatedAt: string) {
+  return {
+    status: status.status,
+    releasePriorsAdjudicated: status.releasePriorsAdjudicated,
+    acceptedCount: status.acceptedCount,
+    proposalCount: status.proposalCount,
+    proposalRefCount: status.proposalRefCount,
+    proposalRefConditionIds: status.proposalRefConditionIds,
+    activeParameterCount: status.activeParameterCount,
+    acceptedCoveredParameterCount: status.acceptedCoveredParameterCount,
+    uncoveredParameterCount: status.uncoveredParameterCount,
+    malformedAcceptedRowCount: status.malformedAcceptedRows.length,
+    message: status.message,
+    generatedAt,
+  };
+}
+
+/** F6: regenerate both status objects in memory and fail if the committed
+ *  files have drifted. The full status file is fully deterministic and is
+ *  compared verbatim; the frontend summary is compared ignoring the
+ *  `generatedAt` timestamp (carried from the committed file). */
+function checkFreshness(): number {
+  const status = buildEvidenceStatus();
+  let drift = 0;
+
+  const fullCommitted = readFileSync(
+    resolve(REPO_ROOT, "research/evidence_extracted/evidence_status.json"),
+    "utf8",
+  ).trim();
+  const fullExpected = JSON.stringify(status, null, 2);
+  if (fullCommitted !== fullExpected) {
+    console.error(
+      "✗ research/evidence_extracted/evidence_status.json is stale. Run `npm run evidence:status -- --write`.",
+    );
+    drift++;
+  }
+
+  const feCommitted = JSON.parse(
+    readFileSync(resolve(REPO_ROOT, "src/data/evidence-status.json"), "utf8"),
+  ) as { generatedAt?: string };
+  const feExpected = buildFrontendSummary(status, feCommitted.generatedAt ?? "");
+  if (JSON.stringify(feCommitted) !== JSON.stringify(feExpected)) {
+    console.error(
+      "✗ src/data/evidence-status.json is stale. Run `npm run evidence:status -- --write`.",
+    );
+    drift++;
+  }
+
+  if (drift === 0) {
+    console.log("evidence-status freshness OK (full + frontend summary match committed files).");
+    return 0;
+  }
+  return 1;
+}
+
 function main(): number {
+  if (process.argv.includes("--check")) {
+    return checkFreshness();
+  }
   const status = buildEvidenceStatus();
   const json = JSON.stringify(status, null, 2);
   if (process.argv.includes("--write")) {
     writeFileSync(resolve(REPO_ROOT, "research/evidence_extracted/evidence_status.json"), `${json}\n`);
-    const frontendSummary = {
-      status: status.status,
-      releasePriorsAdjudicated: status.releasePriorsAdjudicated,
-      acceptedCount: status.acceptedCount,
-      proposalCount: status.proposalCount,
-      proposalRefCount: status.proposalRefCount,
-      proposalRefConditionIds: status.proposalRefConditionIds,
-      activeParameterCount: status.activeParameterCount,
-      acceptedCoveredParameterCount: status.acceptedCoveredParameterCount,
-      uncoveredParameterCount: status.uncoveredParameterCount,
-      malformedAcceptedRowCount: status.malformedAcceptedRows.length,
-      message: status.message,
-      generatedAt: new Date().toISOString(),
-    };
+    const frontendSummary = buildFrontendSummary(status, new Date().toISOString());
     writeFileSync(
       resolve(REPO_ROOT, "src/data/evidence-status.json"),
       `${JSON.stringify(frontendSummary, null, 2)}\n`,

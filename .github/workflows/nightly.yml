@@ -23,6 +23,12 @@ jobs:
       - name: Install Node dependencies
         run: npm ci
 
+      - name: Slow stochastic Vitest suite
+        # F6: the slow stochastic suites relegated out of the required CI lane
+        # (calibration idempotency, K15 reproduction, leave-calibrated-out
+        # sensitivity, R-hat convergence).
+        run: npm run test:slow
+
       - name: Analog IMM validation
         run: npm run validate:imm:analog
 

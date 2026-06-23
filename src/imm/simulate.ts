@@ -414,17 +414,19 @@ export function runIMMTrial(
     opts.vulnerabilityCouplingMode === "scenario"
       ? opts.criteriaIndex ?? new Map()
       : new Map();
-  // F9: in scenario mode an invalid scale fails closed to 0 (no coupling
-  // effect) rather than silently defaulting to 1.0 (full assumed coupling).
-  // The public simulateIMM API validates before reaching here; this is
-  // defense-in-depth for direct callers of runIMMTrial.
+  // F9: distinguish "not provided" (undefined → default coupling strength
+  // 1.0, the legitimate default) from "explicitly invalid" (NaN / negative /
+  // non-finite → fail closed to 0, no coupling). The public simulateIMM API
+  // validates and throws on explicitly-invalid values before reaching here,
+  // so the fail-closed branch is defense-in-depth for direct callers.
   const familyBetaScale =
-    opts.vulnerabilityCouplingMode === "scenario" &&
-    opts.familyBetaScale !== undefined &&
-    Number.isFinite(opts.familyBetaScale) &&
-    opts.familyBetaScale >= 0
-      ? opts.familyBetaScale
-      : (opts.vulnerabilityCouplingMode === "scenario" ? 0 : 1.0);
+    opts.vulnerabilityCouplingMode === "scenario"
+      ? (opts.familyBetaScale === undefined
+          ? 1.0
+          : (Number.isFinite(opts.familyBetaScale) && opts.familyBetaScale >= 0
+              ? opts.familyBetaScale
+              : 0))
+      : 1.0;
   // peer-review-2 §4.5 + 2026-06-05 terrestrial guard: filter active conditions
   // once per trial (not per-crew-member) for O(|conditions|) overhead.
   // For terrestrial analog missions, space-only processTypes and ECLSS-specific

@@ -298,7 +298,11 @@ describe("CrewComposition · IMM-50 save / load / export toolbar", () => {
     const exportBtn = screen.getByRole("button", { name: /export current IMM session as JSON/i });
     fireEvent.click(exportBtn);
 
-    expect(createObjectURLMock).toHaveBeenCalledTimes(1);
+    // F3: the export handler is async (it awaits prior/multiplier provenance
+    // hashes), so wait for the blob to be created before asserting on it.
+    await waitFor(() => {
+      expect(createObjectURLMock).toHaveBeenCalledTimes(1);
+    });
     const blobArg = createObjectURLMock.mock.calls[0][0];
     expect(blobArg).toBeInstanceOf(Blob);
     expect(blobArg.type).toBe("application/json");

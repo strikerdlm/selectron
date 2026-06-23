@@ -89,5 +89,12 @@ describe("active analog workflow guards", () => {
     expect(readRepoFile("src/ui/views/calibration/BatchFitPanel.tsx")).toContain("Evidence ledger not release-ready");
     expect(readRepoFile("src/ui/views/CrewComposition.tsx")).toContain("data/demo-criteria");
     expect(readRepoFile("src/ui/App.tsx")).toContain("SELECTRON_VERSION");
+    // F3: session save records the operative scenario controls, not just
+    // couplingMode.
+    expect(readRepoFile("src/ui/views/CrewComposition.tsx")).toContain("familyBetaScale: state.familyBetaScale");
+    expect(readRepoFile("src/ui/views/CrewComposition.tsx")).toContain("priorsHash");
+    // F4: every outcome surface carries the operative coverage fact.
+    expect(readRepoFile("src/ui/views/CrewComposition.tsx")).toContain("EVIDENCE_COVERAGE_STATEMENT");
+    expect(readRepoFile("src/ui/views/CrewComposition.tsx")).toContain("accepted coverage");
   });
 });

@@ -28,6 +28,13 @@ import { IMMConditionDrivers } from "../figures/IMMConditionDrivers";
 import { IMMConvergencePlot } from "../figures/IMMConvergencePlot";
 import { IMMValidationCompare } from "../figures/IMMValidationCompare";
 import { loadIMMPriors } from "../../imm/priors";
+import {
+  EVIDENCE_COVERAGE_STATEMENT,
+  EVIDENCE_STATUS_SNAPSHOT,
+  computeKindMultiplierHash,
+  computePriorsHash,
+} from "../../imm/provenance";
+import { SELECTRON_VERSION } from "../../version";
 import { KindMultipliersTable } from "../components/KindMultipliersTable";
 import { notify } from "../components/Toast";
 import { createIMMSession, recentIMMSessionsFor } from "../../db/repository";
@@ -774,9 +781,23 @@ export function CrewComposition() {
                   <span className="mono text-[11px] text-ink-3">
                     trait coupling: {state.couplingMode === "scenario" ? `scenario x${state.familyBetaScale.toFixed(2)}` : "off"}
                   </span>
+                  {/* F4: the operative evidence fact, not just the static profile grade. */}
+                  <span
+                    className="mono text-[11px] text-warn"
+                    title={EVIDENCE_COVERAGE_STATEMENT}
+                  >
+                    accepted coverage: {EVIDENCE_STATUS_SNAPSHOT.acceptedCoveredParameterCount} / {EVIDENCE_STATUS_SNAPSHOT.activeParameterCount} params · {EVIDENCE_STATUS_SNAPSHOT.status}
+                  </span>
                 </div>
               )}
             </div>
+            {/* F4: every outcome surface states that priors are unadjudicated
+                 and that Monte Carlo intervals are variability, not calibration. */}
+            {readoutOutcome && (
+              <p className="mono text-[11px] leading-relaxed text-ink-3 mt-3 border-t border-line/60 pt-2 max-w-4xl">
+                {EVIDENCE_COVERAGE_STATEMENT}
+              </p>
+            )}
           </div>
         );
       })()}
@@ -1313,6 +1334,16 @@ export function CrewComposition() {
           className="mono text-xs border border-line/40 px-2 py-1 hover:bg-line/10"
           onClick={async () => {
             try {
+              // F3: record the full assumption set so a reloaded session
+              // cannot be silently re-run under different controls. Hashes
+              // are frozen at save time to detect priors/multiplier drift on
+              // reload. Each save creates a NEW session row — outcome-bearing
+              // sessions are immutable; editing assumptions and re-saving
+              // produces a derived session with a new id.
+              const [priorsHash, kindMultiplierHash] = await Promise.all([
+                computePriorsHash(),
+                computeKindMultiplierHash(),
+              ]);
               const id = await createIMMSession({
                 candidateId: null,
                 // Sync display metadata to the actual crew before persisting.
@@ -1326,6 +1357,15 @@ export function CrewComposition() {
                 engine: "monte-carlo",
                 outcomes: outcome ?? null,
                 couplingMode: state.couplingMode,
+                familyBetaScale: state.familyBetaScale,
+                chiStar: state.chiStar,
+                aggregator: state.aggregator,
+                criterionCatalogId: ACTIVE_CRITERION_CATALOG.id,
+                criterionCatalogVersion: ACTIVE_CRITERION_CATALOG.version,
+                priorsHash,
+                kindMultiplierHash,
+                evidenceStatusSnapshot: EVIDENCE_STATUS_SNAPSHOT,
+                softwareVersion: SELECTRON_VERSION,
                 validation: {
                   vsK15Table1: {
                     delta_tme: 0, delta_chi: 0, delta_pEvac: 0, delta_pLocl: 0,
@@ -1369,6 +1409,13 @@ export function CrewComposition() {
               trials: s.trials,
               seed: s.seed,
               members: s.crew,
+              // F3: restore the operative scenario controls recorded at save
+              // time, so a loaded session re-runs under the assumptions that
+              // generated its outcome (not the current working-state controls).
+              couplingMode: s.couplingMode ?? cur.couplingMode,
+              familyBetaScale: s.familyBetaScale ?? cur.familyBetaScale,
+              chiStar: s.chiStar ?? cur.chiStar,
+              aggregator: s.aggregator ?? cur.aggregator,
             }));
             // A config-only session has no outcome — clear any stale result so
             // the user re-runs the loaded setup.
@@ -1391,13 +1438,37 @@ export function CrewComposition() {
           type="button"
           aria-label="Export current IMM session as JSON"
           className="mono text-xs border border-line/40 px-2 py-1 hover:bg-line/10"
-          onClick={() => {
+          onClick={async () => {
+            // F3/F4: export the full assumption set + evidence provenance so the
+            // exported JSON is self-describing and cannot be confused with a
+            // calibrated estimate.
+            const [priorsHash, kindMultiplierHash] = await Promise.all([
+              computePriorsHash(),
+              computeKindMultiplierHash(),
+            ]);
             const payload = {
+              softwareVersion: SELECTRON_VERSION,
+              exportedAt: new Date().toISOString(),
               mission: { ...state.mission, crewSize: state.members.length, totalEVAs },
               kit: state.kit.scenarioId,
               trials: state.trials,
               seed: state.seed,
               members: state.members,
+              // F3: operative scenario controls
+              couplingMode: state.couplingMode,
+              familyBetaScale: state.familyBetaScale,
+              chiStar: state.chiStar,
+              aggregator: state.aggregator,
+              // F3: catalog + prior/multiplier provenance
+              criterionCatalog: {
+                id: ACTIVE_CRITERION_CATALOG.id,
+                version: ACTIVE_CRITERION_CATALOG.version,
+              },
+              priorsHash,
+              kindMultiplierHash,
+              // F4: operative evidence coverage + disclaimer
+              evidenceStatus: EVIDENCE_STATUS_SNAPSHOT,
+              coverageStatement: EVIDENCE_COVERAGE_STATEMENT,
               outcome: outcome ?? null,
             };
             const blob = new Blob([JSON.stringify(payload, null, 2)], {

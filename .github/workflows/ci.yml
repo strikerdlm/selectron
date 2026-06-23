@@ -27,17 +27,17 @@ jobs:
       - name: Active import guard
         run: npm run guard:active-imports
 
-      - name: Focused unit gates
-        run: >
-          npx vitest run
-          tests/imm/simulate.test.ts
-          tests/imm/evidence_status.test.ts
-          tests/ui/active_workflow_guards.test.ts
-          tests/engine/placeholder-criteria.test.ts
-          -t "applyStageAVulnerabilityMultiplier|evidence status gate|active analog workflow guards|DEMO_CRITERIA"
+      - name: Fast unit suite
+        # F6: run the complete fast Vitest suite, not a regex subset. The slow
+        # stochastic suites (calibration, K15 reproduction, LOO, R-hat) are
+        # relegated to the nightly workflow.
+        run: npm run test:fast
 
-      - name: Evidence status
-        run: npm run evidence:status
+      - name: Evidence-status freshness
+        # F6: fail if the committed evidence-status JSON has drifted from the
+        # ledger + priors. Regenerates in memory (ignoring generatedAt) and
+        # compares to the committed files.
+        run: npm run evidence:check
 
       - name: Build
         run: npm run build
