@@ -10,7 +10,7 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { IMMCrewMember, CrewCompositeMethod, IMMOutcome, VulnerabilityCouplingMode } from "../../imm/types";
-import { ACTIVE_CRITERION_CATALOG } from "../../data/placeholder-criteria";
+import { ACTIVE_CRITERION_CATALOG } from "../../data/demo-criteria";
 import { ACTIVE_MISSIONS } from "../../data/imm-missions";
 import type { IMMMission } from "../../imm/types";
 import { IMM_KITS } from "../../imm/kits";

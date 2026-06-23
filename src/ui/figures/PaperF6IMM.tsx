@@ -16,7 +16,7 @@
 // Caption text: paper/manuscript.md §3.4 (post-v0.5.1 revision)
 
 import workedExample from "@/data/imm-worked-example.json";
-import { LXC_PRIORITY_SCORES } from "@/risk/lxc-definitions";
+import { LXC_PRIORITY_SCORES } from "@/engine/lxc-definitions";
 
 export function PaperF6IMM() {
   const f6 = workedExample.f6;

@@ -1,9 +1,9 @@
 // Experimental HSRB-inspired LxC translation for IMM Calculator outputs.
 // ─────────────────────────────────────────────────────────────────────
-// Mirrors `src/risk/lxc.ts::assessLxC` but takes `IMMOutcome` + optional
+// Mirrors the archived `src/risk/lxc.ts::assessLxC` but takes `IMMOutcome` + optional
 // `CrewGateResult` directly — closes the gap where IMM Calculator output
 // did not feed the LxC matrix construction. The band definitions live in
-// `src/risk/lxc-definitions.ts` (NASA JSC-66705 Rev A, pipeline-agnostic).
+// `src/engine/lxc-definitions.ts` (NASA JSC-66705 Rev A, pipeline-agnostic).
 //
 // Mapping IMMOutcome → LxC inputs:
 //
@@ -35,7 +35,7 @@ import {
   type ConsequenceLevel,
   type LikelihoodLevel,
   type RiskColor,
-} from "../risk/lxc-definitions";
+} from "../engine/lxc-definitions";
 
 export type IMMLxCAssessment = {
   likelihood: LikelihoodLevel;
@@ -55,7 +55,7 @@ export type IMMLxCAssessment = {
   reason?: string;
 };
 
-// IEEE-754 epsilon — matches src/risk/lxc.ts EPS for canonical-boundary cases
+// IEEE-754 epsilon — matches the archived src/risk/lxc.ts EPS for canonical-boundary cases
 // (e.g. 1 − 0.70 = 0.30000000000000004 must not be pushed into the next band).
 const EPS = 1e-9;
 

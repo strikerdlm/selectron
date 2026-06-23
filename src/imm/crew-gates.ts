@@ -24,7 +24,7 @@ import { evaluateGates } from "../engine/gates";
  *
  * @param crew - Array of IMMCrewMember objects. Each member is evaluated
  *   using `member.stageAScores ?? {}` as the score map.
- * @param criteria - Criterion catalog with gateThreshold fields (e.g. PLACEHOLDER_CRITERIA).
+ * @param criteria - Criterion catalog with gateThreshold fields (e.g. DEMO_CRITERIA).
  *   Only criteria that carry a `gateThreshold` contribute to gate evaluation;
  *   criteria without one are still listed under `evaluated` in the individual
  *   GateResult but do not contribute to failures.

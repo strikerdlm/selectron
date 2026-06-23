@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import type { DbCandidate, CandidateStatus } from "@/db/schema";
 import { listCandidates, deleteCandidate, exportDb, importDb, createCandidate, upsertCriterionEntry } from "@/db/repository";
 import { CandidateCard } from "../dashboard/CandidateCard";
-import { PLACEHOLDER_CRITERIA } from "@/data/placeholder-criteria";
+import { DEMO_CRITERIA } from "@/data/demo-criteria";
 import { generateCandidate } from "@/engine";
 
 type StatusFilter = "all" | CandidateStatus;
@@ -42,7 +42,7 @@ export function Dashboard(props: {
   }
 
   async function handleGenerateSynthetic() {
-    const synth = generateCandidate(PLACEHOLDER_CRITERIA, Math.floor(Math.random() * 1e9), "synth");
+    const synth = generateCandidate(DEMO_CRITERIA, Math.floor(Math.random() * 1e9), "synth");
     const c = await createCandidate({ alias: synth.alias });
     for (const [criterionId, rawValue] of Object.entries(synth.scores)) {
       await upsertCriterionEntry({

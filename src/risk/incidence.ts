@@ -1,5 +1,6 @@
 import { SelectronError } from "@/engine/errors";
 import { sampleGamma } from "@/engine/gamma";
+export { applyVulnerabilityMultiplier } from "@/engine/vulnerability";
 
 type Rng = () => number;
 
@@ -100,37 +101,6 @@ export function sampleBinomial(rng: Rng, n: number, p: number): number {
   let k = 0;
   for (let i = 0; i < n; i++) if (rng() < p) k++;
   return k;
-}
-
-/**
- * Candidate-vulnerability log-linear multiplier on a per-person-day incidence
- * rate λ: λ_i = λ_base · exp(Σ_j β_j · z_{i,j}).
- *
- * β is the per-criterion vulnerability coefficient (Iter-3 spec §3.1); z is
- * the normalised Stage-A score vector for crew member i. Only keys present in
- * BOTH β and z contribute; missing keys are treated as 0 (no contribution).
- *
- * Preserves Poisson conjugacy — this is the standard PRA scaling convention
- * (Cox 1972 proportional hazards; Apostolakis 2004 Bayesian PRA).
- */
-export function applyVulnerabilityMultiplier(
-  baseLambda: number,
-  beta: Record<string, number>,
-  z: Record<string, number>,
-): number {
-  if (!Number.isFinite(baseLambda) || baseLambda < 0) {
-    throw new SelectronError(
-      "E_BAD_PRIOR",
-      `baseLambda must be a finite non-negative number, got ${baseLambda}`,
-      { baseLambda },
-    );
-  }
-  let dot = 0;
-  for (const key of Object.keys(beta)) {
-    const zi = z[key];
-    if (zi !== undefined && Number.isFinite(zi)) dot += beta[key] * zi;
-  }
-  return baseLambda * Math.exp(dot);
 }
 
 /** Standard normal via Box–Muller. Deterministic given a seeded rng. */

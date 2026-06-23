@@ -1,7 +1,7 @@
 import { SelectronError } from "@/engine/errors";
 import { makeRng } from "@/engine/prng";
 import { zScoreAgainstScale } from "@/engine/normalize-cohort";
-import { PLACEHOLDER_CRITERIA } from "@/data/placeholder-criteria";
+import { DEMO_CRITERIA } from "@/data/demo-criteria";
 import type {
   AnalogMission,
   Candidate,
@@ -409,7 +409,7 @@ export function simulateMission(
   // Build criteria index once per simulation call (option (a) from plan G5:
   // testable, avoids re-importing inside the hot trial loop).
   const criteriaIndex: Map<string, Criterion> = new Map(
-    PLACEHOLDER_CRITERIA.map((c) => [c.id, c]),
+    DEMO_CRITERIA.map((c) => [c.id, c]),
   );
 
   const trials = options.trials;

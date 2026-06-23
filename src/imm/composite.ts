@@ -60,7 +60,7 @@ function memberCompositeScore(member: IMMCrewMember, criteria: readonly Criterio
  * - "geometric-mean" with any zero score: result is 0 (mathematically correct; log(0) = -∞).
  *
  * @param crew - Array of IMMCrewMember objects (stageAScores is optional on each).
- * @param criteria - Criterion catalog used for normalisation (PLACEHOLDER_CRITERIA or ratified docs/criteria.md).
+ * @param criteria - Criterion catalog used for normalisation (DEMO_CRITERIA or a future ratified catalog).
  * @param method - Aggregation strategy.
  * @returns CrewComposite with compositeScore ∈ [0, 1].
  */

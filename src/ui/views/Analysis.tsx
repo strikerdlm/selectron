@@ -1,7 +1,7 @@
 // src/ui/views/Analysis.tsx
 import { useEffect, useMemo, useState, type ReactNode } from "react";
 import type { Candidate, Criterion } from "@/types";
-import { PLACEHOLDER_CRITERIA } from "@/data/placeholder-criteria";
+import { DEMO_CRITERIA } from "@/data/demo-criteria";
 import { listCandidates, listCriterionEntries } from "@/db/repository";
 import { makeDemoCohort } from "@/analysis/demo-cohort";
 import { buildBubbleData } from "@/analysis/imm-bubbles";
@@ -89,7 +89,7 @@ function CouplingAuditTable({ criteria }: { criteria: readonly Criterion[] }) {
 }
 
 export function Analysis() {
-  const criteria = PLACEHOLDER_CRITERIA;
+  const criteria = DEMO_CRITERIA;
   const [cohort, setCohort] = useState<Candidate[]>(() => makeDemoCohort(criteria));
   const [isDemo, setIsDemo] = useState(true);
 

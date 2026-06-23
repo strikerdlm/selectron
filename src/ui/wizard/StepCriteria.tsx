@@ -1,5 +1,5 @@
 import { useMemo } from "react";
-import { PLACEHOLDER_CRITERIA } from "@/data/placeholder-criteria";
+import { DEMO_CRITERIA } from "@/data/demo-criteria";
 import { useWizard } from "@/contexts/WizardContext";
 import { CriterionRow, evidenceStatus } from "./CriterionRow";
 import { notify } from "@/ui/components/Toast";
@@ -12,7 +12,7 @@ export function StepCriteria() {
   // inclusion. `isCriterionAvailableAtTier` now keeps the construct set stable
   // so Dirichlet mean weights do not change simply because K changed by tier.
   const visibleCriteria = useMemo(
-    () => PLACEHOLDER_CRITERIA.filter((c) => isCriterionAvailableAtTier(c.minimumTier, accessTier)),
+    () => DEMO_CRITERIA.filter((c) => isCriterionAvailableAtTier(c.minimumTier, accessTier)),
     [accessTier],
   );
 
@@ -50,7 +50,7 @@ export function StepCriteria() {
           <h2 className="display text-lg">Step 2 — Criteria</h2>
           <span className="mono text-[13px] text-ink-2">
             {counts.ok} ok · {counts.partial} partial · {counts.empty} empty
-            <span className="text-ink-3"> · {visibleCriteria.length} of {PLACEHOLDER_CRITERIA.length} criteria</span>
+            <span className="text-ink-3"> · {visibleCriteria.length} of {DEMO_CRITERIA.length} criteria</span>
           </span>
         </div>
         <p className="mono mt-2 text-[12px] text-ink-3 leading-relaxed">

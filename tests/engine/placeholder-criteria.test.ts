@@ -1,15 +1,17 @@
 import { describe, it, expect } from "vitest";
-import { PLACEHOLDER_CRITERIA } from "@/data/placeholder-criteria";
+import { ACTIVE_CRITERION_CATALOG, DEMO_CRITERIA } from "@/data/demo-criteria";
 import { ACCESS_TIERS } from "@/types";
 
-describe("PLACEHOLDER_CRITERIA", () => {
-  it("has 12 entries (5 Iter-1 placeholders + 7 Diego 2026-05-19 scope expansion: NASA Cog Battery, PVT-B, SOT-5, CD-RISC-25, MSCEIT, MMPI-2-RF EID, BDI-II)", () => {
-    expect(PLACEHOLDER_CRITERIA.length).toBe(12);
+describe("DEMO_CRITERIA", () => {
+  it("has 12 demo entries and is explicitly non-ratified", () => {
+    expect(DEMO_CRITERIA.length).toBe(12);
+    expect(ACTIVE_CRITERION_CATALOG.status).toBe("demo");
+    expect(ACTIVE_CRITERION_CATALOG.intendedUse).toContain("not a ratified eligibility or selection instrument");
   });
 
   it("each has unique id, sane scale, and at least one citation", () => {
     const ids = new Set<string>();
-    for (const c of PLACEHOLDER_CRITERIA) {
+    for (const c of DEMO_CRITERIA) {
       expect(ids.has(c.id)).toBe(false);
       ids.add(c.id);
       expect(c.scale.min).toBeLessThan(c.scale.max);
@@ -18,7 +20,7 @@ describe("PLACEHOLDER_CRITERIA", () => {
   });
 
   it("every criterion populates tierInstruments for all 3 access tiers (scope-expansion-3)", () => {
-    for (const c of PLACEHOLDER_CRITERIA) {
+    for (const c of DEMO_CRITERIA) {
       expect(c.tierInstruments).toBeDefined();
       for (const t of ACCESS_TIERS) {
         const inst = c.tierInstruments![t];

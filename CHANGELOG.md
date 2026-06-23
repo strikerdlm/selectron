@@ -5,7 +5,26 @@ All notable changes to Selectron are documented here. Format roughly follows
 references to the commits and STATUS.md audit-log entries that produced each
 entry.
 
-## [0.5.7] — 2026-05-30 — Light/dark theme, +2pt type scale, correlation Analysis tab
+## [0.6.0-rebaseline.0] — 2026-06-23 — Rebaseline governance and release gates
+
+### Added
+- Formal v0.6 rebaseline document at `docs/v0.6_rebaseline.md`, replacing the
+  abandoned Iteration 1-4 sequence as the active baseline and explicitly
+  dispositioning each original gate.
+- Canonical Stage-A demo catalog source at `src/data/demo-criteria.ts`. The old
+  `src/data/placeholder-criteria.ts` path is retained as a compatibility shim.
+- Active import guard (`npm run guard:active-imports`) to keep archived
+  `src/risk` dependencies out of active app/IMM paths.
+- GitHub Actions CI workflow covering typecheck, active import guard, focused
+  unit gates, evidence status, production build, focused browser smoke, and
+  fast Python tests.
+
+### Changed
+- Source/version metadata advanced together to `0.6.0-rebaseline.0`.
+- Shared vulnerability and LxC utilities moved into neutral `src/engine` modules;
+  archived `src/risk` now re-exports compatibility surfaces where needed.
+
+## [0.5.7-unreleased] — 2026-05-30 — Light/dark theme, +2pt type scale, correlation Analysis tab
 
 Frontend feature pass (subagent-driven, two-stage reviewed per task). No engine
 math changed — `src/imm/`, `src/risk/`, and the priors are untouched (one `export`

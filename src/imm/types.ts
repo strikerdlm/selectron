@@ -88,7 +88,7 @@ export type IMMCrewMember = {
   selectronStageACandidateId?: string;
   /**
    * Per-criterion Stage A scores (raw, instrument scale).
-   * Keys are criterion IDs from PLACEHOLDER_CRITERIA / docs/criteria.md.
+   * Keys are criterion IDs from DEMO_CRITERIA or a future ratified catalog.
    * When present, used in `simulateIMM` to compute z-scored vulnerability multipliers
    * that modulate per-condition λ (gate-then-modulate, Commit 5).
    */

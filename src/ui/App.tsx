@@ -1,6 +1,7 @@
-import { useEffect, useState } from "react";
+import { lazy, Suspense, useEffect, useState } from "react";
 import { DbProvider } from "@/contexts/DbContext";
 import { CalibrationJobsProvider, useCalibrationJobs } from "@/contexts/CalibrationJobsContext";
+import { SELECTRON_VERSION } from "@/version";
 import { ThemeProvider } from "./theme/ThemeContext";
 import { ThemeToggle } from "./theme/ThemeToggle";
 import { createCandidate } from "@/db/repository";
@@ -11,7 +12,10 @@ import { Calibration } from "./views/Calibration";
 import { Analysis } from "./views/Analysis";
 import { ToastHost } from "./components/Toast";
 import { ErrorBoundary } from "./components/ErrorBoundary";
-import { TestFigureHost } from "./testing/TestFigureHost";
+
+const TestFigureHost = lazy(() =>
+  import("./testing/TestFigureHost").then((mod) => ({ default: mod.TestFigureHost })),
+);
 
 const SEED_SAMPLER = 0xc0ffee;
 
@@ -65,7 +69,11 @@ export function App() {
   if (import.meta.env.DEV) {
     const testFigure = new URLSearchParams(location.search).get("testFigure");
     if (testFigure) {
-      return <TestFigureHost figureId={testFigure} />;
+      return (
+        <Suspense fallback={<div className="p-6 text-sm text-ink-2">loading figure harness...</div>}>
+          <TestFigureHost figureId={testFigure} />
+        </Suspense>
+      );
     }
   }
 
@@ -87,7 +95,7 @@ export function App() {
               <span className="mono text-[13px] uppercase tracking-cap text-ink-1">
                 by <span className="text-ink-0">Diego Malpica MD</span>
               </span>
-              <span className="label text-signal">v0.5.6 · analog research prototype</span>
+              <span className="label text-signal">v{SELECTRON_VERSION} · analog research prototype</span>
             </div>
             <div className="mono flex items-center gap-4 text-[13px] text-ink-2">
               <ThemeToggle />
@@ -208,7 +216,7 @@ export function App() {
         <footer className="mt-10 border-t border-line">
           <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-4 px-8 py-5">
             <div className="mono text-[12px] uppercase tracking-cap text-ink-3">
-              selectron · v0.5.6 · uncertain-weight mcda + analog mission simulation
+              selectron · v{SELECTRON_VERSION} · uncertain-weight mcda + analog mission simulation
             </div>
             <div className="mono text-[12px] uppercase tracking-cap text-ink-3">
               <a

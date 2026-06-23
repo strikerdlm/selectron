@@ -1,11 +1,10 @@
 # Selectron — STATUS
 
-**Last updated:** 2026-06-23 (Gate 0-2 audit upgrade; claim containment, simulator multiplier/severity fixes, and parameter-level evidence gate.)
+**Last updated:** 2026-06-23 (v0.6 rebaseline; traceability, Stage-A disposition, active import guard, and CI gates.)
 **Current branch:** `master`
-**Active plan (Iter 1):** [`docs/superpowers/plans/2026-05-18-selectron-iter1-phase0.md`](docs/superpowers/plans/2026-05-18-selectron-iter1-phase0.md)
-**Active plan (Iter 3):** [`docs/superpowers/plans/2026-05-18-selectron-iter3-risk.md`](docs/superpowers/plans/2026-05-18-selectron-iter3-risk.md)
-**Active spec (Iter 1):** [`docs/superpowers/specs/2026-05-18-selectron-design.md`](docs/superpowers/specs/2026-05-18-selectron-design.md)
-**Active spec (Iter 3):** [`docs/superpowers/specs/2026-05-18-selectron-iter3-risk.md`](docs/superpowers/specs/2026-05-18-selectron-iter3-risk.md)
+**Active baseline:** [`docs/v0.6_rebaseline.md`](docs/v0.6_rebaseline.md)
+**Historical plan (Iter 1):** [`docs/superpowers/plans/2026-05-18-selectron-iter1-phase0.md`](docs/superpowers/plans/2026-05-18-selectron-iter1-phase0.md)
+**Historical plan (Iter 3):** [`docs/superpowers/plans/2026-05-18-selectron-iter3-risk.md`](docs/superpowers/plans/2026-05-18-selectron-iter3-risk.md)
 
 ---
 
@@ -56,6 +55,8 @@ Update rules:
 ---
 
 ## Current state
+
+**2026-06-23 — v0.6 rebaseline DONE.** The next workstream is no longer called Iteration 7. `docs/v0.6_rebaseline.md` is the active baseline and disposition matrix for the abandoned Iteration 1-4 contract. Stage A is frozen as a demo MCDA method with canonical source `src/data/demo-criteria.ts`; `src/data/placeholder-criteria.ts` remains a compatibility shim only. Shared vulnerability and LxC definitions were moved into neutral `src/engine` modules, and `npm run guard:active-imports` now enforces that active app/IMM paths do not import archived `src/risk` modules. GitHub Actions CI is defined for typecheck, guard, focused unit gates, evidence status, build, focused browser smoke, fast Python tests, and nightly slow validation lanes. Source identity is advanced coherently to `0.6.0-rebaseline.0`; the previous 0.5.7 changelog entry is labeled unreleased. **Verification:** `npm run guard:active-imports` PASS; `npm run typecheck` PASS; focused rebaseline Vitest suite PASS (16/16); `npm run evidence:status` PASS with `releasePriorsAdjudicated=false`; `npm run build` PASS with pre-existing Vite chunk/dynamic-import warnings only; focused Playwright browser smoke PASS (3/3).
 
 **2026-06-23 — Gate 0-2 audit upgrade DONE.** The app now implements the next audit containment layer after the workflow split. Active analog surfaces carry research-prototype warnings and no longer use visible mission-success/MSP, NASA-verdict, NASA-standard, or posterior-certainty language. Stage A exposes the current equal-weight demo prior as `alpha_k = kappa * m_k` with `kappa = K`, and the active criterion set is wrapped as a `demo` catalog rather than a ratified selection taxonomy. Crew gates remain review flags and no longer fast-fail developer LxC adapters into L5/C5. Legacy figure/simulator surfaces now label LxC as a non-operational appendix mapping, not an applicant verdict. The IMM engine now applies positive multipliers on one-shot/EVA/SPE-style Bernoulli paths through proportional-hazard probability scaling instead of the previous capped `rng() < effectiveMult` gate, and sampled best/worst severity now selects scenario-specific outcome branches when present. Legacy priors without branch-specific outcomes are duplicated into both branches at runtime and remain unvalidated for severity-split claims. Evidence status is now parameter-level: current generated status reports `acceptedCount=0`, `proposalRefCount=7`, `activeParameterCount=4846`, `uncoveredParameterCount=4846`, and `releasePriorsAdjudicated=false`. **Verification:** `npm run typecheck` PASS; focused Gate 0-2 tests PASS (90/90); simulator/UI regression set PASS (85/85); `npm run validate:imm:analog` PASS (26/26); `npm run validate:imm` PASS with known K15 benchmark divergence documented in output; `npm run evidence:status -- --write` PASS; `npm run evidence:status` PASS; `npm run build` PASS with pre-existing Vite chunk/dynamic-import warnings only; `git diff --check` PASS.
 

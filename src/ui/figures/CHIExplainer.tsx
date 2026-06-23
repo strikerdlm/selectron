@@ -217,7 +217,7 @@ export function CHIExplainer({ posterior, chiStar, missionId, gate }: Props) {
         <p className="mono mt-4 pt-3 border-t border-line/40 text-[10px] text-ink-3 leading-relaxed">
           This mapping is a developer comparison. Its quantitative bridge from
           chi-gap to consequence band (1 %, 5 %, 15 %, 30 % crew-days lost) is
-          defined in src/risk/lxc-definitions.ts and is not an endorsed external
+          defined in src/engine/lxc-definitions.ts and is not an endorsed external
           threshold set. Per-mission LxC chips appear in the Mission Comparison
           panel below.
         </p>

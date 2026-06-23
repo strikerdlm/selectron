@@ -149,7 +149,7 @@ const CRITERION_CITATIONS: Record<CitationKey, Citation> = {
     volume: "62",
     issue: "1",
     pages: "4-23",
-    scite_verified: false, // Crossref 404; DOI from placeholder-criteria.ts — flagged for Diego manual check
+    scite_verified: false, // Crossref 404; DOI from demo-criteria.ts — flagged for Diego manual check
     retraction_status: "none",
     relevance_quote: "Structured behavioural rubrics and panel ratings are the primary validated instruments for technical competence assessment in safety-critical operations.",
   },

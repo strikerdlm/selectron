@@ -1,6 +1,6 @@
 import { useMemo } from "react";
 import { useWizard } from "@/contexts/WizardContext";
-import { ACTIVE_CRITERION_CATALOG } from "@/data/placeholder-criteria";
+import { ACTIVE_CRITERION_CATALOG } from "@/data/demo-criteria";
 import { buildEqualWeightPrior, scoreCandidate, normalizeScore } from "@/engine";
 import { PosteriorPlot } from "@/ui/figures/PosteriorPlot";
 import { ScoreCard } from "@/ui/components/ScoreCard";

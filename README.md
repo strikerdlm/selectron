@@ -9,7 +9,7 @@
 ---
 
 ![status](https://img.shields.io/badge/status-Gate%200--2%20prototype%20containment-success)
-![version](https://img.shields.io/badge/version%20of%20record-v0.5.6-blue)
+![version](https://img.shields.io/badge/version%20of%20record-v0.6.0--rebaseline.0-blue)
 ![typescript](https://img.shields.io/badge/TypeScript-5.5-3178c6?logo=typescript&logoColor=white)
 ![python](https://img.shields.io/badge/Python%20calibration-3.12-3776ab?logo=python&logoColor=white)
 ![vite](https://img.shields.io/badge/Vite-5.3-646cff?logo=vite&logoColor=white)
@@ -39,11 +39,13 @@ Selectron combines four pieces that are kept in one source tree:
 - **A browser application** in Vite + React + Tailwind + ECharts. The main surfaces are Dashboard, Wizard, Crew Composition, Calibration, and Analysis.
 - **Evidence and reproducibility tooling** in `research/`, `python/`, `paper/`, and `docs/`. Release fitting reads only adjudicated rows from `research/evidence_extracted/evidence_ledger.csv`; proposal CSVs require an explicit exploratory flag. The current ledger has no accepted rows, so the existing prior catalog must be treated as unadjudicated for analog-outcome validation claims.
 
-The public repository is `https://github.com/strikerdlm/selectron`. The public software archive is on Zenodo at `https://doi.org/10.5281/zenodo.20693257`. The version of record remains **v0.5.6** across `package.json`, `CITATION.cff`, `src/version.ts`, app chrome, and the manuscript source. `CHANGELOG.md` also documents a post-release **0.5.7 frontend pass**: persisted light/dark theme, +2 pt live-app type scale, and a five-figure Analysis tab.
+The public repository is `https://github.com/strikerdlm/selectron`. The public software archive is on Zenodo at `https://doi.org/10.5281/zenodo.20693257`. The active development version is **v0.6.0-rebaseline.0** across `package.json`, `CITATION.cff`, `src/version.ts`, and app chrome. `CHANGELOG.md` labels the earlier **0.5.7 frontend pass** as unreleased because it was never advanced as a coherent version of record before this rebaseline.
 
 ## Current State
 
-`STATUS.md` is the live tracker. As of **2026-06-23**, the app implements the Gate 0-2 audit containment pass: analog workflows carry research-prototype warnings, the Stage-A demo catalog is explicit, the current equal-weight Dirichlet prior is exposed as `alpha_k = kappa * m_k` with `kappa = K`, simulator severity branches are operative, positive one-shot/EVA/SPE incidence multipliers are no longer capped, and evidence status is checked at parameter-path level. The Wizard stops at Stage-A candidate scoring and hands off to Crew Composition for team-level scenario analysis. Crew Composition defaults to analog mission profiles, default-off trait-to-incidence coupling, and analog outcome estimates. ISS remains available as a developer benchmark, not as the primary analog workflow.
+`STATUS.md` is the live tracker. As of **2026-06-23**, the active baseline is **v0.6 Rebaseline**, documented in `docs/v0.6_rebaseline.md`. The app implements the Gate 0-2 audit containment pass: analog workflows carry research-prototype warnings, the Stage-A demo catalog is explicit, the current equal-weight Dirichlet prior is exposed as `alpha_k = kappa * m_k` with `kappa = K`, simulator severity branches are operative, positive one-shot/EVA/SPE incidence multipliers are no longer capped, and evidence status is checked at parameter-path level. The Wizard stops at Stage-A candidate scoring and hands off to Crew Composition for team-level scenario analysis. Crew Composition defaults to analog mission profiles, default-off trait-to-incidence coupling, and analog outcome estimates. ISS remains available as a developer benchmark, not as the primary analog workflow.
+
+The v0.6 rebaseline establishes five release gates: requirements traceability, Stage-A disposition, separate evidence/validation protocol, architecture/CI enforcement, and release/publication freeze. Do not call the next workstream "Iteration 7"; use the v0.6 gate names until a replacement baseline is issued.
 
 Evidence status is machine-readable at `research/evidence_extracted/evidence_status.json` and can be regenerated with:
 
@@ -248,7 +250,7 @@ The current reproducibility contract is split across code, tests, and manuscript
 - `tests/imm/priors.test.ts` locks the 101-condition prior count, provenance counts, zero tier-C synthetic priors, prior-file SHA-256, and citation-hygiene tokens.
 - `tests/imm/validation_k15.test.ts` and related IMM tests lock the K15 reproduction gate and documented-divergent brackets.
 - `paper/REPRODUCIBILITY_LOCK.json` records manuscript source hashes, figure hashes, the `imm-priors.json` hash, verification commands, and the Zenodo DOI.
-- `src/version.ts` currently records `SELECTRON_VERSION = "0.5.6"` and `FIGURE_GENERATION_COMMIT = "538e16ccff94"`.
+- `src/version.ts` currently records `SELECTRON_VERSION = "0.6.0-rebaseline.0"` and `FIGURE_GENERATION_COMMIT = "538e16ccff94"`.
 
 Last recorded verification in `STATUS.md`:
 

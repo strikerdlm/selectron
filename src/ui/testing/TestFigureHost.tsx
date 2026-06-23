@@ -11,7 +11,7 @@ import { LxCMatrix } from "@/ui/figures/LxCMatrix";
 import { MissionComparison } from "@/ui/figures/MissionComparison";
 import { PaperF6IMM } from "@/ui/figures/PaperF6IMM";
 import { PaperF7IMM } from "@/ui/figures/PaperF7IMM";
-import { PLACEHOLDER_CRITERIA } from "@/data/placeholder-criteria";
+import { DEMO_CRITERIA } from "@/data/demo-criteria";
 import { ANALOG_CONDITIONS } from "@/risk/conditions";
 import { ANALOG_MISSIONS } from "@/data/analog-missions";
 import { SYNTHETIC_PRIORS, synthesizeCrew } from "@/data/synthetic-iter3";
@@ -112,8 +112,8 @@ function paperMCDAPosterior(): Posterior {
       alias:  PAPER_ALIAS,
       scores: HETERO_SCORES,
     },
-    criteria:   PLACEHOLDER_CRITERIA,
-    alpha:      new Array(PLACEHOLDER_CRITERIA.length).fill(1),
+    criteria:   DEMO_CRITERIA,
+    alpha:      new Array(DEMO_CRITERIA.length).fill(1),
     iterations: 5_000,
     seed:       PAPER_SEED,
   });
@@ -121,9 +121,9 @@ function paperMCDAPosterior(): Posterior {
 
 /** Closed-form per-criterion contributions (w̄_k · z_k) for the ScoreBreakdownRadar. */
 function paperRadarData(): import("@/ui/figures/ScoreBreakdownRadar").RadarDatum[] {
-  const K = PLACEHOLDER_CRITERIA.length;
+  const K = DEMO_CRITERIA.length;
   const wBar = 1 / K; // Dirichlet(1,…,1) mean weight per criterion
-  return PLACEHOLDER_CRITERIA.map((c) => {
+  return DEMO_CRITERIA.map((c) => {
     const raw = HETERO_SCORES[c.id];
     const z   = normalizeScore(raw, c.scale, c.higherIsBetter);
     return {
@@ -295,7 +295,7 @@ export function TestFigureHost({ figureId }: { figureId: string }) {
   }
   if (figureId === "F5") {
     return wrap(
-      <EvidenceReference criterion={PLACEHOLDER_CRITERIA[0]} enteredValue={62.5} />
+      <EvidenceReference criterion={DEMO_CRITERIA[0]} enteredValue={62.5} />
     );
   }
   if (figureId === "F6") {
@@ -394,7 +394,7 @@ function PaperF4() {
     >
       <MCDACalculationTrace
         posterior={posterior}
-        criteria={PLACEHOLDER_CRITERIA}
+        criteria={DEMO_CRITERIA}
         scores={HETERO_SCORES}
         alias={PAPER_ALIAS}
         seed={PAPER_SEED}

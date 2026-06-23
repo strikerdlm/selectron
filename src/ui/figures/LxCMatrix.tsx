@@ -10,10 +10,10 @@ import {
   lxcColor,
   type LikelihoodLevel,
   type ConsequenceLevel,
-} from "@/risk/lxc-definitions";
+} from "@/engine/lxc-definitions";
 
-// Minimal structural prop — both the Stage-B `LxCAssessment` (risk/lxc) and
-// the crew-level `IMMLxCAssessment` (imm/lxc) satisfy it, keeping this figure
+// Minimal structural prop — both the archived Stage-B `LxCAssessment` and
+// the active crew-level `IMMLxCAssessment` satisfy it, keeping this figure
 // pipeline-agnostic like the band definitions it renders.
 export type LxCMatrixAssessment = {
   likelihood: LikelihoodLevel;

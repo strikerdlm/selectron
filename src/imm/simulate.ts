@@ -50,7 +50,7 @@ import type { IMMCrewMember, IMMMission, IMMKitScenario, IMMPrior, IMMConditionF
 import { IMM_CONDITIONS } from "./conditions";
 import { loadIMMPriors } from "./priors";
 import { applyProportionalHazardMultiplier, samplePoisson, sampleLognormal, sampleScaledBetaBernoulli, samplePoissonProcess } from "./incidence";
-import { applyVulnerabilityMultiplier } from "../risk/incidence";
+import { applyVulnerabilityMultiplier } from "../engine/vulnerability";
 import { zScoreAgainstScale } from "../engine/normalize-cohort";
 import { sampleGamma } from "../engine/gamma";
 import { sampleSeverity } from "./severity";

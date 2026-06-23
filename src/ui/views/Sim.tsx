@@ -3,7 +3,7 @@ import type { SimSession } from "@/db/schema";
 import { recentSimsFor, getCandidateWithEvidence } from "@/db/repository";
 import { ANALOG_CONDITIONS } from "@/risk/conditions";
 import { ANALOG_MISSIONS } from "@/data/analog-missions";
-import { PLACEHOLDER_CRITERIA } from "@/data/placeholder-criteria";
+import { DEMO_CRITERIA } from "@/data/demo-criteria";
 import { evaluateGates } from "@/engine/gates";
 import { RiskCard } from "@/ui/components/RiskCard";
 import { RiskHistogram } from "@/ui/figures/RiskHistogram";
@@ -48,7 +48,7 @@ export function Sim({
         tierNote?.[1] && ACCESS_TIERS.includes(tierNote[1] as AccessTier)
           ? (tierNote[1] as AccessTier)
           : "minimum";
-      const tierCriteria = PLACEHOLDER_CRITERIA.filter(
+      const tierCriteria = DEMO_CRITERIA.filter(
         (c) => isCriterionAvailableAtTier(c.minimumTier, tier),
       );
       // Build Candidate shape from DB entries and evaluate gates

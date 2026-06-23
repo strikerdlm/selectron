@@ -3,7 +3,7 @@
 
 import type { AccessTier } from "@/types";
 import { ACCESS_TIERS, TIER_LABEL, TIER_SHORT_DESCRIPTION, isCriterionAvailableAtTier } from "@/types";
-import { ACTIVE_CRITERION_CATALOG } from "@/data/placeholder-criteria";
+import { ACTIVE_CRITERION_CATALOG } from "@/data/demo-criteria";
 
 type Props = {
   value: AccessTier;
