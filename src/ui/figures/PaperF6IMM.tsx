@@ -1,16 +1,16 @@
 // src/ui/figures/PaperF6IMM.tsx
 //
-// IMM Calculator NASA HSRB LxC verdict — paper Figure 6 (v0.5.1+).
+// IMM Calculator experimental LxC appendix mapping — paper Figure 6 (v0.5.1+).
 //
 // Replaces the Iter-3 src/risk/-backed PaperF6 LxC render with an IMM-Calculator
 // equivalent: K15 reference crew × ISS 6mo × ISS HMS at T = 100,000 trials,
 // seed 0xc0ffee, computed offline by scripts/extract_imm_worked_example.ts and
 // loaded as a static JSON import for synchronous Playwright snapshot.
 //
-// The L4 × C3 = 18 yellow verdict at the v0.5.0 calibration is the headline
-// "operational" HSRB output: significant fraction-lost (CHI 90.25 → 9.75 %
-// fractionLost = C3) at a measurable per-mission failure probability
-// (1 − missionSuccess 92.1 % = 7.9 % = L4 per JSC-66705 In-Mission bands).
+// The L4 × C3 = 18 yellow mapping at the v0.5.0 calibration is a historical
+// appendix comparison only: significant fraction-lost (CHI 90.25 → 9.75 %
+// fractionLost = C3) at a measurable threshold-failure probability
+// (1 − health criterion 92.1 % = 7.9 % = L4 in the configured bands).
 //
 // Source data: src/data/imm-worked-example.json
 // Caption text: paper/manuscript.md §3.4 (post-v0.5.1 revision)
@@ -32,7 +32,7 @@ export function PaperF6IMM() {
     <div className="p-8 bg-white" style={{ width: 1400 }}>
       <div className="mb-6">
         <h1 className="text-[24px] font-semibold text-gray-900">
-          NASA HSRB Likelihood × Consequence — IMM Calculator at v0.5.x
+          Experimental Likelihood × Consequence appendix — IMM Calculator at v0.5.x
         </h1>
         <p className="mono text-[14px] text-gray-600 mt-2">
           {f6.mission.label} · kit = {f6.kit.label} · T = {f6.trials.toLocaleString()} trials · seed = 0x{(workedExample.seed).toString(16)}
@@ -71,7 +71,7 @@ export function PaperF6IMM() {
         ))}
       </div>
 
-      {/* Verdict callout */}
+      {/* Appendix mapping callout */}
       <div className={`mt-6 border-2 ${colorClass} rounded p-5 max-w-4xl`}>
         <div className="flex items-baseline gap-4 flex-wrap">
           <span className="text-4xl font-bold">L{L} × C{C} = {f6.assessment.score}</span>
@@ -79,13 +79,13 @@ export function PaperF6IMM() {
         </div>
         <dl className="mono text-[12px] mt-3 grid grid-cols-2 gap-x-6 gap-y-1">
           <dt className="text-gray-700">Likelihood</dt>
-          <dd>L{L} · {f6.assessment.likelihoodLabel} · pFailure = {(100 * f6.assessment.pMissionFailure).toFixed(2)}%</dd>
+          <dd>L{L} · {f6.assessment.likelihoodLabel} · threshold failure = {(100 * f6.assessment.pMissionFailure).toFixed(2)}%</dd>
           <dt className="text-gray-700">Consequence</dt>
           <dd>C{C} · {f6.assessment.consequenceLabel} · fractionLost = {(100 * f6.assessment.fractionLost).toFixed(2)}%</dd>
         </dl>
         <p className="mono text-[10px] text-gray-600 mt-3 border-t border-current/30 pt-2">
-          pFailure = 1 − MSP (MSP = P[no EVAC ∧ no LOCL ∧ CHI ≥ χ*=0.7]).
-          fractionLost = 1 − CHI/100. NASA JSC-66705 Rev A §3.2.4.
+          threshold failure = 1 − health criterion (health criterion = P[no EVAC ∧ no LOCL ∧ CHI ≥ χ*=0.7]).
+          fractionLost = 1 − CHI/100. Non-operational appendix mapping.
         </p>
       </div>
 

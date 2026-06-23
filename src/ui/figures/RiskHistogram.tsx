@@ -55,7 +55,7 @@ function buildHistogram(
     if (s < min) min = s;
     if (s > max) max = s;
   }
-  // Degenerate-posterior guard: if all samples are identical (e.g. all 1.0),
+  // Degenerate-sample guard: if all samples are identical (e.g. all 1.0),
   // pad ±1e-6 to avoid divide-by-zero in the bin-width calculation.
   if (min === max) {
     min -= 1e-6;
@@ -102,7 +102,7 @@ export function RiskHistogram({
   if (chiSamples.length < 10) {
     return (
       <div className="grid h-[280px] place-items-center text-sm text-ink-2 mono">
-        no diagnostics — run a simulation to see the CHI posterior
+        no diagnostics — run a simulation to see the CHI distribution
       </div>
     );
   }
@@ -184,7 +184,7 @@ export function RiskHistogram({
 
     series: [
       {
-        name: "CHI posterior",
+        name: "CHI simulation distribution",
         type: "bar",
         data: counts,
         barCategoryGap: "8%",

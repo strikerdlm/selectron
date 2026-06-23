@@ -64,7 +64,7 @@ describe("IMMHeadlineCard (I1)", () => {
     ).not.toThrow();
   });
 
-  it("displays TME, CHI, pEVAC, pLOCL, and MSP numeric values in the DOM", () => {
+  it("displays TME, CHI, pEVAC, pLOCL, and health-criterion numeric values in the DOM", () => {
     const outcome = makeOutcome({
       tme:   123.4,
       chi:   91.5,
@@ -85,7 +85,7 @@ describe("IMMHeadlineCard (I1)", () => {
     expect(text).toContain("CHI");
     expect(text).toContain("pEVAC");
     expect(text).toContain("pLOCL");
-    expect(text).toContain("MSP");
+    expect(text).toContain("Health criterion");
     // Formatted means (count for TME, "%" for the others)
     expect(text).toContain("123.4");
     expect(text).toContain("91.5%");
@@ -152,7 +152,7 @@ describe("IMMHeadlineCard (I1)", () => {
     ).toBeNull();
     // But cards still render
     expect(container.textContent).toContain("TME");
-    expect(container.textContent).toContain("MSP");
+    expect(container.textContent).toContain("Health criterion");
   });
 
   it("caption mentions trial count with thousands separator", () => {

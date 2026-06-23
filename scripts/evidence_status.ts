@@ -9,6 +9,11 @@ export type EvidenceStatus = {
   proposalCount: number;
   proposalRefCount: number;
   proposalRefConditionIds: string[];
+  activeParameterCount: number;
+  acceptedCoveredParameterCount: number;
+  uncoveredParameterCount: number;
+  uncoveredParameterPaths: string[];
+  malformedAcceptedRows: string[];
   releasePriorsAdjudicated: boolean;
   status: "adjudicated" | "unadjudicated";
   message: string;
@@ -18,18 +23,129 @@ const REPO_ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const LEDGER_PATH = "research/evidence_extracted/evidence_ledger.csv";
 const PRIORS_PATH = "src/data/imm-priors.json";
 
+const REQUIRED_ACCEPTED_FIELDS = [
+  "parameter_path",
+  "study_slug",
+  "endpoint_definition",
+  "extractor",
+  "verifier",
+  "risk_of_bias",
+  "transportability",
+  "uncertainty_distribution",
+  "model_version",
+  "acceptance_version",
+  "prior_value_hash",
+];
+
+function parseCsvRecords(text: string): string[][] {
+  const rows: string[][] = [];
+  let row: string[] = [];
+  let field = "";
+  let inQuotes = false;
+
+  for (let i = 0; i < text.length; i++) {
+    const ch = text[i];
+    const next = text[i + 1];
+
+    if (ch === "\"") {
+      if (inQuotes && next === "\"") {
+        field += "\"";
+        i++;
+      } else {
+        inQuotes = !inQuotes;
+      }
+      continue;
+    }
+
+    if (ch === "," && !inQuotes) {
+      row.push(field);
+      field = "";
+      continue;
+    }
+
+    if ((ch === "\n" || ch === "\r") && !inQuotes) {
+      if (ch === "\r" && next === "\n") i++;
+      row.push(field);
+      if (row.some((value) => value.trim().length > 0)) rows.push(row);
+      row = [];
+      field = "";
+      continue;
+    }
+
+    field += ch;
+  }
+
+  row.push(field);
+  if (row.some((value) => value.trim().length > 0)) rows.push(row);
+  return rows;
+}
+
 function parseCsvRows(text: string): Record<string, string>[] {
-  const lines = text.split(/\r?\n/).filter((line) => line.trim().length > 0);
-  if (lines.length <= 1) return [];
-  const headers = lines[0].split(",").map((h) => h.trim());
-  return lines.slice(1).map((line) => {
-    const values = line.split(",");
+  const records = parseCsvRecords(text);
+  if (records.length <= 1) return [];
+  const headers = records[0].map((h) => h.trim());
+  return records.slice(1).map((values) => {
     const row: Record<string, string> = {};
     headers.forEach((header, index) => {
       row[header] = (values[index] ?? "").trim();
     });
     return row;
   });
+}
+
+function walkNumericParameters(value: unknown, prefix: string, out: string[]): void {
+  if (typeof value === "number" && Number.isFinite(value)) {
+    out.push(prefix);
+    return;
+  }
+  if (!value || typeof value !== "object" || Array.isArray(value)) return;
+  for (const [key, child] of Object.entries(value as Record<string, unknown>)) {
+    walkNumericParameters(child, `${prefix}.${key}`, out);
+  }
+}
+
+function activeParameterPaths(priors: {
+  conditions?: Record<string, unknown>;
+  global_calibration?: Record<string, unknown>;
+}): string[] {
+  const paths: string[] = [];
+  for (const [conditionId, rawPrior] of Object.entries(priors.conditions ?? {})) {
+    const prior = rawPrior as Record<string, unknown>;
+    for (const field of [
+      "incidence",
+      "severity",
+      "outcomeScenarios",
+      "treated",
+      "untreated",
+      "risk_factor_multipliers",
+      "required_resources",
+    ]) {
+      if (prior[field] !== undefined) {
+        walkNumericParameters(prior[field], `conditions.${conditionId}.${field}`, paths);
+      }
+    }
+  }
+
+  const global = priors.global_calibration ?? {};
+  for (const field of ["tierA_multiplier", "tierB_multiplier", "tierC_multiplier", "kind_multipliers"]) {
+    if (global[field] !== undefined) {
+      walkNumericParameters(global[field], `global_calibration.${field}`, paths);
+    }
+  }
+
+  return Array.from(new Set(paths)).sort();
+}
+
+function malformedAcceptedRowIds(rows: Record<string, string>[]): string[] {
+  const malformed: string[] = [];
+  rows.forEach((row, index) => {
+    if (row.status !== "accepted") return;
+    const missing = REQUIRED_ACCEPTED_FIELDS.filter((field) => !row[field]);
+    if (missing.length > 0) {
+      malformed.push(`row ${index + 2}: missing ${missing.join("|")}`);
+    }
+  });
+  return malformed;
 }
 
 export function buildEvidenceStatus(root = REPO_ROOT): EvidenceStatus {
@@ -41,14 +157,28 @@ export function buildEvidenceStatus(root = REPO_ROOT): EvidenceStatus {
 
   const priors = JSON.parse(readFileSync(priorsPath, "utf8")) as {
     conditions?: Record<string, { source_ref?: string }>;
+    global_calibration?: Record<string, unknown>;
   };
   const proposalRefConditionIds = Object.entries(priors.conditions ?? {})
     .filter(([, prior]) => /proposals_p-/i.test(prior.source_ref ?? ""))
     .map(([conditionId]) => conditionId)
     .sort();
 
+  const parameterPaths = activeParameterPaths(priors);
+  const acceptedRows = ledgerRows.filter((row) => row.status === "accepted");
+  const malformedRows = malformedAcceptedRowIds(ledgerRows);
+  const acceptedParameterPaths = new Set(
+    acceptedRows
+      .map((row) => row.parameter_path)
+      .filter((path): path is string => typeof path === "string" && path.length > 0),
+  );
+  const uncoveredParameterPaths = parameterPaths.filter((path) => !acceptedParameterPaths.has(path));
+
   const releasePriorsAdjudicated =
-    acceptedCount > 0 && proposalRefConditionIds.length === 0;
+    parameterPaths.length > 0 &&
+    uncoveredParameterPaths.length === 0 &&
+    proposalRefConditionIds.length === 0 &&
+    malformedRows.length === 0;
 
   return {
     ledgerPath: LEDGER_PATH,
@@ -57,11 +187,16 @@ export function buildEvidenceStatus(root = REPO_ROOT): EvidenceStatus {
     proposalCount,
     proposalRefCount: proposalRefConditionIds.length,
     proposalRefConditionIds,
+    activeParameterCount: parameterPaths.length,
+    acceptedCoveredParameterCount: parameterPaths.length - uncoveredParameterPaths.length,
+    uncoveredParameterCount: uncoveredParameterPaths.length,
+    uncoveredParameterPaths,
+    malformedAcceptedRows: malformedRows,
     releasePriorsAdjudicated,
     status: releasePriorsAdjudicated ? "adjudicated" : "unadjudicated",
     message: releasePriorsAdjudicated
-      ? "Release priors are backed by accepted evidence ledger rows."
-      : "No adjudicated analog evidence release is available; proposal-stage references remain exploratory.",
+      ? "Every active prior parameter is covered by accepted evidence ledger rows."
+      : "No complete adjudicated analog evidence release is available; active prior parameters remain uncovered or proposal-stage references remain exploratory.",
   };
 }
 

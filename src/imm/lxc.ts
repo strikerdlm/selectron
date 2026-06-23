@@ -1,4 +1,4 @@
-// NASA HSRB LxC scoring for IMM Calculator outputs.
+// Experimental HSRB-inspired LxC translation for IMM Calculator outputs.
 // ─────────────────────────────────────────────────────────────────────
 // Mirrors `src/risk/lxc.ts::assessLxC` but takes `IMMOutcome` + optional
 // `CrewGateResult` directly — closes the gap where IMM Calculator output
@@ -19,9 +19,8 @@
 //     CHI is in IMMOutcome's percent scale (0–100). The HSRB consequence
 //     band reads fraction-lost (0–1), so divide by 100 first.
 //
-// Crew-level gate (CrewGateResult.crewVerdict === "disqualified") triggers
-// the immediate L5×C5=25 RED verdict — same NASA-standard fast-fail as the
-// Stage-B per-candidate gate path.
+// Crew-level gate flags are reported as review flags only. They do not create
+// an automatic L5×C5 board-equivalent posture.
 //
 // Reference: JSC-66705 Revision A §3.2.4 + Figure 4 (p. 28). Selectron CHI
 // = 1 − QTL/(t·c) per the IMM aggregation rule (`src/imm/chi.ts` not yet
@@ -78,43 +77,17 @@ function bucketConsequence(fractionLost: number): ConsequenceLevel {
 }
 
 /**
- * Translate an `IMMOutcome` (and optional crew gate verdict) into a NASA
- * HSRB LxC verdict. Mirrors `src/risk/lxc.ts::assessLxC` semantics:
- *
- *  - Crew-level gate disqualified → L5×C5=25 RED (NASA fast-fail).
- *  - Otherwise: bucket pMissionFailure into Likelihood, fractionLost into
- *    Consequence, look up priority score + color.
- *
- * The crew gate is checked at the CREW level (CrewGateResult.crewVerdict),
- * not per-member — the LxC verdict applies to the whole crew under the
- * weakest-link semantics of `src/imm/crew-gates.ts`.
+ * Translate an `IMMOutcome` into an experimental HSRB-inspired LxC tuple.
+ * Gate failures are carried as review flags and never override the Monte Carlo
+ * result into a board-equivalent L5×C5 posture.
  */
 export function assessIMMLxC(
   outcome: IMMOutcome,
   crewGate?: CrewGateResult,
 ): IMMLxCAssessment {
-  // Whole-crew disqualification short-circuits the Monte Carlo result.
-  if (crewGate?.crewVerdict === "disqualified") {
-    const Lband = LIKELIHOOD_BANDS_IN_MISSION[4]; // L5
-    const Cband = CONSEQUENCE_BANDS_MISSION_OBJ[4]; // C5
-    return {
-      likelihood: 5,
-      likelihoodLabel: Lband.label,
-      likelihoodDefinition: Lband.definition,
-      consequence: 5,
-      consequenceLabel: Cband.label,
-      consequenceDefinition: Cband.definition,
-      score: 25,
-      color: "red",
-      pMissionFailure: 1.0,
-      fractionLost: 1.0,
-      disqualified: true,
-      reason: `crew disqualified: ${crewGate.disqualifiedMemberIds.join(", ")}`,
-    };
-  }
-
-  // missionSuccess is stored ×100 (percent) in IMMOutcome; chi likewise.
-  const pMissionFailure = Math.max(0, 1 - outcome.missionSuccess.mean / 100);
+  // Health-criterion attainment is stored ×100 (percent) in IMMOutcome; chi likewise.
+  const hca = outcome.healthCriterionAttainment ?? outcome.missionSuccess;
+  const pMissionFailure = Math.max(0, 1 - hca.mean / 100);
   const fractionLost    = Math.max(0, 1 - outcome.chi.mean / 100);
 
   const L = bucketLikelihood(pMissionFailure);
@@ -125,6 +98,7 @@ export function assessIMMLxC(
   const Lband = LIKELIHOOD_BANDS_IN_MISSION[L - 1];
   const Cband = CONSEQUENCE_BANDS_MISSION_OBJ[C - 1];
 
+  const flagged = crewGate?.crewVerdict === "disqualified";
   return {
     likelihood: L,
     likelihoodLabel: Lband.label,
@@ -136,5 +110,11 @@ export function assessIMMLxC(
     color,
     pMissionFailure,
     fractionLost,
+    ...(flagged
+      ? {
+          disqualified: true,
+          reason: `crew review flags: ${crewGate.disqualifiedMemberIds.join(", ")}`,
+        }
+      : {}),
   };
 }

@@ -6,7 +6,7 @@
 // usePaperF7Seed-generated synthetic chi samples) with the IMM Calculator
 // applied across 7 representative Earth-analog + LEO-ISS missions at the
 // operational ISS HMS kit. Each mission row shows CHI mean (with CI₉₅
-// bracket), MSP %, and an HSRB color chip.
+// bracket), health-criterion %, and an experimental LxC color chip.
 //
 // Source data: src/data/imm-worked-example.json (computed offline by
 // scripts/extract_imm_worked_example.ts at T = 25 000 trials × 7 missions).
@@ -16,9 +16,9 @@ import workedExample from "@/data/imm-worked-example.json";
 
 type F7Row = (typeof workedExample.f7.rows)[number];
 
-function hsrbColorForRow(row: F7Row): "green" | "yellow" | "red" {
+function lxcColorForRow(row: F7Row): "green" | "yellow" | "red" {
   // Same bucketing rules as src/imm/lxc.ts. fractionLost = 1 − CHI/100,
-  // pFailure = 1 − MSP/100. Computed inline so this fixture has no runtime
+  // pFailure = 1 − health criterion/100. Computed inline so this fixture has no runtime
   // dependency on simulateIMM / assessIMMLxC (Playwright e2e load speed).
   const fractionLost = Math.max(0, 1 - row.chi_mean / 100);
   const pFailure = Math.max(0, 1 - row.missionSuccess_mean / 100);
@@ -74,13 +74,13 @@ export function PaperF7IMM() {
             <th className="text-right p-2">CHI CI₉₅</th>
             <th className="text-right p-2">pEVAC %</th>
             <th className="text-right p-2">pLOCL %</th>
-            <th className="text-right p-2">MSP %</th>
-            <th className="text-center p-2">HSRB</th>
+            <th className="text-right p-2">Health criterion %</th>
+            <th className="text-center p-2">Appendix LxC</th>
           </tr>
         </thead>
         <tbody>
           {rows.map((row) => {
-            const color = hsrbColorForRow(row);
+            const color = lxcColorForRow(row);
             return (
               <tr key={row.missionId} className="border-t border-gray-200 hover:bg-gray-50">
                 <td className="p-2">
@@ -113,7 +113,7 @@ export function PaperF7IMM() {
         <div className="space-y-1.5">
           {rows.map((row) => {
             const widthPct = row.chi_mean; // CHI is already in 0–100 range
-            const color = hsrbColorForRow(row);
+            const color = lxcColorForRow(row);
             const barColor = color === "red" ? "bg-red-400"
                            : color === "yellow" ? "bg-amber-400"
                            : "bg-emerald-400";

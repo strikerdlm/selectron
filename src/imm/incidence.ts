@@ -82,6 +82,30 @@ export function sampleBetaBernoulli(rng: Rng, alpha: number, beta: number): 0 | 
 }
 
 /**
+ * Convert a base event probability through a proportional-hazard multiplier.
+ *
+ * For a multiplier m, this applies p' = 1 - (1 - p)^m. This preserves the
+ * boundaries p=0 and p=1, supports m=0 as event suppression, and lets m>1
+ * increase risk without the silent cap created by post-hoc Bernoulli gates.
+ */
+export function applyProportionalHazardMultiplier(p: number, multiplier: number): number {
+  if (!Number.isFinite(multiplier) || multiplier <= 0) return 0;
+  const base = Math.max(0, Math.min(1, p));
+  if (base <= 0 || base >= 1 || multiplier === 1) return base;
+  return 1 - Math.pow(1 - base, multiplier);
+}
+
+export function sampleScaledBetaBernoulli(
+  rng: Rng,
+  alpha: number,
+  beta: number,
+  multiplier: number,
+): 0 | 1 {
+  const p = applyProportionalHazardMultiplier(sampleBeta(rng, alpha, beta), multiplier);
+  return rng() < p ? 1 : 0;
+}
+
+/**
  * samplePoissonProcess — homogeneous Poisson process via inter-arrival times.
  * Returns sorted list of event times in [0, duration].
  * Uses -log(U)/lambda inter-arrival gaps; U floored at 1e-12 to avoid log(0).

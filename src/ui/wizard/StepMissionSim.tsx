@@ -29,7 +29,7 @@ export function StepMissionSim({ onOpenCrewComposition }: Props) {
           <ul className="mt-3 space-y-2 text-sm leading-relaxed text-ink-2">
             <li>No single-candidate medical prediction is generated from Stage-A scores.</li>
             <li>No candidate is cloned into a synthetic crew for production results.</li>
-            <li>No legacy HSRB or applicant traffic-light verdict is produced.</li>
+            <li>No applicant verdict is produced.</li>
             <li>Team-level scenario analysis belongs in Crew Composition after the crew is defined.</li>
           </ul>
         </div>

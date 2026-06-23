@@ -6,4 +6,6 @@ export { sampleDirichlet, dirichletMean, dirichletVariance } from "./dirichlet";
 export { normalizeScore } from "./normalize";
 export { scoreCandidate, closedFormMoments } from "./mcda";
 export type { ScoreInput, ClosedFormInput } from "./mcda";
+export { buildEqualWeightPrior } from "./weight-prior";
+export type { WeightPriorConfig } from "./weight-prior";
 export { generateCandidate, generateCandidates } from "./synthetic";

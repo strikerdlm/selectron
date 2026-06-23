@@ -3,7 +3,7 @@
 
 import type { AccessTier } from "@/types";
 import { ACCESS_TIERS, TIER_LABEL, TIER_SHORT_DESCRIPTION, isCriterionAvailableAtTier } from "@/types";
-import { PLACEHOLDER_CRITERIA } from "@/data/placeholder-criteria";
+import { ACTIVE_CRITERION_CATALOG } from "@/data/placeholder-criteria";
 
 type Props = {
   value: AccessTier;
@@ -55,7 +55,7 @@ export function ScenarioSelector({ value, onChange, disabled = false }: Props) {
           computations change." */}
       <div className="mt-3 pt-3 border-t border-line/40 grid grid-cols-3 gap-3">
         {ACCESS_TIERS.map((t) => {
-          const count = PLACEHOLDER_CRITERIA.filter((c) =>
+          const count = ACTIVE_CRITERION_CATALOG.criteria.filter((c) =>
             isCriterionAvailableAtTier(c.minimumTier, t),
           ).length;
           const active = t === value;
@@ -69,7 +69,7 @@ export function ScenarioSelector({ value, onChange, disabled = false }: Props) {
             >
               <span className="uppercase tracking-cap">{TIER_LABEL[t]}</span>
               <div className="tabular-nums mt-0.5">
-                {count} of {PLACEHOLDER_CRITERIA.length} criteria
+                {count} of {ACTIVE_CRITERION_CATALOG.criteria.length} criteria
               </div>
             </div>
           );
@@ -77,11 +77,10 @@ export function ScenarioSelector({ value, onChange, disabled = false }: Props) {
       </div>
 
       <p className="mt-3 mono text-[12px] text-ink-3 leading-relaxed">
-        switching tier changes BOTH the criteria list AND the instrument used for each one.
-        The uncertain-weight MCDA aggregation runs against whatever subset is active, so the
-        score distribution is conditional on which tests the program actually measured.
-        Mathematical detail: production uses a symmetric Dirichlet(1,…,1) weight prior.
-        Its mean weight per criterion is 1/K, where K is the number of active criteria.
+        switching tier changes the instrument implementation for each construct. The
+        uncertain-weight MCDA aggregation uses an explicit equal-weight demo prior:
+        alpha_k = kappa x m_k, with m_k = 1/K and kappa = K, so the current runtime
+        is Dirichlet(1,...,1).
       </p>
     </div>
   );

@@ -8,7 +8,7 @@
 
 ---
 
-![status](https://img.shields.io/badge/status-post--audit%20methods%20rewrite-success)
+![status](https://img.shields.io/badge/status-Gate%200--2%20prototype%20containment-success)
 ![version](https://img.shields.io/badge/version%20of%20record-v0.5.6-blue)
 ![typescript](https://img.shields.io/badge/TypeScript-5.5-3178c6?logo=typescript&logoColor=white)
 ![python](https://img.shields.io/badge/Python%20calibration-3.12-3776ab?logo=python&logoColor=white)
@@ -26,7 +26,7 @@
 
 Selectron is a research artifact and decision-support prototype. It is **not** a flight-certification system, a clinical decision-support tool, a medical-clearance product, a registry, an applicant-tracking system, or a replacement for expert selection-panel judgment.
 
-The analog-facing application no longer presents NASA HSRB traffic-light verdicts, LxC scores, or "NASA-standard" applicant decisions. HSRB-related adapters remain only as developer/benchmark utilities for historical comparison and are not the operational analog workflow.
+The analog-facing application no longer presents NASA HSRB traffic-light verdicts, LxC scores, or "NASA-standard" applicant decisions. HSRB-related adapters remain only as developer/benchmark utilities for historical comparison and are not the operational analog workflow. Gate review flags are not converted into L5/C5 risk postures.
 
 The application runs locally in the browser. Candidate and simulation data are stored on the operator's machine through IndexedDB; there is no backend service, account system, or SaaS data store. The optional Python tools are for offline prior calibration and manuscript reproducibility, not for browser runtime.
 
@@ -43,7 +43,7 @@ The public repository is `https://github.com/strikerdlm/selectron`. The public s
 
 ## Current State
 
-`STATUS.md` is the live tracker. As of **2026-06-23**, commit `7caad1007e44e3e5aff4c8b41de74e6fda6a2f7c` closes the active workflow split identified by the fix-implementation audit. The Wizard stops at Stage-A candidate scoring and hands off to Crew Composition for team-level scenario analysis. Crew Composition defaults to analog mission profiles, default-off trait-to-incidence coupling, and analog outcome estimates. ISS remains available as a developer benchmark, not as the primary analog workflow.
+`STATUS.md` is the live tracker. As of **2026-06-23**, the app implements the Gate 0-2 audit containment pass: analog workflows carry research-prototype warnings, the Stage-A demo catalog is explicit, the current equal-weight Dirichlet prior is exposed as `alpha_k = kappa * m_k` with `kappa = K`, simulator severity branches are operative, positive one-shot/EVA/SPE incidence multipliers are no longer capped, and evidence status is checked at parameter-path level. The Wizard stops at Stage-A candidate scoring and hands off to Crew Composition for team-level scenario analysis. Crew Composition defaults to analog mission profiles, default-off trait-to-incidence coupling, and analog outcome estimates. ISS remains available as a developer benchmark, not as the primary analog workflow.
 
 Evidence status is machine-readable at `research/evidence_extracted/evidence_status.json` and can be regenerated with:
 
@@ -51,7 +51,7 @@ Evidence status is machine-readable at `research/evidence_extracted/evidence_sta
 npm run evidence:status -- --write
 ```
 
-Current status: `acceptedCount = 0`, `proposalRefCount = 7`, `releasePriorsAdjudicated = false`. Do not describe release priors as accepted-ledger-derived until independently adjudicated rows are added.
+Current status: `acceptedCount = 0`, `proposalRefCount = 7`, `activeParameterCount = 4846`, `uncoveredParameterCount = 4846`, and `releasePriorsAdjudicated = false`. Do not describe release priors as accepted-ledger-derived until every active parameter path has an accepted, independently verified ledger row.
 
 The active manuscript package lives in `strikerdlm/manuscripts` and was rewritten as a methods/software paper in commit `368e488351428a602b72fe9b177238c8fb1f2b13`. Generated Acta DOCX files in that package were rebuilt from the corrected markdown. The older `paper/submission/*.docx` files in this app repository remain stale and should not be uploaded.
 
@@ -125,7 +125,7 @@ Routes:
 | `GET` | `/conditions` | 101-condition provenance and fit-status catalog |
 | `POST` | `/fit` | Start an async PyMC NUTS batch-fit job |
 | `GET` | `/fit/{job_id}` | Poll fit-job status and posterior summaries |
-| `GET` | `/validate` | Run the K15 validation gate |
+| `GET` | `/validate` | Run the K15 reference-model benchmark |
 | `GET` | `/sensitivity` | Run Sobol/Morris sensitivity analysis |
 | `GET` | `/posterior/draws` | Return stored lambda parameter draws for predictive uncertainty runs |
 
@@ -145,6 +145,8 @@ where `x_i,k` is the raw score for criterion `k`, `z(...)` is the criterion-spec
 
 The TypeScript sampler uses the standard Dirichlet construction: independent Gamma(alpha_k, 1) draws are normalized by their sum. The implementation is tested against closed-form Dirichlet moments, Kolmogorov-Smirnov marginal checks, effective-sample diagnostics, and alpha0 robustness cases in `tests/engine/`.
 
+The current runtime prior is explicit: `alpha_k = kappa * m_k`, with equal means `m_k = 1/K` and `kappa = K`, which reproduces `Dirichlet(1,...,1)`. This is a demo equal-weight prior until expert elicitation or observed outcome data are added.
+
 Incomplete Stage-A records are blocked in the wizard. Missing criterion values are no longer silently replaced with worst-case scores. The candidate Wizard does not run Stage-B medical simulation and does not clone a candidate into a synthetic crew.
 
 ### Stage B: Analog Mission Simulation
@@ -163,8 +165,10 @@ Current analog-facing outputs include:
 - `CHI`: Crew Health Index.
 - `pEVAC`: evacuation probability.
 - `pLOCL`: loss-of-crew-life probability.
-- `MSP`: mission-success probability, defined as no LOCL, no EVAC, and CHI above the configured floor.
+- composite health-criterion attainment: no LOCL, no EVAC, and CHI above the configured floor.
 - expected duty hours lost and evidence grade.
+
+Severity is now selected before outcome sampling. Priors that lack branch-specific best/worst outcome distributions are duplicated into both branches at runtime and treated as compatibility priors, not evidence for a validated severity split. The current treatment/resource model still uses RAF interpolation and remains a v1 approximation pending a treatment-state redesign.
 
 Stage-A-to-incidence coupling is quarantined by default. It can be enabled only as explicit scenario analysis through `vulnerabilityCouplingMode: "scenario"` / the "Trait coupling" switch. Default scientific runs report no trait-derived incidence changes until analog data support calibrated coefficients.
 
@@ -194,7 +198,7 @@ Mars and Artemis mission models remain out of scope until the structural require
 
 - **Conditions**: provenance-filterable table over all 101 conditions.
 - **Batch Fit**: async PyMC NUTS jobs with live polling, R-hat, ESS, and divergence summaries.
-- **V&V**: K15 validation gate and Sobol/Morris sensitivity views.
+- **Benchmarks**: K15 reference-model comparison and Sobol/Morris sensitivity views.
 
 `src/contexts/CalibrationJobsContext.tsx` keeps fit, validation, and sensitivity jobs alive across tab switches and refreshes.
 
@@ -248,7 +252,7 @@ The current reproducibility contract is split across code, tests, and manuscript
 
 Last recorded verification in `STATUS.md`:
 
-- **2026-06-23**: `npm run typecheck` passed; `npm run build` passed with Vite chunk warnings only; `npm run validate:imm` passed; `npm run validate:imm:analog` passed (26/26); targeted guards/database/evidence tests passed (29/29); `npm run evidence:status` passed with `releasePriorsAdjudicated=false`; `python3 scripts/apply_fit.py --dry-run` failed closed with exit 2 because the accepted ledger has zero accepted rows; `git diff --check` passed.
+- **2026-06-23 Gate 0-2 audit upgrade**: `npm run typecheck` passed; focused Gate 0-2 Vitest suites passed (90/90); simulator/UI regression suites passed (85/85); `npm run validate:imm:analog` passed (26/26); `npm run validate:imm` passed with the known K15 benchmark divergence documented in output; `npm run evidence:status -- --write` and `npm run evidence:status` passed with `releasePriorsAdjudicated=false`, `activeParameterCount=4846`, and `uncoveredParameterCount=4846`; `npm run build` passed with Vite chunk/dynamic-import warnings only; `git diff --check` passed.
 - **2026-06-22**: `npm run typecheck` passed; `npm run build` passed with Vite warnings only; targeted IMM/UI vitest suites passed; Python accepted-evidence/fitter tests passed in `python/.venv`; Playwright crew-workflow smoke passed via the sandbox workaround.
 - **2026-06-11**: `npm run verify:fast` passed, `npm run build` passed with Vite chunk/dynamic-import warnings only, Python `pytest -m "not slow"` passed with 71 passed / 14 slow deselected, calibration dry-run completed with 66 skipped / 0 failed, and targeted Crew Composition Playwright smoke passed 4/4 through the sandbox workaround.
 - **2026-06-14**: manuscript source and prior-catalog freeze controls were updated. Rebuild the rendered submission package and rerun the recorded verification lanes before upload.
@@ -262,6 +266,9 @@ Last recorded verification in `STATUS.md`:
 - Some tier-B conditions use proxy anchors because condition-specific isolated-mission incidence rates were not found.
 - Stage-A-to-Stage-B vulnerability coupling is implemented and tested only as explicit scenario analysis. It is off by default in the analog scientific workflow.
 - The active evidence ledger currently contains schema and quarantine controls; proposal-stage extraction files do not feed release priors unless adjudicated into accepted ledger rows.
+- The evidence gate is now parameter-level. The current prior file has 4,846 uncovered active numeric parameter paths.
+- Best/worst severity selection is implemented, but current release priors generally duplicate the same top-level outcomes into both branches until branch-specific evidence is adjudicated.
+- Treatment availability is still represented by RAF interpolation rather than a condition-specific treatment-state machine.
 - Mars and Artemis need separate structural model work and are intentionally deferred.
 - `paper/submission/*.docx` files are stale after the 2026-06-14 Acta-source revision.
 

@@ -154,7 +154,7 @@ describe("End-to-end posterior → (L, C, score, color)", () => {
 import type { GateResult } from "@/types";
 
 describe("assessLxC with gate verdict", () => {
-  it("disqualified gate → red L5×C5=25 regardless of CHI", () => {
+  it("disqualified gate reports review flags without overriding CHI/posterior inputs", () => {
     const post = {
       chi: { mean: 0.99, ci90: [0.99, 0.99] as [number, number], ci95: [0.99, 0.99] as [number, number] },
       pEarlyTermination: { mean: 0, ci90: [0, 0] as [number, number] },
@@ -165,10 +165,10 @@ describe("assessLxC with gate verdict", () => {
     } as any;
     const gate: GateResult = { verdict: "disqualified", failedGates: ["psych.mmpi2rf_eid"], evaluated: ["psych.mmpi2rf_eid"] };
     const result = assessLxC(post, gate);
-    expect(result.color).toBe("red");
-    expect(result.likelihood).toBe(5);
-    expect(result.consequence).toBe(5);
-    expect(result.score).toBe(25);
+    expect(result.color).toBe("green");
+    expect(result.likelihood).toBe(1);
+    expect(result.consequence).toBe(1);
+    expect(result.score).toBe(1);
     expect(result.disqualified).toBe(true);
     expect(result.reason).toMatch(/psych\.mmpi2rf_eid/);
   });

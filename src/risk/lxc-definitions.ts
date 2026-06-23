@@ -5,10 +5,9 @@
 // 2020). Figure 4 on page 28 and Section 3.2.4 on page 27 give the verbatim
 // scale definitions and matrix cell scores reproduced here.
 //
-// Selectron uses this framework to translate the Bayesian Monte-Carlo
-// posterior (P(χ < χ*) and E[lost crew-days]) into a NASA-standard risk
-// color (green / yellow / red) so the verdict speaks the same language as
-// the HSRB Risk Posture process.
+// The archived developer adapter uses this framework to translate Monte Carlo
+// summaries into an HSRB-inspired color for technical comparison only. It is
+// not a NASA HSRB risk posture or board-equivalent verdict.
 //
 // IMPORTANT: This is the *Human System* matrix, not the general Agency
 // risk matrix from NPR 8000.4C — the HSRB explicitly weights consequence

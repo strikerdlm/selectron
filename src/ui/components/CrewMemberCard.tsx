@@ -81,7 +81,7 @@ export function CrewMemberCard({
           className="flex-1 min-w-0 flex items-center justify-between gap-4 text-left py-0.5"
           onClick={onToggle}
           aria-expanded={expanded}
-          aria-label={`${member.id} — ${qualified ? "qualified" : "disqualified"}, composite ${pct}%`}
+          aria-label={`${member.id} — ${qualified ? "no review flags" : "review required"}, composite ${pct}%`}
         >
           {/* Left cluster */}
           <div className="flex items-center gap-3 min-w-0">
@@ -89,7 +89,7 @@ export function CrewMemberCard({
             <span
               className="shrink-0 w-2.5 h-2.5 rounded-full"
               style={{ background: qualified ? "var(--go)" : "var(--warn)" }}
-              title={qualified ? "gate passed" : `gate failed: ${failedGates.join(", ")}`}
+              title={qualified ? "no review flags" : `review flags: ${failedGates.join(", ")}`}
             />
             {/* Member ID */}
             <span className="mono text-[15px] text-ink-0 truncate">{member.id}</span>
@@ -107,7 +107,7 @@ export function CrewMemberCard({
                 className="mono text-[11px] uppercase tracking-cap px-1.5 py-0.5 rounded-full border"
                 style={{ color: "var(--warn)", borderColor: "var(--warn)", background: "rgba(255,107,94,0.08)" }}
               >
-                DQ
+                review
               </span>
             )}
             {/* Composite score */}
@@ -224,7 +224,7 @@ export function CrewMemberCard({
               className="mono text-[13px] rounded border px-3 py-2 mb-4"
               style={{ borderColor: "var(--warn)", color: "var(--warn)", background: "rgba(255,107,94,0.06)" }}
             >
-              Gate DQ · {failedGates.join(" · ")}
+              Review required · {failedGates.join(" · ")}
             </div>
           )}
 

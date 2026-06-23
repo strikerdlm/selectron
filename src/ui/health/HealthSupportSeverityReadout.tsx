@@ -28,7 +28,7 @@ export function HealthSupportSeverityReadout({
         </span>
       </div>
       <div className={"mono text-[12px] inline-block self-start px-1.5 py-0.5 border rounded-sm uppercase tracking-cap " + CHIP[verdictColor]}>
-        HSRB {verdictColor} · score {verdictScore}
+        appendix LxC {verdictColor} · score {verdictScore}
       </div>
     </div>
   );

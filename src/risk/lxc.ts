@@ -1,7 +1,8 @@
-// NASA HSRB LxC scoring engine for Selectron Monte-Carlo posteriors.
+// Experimental HSRB-inspired LxC scoring engine for Monte-Carlo posteriors.
 // ─────────────────────────────────────────────────────────────────────
-// Translates a Selectron RiskPosterior + χ* threshold into a NASA-standard
-// (likelihood, consequence, color) tuple per JSC-66705 Rev A.
+// Translates a RiskPosterior + χ* threshold into an HSRB-inspired
+// (likelihood, consequence, color) tuple per JSC-66705 Rev A. This is not a
+// NASA board determination.
 //
 //   Likelihood = bucketed P(χ < χ*) using the In-Mission likelihood bands
 //                (verbatim quantitative thresholds, JSC-66705 Fig. 4 p. 28).
@@ -66,27 +67,6 @@ function bucketConsequence(fractionLost: number): ConsequenceLevel {
 }
 
 export function assessLxC(posterior: RiskPosterior, gate?: GateResult): LxCAssessment {
-  // If the candidate failed a binary clearance gate, return the maximum risk
-  // verdict (L5×C5=25, RED) immediately — Stage B Monte Carlo result is irrelevant.
-  if (gate?.verdict === "disqualified") {
-    const Lband = LIKELIHOOD_BANDS_IN_MISSION[4]; // L5
-    const Cband = CONSEQUENCE_BANDS_MISSION_OBJ[4]; // C5
-    return {
-      likelihood: 5,
-      likelihoodLabel: Lband.label,
-      likelihoodDefinition: Lband.definition,
-      consequence: 5,
-      consequenceLabel: Cband.label,
-      consequenceDefinition: Cband.definition,
-      score: 25,
-      color: "red",
-      pEarlyTermination: 1.0,
-      fractionLost: 1.0,
-      disqualified: true,
-      reason: `disqualified: ${gate.failedGates.join(", ")}`,
-    };
-  }
-
   const pET = posterior.pEarlyTermination.mean;
   const fractionLost = Math.max(0, 1 - posterior.chi.mean);
 
@@ -98,6 +78,7 @@ export function assessLxC(posterior: RiskPosterior, gate?: GateResult): LxCAsses
   const Lband = LIKELIHOOD_BANDS_IN_MISSION[L - 1];
   const Cband = CONSEQUENCE_BANDS_MISSION_OBJ[C - 1];
 
+  const flagged = gate?.verdict === "disqualified";
   return {
     likelihood: L,
     likelihoodLabel: Lband.label,
@@ -109,5 +90,11 @@ export function assessLxC(posterior: RiskPosterior, gate?: GateResult): LxCAsses
     color,
     pEarlyTermination: pET,
     fractionLost,
+    ...(flagged
+      ? {
+          disqualified: true,
+          reason: `review flags: ${gate.failedGates.join(", ")}`,
+        }
+      : {}),
   };
 }

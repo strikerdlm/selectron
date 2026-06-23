@@ -1,5 +1,5 @@
 // @vitest-environment jsdom
-// IMM-46 — RTL tests for the K15 Table 1 reproduction badge in CrewComposition.
+// IMM-46 — RTL tests for the K15 reference-model benchmark badge in CrewComposition.
 //
 // The badge is rendered as a subcomponent so it can be unit-tested directly
 // with crafted props (no need to mock Worker, Dexie, or ECharts).
@@ -54,7 +54,7 @@ describe("K15ValidationBadge (IMM-46)", () => {
         kitScenarioId="issHMS"
       />,
     );
-    expect(queryByText(/K15 Table 1 reproduction/i)).not.toBeNull();
+    expect(queryByText(/K15 Table 1 reference-model benchmark/i)).not.toBeNull();
     expect(queryByText(/issHMS scenario/i)).not.toBeNull();
     // All 4 metric rows present
     expect(container.querySelector("[data-testid='k15-badge-row-TME']")).not.toBeNull();

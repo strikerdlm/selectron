@@ -44,4 +44,31 @@ describe("active analog workflow guards", () => {
     expect(source).toContain("No candidate is cloned");
     expect(source).toContain("Open Crew Composition");
   });
+
+  it("keeps active workflow copy inside research-prototype claim boundaries", () => {
+    const checkedFiles = [
+      ...activeFiles,
+      "src/ui/views/CrewComposition.tsx",
+      "src/ui/components/CompositeCrewPanel.tsx",
+      "src/ui/components/CrewMemberCard.tsx",
+      "src/ui/components/ScoreCard.tsx",
+      "src/ui/figures/IMMHeadlineCard.tsx",
+      "src/ui/wizard/StepReview.tsx",
+    ];
+    const forbidden = [
+      "NASA-standard",
+      "NASA verdict",
+      "mission success probability",
+      "posterior certainty",
+      "estimate precision",
+      "HSRB risk posture",
+    ];
+
+    for (const path of checkedFiles) {
+      const source = readRepoFile(path);
+      for (const token of forbidden) {
+        expect(source, `${path} must not contain ${token}`).not.toContain(token);
+      }
+    }
+  });
 });

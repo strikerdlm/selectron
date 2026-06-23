@@ -56,3 +56,14 @@ export type Criterion = {
    */
   gateThreshold?: { operator: "fail-if-below" | "fail-if-above"; value: number };
 };
+
+export type CriterionCatalogStatus = "demo" | "ratified";
+
+export type CriterionCatalog = {
+  id: string;
+  version: string;
+  label: string;
+  status: CriterionCatalogStatus;
+  intendedUse: string;
+  criteria: readonly Criterion[];
+};

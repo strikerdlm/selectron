@@ -4,7 +4,7 @@
 // The old component is preserved at src/ui/components/PosteriorPlot.tsx until T81 (cleanup).
 //
 // Design:
-//   - 56-bin histogram of posterior.samples over [0, 1] (the score domain).
+//   - 56-bin histogram of MCDA score samples over [0, 1] (the score domain).
 //   - Bars: amber sequential palette (#fde68a light → #d97706 deep) — preserves
 //     the Iter-1 visual identity from the original PosteriorPlot / ScoreCard.
 //   - Overlay: CI₉₀ shaded markArea; dashed μ markLine.
@@ -83,7 +83,7 @@ export function PosteriorPlot({ posterior, seed = 0xc0ffee, alias = "—", acces
   if (posterior.samples.length < 10) {
     return (
       <div className="grid h-[280px] place-items-center text-sm text-ink-2 mono">
-        no posterior — need 10+ samples
+        no score distribution — need 10+ samples
       </div>
     );
   }

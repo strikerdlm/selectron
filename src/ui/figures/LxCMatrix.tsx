@@ -1,5 +1,5 @@
-// LxC matrix visualization — replicates JSC-66705 Rev A Figure 4 (p. 28).
-// 5×5 grid of NASA-priority-scored cells, with this run's (L, C) cell
+// LxC matrix visualization for the non-operational appendix mapping.
+// 5×5 grid of priority-scored cells, with this run's (L, C) cell
 // highlighted. Pure HTML/CSS — the matrix is discrete and categorical,
 // which makes a CSS grid cleaner than ECharts heatmap for this use case.
 
@@ -20,8 +20,7 @@ export type LxCMatrixAssessment = {
   consequence: ConsequenceLevel;
 };
 
-// NASA-style cell fill palette. JSC-66705 Figure 4 uses the standard
-// green/yellow/red traffic-light scheme; we use slightly darker tones so
+// Cell fill palette. The matrix uses green/yellow/red bands; we use slightly darker tones so
 // the priority-score numbers remain legible on a dark wizard background.
 const CELL_FILL = {
   green: "rgba(34, 197, 94, 0.85)",   // emerald-500

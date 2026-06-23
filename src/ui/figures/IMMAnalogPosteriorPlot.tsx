@@ -1,5 +1,5 @@
 // I6 IMMAnalogPosteriorPlot — per-condition λ draw histograms + scenario-conditioned
-// pEVAC / pLOCL / CHI posterior metric cards.
+// pEVAC / pLOCL / CHI predictive metric cards.
 //
 // Data sources (three independent):
 //   • Metric cards   ← outcome.pEvacPost / pLoclPost / chiPost  (already percent 0..100)
@@ -142,7 +142,7 @@ function LambdaHistPanel({ conditionId, lambdas, themeName }: LambdaHistPanelPro
     },
     series: [
       {
-        name: "λ posterior",
+        name: "λ parameter draws",
         type: "bar" as const,
         data: counts,
         barCategoryGap: "6%",

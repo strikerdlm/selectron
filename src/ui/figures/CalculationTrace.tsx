@@ -130,7 +130,7 @@ function mcdaSteps(args: {
   const demoCInstrument =
     demoC.tierInstruments?.[args.accessTier]?.instrument ?? demoC.instrument;
 
-  // For step 3 demo: actually compute a weighted sum on the FIRST posterior draw
+  // For step 3 demo: compute a weighted sum on the first sampled score draw.
   const samples = posterior.samples;
   const firstDraw = samples[0] ?? posterior.mean;
 
@@ -170,7 +170,7 @@ function mcdaSteps(args: {
       ),
       concrete: (
         <span>
-          K = {K} criteria · α = (1, …, 1) → uninformative prior · mean weight ={" "}
+          K = {K} criteria · α = (1, …, 1) → symmetric prior · mean weight ={" "}
           {fmt(1 / K, 3)} per criterion
         </span>
       ),
@@ -366,7 +366,7 @@ function immSteps(args: {
       title: "Look up each condition's base incidence rate from the prior",
       equation: (
         <span>
-          log λ{sub("k")} ~ p(log λ | data){"  "}(frozen posterior, model {priorsVersion})
+          log λ{sub("k")} ~ stored fitted parameter distribution{"  "}(model {priorsVersion})
         </span>
       ),
       concrete: (
@@ -376,10 +376,10 @@ function immSteps(args: {
         </span>
       ),
       lay:
-        "Before any simulation runs, we already have a probability distribution over each condition's base rate (events per crew member per day). This distribution comes from fitting a hierarchical Bayesian model on the analog-mission literature — it's what's stored in priors.json. Each Monte-Carlo trial draws a new rate from this distribution, so the simulation honestly reflects how much we don't know.",
+        "Before any simulation runs, we already have a probability distribution over each condition's base rate (events per crew member per day). This stored prior distribution comes from the fitting pipeline and is saved in priors.json. Each Monte-Carlo trial draws a new rate from this distribution, so the simulation reflects parameter uncertainty under the configured model.",
       citation: {
         id: "Iter-3 spec §3.6 / [M18 §2.1.1]",
-        label: "Hierarchical Lognormal-Poisson posterior",
+        label: "Stored Lognormal-Poisson parameter distribution",
       },
     },
     {
@@ -476,23 +476,23 @@ function immSteps(args: {
     },
     {
       n: 6,
-      title: "Repeat thousands of trials → CHI posterior + early-termination probability",
+      title: "Repeat thousands of trials → CHI simulation distribution + threshold-failure probability",
       equation: (
         <span>
           run T = {trials.toLocaleString()} independent trials · χ* threshold ={" "}
-          {chiStar.toFixed(2)} · pEarly = (1/T) Σ 1[CHI{sub("t")} ≤ χ*]
+          {chiStar.toFixed(2)} · pBelow = (1/T) Σ 1[CHI{sub("t")} ≤ χ*]
         </span>
       ),
       concrete: (
         <span>
           CHI μ = {fmt(100 * posterior.chi.mean, 1)}% · CI₉₀ = [
           {fmt(100 * posterior.chi.ci90[0], 1)}%,{" "}
-          {fmt(100 * posterior.chi.ci90[1], 1)}%] · pEarlyTermination ={" "}
+          {fmt(100 * posterior.chi.ci90[1], 1)}%] · pBelowThreshold ={" "}
           {fmt(100 * posterior.pEarlyTermination.mean, 1)}%
         </span>
       ),
       lay:
-        "One trial captures one possible mission. We re-run with fresh randomness many thousand times to see the full range of outcomes. The 90% simulation interval is the band that holds 90% of the trials. pEarlyTermination is the fraction of trials where the crew health dropped below the 'should-end-mission' threshold χ*. It's the closest number we have to 'how likely is this mission to fail'.",
+        "One trial captures one possible mission. We re-run with fresh randomness many thousand times to see the full range of outcomes. The 90% simulation interval is the band that holds 90% of the trials. pBelowThreshold is the fraction of trials where crew health dropped below the configured threshold χ*.",
       citation: {
         id: "Iter-3 spec §3.5 / [G12] convergence",
         label: "Monte Carlo summary + early-termination probability",

@@ -10,7 +10,7 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { IMMCrewMember, CrewCompositeMethod, IMMOutcome, VulnerabilityCouplingMode } from "../../imm/types";
-import { PLACEHOLDER_CRITERIA } from "../../data/placeholder-criteria";
+import { ACTIVE_CRITERION_CATALOG } from "../../data/placeholder-criteria";
 import { ACTIVE_MISSIONS } from "../../data/imm-missions";
 import type { IMMMission } from "../../imm/types";
 import { IMM_KITS } from "../../imm/kits";
@@ -48,6 +48,7 @@ type PpState = "idle" | "running" | "done" | "api-error" | "compute-error";
 // per-condition parameter draws. For other kinds the endpoint returns empty
 // draws and the uncertainty figure adds nothing, so we skip the fetch+sim entirely.
 const POSTERIOR_KINDS = new Set(["antarctic-station", "analog-controlled"]);
+const ACTIVE_CRITERIA = ACTIVE_CRITERION_CATALOG.criteria;
 
 // ─── safe default score generation ───────────────────────────────────────────
 // Rules (from advisor):
@@ -61,7 +62,7 @@ const POSTERIOR_KINDS = new Set(["antarctic-station", "analog-controlled"]);
 // geometric-mean all produce distinguishable crew composites.
 function defaultScores(fractions: Record<string, number>): Record<string, number> {
   const scores: Record<string, number> = {};
-  for (const c of PLACEHOLDER_CRITERIA) {
+  for (const c of ACTIVE_CRITERIA) {
     // Gate overrides take precedence
     if (c.id === "psych.mmpi2rf_eid") {
       // fail-if-above:65 — hardcode safe low T-score
@@ -327,7 +328,7 @@ export function CrewComposition() {
 
   // ── live crew composite ─────────────────────────────────────────────────
   const composite = useMemo(
-    () => aggregateCrewComposite(state.members, PLACEHOLDER_CRITERIA, state.aggregator),
+    () => aggregateCrewComposite(state.members, ACTIVE_CRITERIA, state.aggregator),
     [state.members, state.aggregator],
   );
 
@@ -340,7 +341,7 @@ export function CrewComposition() {
 
   // ── live gate evaluation ────────────────────────────────────────────────
   const gateResult = useMemo(
-    () => evaluateCrewGates(state.members, PLACEHOLDER_CRITERIA),
+    () => evaluateCrewGates(state.members, ACTIVE_CRITERIA),
     [state.members],
   );
 
@@ -387,7 +388,7 @@ export function CrewComposition() {
       };
       w.postMessage({
         crew: state.members, mission: state.mission, kit: state.kit,
-        trials: 5000, seed: state.seed, chiStar: state.chiStar, criteria: PLACEHOLDER_CRITERIA,
+        trials: 5000, seed: state.seed, chiStar: state.chiStar, criteria: ACTIVE_CRITERIA,
         vulnerabilityCouplingMode: state.couplingMode,
       });
     }, 400);
@@ -618,7 +619,7 @@ export function CrewComposition() {
       trials: state.trials,
       seed: state.seed,
       chiStar: state.chiStar,
-      criteria: PLACEHOLDER_CRITERIA,
+      criteria: ACTIVE_CRITERIA,
       vulnerabilityCouplingMode: state.couplingMode,
     });
   }, [simState, state.members, state.mission, state.kit, state.trials, state.seed, state.chiStar, state.couplingMode]);
@@ -666,10 +667,22 @@ export function CrewComposition() {
         className="sr-only"
       >
         Crew composite: {Math.round(composite.compositeScore * 100)}%,{" "}
-        {gateResult.crewVerdict}.
+        {gateResult.crewVerdict === "qualified" ? "no review flags" : "review required"}.
         {gateResult.disqualifiedMemberIds.length > 0
-          ? ` Disqualified: ${gateResult.disqualifiedMemberIds.join(", ")}.`
+          ? ` Review flags: ${gateResult.disqualifiedMemberIds.join(", ")}.`
           : ""}
+      </div>
+
+      <div className="panel border-warn/40 bg-warn/5 p-4" role="note">
+        <p className="label text-warn uppercase tracking-cap">Research prototype</p>
+        <p className="mt-2 text-sm text-ink-2 leading-relaxed">
+          This app supports space-analog research scenarios only. It is not for applicant
+          acceptance or rejection, clinical disposition, operational crew selection,
+          medical-kit sizing, mission-success prediction, or NASA risk-posture determination.
+        </p>
+        <p className="mono mt-2 text-[12px] text-ink-3">
+          criterion catalog · {ACTIVE_CRITERION_CATALOG.status} · {ACTIVE_CRITERION_CATALOG.version}
+        </p>
       </div>
 
       {/* ── Analog outcome estimate — prominent live dashboard ──────────────
@@ -680,6 +693,9 @@ export function CrewComposition() {
         const dutyHoursLost = readoutOutcome
           ? ((100 - readoutOutcome.chi.mean) / 100) * state.mission.durationDays * 24 * state.members.length
           : 0;
+        const healthCriterion = readoutOutcome
+          ? readoutOutcome.healthCriterionAttainment ?? readoutOutcome.missionSuccess
+          : undefined;
         return (
           <div
             className="panel border-l-4 border-l-signal"
@@ -715,8 +731,8 @@ export function CrewComposition() {
                 </div>
                 {readoutOutcome && (
                   <dl className="mono text-[13px] text-ink-2 grid grid-cols-[auto_auto] gap-x-3 gap-y-0.5">
-                    <dt className="text-ink-3">mission success</dt>
-                    <dd className="tabular-nums text-right text-ink-1">{readoutOutcome.missionSuccess.mean.toFixed(1)}%</dd>
+                    <dt className="text-ink-3">health criterion</dt>
+                    <dd className="tabular-nums text-right text-ink-1">{healthCriterion?.mean.toFixed(1)}%</dd>
                     <dt className="text-ink-3">medical events</dt>
                     <dd className="tabular-nums text-right text-ink-1">{readoutOutcome.tme.mean.toFixed(2)}</dd>
                     <dt className="text-ink-3">p(evacuation)</dt>
@@ -915,7 +931,7 @@ export function CrewComposition() {
 
               <div className="flex flex-col gap-1">
                 <label className="mono text-[12px] text-ink-3">
-                  χ* (mission success threshold): {state.chiStar.toFixed(2)}
+                  χ* (composite health criterion): {state.chiStar.toFixed(2)}
                 </label>
                 <input
                   type="range"
@@ -923,7 +939,7 @@ export function CrewComposition() {
                   value={state.chiStar}
                   className="instrument w-full"
                   onChange={(e) => setState((s) => ({ ...s, chiStar: parseFloat(e.target.value) }))}
-                  aria-label="chi-star mission success threshold"
+                  aria-label="chi-star composite health criterion threshold"
                 />
               </div>
 
@@ -1025,7 +1041,7 @@ export function CrewComposition() {
               const isExpanded = expandedIds.has(member.id);
               const figures: Record<string, React.ReactNode> = {};
               if (isExpanded) {
-                for (const c of PLACEHOLDER_CRITERIA) {
+                for (const c of ACTIVE_CRITERIA) {
                   const score = member.stageAScores?.[c.id] ?? c.scale.min + 0.5 * (c.scale.max - c.scale.min);
                   figures[c.id] = (
                     <CriterionMiniFigure
@@ -1046,7 +1062,7 @@ export function CrewComposition() {
                   failedGates={memberGate?.failedGates ?? []}
                   expanded={isExpanded}
                   onToggle={() => toggleMember(member.id)}
-                  criteria={PLACEHOLDER_CRITERIA}
+                  criteria={ACTIVE_CRITERIA}
                   onScoreChange={handleScoreChange}
                   figures={figures}
                   onMemberChange={changeMember}
@@ -1080,7 +1096,7 @@ export function CrewComposition() {
       {outcome && (
         <div className="flex flex-col gap-6 mt-4" role="region" aria-label="IMM simulation figures">
 
-          {/* IMM-46 · K15 Table 1 reproduction badge — compact comparison of run
+          {/* IMM-46 · K15 Table 1 reference-model benchmark badge — compact comparison of run
               vs K15 Table 1 (Keenan et al. 2015 ICES-2015-123). Rendered only
               when the mission is iss-6mo AND the kit is one of the three K15
               scenarios. Hidden for analog missions and custom kits. */}
@@ -1147,7 +1163,7 @@ export function CrewComposition() {
             (["none", "issHMS", "unlimited"] as const).includes(state.kit.scenarioId as "none" | "issHMS" | "unlimited") && (
             <div className="panel">
               <h3 className="label text-ink-1 uppercase tracking-cap mb-4">
-                I5 · K15 Validation Comparison
+                I5 · K15 Reference-Model Benchmark
               </h3>
               <IMMValidationCompare outcome={outcome} />
             </div>
@@ -1158,8 +1174,8 @@ export function CrewComposition() {
 
       {/* ── Analog-mission context — NOT gated on `outcome` (2026-06-05). The
           kind-multipliers table reads only the static calibrated priors, and
-          the I6 posterior layer consumes the calibration API + the worker
-          sweep driven by the pp effect above — both independent of the main
+          the I6 parameter-draw layer consumes the calibration API + the worker
+          predictive sweep above — both independent of the main
           T=100k run. Previously these sat inside the figures region, so every
           mission switch (which clears `outcome` via the stale-outcome guard)
           blanked them until a fresh full run; observed live 2026-06-05. ── */}
@@ -1365,7 +1381,7 @@ export function CrewComposition() {
   );
 }
 
-// ─── IMM-46 · K15 Table 1 reproduction badge ────────────────────────────────
+// ─── IMM-46 · K15 Table 1 reference-model benchmark badge ───────────────────
 // Compact in-UI badge that compares the current sim's IMMOutcome to K15 Table 1
 // (Keenan et al. 2015 ICES-2015-123) for the corresponding kit scenario. Shows
 // ✓/✗ per metric (TME, CHI, pEVAC, pLOCL) based on whether the run's posterior
@@ -1433,8 +1449,9 @@ export type K15ValidationBadgeProps = {
  *   - `kitScenarioId` is one of the three K15 scenarios (not "custom").
  *
  * When visible, shows a single row of 4 mini-stats (TME / CHI / pEVAC / pLOCL),
- * each with the engine value, the K15 reference, the Δ, and a ✓/✗ flag based on
- * inclusion in K15's CI₉₅.
+ * each with the engine value, the K15 reference, the delta, and a pass/fail flag
+ * based on inclusion in K15's CI95. This is a reference-model benchmark, not
+ * empirical validation.
  */
 export function K15ValidationBadge({
   outcome,
@@ -1469,10 +1486,10 @@ export function K15ValidationBadge({
     <div
       className="panel"
       role="status"
-      aria-label={`K15 Table 1 reproduction badge for ${kitScenarioId} scenario`}
+      aria-label={`K15 Table 1 reference-model benchmark for ${kitScenarioId} scenario`}
     >
       <h3 className="label text-ink-1 uppercase tracking-cap mb-3">
-        K15 Table 1 reproduction · {kitScenarioId} scenario
+        K15 Table 1 reference-model benchmark · {kitScenarioId} scenario
       </h3>
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
         {rows.map((r) => {

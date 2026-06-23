@@ -1,4 +1,4 @@
-import type { Criterion } from "@/types";
+import type { Criterion, CriterionCatalog } from "@/types";
 
 // PLACEHOLDER set for Iter 1. Replaced in Iter 2 by docs/criteria.md output of Phase 0.
 // Each criterion below is a defensible placeholder chosen so the end-to-end pipeline
@@ -385,3 +385,15 @@ export const PLACEHOLDER_CRITERIA: readonly Criterion[] = [
     },
   },
 ];
+
+export const DEMO_CRITERION_CATALOG: CriterionCatalog = {
+  id: "demo-analog-crew-mcda",
+  version: "2026-06-gate0",
+  label: "Demonstration analog-crew MCDA catalog",
+  status: "demo",
+  intendedUse:
+    "Research demonstration of uncertain-weight MCDA scoring only; not a ratified eligibility or selection instrument.",
+  criteria: PLACEHOLDER_CRITERIA,
+};
+
+export const ACTIVE_CRITERION_CATALOG = DEMO_CRITERION_CATALOG;

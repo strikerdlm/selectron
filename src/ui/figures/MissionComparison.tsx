@@ -1,4 +1,4 @@
-// F7 MissionComparison — 5-panel small-multiples of CHI posteriors across all analog missions.
+// F7 MissionComparison — 5-panel small-multiples of CHI simulation distributions across all analog missions.
 //
 // On first render, checks for a cached "comparison-run-<isoNow>" set in simSessions.
 // If a valid set exists (exactly 5 rows sharing the same run-id), renders the grid.
@@ -30,8 +30,8 @@ import { f7Caption } from "./captions/F7.captions";
 import type { AccessTier, GateResult } from "@/types";
 import { assessLxC } from "@/risk/lxc";
 
-// NASA HSRB color → swatch fill for the per-mission chips.
-const NASA_CHIP_FILL: Record<"green" | "yellow" | "red" | "gray", string> = {
+// Color band → swatch fill for the per-mission chips.
+const LXC_CHIP_FILL: Record<"green" | "yellow" | "red" | "gray", string> = {
   green: "bg-emerald-500/85 text-emerald-950 border-emerald-400/60",
   yellow: "bg-amber-500/90 text-amber-950 border-amber-400/60",
   red: "bg-red-600/90 text-red-50 border-red-500/60",
@@ -174,7 +174,7 @@ function miniHistogramOption(
 
     series: [
       {
-        name: "CHI posterior",
+        name: "CHI simulation distribution",
         type: "bar",
         data: counts,
         barCategoryGap: "4%",
@@ -252,8 +252,7 @@ export type MissionComparisonProps = {
   // component doesn't need to call useWizard — Sim renders OUTSIDE the
   // WizardProvider, which previously caused a hard crash here.
   accessTier: AccessTier;
-  /** Optional gate verdict forwarded from Sim. When disqualified, all per-mission
-   *  LxC chips show RED L5×C5=25 to stay consistent with the headline CHIExplainer. */
+  /** Optional gate flags forwarded from Sim for review context. */
   gate?: GateResult;
 };
 
@@ -426,7 +425,7 @@ export function MissionComparison({ candidateId, accessTier, gate }: MissionComp
     return (
       <div className="flex flex-col gap-3 items-center justify-center py-10">
         <p className="mono text-sm text-ink-2 text-center max-w-xs">
-          No comparison data. Run the 5-mission simulator to compare CHI posteriors across
+          No comparison data. Run the 5-mission simulator to compare CHI distributions across
           all analog missions for this candidate.
         </p>
         <button
@@ -512,10 +511,9 @@ export function MissionComparison({ candidateId, accessTier, gate }: MissionComp
                 </span>
               </div>
 
-              {/* Cumulative-risk verdict — the PRIMARY chip, driven by total
-                  expected lost crew-days (Diego 2026-05-29). The per-time NASA
-                  HSRB LxC verdict is shown beneath as secondary context. A
-                  disqualified gate forces both to the top band. */}
+              {/* Cumulative-risk band — the primary chip, driven by total
+                  expected lost crew-days. The per-time LxC appendix mapping is
+                  shown beneath as secondary context. */}
               {(() => {
                 const lostCrewDays = row.posterior.expectedLostCrewDays.mean;
                 const band = cumulativeRiskBand(lostCrewDays, gate);
@@ -529,7 +527,7 @@ export function MissionComparison({ candidateId, accessTier, gate }: MissionComp
                       <span
                         className={
                           "mono text-[10px] tabular-nums uppercase tracking-cap font-semibold px-2 py-1 rounded-sm border " +
-                          NASA_CHIP_FILL[band.color]
+                          LXC_CHIP_FILL[band.color]
                         }
                         title={`Total expected crew-days lost over the mission: ${lostCrewDays.toFixed(1)} (= ${(lostCrewDays / (ANALOG_MISSIONS.find((m) => m.id === row.missionId)?.crewSize ?? 1)).toFixed(1)} per crew member). Bands: <8 low · 8–25 moderate · ≥25 high.`}
                       >
@@ -538,12 +536,12 @@ export function MissionComparison({ candidateId, accessTier, gate }: MissionComp
                     </div>
                     <div className="flex items-center justify-between gap-2">
                       <span className="mono text-[9px] uppercase tracking-cap text-ink-3">
-                        per-time · HSRB JSC-66705
+                        per-time · appendix LxC
                       </span>
                       <span
                         className={
                           "mono text-[9px] tabular-nums uppercase tracking-cap px-1.5 py-0.5 rounded-sm border " +
-                          NASA_CHIP_FILL[lxc.color]
+                          LXC_CHIP_FILL[lxc.color]
                         }
                         title={`L${lxc.likelihood} (${lxc.likelihoodLabel}) — ${lxc.likelihoodDefinition}\n\nC${lxc.consequence} (${lxc.consequenceLabel}) — ${lxc.consequenceDefinition}\n\nLxC score ${lxc.score} → ${lxc.color}\n\nNote: CHI is a per-time fraction; short missions can look worse here than on cumulative risk.`}
                       >

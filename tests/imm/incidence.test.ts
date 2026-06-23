@@ -1,5 +1,11 @@
 import { describe, it, expect } from "vitest";
-import { samplePoisson, sampleLognormalPoisson, sampleGammaPoisson, sampleBetaBernoulli } from "../../src/imm/incidence";
+import {
+  applyProportionalHazardMultiplier,
+  samplePoisson,
+  sampleLognormalPoisson,
+  sampleGammaPoisson,
+  sampleBetaBernoulli,
+} from "../../src/imm/incidence";
 import { makeRng } from "../../src/engine/prng";
 
 describe("samplePoisson", () => {
@@ -58,6 +64,25 @@ describe("sampleBetaBernoulli", () => {
     let sum = 0;
     for (let i = 0; i < 50_000; i++) sum += sampleBetaBernoulli(rng, 2, 8);
     expect(sum / 50_000).toBeCloseTo(0.2, 1);
+  });
+});
+
+describe("applyProportionalHazardMultiplier", () => {
+  it("handles suppression, identity, and positive risk elevation monotonically", () => {
+    const p = 0.2;
+    expect(applyProportionalHazardMultiplier(p, 0)).toBe(0);
+    expect(applyProportionalHazardMultiplier(p, 0.5)).toBeLessThan(p);
+    expect(applyProportionalHazardMultiplier(p, 1)).toBe(p);
+    expect(applyProportionalHazardMultiplier(p, 2)).toBeGreaterThan(p);
+    expect(applyProportionalHazardMultiplier(p, 5)).toBeGreaterThan(
+      applyProportionalHazardMultiplier(p, 2),
+    );
+  });
+
+  it("keeps probabilities inside [0, 1] for large multipliers", () => {
+    const elevated = applyProportionalHazardMultiplier(0.9, 10);
+    expect(elevated).toBeGreaterThan(0.9);
+    expect(elevated).toBeLessThanOrEqual(1);
   });
 });
 

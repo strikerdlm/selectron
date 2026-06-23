@@ -39,7 +39,7 @@ function ResultMetric({
 }) {
   const mean = summary.mean;
   const [lo, hi] = summary.ci95;
-  // Colour logic: if goodIsHigh (e.g. missionSuccess), green = high; else green = low.
+  // Colour logic: if goodIsHigh (e.g. health criterion attainment), green = high; else green = low.
   const color =
     goodIsHigh
       ? mean >= 70 ? "var(--go)" : mean >= 45 ? "var(--signal)" : "var(--warn)"
@@ -106,7 +106,7 @@ export function CompositeCrewPanel({
             background: qualified ? "rgba(86,214,160,0.08)" : "rgba(255,107,94,0.08)",
           }}
         >
-          {qualified ? "✓ qualified" : "✗ disqualified"}
+          {qualified ? "no review flags" : "review required"}
         </span>
       </div>
 
@@ -159,7 +159,7 @@ export function CompositeCrewPanel({
       {disqualifiedMemberIds.length > 0 && (
         <div className="flex flex-col gap-1">
           <span className="label text-[12px] uppercase tracking-cap" style={{ color: "var(--warn)" }}>
-            Gate failures
+            Review flags
           </span>
           {disqualifiedMemberIds.map((id) => (
             <div
@@ -210,8 +210,8 @@ export function CompositeCrewPanel({
 
           <div className="flex flex-col gap-2">
             <ResultMetric
-              label="Mission Success (MSP)"
-              summary={outcome.missionSuccess}
+              label="Health Criterion"
+              summary={outcome.healthCriterionAttainment ?? outcome.missionSuccess}
               unit="%"
               goodIsHigh
             />

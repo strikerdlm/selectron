@@ -71,9 +71,8 @@ describe("assessIMMLxC — happy paths", () => {
   });
 });
 
-describe("assessIMMLxC — crew gate fast-fail", () => {
-  it("crewVerdict=disqualified → L5×C5=25 RED regardless of IMM result", () => {
-    // Pretty-looking IMM result that would normally be green.
+describe("assessIMMLxC — crew gate review flags", () => {
+  it("crewVerdict=disqualified reports review flags without overriding the IMM result", () => {
     const greatOutcome = fakeOutcome({ chiPct: 99, missionSuccessPct: 99 });
     const failedCrew: CrewGateResult = {
       crewVerdict: "disqualified",
@@ -82,10 +81,9 @@ describe("assessIMMLxC — crew gate fast-fail", () => {
     };
     const r = assessIMMLxC(greatOutcome, failedCrew);
     expect(r.disqualified).toBe(true);
-    expect(r.likelihood).toBe(5);
-    expect(r.consequence).toBe(5);
-    expect(r.score).toBe(25);
-    expect(r.color).toBe("red");
+    expect(r.likelihood).toBeLessThan(5);
+    expect(r.consequence).toBeLessThan(5);
+    expect(r.score).toBeLessThan(25);
     expect(r.reason).toMatch(/mike/);
     expect(r.reason).toMatch(/alice/);
   });

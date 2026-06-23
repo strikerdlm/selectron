@@ -2,14 +2,14 @@
 //
 // Layout: 4 large stat cards (TME / CHI / pEVAC / pLOCL), one row, each card
 // showing the Monte Carlo mean as the headline number plus a CI₉₅ whisker.
-// Below the grid: a slim inline row for Mission Success Probability (MSP),
+// Below the grid: a slim inline row for composite health-criterion attainment,
 // followed by a small σ(CHI) convergence sparkline (the "did this run converge?"
 // glance — full diagnostic lives in I4).
 //
 // Whiskers are styled divs (no ECharts) per spec. The sparkline IS ECharts but
 // stripped of legend / axis labels — it shows only the σ(CHI) trajectory.
 //
-// Empty convergence (T < 1 000 → no checkpoints): cards + MSP row render
+// Empty convergence (T < 1 000): cards + health-criterion row render
 // normally; the sparkline area shows a small placeholder.
 
 import ReactEChartsCore from "echarts-for-react/lib/core";
@@ -28,7 +28,7 @@ const COLORS = {
 };
 
 // ── Formatters ───────────────────────────────────────────────────────────────
-// TME is a count (1 decimal, no suffix). CHI / pEVAC / pLOCL / MSP are
+// TME is a count (1 decimal, no suffix). CHI / pEVAC / pLOCL / health criterion are
 // percentages on the 0–100 scale (1 decimal + "%").
 function fmtCount(x: number): string {
   return x.toFixed(1);
@@ -108,17 +108,17 @@ function StatCard({ label, unit, summary, fmt, color }: StatCardProps) {
   );
 }
 
-// ── MSP inline row ───────────────────────────────────────────────────────────
-// 5th metric (Mission Success Probability) gets a slim full-width row instead
+// ── Composite-health inline row ──────────────────────────────────────────────
+// 5th metric gets a slim full-width row instead
 // of a 5th card — avoids the visual asymmetry of 5 across in a 4-col grid.
-function MSPRow({ msp }: { msp: PosteriorSummary }) {
-  const color = "#0072B2"; // Blue (Okabe-Ito); MSP is "joint success", primary metric.
+function HealthCriterionRow({ summary }: { summary: PosteriorSummary }) {
+  const color = "#0072B2"; // Blue (Okabe-Ito); joint health criterion metric.
   return (
     <div className="panel p-4 flex items-center justify-between gap-4">
       <div className="flex items-baseline gap-3">
-        <span className="label" style={{ color }}>MSP</span>
+        <span className="label" style={{ color }}>Health criterion</span>
         <span className="mono text-[10px] text-ink-3 uppercase tracking-cap">
-          mission success probability
+          composite threshold attainment
         </span>
       </div>
       <div className="flex items-baseline gap-3">
@@ -126,12 +126,12 @@ function MSPRow({ msp }: { msp: PosteriorSummary }) {
           className="display mono text-2xl text-ink-0 leading-none tabular-nums"
           data-testid="imm-headline-msp-mean"
         >
-          {fmtPct(msp.mean)}
+          {fmtPct(summary.mean)}
         </span>
         <span className="mono text-[10px] text-ink-3">
           CI₉₅{" "}
           <span className="tabular-nums text-ink-2">
-            {fmtPct(msp.ci95[0])} <span className="text-ink-3">→</span> {fmtPct(msp.ci95[1])}
+            {fmtPct(summary.ci95[0])} <span className="text-ink-3">→</span> {fmtPct(summary.ci95[1])}
           </span>
         </span>
       </div>
@@ -242,7 +242,8 @@ export function IMMHeadlineCard({
   seed = 0xc0ffee,
   mission,
 }: IMMHeadlineCardProps) {
-  const { tme, chi, pEvac, pLocl, missionSuccess, convergence } = outcome;
+  const { tme, chi, pEvac, pLocl, convergence } = outcome;
+  const healthCriterion = outcome.healthCriterionAttainment ?? outcome.missionSuccess;
   const missionLabel = mission?.label ?? "(mission not specified)";
   const seedHex = `0x${seed.toString(16).toUpperCase()}`;
 
@@ -253,13 +254,13 @@ export function IMMHeadlineCard({
       `CHI=${fmtPct(chi.mean)}, ` +
       `pEVAC=${fmtPct(pEvac.mean)}, ` +
       `pLOCL=${fmtPct(pLocl.mean)}, ` +
-      `MSP=${fmtPct(missionSuccess.mean)} ` +
+      `healthCriterion=${fmtPct(healthCriterion.mean)} ` +
       `after T=${trials.toLocaleString()} IMM Monte Carlo trials on ${missionLabel}.`,
     methods:
-      "Hero composite: four stat cards (TME, CHI, pEVAC, pLOCL) plus a Mission " +
-      "Success Probability (MSP) row. Each headline number is the Monte Carlo mean " +
+      "Hero composite: four stat cards (TME, CHI, pEVAC, pLOCL) plus a composite " +
+      "health-criterion row. Each headline number is the Monte Carlo mean " +
       "across T trials; the whisker below shows the 95% simulation " +
-      "interval (CI₉₅) span with a tick at the mean. MSP is the joint probability " +
+      "interval (CI₉₅) span with a tick at the mean. The health criterion is the joint probability " +
       "P(no LOCL ∧ no EVAC ∧ CHI ≥ χ*). The σ(CHI) sparkline at the bottom is the " +
       "convergence glance: a flat trajectory near zero indicates a converged run; " +
       "rising or jagged σ means insufficient trials. See I4 for the full diagnostic.",
@@ -275,10 +276,9 @@ export function IMMHeadlineCard({
       "care. Crew Health Index (CHI) goes from 0% to 100% — a CHI of 95% means " +
       "the crew lost 5% of their available healthy time to illness or injury. " +
       "pEVAC is the chance an emergency return to Earth would be considered; " +
-      "pLOCL is the chance one or more crew members would die. MSP combines all " +
-      "three into a single mission-level success rate. The small bar under each " +
-      "number shows how uncertain the estimate is — narrower bars mean we are " +
-      "more confident.",
+      "pLOCL is the chance one or more crew members would die. The composite health " +
+      "criterion combines those health endpoints for scenario comparison. The small bar under each " +
+      "number shows the simulation interval; narrower bars mean less Monte Carlo spread under the current assumptions.",
   };
 
   return (
@@ -291,7 +291,7 @@ export function IMMHeadlineCard({
       </div>
 
       <div className="mt-4">
-        <MSPRow msp={missionSuccess} />
+        <HealthCriterionRow summary={healthCriterion} />
       </div>
 
       <div className="mt-4">

@@ -1,4 +1,4 @@
-export type { Criterion, CriterionInstrument } from "./criterion";
+export type { Criterion, CriterionCatalog, CriterionCatalogStatus, CriterionInstrument } from "./criterion";
 export type { Candidate } from "./candidate";
 export type { GateVerdict, GateResult } from "./gate";
 export type { Posterior } from "./posterior";

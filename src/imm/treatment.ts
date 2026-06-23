@@ -1,5 +1,9 @@
 // src/imm/treatment.ts — RAF-based Beta-Pert distribution shifting (K15 §II.B.7 Fig 3)
-import type { IMMBetaPert } from "./types";
+import type {
+  IMMBetaPert,
+  IMMConditionOutcomes,
+  IMMPrior,
+} from "./types";
 
 /**
  * interpolateBetaPertByRAF — linearly interpolates between treated and untreated
@@ -21,5 +25,38 @@ export function interpolateBetaPertByRAF(
     min:  r * treated.min  + (1 - r) * untreated.min,
     mode: r * treated.mode + (1 - r) * untreated.mode,
     max:  r * treated.max  + (1 - r) * untreated.max,
+  };
+}
+
+export type SelectedSeverityOutcomes = {
+  treated: IMMConditionOutcomes;
+  untreated: IMMConditionOutcomes;
+  source: "scenario" | "legacy-v1-duplicated";
+};
+
+/**
+ * Select outcome distributions for the sampled best/worst severity branch.
+ *
+ * Current release priors mostly predate this branch and contain only one
+ * treated/untreated pair. Those legacy priors are duplicated into both branches
+ * at runtime so the simulator remains compatible while making the missing
+ * branch-specific evidence explicit to callers and tests.
+ */
+export function selectSeverityOutcomes(
+  prior: IMMPrior,
+  severity: "best" | "worst",
+): SelectedSeverityOutcomes {
+  const branch = prior.outcomeScenarios?.[severity];
+  if (branch) {
+    return {
+      treated: branch.treated,
+      untreated: branch.untreated,
+      source: "scenario",
+    };
+  }
+  return {
+    treated: prior.treated,
+    untreated: prior.untreated,
+    source: "legacy-v1-duplicated",
   };
 }

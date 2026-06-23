@@ -1,7 +1,7 @@
 import { useMemo } from "react";
 import { useWizard } from "@/contexts/WizardContext";
-import { PLACEHOLDER_CRITERIA } from "@/data/placeholder-criteria";
-import { scoreCandidate, normalizeScore } from "@/engine";
+import { ACTIVE_CRITERION_CATALOG } from "@/data/placeholder-criteria";
+import { buildEqualWeightPrior, scoreCandidate, normalizeScore } from "@/engine";
 import { PosteriorPlot } from "@/ui/figures/PosteriorPlot";
 import { ScoreCard } from "@/ui/components/ScoreCard";
 import { ScoreBreakdownRadar } from "@/ui/figures/ScoreBreakdownRadar";
@@ -17,8 +17,12 @@ export function StepReview() {
   // The construct set is stable across tiers; tiers change the assessment
   // instrument fidelity shown upstream, not the criteria included here.
   const visibleCriteria = useMemo(
-    () => PLACEHOLDER_CRITERIA.filter((c) => isCriterionAvailableAtTier(c.minimumTier, accessTier)),
+    () => ACTIVE_CRITERION_CATALOG.criteria.filter((c) => isCriterionAvailableAtTier(c.minimumTier, accessTier)),
     [accessTier],
+  );
+  const weightPrior = useMemo(
+    () => buildEqualWeightPrior(visibleCriteria.length),
+    [visibleCriteria.length],
   );
 
   // Clamp at the source — legacy persisted rawValues from before the
@@ -58,12 +62,12 @@ export function StepReview() {
         ? scoreCandidate({
             candidate: candidateForEngine,
             criteria: visibleCriteria,
-            alpha: visibleCriteria.map(() => 1),
+            alpha: weightPrior.alpha,
             iterations: ITERATIONS,
             seed: SEED_SAMPLER,
           })
         : null,
-    [candidateForEngine, visibleCriteria, isComplete],
+    [candidateForEngine, visibleCriteria, isComplete, weightPrior],
   );
 
   const radarData = useMemo(
@@ -84,6 +88,16 @@ export function StepReview() {
     <div className="grid grid-cols-1 gap-6 lg:grid-cols-12">
       <section className="lg:col-span-7 panel p-6 space-y-4">
         <h2 className="display text-lg">Step 3 — Review</h2>
+        <div className="border border-warn/40 bg-warn/5 p-3 text-sm text-ink-2">
+          <p className="font-medium text-ink-1">Research demonstration catalog</p>
+          <p className="mt-1 leading-relaxed">
+            {ACTIVE_CRITERION_CATALOG.label} · status {ACTIVE_CRITERION_CATALOG.status}. Scores are
+            uncertain-weight MCDA research outputs, not eligibility decisions or validated suitability probabilities.
+          </p>
+          <p className="mono mt-2 text-[12px] text-ink-3">
+            weight prior · source {weightPrior.source} · kappa {weightPrior.kappa.toFixed(0)} · alpha=[1,...,1]
+          </p>
+        </div>
         <table className="mono w-full text-[13px]">
           <thead>
             <tr className="text-ink-3 uppercase tracking-cap">

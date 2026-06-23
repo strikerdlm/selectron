@@ -36,6 +36,22 @@ export type IMMConditionOutcomes = {
   p_evac: IMMBetaPert; p_locl: IMMBetaPert;
 };
 
+export type IMMSeverityScenarioOutcomes = {
+  treated: IMMConditionOutcomes;
+  untreated: IMMConditionOutcomes;
+  /**
+   * `legacy-v1-duplicated` means a pre-scenario prior was copied into both
+   * severity branches for compatibility. It is mechanistically active, but not
+   * independent evidence for a best/worst outcome split.
+   */
+  evidenceStatus?: "accepted" | "scenario" | "legacy-v1-duplicated";
+};
+
+export type IMMSeverityOutcomeScenarios = {
+  best: IMMSeverityScenarioOutcomes;
+  worst: IMMSeverityScenarioOutcomes;
+};
+
 export type IMMPrior = {
   conditionId: string;
   provenance: "tierA-nasa" | "tierB-lit" | "tierB-pymc" | "tierC-synth" | "user-custom";
@@ -48,6 +64,12 @@ export type IMMPrior = {
     lambda_unit?: "events-per-person-day" | "events-per-EVA" | "events-per-SPE";
   };
   severity: { worst_case_prob_alpha: number; worst_case_prob_beta: number };
+  /**
+   * Scenario-specific outcomes selected after sampling best/worst severity.
+   * Legacy priors may omit this; the simulator then treats top-level
+   * treated/untreated outcomes as duplicated best and worst branches.
+   */
+  outcomeScenarios?: IMMSeverityOutcomeScenarios;
   treated: IMMConditionOutcomes;
   untreated: IMMConditionOutcomes;
   risk_factor_multipliers: Partial<Record<IMMRiskFactor, number>>;
@@ -198,9 +220,14 @@ export type IMMOutcome = {
   pEvac: PosteriorSummary;
   pLocl: PosteriorSummary;
   /**
-   * Mission Success Probability (×100, percent scale, same as pEvac/pLocl).
-   * Fraction of trials where EVAC=0 AND LOCL=0 AND CHI >= chiStar×100.
-   * chiStar defaults to 0.7 per spec §3.5 (Palinkas 2004 anchor).
+   * Probability of meeting the specified composite health criterion (×100,
+   * percent scale, same as pEvac/pLocl). A trial meets the criterion when:
+   * EVAC=0 AND LOCL=0 AND CHI >= chiStar×100.
+   */
+  healthCriterionAttainment?: PosteriorSummary;
+  /**
+   * Legacy alias retained for persisted sessions and historical tests. New UI
+   * should use healthCriterionAttainment terminology.
    */
   missionSuccess: PosteriorSummary;
   perConditionDrivers: {

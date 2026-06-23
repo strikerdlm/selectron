@@ -232,7 +232,7 @@ export function ConditionContribution({
     <div>
       {total === 0 ? (
         <div className="grid h-[80px] place-items-center text-sm text-ink-2 mono">
-          no QTL yet — select a mission to populate the posterior
+          no QTL yet — select a mission to populate the simulation output
         </div>
       ) : (
         <div className="relative">

@@ -13,37 +13,36 @@ type Props = {
   posterior: RiskPosterior;
   chiStar: number;
   missionId: string;
-  /** Optional gate verdict. When disqualified, assessLxC returns RED L5×C5=25
-   *  and the DISQUALIFIED banner is shown above the LxC matrix. */
+  /** Optional gate result. Review flags are shown separately from the
+   *  non-operational LxC appendix mapping. */
   gate?: GateResult;
 };
 
-const NASA_COLOR_TONE: Record<"green" | "yellow" | "red" | "gray", string> = {
+const LXC_COLOR_TONE: Record<"green" | "yellow" | "red" | "gray", string> = {
   green: "text-emerald-300",
   yellow: "text-amber-300",
   red: "text-warn",
   gray: "text-ink-2",
 };
 
-const NASA_COLOR_BORDER: Record<"green" | "yellow" | "red" | "gray", string> = {
+const LXC_COLOR_BORDER: Record<"green" | "yellow" | "red" | "gray", string> = {
   green: "border-emerald-400/40",
   yellow: "border-amber-400/40",
   red: "border-warn/40",
   gray: "border-ink-2/40",
 };
 
-// Per JSC-66705 Rev A §3.2.6, the color informs (but does not dictate) the
-// HSRB Risk Disposition. These blurbs paraphrase the document's intent into
-// operational guidance a non-NASA reader can act on.
-const NASA_COLOR_GUIDANCE: Record<"green" | "yellow" | "red" | "gray", string> = {
+// Non-operational interpretation for the appendix LxC mapping. This is not a
+// NASA disposition and must not be used as applicant eligibility guidance.
+const LXC_COLOR_GUIDANCE: Record<"green" | "yellow" | "red" | "gray", string> = {
   green:
-    "GREEN risks are managed within existing standards and resources. Per JSC-66705 §3.2.6, current countermeasures are deemed effective; the HSRB would typically ACCEPT this risk without further mitigation work.",
+    "GREEN means this experimental mapping falls in the lowest priority band under the configured thresholds. It does not establish that the candidate or crew is operationally cleared.",
   yellow:
-    "YELLOW risks fall in the 'Requires Mitigation' band. Per JSC-66705 §3.2.6.2, current countermeasures are believed inadequate and the HSRB would commission additional or improved countermeasures, technologies, or standards to improve Risk Posture before flight.",
+    "YELLOW means this experimental mapping falls in an intermediate priority band. It should trigger review of assumptions, mitigations, and uncertainty rather than an automatic decision.",
   red:
-    "RED risks admit at least one credible scenario with a very serious consequence/likelihood combination (LxC ≥ 20). Per JSC-66705 §3.2.4, red risks are PRIORITIZED for mitigation over yellow risks; per §3.2.6, the HSRB may still accept a red risk if mitigation resources are unachievable, but acceptance must be explicitly documented and revisited as new evidence emerges.",
+    "RED means this experimental mapping falls in the highest priority band. It is a review signal, not a NASA-approved risk posture or a substitute for human governance.",
   gray:
-    "GRAY risks are those the LxC matrix cannot characterize (likelihood or consequence undefined). Per JSC-66705 §3.2.4 final paragraph, gray is used as a placeholder — additional evidence collection is needed before a real color can be assigned.",
+    "GRAY means the mapping cannot characterize likelihood or consequence from the available simulation output.",
 };
 
 function severityBucket(chiMean: number, chiStar: number): {
@@ -59,7 +58,7 @@ function severityBucket(chiMean: number, chiStar: number): {
       label: "STRONG",
       tone: "text-emerald-300 border-emerald-400/40",
       blurb:
-        "Posterior crew health holds comfortably above the operational floor — the mission profile is well-matched to this crew under the modeled prior.",
+        "Simulated crew health holds comfortably above the operational floor under the configured assumptions.",
     };
   }
   if (delta >= 0) {
@@ -67,7 +66,7 @@ function severityBucket(chiMean: number, chiStar: number): {
       label: "ADEQUATE",
       tone: "text-signal border-signal/40",
       blurb:
-        "Posterior crew health sits at or just above the operational floor. Acceptable, but the margin is thin — small adverse drifts in the prior could push the result into degraded territory.",
+        "Simulated crew health sits at or just above the operational floor. The margin is thin, so small adverse assumption changes could move the result into degraded territory.",
     };
   }
   if (delta >= -0.05) {
@@ -75,14 +74,14 @@ function severityBucket(chiMean: number, chiStar: number): {
       label: "MARGINAL",
       tone: "text-amber-300 border-amber-400/40",
       blurb:
-        "Posterior crew health is slightly below the χ* floor. Selection is not categorically refused, but mission planners should consider mitigations (extra training, longer EVAs windows, medical kits) before clearing.",
+        "Simulated crew health is slightly below the χ* floor. Review mitigations and assumptions before treating this scenario as acceptable.",
     };
   }
   return {
     label: "DEGRADED",
     tone: "text-warn border-warn/40",
     blurb:
-      "Posterior crew health is clearly below the operational floor. This run flags a mission-profile mismatch — either the candidate's evidence is insufficient or the mission is too demanding for the modeled risk priors.",
+      "Simulated crew health is clearly below the operational floor. This run flags a mission-profile mismatch or insufficient evidence under the modeled priors.",
   };
 }
 
@@ -103,16 +102,15 @@ export function CHIExplainer({ posterior, chiStar, missionId, gate }: Props) {
 
   const severity = severityBucket(chi, chiStar);
   const etBucket = pctBucket(pET);
-  // NASA HSRB LxC assessment driven by the Monte-Carlo posterior (or the gate
-  // override). This is the canonical verdict surface — the chi-gap "severity"
-  // above stays as a secondary lay-language layer below.
+  // Non-operational LxC appendix mapping driven by the Monte-Carlo output.
+  // Gate review flags are not converted into applicant risk postures.
   const lxc = assessLxC(posterior, gate);
-  const nasaTone = NASA_COLOR_TONE[lxc.color];
-  const nasaBorder = NASA_COLOR_BORDER[lxc.color];
+  const lxcTone = LXC_COLOR_TONE[lxc.color];
+  const lxcBorder = LXC_COLOR_BORDER[lxc.color];
 
   return (
-    <section className={`panel p-6 border-l-2 ${nasaBorder}`}>
-      {/* ── DISQUALIFIED BANNER ─────────────────────────────────────────── */}
+    <section className={`panel p-6 border-l-2 ${lxcBorder}`}>
+      {/* ── REVIEW-FLAG BANNER ──────────────────────────────────────────── */}
       {gate?.verdict === "disqualified" && (
         <div
           role="alert"
@@ -120,12 +118,12 @@ export function CHIExplainer({ posterior, chiStar, missionId, gate }: Props) {
           data-testid="disqualified-banner"
         >
           <div className="font-semibold text-red-900 mb-2">
-            ⛔ DISQUALIFIED — clearance gate failed
+            REVIEW REQUIRED — clearance gate flag
           </div>
           <p className="text-sm text-red-800 mb-2">
-            The candidate failed one or more binary clearance gates. Stage B Monte
-            Carlo was not used to compute this LxC verdict; the matrix is RED on
-            principle per NASA selection process (failed clearance = exclusion).
+            One or more binary clearance gates were flagged. The Stage B Monte
+            Carlo result is not converted into an applicant verdict; this panel
+            only shows the flagged inputs for human review.
           </p>
           <ul className="mt-2 list-disc list-inside text-sm text-red-800 font-mono">
             {gate.failedGates.map((g) => (
@@ -140,34 +138,30 @@ export function CHIExplainer({ posterior, chiStar, missionId, gate }: Props) {
 
       <header className="flex items-baseline justify-between mb-4 flex-wrap gap-2">
         <h2 className="display text-lg text-ink-0">
-          NASA Risk analysis framework
+          Experimental LxC comparison
         </h2>
-        <span className={`mono text-[10px] uppercase tracking-cap ${nasaTone}`}>
-          NASA verdict · {lxc.color.toUpperCase()} · LxC = {lxc.score}
+        <span className={`mono text-[10px] uppercase tracking-cap ${lxcTone}`}>
+          appendix mapping · {lxc.color.toUpperCase()} · LxC = {lxc.score}
         </span>
       </header>
 
-      {/* ── NASA LxC RISK ASSESSMENT (per JSC-66705 Rev A) ──────────────── */}
-      <div className={`mb-6 border ${nasaBorder} rounded-md p-4 bg-bg-1/40`}>
+      {/* ── NON-OPERATIONAL LxC APPENDIX MAPPING ───────────────────────── */}
+      <div className={`mb-6 border ${lxcBorder} rounded-md p-4 bg-bg-1/40`}>
         <div className="flex items-baseline justify-between flex-wrap gap-2 mb-3">
           <h3 className="display text-base text-ink-0">
-            NASA HSRB Likelihood × Consequence matrix
+            Likelihood × Consequence appendix matrix
           </h3>
           <span className="mono text-[10px] uppercase tracking-cap text-ink-3">
-            JSC-66705 Rev A · Fig. 4
+            experimental · non-NASA
           </span>
         </div>
         <p className="text-sm text-ink-1 leading-relaxed mb-4">
-          NASA's Human System Risk Board scores every Human System Risk on a 5×5
-          Likelihood × Consequence matrix and assigns a single color (green /
-          yellow / red) that summarises the mission-level disposition. Selectron
-          maps this run's Bayesian Monte-Carlo posterior onto that matrix using
-          NASA's published quantitative likelihood bands and the In-Mission
-          Mission Objectives Impact consequence definitions (the sub-category
-          that aligns with our QTL-based fraction-of-mission-time-lost metric;
-          JSC-66705 §3.2.4 p. 29 requires picking exactly one sub-category per
-          impact category). The matrix below shows where this run lands; the
-          priority scores in each cell are verbatim from Figure 4.
+          This legacy panel maps a simulation run onto a 5×5 likelihood ×
+          consequence grid for technical comparison only. It is not a NASA risk
+          disposition, not an applicant eligibility decision, and not evidence
+          that analog outcomes have been externally validated. The mapping uses
+          configured likelihood and crew-time-loss bands to make assumptions
+          explicit.
         </p>
 
         <div className="grid grid-cols-1 md:grid-cols-[minmax(260px,360px)_1fr] gap-5 items-start">
@@ -205,31 +199,26 @@ export function CHIExplainer({ posterior, chiStar, missionId, gate }: Props) {
                   L{lxc.likelihood} × C{lxc.consequence} = priority score {lxc.score}
                 </span>{" "}
                 · color{" "}
-                <span className={`mono uppercase tracking-cap ${nasaTone}`}>
+                <span className={`mono uppercase tracking-cap ${lxcTone}`}>
                   {lxc.color}
                 </span>{" "}
-                (NASA cut-offs: green ≤ 10, yellow 11–19, red ≥ 20).
+                (configured cut-offs: green ≤ 10, yellow 11–19, red ≥ 20).
               </p>
             </div>
-            <div className={`border-t ${nasaBorder} pt-3 mt-3`}>
+            <div className={`border-t ${lxcBorder} pt-3 mt-3`}>
               <span className="mono text-[10px] uppercase tracking-cap text-ink-3">
-                HSRB disposition guidance
+                appendix interpretation
               </span>
-              <p className="mt-1">{NASA_COLOR_GUIDANCE[lxc.color]}</p>
+              <p className="mt-1">{LXC_COLOR_GUIDANCE[lxc.color]}</p>
             </div>
           </div>
         </div>
 
         <p className="mono mt-4 pt-3 border-t border-line/40 text-[10px] text-ink-3 leading-relaxed">
-          Likelihood thresholds verbatim from JSC-66705 Rev A Figure 4 p. 28
-          "LIKELIHOOD RATING · In-Mission" (P ≤ 0.01 %, 0.01–0.1 %, 0.1–1 %, 1–10 %,
-          &gt; 10 %). Consequence categories verbatim from Figure 4 "IN MISSION ·
-          Mission Objectives Impact" row. Selectron's quantitative bridge from
+          This mapping is a developer comparison. Its quantitative bridge from
           chi-gap to consequence band (1 %, 5 %, 15 %, 30 % crew-days lost) is
-          documented in src/risk/lxc-definitions.ts — JSC-66705's consequence
-          scale is qualitative; cutoffs here are aligned to the published
-          descriptors. Color rule from §3.2.4 p. 27: red ≥ 20, yellow 11–19,
-          green ≤ 10. Per-mission LxC chips appear in the Mission Comparison
+          defined in src/risk/lxc-definitions.ts and is not an endorsed external
+          threshold set. Per-mission LxC chips appear in the Mission Comparison
           panel below.
         </p>
       </div>
@@ -239,7 +228,7 @@ export function CHIExplainer({ posterior, chiStar, missionId, gate }: Props) {
           Crew Health Index
         </h3>
         <span className={`mono text-[10px] uppercase tracking-cap ${severity.tone}`}>
-          lay verdict · {severity.label}
+          scenario status · {severity.label}
         </span>
       </header>
 
@@ -254,9 +243,9 @@ export function CHIExplainer({ posterior, chiStar, missionId, gate }: Props) {
             [0, 1] where <strong className="text-ink-0">1.0</strong> means the crew finished the
             mission with no quality-of-life days lost, and <strong className="text-ink-0">0.0</strong>{" "}
             means the entire crew was incapacitated for the entire mission. Anything in
-            between scales linearly. This is the NASA Integrated Medical Model's
-            single-number readout for mission-level health, computed by the Bayesian
-            forward Monte-Carlo over the modeled medical conditions.
+            between scales linearly. This is a single-number readout for
+            mission-level health, computed by a stochastic forward Monte-Carlo
+            over the modeled medical conditions.
           </p>
         </div>
         <div>
@@ -265,11 +254,11 @@ export function CHIExplainer({ posterior, chiStar, missionId, gate }: Props) {
           </div>
           <p className="text-sm text-ink-1 leading-relaxed">
             <span className="mono text-ink-0">χ* = {chiStar.toFixed(2)}</span> · the minimum CHI
-            this Selectron run is willing to accept. Adjustable on the previous step. NASA
-            reference programs use 0.7 as a default; tighter floors (0.8+) raise the bar for
-            elite missions, looser floors (0.6) suit lower-risk analog campaigns. The
-            posterior probability that <span className="mono">χ &lt; χ*</span> is what we call{" "}
-            <em>early-termination risk</em> below.
+            this run is configured to accept. Adjustable on the previous step.
+            Tighter floors (0.8+) raise the bar for demanding scenarios; looser
+            floors (0.6) suit lower-risk analog campaigns. The simulated
+            probability that <span className="mono">χ &lt; χ*</span> is reported as{" "}
+            <em>threshold-failure risk</em> below.
           </p>
         </div>
       </div>
@@ -297,7 +286,7 @@ export function CHIExplainer({ posterior, chiStar, missionId, gate }: Props) {
             </span>{" "}
             — fraction of Monte-Carlo trials in which the crew fell below the operational
             floor at some point in the mission. Interpret as a literal "what fraction of
-            possible futures end with the mission being cut short for medical reasons" —
+            possible futures fall below the configured health threshold" —
             below 5 % is operationally low, above 30 % is a hard re-think signal.
           </li>
           <li>
@@ -314,12 +303,11 @@ export function CHIExplainer({ posterior, chiStar, missionId, gate }: Props) {
       {/* ── DECISION HOOK ──────────────────────────────────────────────── */}
       <div className="border-t border-line pt-4">
         <p className="text-sm text-ink-1 leading-relaxed">
-          Selectron is a <em>decision-support</em> tool, not an autonomous selector. The CHI
-          and its early-termination probability are inputs to a human review board. A
-          STRONG verdict means there is no Bayesian objection to the candidate-mission
-          match; a MARGINAL or DEGRADED verdict does not categorically disqualify the
-          candidate but obliges the board to document the mitigations that close the
-          posterior gap.
+          This is a research scenario tool, not an autonomous selector. The CHI
+          and threshold-failure probability are inputs to human review. A STRONG
+          status means the configured model does not flag the scenario; a
+          MARGINAL or DEGRADED status does not categorically disqualify a crew,
+          but it does require documented review of assumptions and mitigations.
         </p>
       </div>
     </section>

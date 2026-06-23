@@ -49,13 +49,13 @@ export function isTerrestrialAnalog(kind: IMMMissionKind): boolean {
 import type { IMMCrewMember, IMMMission, IMMKitScenario, IMMPrior, IMMConditionFamily, IMMCondition, IMMMissionKind, IMMProcessType, VulnerabilityCouplingMode } from "./types";
 import { IMM_CONDITIONS } from "./conditions";
 import { loadIMMPriors } from "./priors";
-import { samplePoisson, sampleLognormal, sampleLognormalPoisson, sampleGammaPoisson, sampleBetaBernoulli, samplePoissonProcess } from "./incidence";
+import { applyProportionalHazardMultiplier, samplePoisson, sampleLognormal, sampleScaledBetaBernoulli, samplePoissonProcess } from "./incidence";
 import { applyVulnerabilityMultiplier } from "../risk/incidence";
 import { zScoreAgainstScale } from "../engine/normalize-cohort";
 import { sampleGamma } from "../engine/gamma";
 import { sampleSeverity } from "./severity";
 import { sampleBetaPert } from "./outcomes";
-import { interpolateBetaPertByRAF } from "./treatment";
+import { interpolateBetaPertByRAF, selectSeverityOutcomes } from "./treatment";
 import { computeRAF } from "./kits";
 import { gateAvailable } from "./health-support";
 import type { Criterion } from "../types";
@@ -352,13 +352,31 @@ function sampleGeneralPoissonCount(
   throw new Error(`E_BAD_PRIOR: sampleGeneralPoissonCount called with unsupported distribution ${inc.distribution}`);
 }
 
-function sampleIncidence(rng: Rng, prior: IMMPrior): number {
+function sampleRateFromPrior(rng: Rng, prior: IMMPrior): number {
   const inc = prior.incidence;
-  if (inc.distribution === "Lognormal-Poisson") return sampleLognormalPoisson(rng, inc.mu_log_lambda!, inc.sigma_log_lambda!);
-  if (inc.distribution === "Gamma-Poisson")     return sampleGammaPoisson(rng, inc.alpha!, inc.beta!);
-  if (inc.distribution === "Beta-Bernoulli")    return sampleBetaBernoulli(rng, inc.alpha!, inc.beta!);
-  if (inc.distribution === "Fixed")             return samplePoisson(rng, inc.lambda_fixed!);
-  throw new Error(`E_BAD_PRIOR: unknown distribution ${inc.distribution}`);
+  if (inc.distribution === "Lognormal-Poisson") return sampleLognormal(rng, inc.mu_log_lambda!, inc.sigma_log_lambda!);
+  if (inc.distribution === "Gamma-Poisson") return sampleGamma(inc.alpha!, rng) / inc.beta!;
+  if (inc.distribution === "Fixed") return inc.lambda_fixed ?? 0;
+  throw new Error(`E_BAD_PRIOR: sampleRateFromPrior called with unsupported distribution ${inc.distribution}`);
+}
+
+function sampleSingleOccurrenceWithMultiplier(
+  rng: Rng,
+  prior: IMMPrior,
+  multiplier: number,
+  exposureUnits: number,
+): 0 | 1 {
+  if (!Number.isFinite(multiplier) || multiplier <= 0 || exposureUnits <= 0) return 0;
+
+  const inc = prior.incidence;
+  if (inc.distribution === "Beta-Bernoulli") {
+    return sampleScaledBetaBernoulli(rng, inc.alpha!, inc.beta!, multiplier);
+  }
+
+  const rate = Math.max(0, sampleRateFromPrior(rng, prior));
+  const baseP = 1 - Math.exp(-rate * exposureUnits);
+  const scaledP = applyProportionalHazardMultiplier(baseP, multiplier);
+  return rng() < scaledP ? 1 : 0;
 }
 
 export function runIMMTrial(
@@ -457,22 +475,18 @@ export function runIMMTrial(
         }
       } else if (cond.processType === "space-adaptation-once") {
         // T24: once-per-mission cap — skip if this crew member already had this condition.
-        // rev3-b-followup: tierMult applied per-Bernoulli (count is 0 or 1; product of
-        // Bernoulli(p)·Bernoulli(mult) = Bernoulli(p·mult), variance-correct).
         if (processedSAOnce[cIdx].has(cond.id)) {
           count = 0;
-        } else {
-          const occ = sampleIncidence(rng, prior);
-          if (occ > 0 && (effectiveMult === 1.0 || rng() < effectiveMult)) {
-            processedSAOnce[cIdx].add(cond.id);
-            count = 1;
-          }
+        } else if (sampleSingleOccurrenceWithMultiplier(rng, prior, effectiveMult, mission.durationDays)) {
+          processedSAOnce[cIdx].add(cond.id);
+          count = 1;
         }
       } else if (cond.processType === "EVA-coupled") {
-        // rev3-b-followup: tierMult applied per-Bernoulli inside the per-EVA loop.
-        // Sum of independent Bernoulli(p·mult) is Binomial(n, p·mult) — variance-correct.
+        // Per-EVA occurrence path. Multiplier is applied to the sampled event
+        // probability through proportional-hazard scaling so values >1 elevate
+        // risk instead of being silently capped by a second Bernoulli gate.
         for (let e = 0; e < member.EVA_count; e++) {
-          if (sampleIncidence(rng, prior) > 0 && (effectiveMult === 1.0 || rng() < effectiveMult)) count++;
+          if (sampleSingleOccurrenceWithMultiplier(rng, prior, effectiveMult, 1)) count++;
         }
       } else if (cond.processType === "SPE-coupled") {
         // T23: Per-SPE-event Bernoulli via ARS prior (Beta-Bernoulli per event).
@@ -487,15 +501,15 @@ export function runIMMTrial(
         const arsAlpha = prior.incidence.alpha ?? 2;
         const arsBeta  = prior.incidence.beta  ?? 18;
         for (const speTime of speEventTimes) {
-          if (sampleBetaBernoulli(rng, arsAlpha, arsBeta) === 1) {
+          if (sampleScaledBetaBernoulli(rng, arsAlpha, arsBeta, effectiveMult) === 1) {
             pendingOccurrences.push({ condition: cond, prior, crewIndex: cIdx, timeDays: speTime });
           }
         }
         count = 0; // SPE occurrences created directly above; skip the generic loop
       } else if (cond.processType === "SA-VIIP-late") {
-        // rev3-b-followup: tierMult applied per-Bernoulli (single Bernoulli; variance-correct).
-        // 2026-06-04: effectiveMult = tierMult × kindMult (kind modulation layered in).
-        if (sampleIncidence(rng, prior) > 0 && (effectiveMult === 1.0 || rng() < effectiveMult)) count = 1;
+        // Single late-mission occurrence path under the same probability
+        // scaling as other Bernoulli-style processes.
+        if (sampleSingleOccurrenceWithMultiplier(rng, prior, effectiveMult, mission.durationDays)) count = 1;
       }
 
       // rev3-b-followup (2026-05-22): the post-count stochastic-rounding block that
@@ -529,15 +543,16 @@ export function runIMMTrial(
     if (earlyTerminated.has(pending.crewIndex)) continue;
     const { condition: cond, prior } = pending;
     const severity = sampleSeverity(rng, prior.severity.worst_case_prob_alpha, prior.severity.worst_case_prob_beta);
+    const severityOutcomes = selectSeverityOutcomes(prior, severity);
     const raf = computeRAF(prior.required_resources, availableResources);
     if (opts.traceRAF) rafHistory.push({ conditionId: cond.id, raf });
-    const fi_cp1 = sampleBetaPert(rng, ...Object.values(interpolateBetaPertByRAF(prior.treated.fi_cp1, prior.untreated.fi_cp1, raf)) as [number, number, number]);
-    const dt_cp1 = sampleBetaPert(rng, ...Object.values(interpolateBetaPertByRAF(prior.treated.dt_cp1_hours, prior.untreated.dt_cp1_hours, raf)) as [number, number, number]);
-    const fi_cp2 = sampleBetaPert(rng, ...Object.values(interpolateBetaPertByRAF(prior.treated.fi_cp2, prior.untreated.fi_cp2, raf)) as [number, number, number]);
-    const dt_cp2 = sampleBetaPert(rng, ...Object.values(interpolateBetaPertByRAF(prior.treated.dt_cp2_hours, prior.untreated.dt_cp2_hours, raf)) as [number, number, number]);
-    const fi_cp3 = sampleBetaPert(rng, ...Object.values(interpolateBetaPertByRAF(prior.treated.fi_cp3, prior.untreated.fi_cp3, raf)) as [number, number, number]);
-    const p_evac = sampleBetaPert(rng, ...Object.values(interpolateBetaPertByRAF(prior.treated.p_evac, prior.untreated.p_evac, raf)) as [number, number, number]);
-    const p_locl = sampleBetaPert(rng, ...Object.values(interpolateBetaPertByRAF(prior.treated.p_locl, prior.untreated.p_locl, raf)) as [number, number, number]);
+    const fi_cp1 = sampleBetaPert(rng, ...Object.values(interpolateBetaPertByRAF(severityOutcomes.treated.fi_cp1, severityOutcomes.untreated.fi_cp1, raf)) as [number, number, number]);
+    const dt_cp1 = sampleBetaPert(rng, ...Object.values(interpolateBetaPertByRAF(severityOutcomes.treated.dt_cp1_hours, severityOutcomes.untreated.dt_cp1_hours, raf)) as [number, number, number]);
+    const fi_cp2 = sampleBetaPert(rng, ...Object.values(interpolateBetaPertByRAF(severityOutcomes.treated.fi_cp2, severityOutcomes.untreated.fi_cp2, raf)) as [number, number, number]);
+    const dt_cp2 = sampleBetaPert(rng, ...Object.values(interpolateBetaPertByRAF(severityOutcomes.treated.dt_cp2_hours, severityOutcomes.untreated.dt_cp2_hours, raf)) as [number, number, number]);
+    const fi_cp3 = sampleBetaPert(rng, ...Object.values(interpolateBetaPertByRAF(severityOutcomes.treated.fi_cp3, severityOutcomes.untreated.fi_cp3, raf)) as [number, number, number]);
+    const p_evac = sampleBetaPert(rng, ...Object.values(interpolateBetaPertByRAF(severityOutcomes.treated.p_evac, severityOutcomes.untreated.p_evac, raf)) as [number, number, number]);
+    const p_locl = sampleBetaPert(rng, ...Object.values(interpolateBetaPertByRAF(severityOutcomes.treated.p_locl, severityOutcomes.untreated.p_locl, raf)) as [number, number, number]);
     const terminal = sampleTerminalOutcome(rng, p_evac, p_locl);
     occurrences.push({
       conditionId: cond.id, crewIndex: pending.crewIndex, timeDays: pending.timeDays, severity, raf,
@@ -648,9 +663,8 @@ export function simulateIMM(opts: {
   tierAMultiplier?: number;
   tierBMultiplier?: number;
   /**
-   * Crew Health Index threshold for Mission Success Probability (MSP).
-   * A trial is a "success" when: evac===0 AND locl===0 AND CHI >= chiStar×100.
-   * Defaults to 0.7 (70%) per spec §3.5 / Palinkas 2004 Antarctic anchor.
+   * Crew Health Index threshold for the composite health criterion.
+   * A trial meets the criterion when: evac===0 AND locl===0 AND CHI >= chiStar×100.
    */
   chiStar?: number;
   /**
@@ -701,7 +715,7 @@ export function simulateIMM(opts: {
   const denom = L_hours * crew.length;
 
   const tmes: number[] = [], chis: number[] = [], evacs: number[] = [], locls: number[] = [];
-  const missionSuccessFlags: number[] = [];
+  const healthCriterionFlags: number[] = [];
   const sigmaCheckpoints: number[] = [];
   const sigmaChi: number[] = [];
   const sigmaPevac: number[] = [];
@@ -730,12 +744,11 @@ export function simulateIMM(opts: {
     chis.push(chiForTrial);
     evacs.push(r.evac);
     locls.push(r.locl);
-    // MSP: trial is a "success" when EVAC=0 AND LOCL=0 AND CHI >= chiStar×100.
+    // Composite health criterion: trial meets the criterion when EVAC=0,
+    // LOCL=0, and CHI >= chiStar×100.
     // Flag is stored ×100 (percent scale) to match pEvac/pLocl convention.
-    // NOTE: with current uncalibrated priors pEVAC ≈ 10–99%, so missionSuccess.mean
-    // will be very low until priors are re-calibrated (see STATUS.md flagged backlog).
-    const successFlag: 0 | 1 = (r.evac === 0 && r.locl === 0 && chiForTrial >= chiStarPct) ? 1 : 0;
-    missionSuccessFlags.push(successFlag);
+    const criterionFlag: 0 | 1 = (r.evac === 0 && r.locl === 0 && chiForTrial >= chiStarPct) ? 1 : 0;
+    healthCriterionFlags.push(criterionFlag);
     for (const [k, v] of Object.entries(r.perConditionCounts)) perConditionCountsSum[k] = (perConditionCountsSum[k] ?? 0) + v;
     for (const [k, v] of Object.entries(r.perConditionEvac))   perConditionEvacSum[k]   = (perConditionEvacSum[k]   ?? 0) + v;
     for (const [k, v] of Object.entries(r.perConditionLocl))   perConditionLoclSum[k]   = (perConditionLoclSum[k]   ?? 0) + v;
@@ -766,14 +779,15 @@ export function simulateIMM(opts: {
     tmeContrib:   (perConditionCountsSum[c.id] ?? 0) / trials,
   }));
 
+  const healthCriterionAttainment = posteriorSummary(healthCriterionFlags.map(x => x * 100));
   const outcome: IMMOutcome = {
     tme:   posteriorSummary(tmes),
     chi:   posteriorSummary(chis),
     pEvac: posteriorSummary(evacs.map(x => x * 100)),
     pLocl: posteriorSummary(locls.map(x => x * 100)),
-    // missionSuccess is stored ×100 (percent) — same convention as pEvac/pLocl.
-    // Mean will be near 0 until priors are re-calibrated (pEVAC currently 10–99%).
-    missionSuccess: posteriorSummary(missionSuccessFlags.map(x => x * 100)),
+    healthCriterionAttainment,
+    // Legacy alias for persisted sessions and existing scripts/tests.
+    missionSuccess: healthCriterionAttainment,
     perConditionDrivers: drivers,
     convergence: { trialCheckpoints: sigmaCheckpoints, sigmaChi, sigmaPevac },
   };

@@ -150,7 +150,7 @@ export function IMMConvergencePlot({ outcome, trials, chiStar }: IMMConvergenceP
       "simulation (simulate.ts). σ values are in the native 0–100% scale (percentage-point " +
       "absolute SD). Convergence criterion: σ < 5 pp, per M18 (Musson & Heaton 2018) and " +
       "A22 (Antonsen et al. 2022 §Methods). The 5% rule is the threshold for declaring " +
-      `the Monte Carlo estimate stable. χ*=${chiStar.toFixed(2)} (mission success threshold).`,
+      `the Monte Carlo estimate stable. χ*=${chiStar.toFixed(2)} (composite health criterion).`,
     source:
       "Musson & Heaton (2018) [M18]; Antonsen et al. (2022) npj Microgravity 8(1) [A22, " +
       "doi:10.1038/s41526-022-00193-9].",

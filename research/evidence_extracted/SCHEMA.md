@@ -8,6 +8,7 @@ Only rows in this file with `status=accepted`, a named `extractor`, and a named
 | Column | Type | Description |
 |---|---|---|
 | status | enum | `accepted`, `rejected`, or `proposal`. Only `accepted` enters fitting. |
+| parameter_path | string | Exact active prior parameter path, e.g. `conditions.anxiety.incidence.alpha`. Required for accepted release coverage. |
 | condition_id | string | Extracted endpoint condition identifier. |
 | mapped_prior_id | string | IMM prior condition id used by `src/data/imm-priors.json`. |
 | mission_type | string | Analog/site/mission context. |
@@ -28,6 +29,8 @@ Only rows in this file with `status=accepted`, a named `extractor`, and a named
 | transformation | string | Any transformation from source endpoint to model endpoint. |
 | uncertainty_distribution | string | Distribution or uncertainty model assigned to the parameter. |
 | model_version | string | Model/release version using the row. |
+| acceptance_version | string | Version of the independent adjudication decision. |
+| prior_value_hash | string | Stable hash of the accepted transformed parameter value. |
 | notes | string | Free text caveats. |
 
 ## `incidence_rates.csv` / `incidence_rates.proposals*.csv` — proposal schema
@@ -59,7 +62,11 @@ npm run evidence:status -- --write
 This file records whether the current prior catalog can be described as
 accepted-ledger-derived. The gate is intentionally conservative:
 
-- `acceptedCount > 0` is required.
+- Every active numeric prior parameter path must be covered by one accepted
+  `evidence_ledger.csv` row.
+- Accepted rows must include extractor, independent verifier, endpoint
+  definition, risk-of-bias, transportability, uncertainty distribution,
+  acceptance version, and prior-value hash.
 - `proposalRefCount` must be `0`.
 - `releasePriorsAdjudicated` must be `true` before release priors are described
   as adjudicated analog evidence.
