@@ -73,8 +73,18 @@ _K15_REGRESSION_BRACKETS_PATH = (
 
 
 def _load_k15_regression_brackets() -> dict[str, dict[str, dict[str, Any]]]:
-    with open(_K15_REGRESSION_BRACKETS_PATH) as f:
-        return json.load(f)
+    # F8: prefer the copy bundled inside the installed package (via
+    # importlib.resources) so the validator works when the Python package is
+    # installed standalone, without the TypeScript source tree. Fall back to
+    # the repo-relative src/data path only when running from a checkout where
+    # the package data has not been installed.
+    try:
+        from importlib.resources import files  # Python 3.9+
+        with (files("selectron") / "k15_regression_brackets.json").open("r") as f:
+            return json.load(f)
+    except (FileNotFoundError, ModuleNotFoundError):
+        with open(_K15_REGRESSION_BRACKETS_PATH) as f:
+            return json.load(f)
 
 
 _K15_REGRESSION_BRACKETS = _load_k15_regression_brackets()

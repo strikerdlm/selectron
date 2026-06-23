@@ -25,7 +25,16 @@ const METHOD_LABELS: Record<CrewCompositeMethod, string> = {
   "geometric-mean": "Geometric mean",
 };
 
-/** Single IMM outcome metric display row. */
+/** Single IMM outcome metric display row.
+ *
+ * F11: outcome metrics are rendered in a NEUTRAL color. Stage A is demo-only
+ * and outcome priors are unadjudicated (0 / 4,846 accepted parameter paths),
+ * so favorable/intermediate/warning color bands would falsely imply
+ * validated decision thresholds. `goodIsHigh` is retained only to mark the
+ * direction-of-good in the accessible label; policy thresholds, if ever
+ * defined, must live in a separately versioned, cited configuration rather
+ * than in this presentation logic.
+ */
 function ResultMetric({
   label,
   summary,
@@ -39,17 +48,15 @@ function ResultMetric({
 }) {
   const mean = summary.mean;
   const [lo, hi] = summary.ci95;
-  // Colour logic: if goodIsHigh (e.g. health criterion attainment), green = high; else green = low.
-  const color =
-    goodIsHigh
-      ? mean >= 70 ? "var(--go)" : mean >= 45 ? "var(--signal)" : "var(--warn)"
-      : mean <= 5 ? "var(--go)" : mean <= 20 ? "var(--signal)" : "var(--warn)";
-
   return (
     <div className="flex items-center justify-between gap-2">
       <span className="mono text-[12px] text-ink-2 uppercase tracking-cap">{label}</span>
       <div className="flex items-baseline gap-1.5">
-        <span className="mono text-[16px] tabular-nums font-medium" style={{ color }}>
+        <span
+          className="mono text-[16px] tabular-nums font-medium"
+          style={{ color: "var(--ink-1)" }}
+          aria-label={`${label}: ${mean.toFixed(1)}${unit} (higher is ${goodIsHigh ? "better" : "worse"})`}
+        >
           {mean.toFixed(1)}{unit}
         </span>
         <span className="mono text-[11px] text-ink-3">
@@ -62,15 +69,12 @@ function ResultMetric({
 
 function ScoreBar({ value }: { value: number }) {
   const pct = Math.round(value * 100);
-  const color =
-    pct >= 70 ? "var(--go)" :
-    pct >= 45 ? "var(--signal)" :
-    "var(--warn)";
+  // F11: neutral bar — no implied favorable/warning bands.
   return (
     <div className="relative h-2 w-full overflow-hidden rounded-full" style={{ background: "var(--line)" }}>
       <div
         className="absolute inset-y-0 left-0 rounded-full transition-all duration-300"
-        style={{ width: `${pct}%`, background: color }}
+        style={{ width: `${pct}%`, background: "var(--ink-2)" }}
       />
     </div>
   );
@@ -110,11 +114,12 @@ export function CompositeCrewPanel({
         </span>
       </div>
 
-      {/* Big score display */}
+      {/* Big score display — F11: neutral color; Stage A is demo-only, so no
+          implied favorable/intermediate/warning band. */}
       <div className="flex items-end gap-3">
         <span
           className="display text-5xl tabular-nums"
-          style={{ color: pct >= 70 ? "var(--go)" : pct >= 45 ? "var(--signal)" : "var(--warn)" }}
+          style={{ color: "var(--ink-0)" }}
         >
           {pct}
         </span>

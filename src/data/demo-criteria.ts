@@ -396,6 +396,16 @@ export const DEMO_CRITERION_CATALOG: CriterionCatalog = {
   status: "demo",
   intendedUse:
     "Research demonstration of uncertain-weight MCDA scoring only; not a ratified eligibility or selection instrument.",
+  knownLimitations: [
+    // F10: the NASA Cognition Battery composite (cognitive.nasa_cognition_battery)
+    // explicitly includes a PVT-B subtest, and PVT-B is also scored as a
+    // separate criterion (cognitive.pvt_b_rt_ms). Under the equal-weight
+    // Dirichlet(1,…,1) prior, vigilance is therefore double-weighted relative
+    // to other domains. This is a known construct overlap awaiting author
+    // resolution (drop PVT-B from the composite, or drop the standalone PVT-B
+    // criterion); it does not affect the demo-only status of the catalog.
+    "Vigilance is double-weighted: the NASA Cognition composite includes PVT-B, which is also scored as a standalone criterion (cognitive.pvt_b_rt_ms). Equal Dirichlet(1,…,1) weights therefore over-represent vigilance relative to other domains. Awaiting author resolution.",
+  ],
   criteria: DEMO_CRITERIA,
 };
 

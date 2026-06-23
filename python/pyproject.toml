@@ -29,6 +29,12 @@ dev = [
 [tool.setuptools.packages.find]
 where = ["src"]
 
+# F8: ship the K15 regression-bracket schema inside the package so the Python
+# validator does not navigate out of the installed package into the TypeScript
+# source tree (which is absent when the package is installed standalone).
+[tool.setuptools.package-data]
+selectron = ["k15_regression_brackets.json"]
+
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 markers = [

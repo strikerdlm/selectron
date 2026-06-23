@@ -9,6 +9,16 @@ describe("DEMO_CRITERIA", () => {
     expect(ACTIVE_CRITERION_CATALOG.intendedUse).toContain("not a ratified eligibility or selection instrument");
   });
 
+  // F10: the PVT-B / NASA Cognition construct overlap is documented as a
+  // known limitation on the catalog (author to resolve by dropping one).
+  it("documents the PVT-B double-weighting as a known catalog limitation", () => {
+    expect(ACTIVE_CRITERION_CATALOG.knownLimitations).toBeDefined();
+    expect(ACTIVE_CRITERION_CATALOG.knownLimitations!.length).toBeGreaterThan(0);
+    const joined = ACTIVE_CRITERION_CATALOG.knownLimitations!.join(" ");
+    expect(joined).toContain("double-weighted");
+    expect(joined).toMatch(/pvt.?b/i);
+  });
+
   it("each has unique id, sane scale, and at least one citation", () => {
     const ids = new Set<string>();
     for (const c of DEMO_CRITERIA) {

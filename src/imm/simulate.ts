@@ -52,7 +52,7 @@ import { IMM_CONDITIONS } from "./conditions";
 import { loadIMMPriors } from "./priors";
 import { applyProportionalHazardMultiplier, samplePoisson, sampleLognormal, sampleScaledBetaBernoulli, samplePoissonProcess } from "./incidence";
 import { applyVulnerabilityMultiplier } from "../engine/vulnerability";
-import { zScoreAgainstScale } from "../engine/normalize-cohort";
+import { scaleRelativeScore } from "../engine/normalize-cohort";
 import { sampleGamma } from "../engine/gamma";
 import { sampleSeverity } from "./severity";
 import { sampleBetaPert } from "./outcomes";
@@ -185,7 +185,9 @@ export type IMMTrialOpts = {
  *
  * For each criterion referenced in vulnerabilityCriteria:
  *   1. Look up the criterion in criteriaIndex to get scale + higherIsBetter.
- *   2. Z-score the member's raw score: zScoreAgainstScale(raw, scale).
+ *   2. Scale-relative score: scaleRelativeScore(raw, scale). This is NOT a
+ *      population z-score — it treats the operational scale endpoints as
+ *      ±2 SD (no normative mean/SD supplied).
  *   3. Apply sign convention: higherIsBetter ? z : -z
  *      (HIGH raw on higherIsBetter=true → z>0; with β<0 → exp<1 → λ↓).
  *   4. Look up the operator-supplied scenario β from FAMILY_BETA (default -0.2).
@@ -220,7 +222,7 @@ export function applyStageAVulnerabilityMultiplier(
     if (raw === undefined || !Number.isFinite(raw)) continue;
     const c = criteriaIndex.get(cid);
     if (!c) continue;
-    const zRaw = zScoreAgainstScale(raw, c.scale);
+    const zRaw = scaleRelativeScore(raw, c.scale);
     const zSigned = c.higherIsBetter ? zRaw : -zRaw;
     beta[cid] = familyBeta;
     z[cid] = zSigned;

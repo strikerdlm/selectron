@@ -66,4 +66,10 @@ export type CriterionCatalog = {
   status: CriterionCatalogStatus;
   intendedUse: string;
   criteria: readonly Criterion[];
+  /**
+   * Known construct limitations the user must be aware of (e.g. overlapping
+   * constructs that double-weight a domain under equal per-criterion weights).
+   * Optional for backward compatibility.
+   */
+  knownLimitations?: readonly string[];
 };
