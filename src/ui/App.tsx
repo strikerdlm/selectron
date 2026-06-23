@@ -6,7 +6,6 @@ import { ThemeToggle } from "./theme/ThemeToggle";
 import { createCandidate } from "@/db/repository";
 import { Dashboard } from "./views/Dashboard";
 import { Wizard } from "./views/Wizard";
-import { Sim } from "./views/Sim";
 import { CrewComposition } from "./views/CrewComposition";
 import { Calibration } from "./views/Calibration";
 import { Analysis } from "./views/Analysis";
@@ -19,7 +18,6 @@ const SEED_SAMPLER = 0xc0ffee;
 type View =
   | { kind: "dashboard" }
   | { kind: "wizard"; candidateId: string; step: 0 | 1 | 2 | 3 }
-  | { kind: "sim"; candidateId: string }
   | { kind: "crew-composition" }
   | { kind: "calibration" }
   | { kind: "analysis" };
@@ -165,7 +163,6 @@ export function App() {
                 setView({ kind: "wizard", candidateId: c.id, step: 0 });
               }}
               onEditCandidate={(id) => setView({ kind: "wizard", candidateId: id, step: 2 })}
-              onSimCandidate={(id) => setView({ kind: "sim", candidateId: id })}
             />
           )}
           {view.kind === "wizard" && (
@@ -177,18 +174,7 @@ export function App() {
                 candidateId={view.candidateId}
                 initialStep={view.step}
                 onExitToDashboard={() => setView({ kind: "dashboard" })}
-                onExitToSim={(id) => setView({ kind: "sim", candidateId: id })}
-              />
-            </ErrorBoundary>
-          )}
-          {view.kind === "sim" && (
-            <ErrorBoundary
-              fallbackLabel="The Sim view crashed during render — your simulation IS saved, this is a display bug"
-              onReset={() => setView({ kind: "dashboard" })}
-            >
-              <Sim
-                candidateId={view.candidateId}
-                onBackToReview={() => setView({ kind: "wizard", candidateId: view.candidateId, step: 2 })}
+                onOpenCrewComposition={() => setView({ kind: "crew-composition" })}
               />
             </ErrorBoundary>
           )}

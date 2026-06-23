@@ -3,9 +3,7 @@ import type { DbCandidate } from "@/db/schema";
 
 type Props = {
   candidate: DbCandidate;
-  lastChi?: number;
   onEdit: (id: string) => void;
-  onSim: (id: string) => void;
   onDelete: (id: string) => void;
 };
 
@@ -21,7 +19,7 @@ function relativeTime(iso: string): string {
   return `${d}d`;
 }
 
-export function CandidateCard({ candidate, lastChi, onEdit, onSim, onDelete }: Props) {
+export function CandidateCard({ candidate, onEdit, onDelete }: Props) {
   const [menuOpen, setMenuOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
 
@@ -37,7 +35,6 @@ export function CandidateCard({ candidate, lastChi, onEdit, onSim, onDelete }: P
   }, [menuOpen]);
 
   const isDraft = candidate.status === "draft";
-  const pct = lastChi !== undefined ? (100 * lastChi).toFixed(1) : null;
 
   return (
     <div
@@ -73,15 +70,11 @@ export function CandidateCard({ candidate, lastChi, onEdit, onSim, onDelete }: P
 
       <div className="hairline mx-3" />
 
-      {/* METRICS — CHI + relative-time in one compact row */}
+      {/* METRICS — status + relative-time in one compact row */}
       <div className="flex items-center justify-between px-3 py-2 gap-3">
         <div className="min-w-0">
-          <div className="mono text-[11px] text-ink-3 leading-none">CHI</div>
-          {pct !== null ? (
-            <div className="mono text-[15px] text-signal tabular-nums leading-tight">{pct}%</div>
-          ) : (
-            <div className="mono text-[13px] text-ink-3 leading-tight">—</div>
-          )}
+          <div className="mono text-[11px] text-ink-3 leading-none">stage</div>
+          <div className="mono text-[13px] text-ink-2 leading-tight">MCDA</div>
         </div>
         <div className="text-right">
           <div className="mono text-[11px] text-ink-3 leading-none">updated</div>
@@ -97,18 +90,6 @@ export function CandidateCard({ candidate, lastChi, onEdit, onSim, onDelete }: P
         <span className="mono text-[10px] text-ink-3 truncate flex-1">{candidate.id.slice(0, 6)}…</span>
 
         <div className="flex items-center gap-1 shrink-0">
-          <button
-            type="button"
-            onClick={(e) => {
-              e.stopPropagation();
-              onSim(candidate.id);
-            }}
-            className="mono uppercase tracking-cap text-[11px] px-2 py-0.5 border border-line
-              text-ink-2 hover:border-signal hover:text-signal transition-colors rounded-sm"
-          >
-            sim
-          </button>
-
           <div className="relative" ref={menuRef}>
             <button
               type="button"

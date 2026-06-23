@@ -9,7 +9,7 @@ export const STEP_LABELS: Record<WizardStep, string> = {
   0: "Identity",
   1: "Criteria",
   2: "Review",
-  3: "Mission & sim",
+  3: "Team handoff",
 };
 
 type WizardState = {

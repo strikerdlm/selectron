@@ -178,7 +178,7 @@ function mcdaSteps(args: {
         "The current app does not learn criterion weights from expert or outcome data. It samples plausible positive weight vectors that sum to 1 from an explicit Dirichlet prior. Using α = (1, …, 1) says 'no prior preference' across criteria.",
       citation: {
         id: "A6 methodology precedents",
-        label: "Bayesian MCDA — Dirichlet weight prior",
+        label: "Uncertain-weight MCDA — Dirichlet weight prior",
       },
     },
     {
@@ -217,7 +217,7 @@ function mcdaSteps(args: {
       concrete: (
         <span>
           MCDA mean μ = {fmt(posterior.mean, 3)} · interval₉₀ = [
-          {fmt(posterior.ci90[0], 3)}, {fmt(posterior.ci90[1], 3)}] · CI₉₅ = [
+          {fmt(posterior.ci90[0], 3)}, {fmt(posterior.ci90[1], 3)}] · interval₉₅ = [
           {fmt(posterior.ci95[0], 3)}, {fmt(posterior.ci95[1], 3)}] · draws ={" "}
           {posterior.ess.toFixed(0)}
         </span>

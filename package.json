@@ -16,7 +16,9 @@
     "verify:e2e": "playwright test",
     "calibrate:imm": "tsx scripts/calibrate_imm_priors.ts",
     "validate:imm": "tsx scripts/validate_imm.ts",
-    "validate:imm:analog": "vitest run tests/imm/analog_45d_unscreened_crew.test.ts tests/imm/analog_90d_crew_archetypes.test.ts tests/imm/posterior_predictive.test.ts"
+    "validate:imm:analog": "vitest run tests/imm/analog_45d_unscreened_crew.test.ts tests/imm/analog_90d_crew_archetypes.test.ts tests/imm/posterior_predictive.test.ts",
+    "evidence:status": "tsx scripts/evidence_status.ts",
+    "evidence:require-adjudicated": "tsx scripts/evidence_status.ts --require-adjudicated"
   },
   "dependencies": {
     "dexie": "^4.4.2",

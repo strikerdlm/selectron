@@ -33,7 +33,13 @@ function Breadcrumb({
   );
 }
 
-function WizardBody({ onExitToDashboard, onExitToSim }: { onExitToDashboard: () => void; onExitToSim: () => void }) {
+function WizardBody({
+  onExitToDashboard,
+  onOpenCrewComposition,
+}: {
+  onExitToDashboard: () => void;
+  onOpenCrewComposition: () => void;
+}) {
   const { step, candidate, accessTier, setAccessTier, enqueueCandidatePatch } = useWizard();
   if (!candidate) return <div className="p-12 text-ink-2">loading candidate…</div>;
 
@@ -48,9 +54,7 @@ function WizardBody({ onExitToDashboard, onExitToSim }: { onExitToDashboard: () 
         {step === 0 && <StepIdentity />}
         {step === 1 && <StepCriteria />}
         {step === 2 && <StepReview />}
-        {step === 3 && (
-          <StepMissionSim onRunComplete={() => onExitToSim()} />
-        )}
+        {step === 3 && <StepMissionSim onOpenCrewComposition={onOpenCrewComposition} />}
       </div>
       <div className="mt-6 flex items-center justify-between">
         <button onClick={onExitToDashboard} className="mono text-[13px] uppercase text-ink-2 hover:text-ink-0">
@@ -76,13 +80,13 @@ export function Wizard(props: {
   candidateId: string;
   initialStep: WizardStep;
   onExitToDashboard: () => void;
-  onExitToSim: (id: string) => void;
+  onOpenCrewComposition: () => void;
 }) {
   return (
     <WizardProvider candidateId={props.candidateId} initialStep={props.initialStep}>
       <WizardBody
         onExitToDashboard={props.onExitToDashboard}
-        onExitToSim={() => props.onExitToSim(props.candidateId)}
+        onOpenCrewComposition={props.onOpenCrewComposition}
       />
     </WizardProvider>
   );

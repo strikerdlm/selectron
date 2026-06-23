@@ -16,17 +16,15 @@ from pathlib import Path
 _REPO_ROOT = Path(__file__).parent.parent.resolve()
 sys.path.insert(0, str(_REPO_ROOT / "python" / "src"))
 
-from selectron.fitter import fit_all_tier_b, fit_all_tier_c, FitResult
-from selectron.writer import merge_fitted_priors
-
 _BRIDGES_DIR = _REPO_ROOT / "research" / "evidence" / "bridges"
+_EVIDENCE_LEDGER = _REPO_ROOT / "research" / "evidence_extracted" / "evidence_ledger.csv"
 
 logging.basicConfig(level=logging.INFO, format="%(levelname)s %(name)s %(message)s")
 logger = logging.getLogger("apply_fit")
 
 
 def write_diagnostics(
-    result: FitResult,
+    result,
     reasons: list[str],
     bridges_dir: Path = _BRIDGES_DIR,
 ) -> None:
@@ -50,6 +48,16 @@ def write_diagnostics(
     logger.info("Diagnostics written: %s", out)
 
 
+def accepted_evidence_count(path: Path = _EVIDENCE_LEDGER) -> int:
+    """Count adjudicated ledger rows available for release-prior fitting."""
+    if not path.exists():
+        return 0
+    with path.open(newline="", encoding="utf-8") as handle:
+        import csv
+
+        return sum(1 for row in csv.DictReader(handle) if row.get("status") == "accepted")
+
+
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--dry-run", action="store_true")
@@ -61,6 +69,17 @@ def main() -> int:
         help="Exploratory only: fit from proposal CSVs instead of accepted evidence ledger",
     )
     args = parser.parse_args()
+
+    if not args.allow_proposals and accepted_evidence_count() == 0:
+        logger.error(
+            "No accepted evidence rows found in %s. Release-prior fitting is blocked; "
+            "use --allow-proposals only for explicitly exploratory proposal-stage fits.",
+            _EVIDENCE_LEDGER.relative_to(_REPO_ROOT),
+        )
+        return 2
+
+    from selectron.fitter import fit_all_tier_b, fit_all_tier_c
+    from selectron.writer import merge_fitted_priors
 
     if args.tier == "B":
         logger.info("Running tier-B fit (dry_run=%s, condition_filter=%s)", args.dry_run, args.condition)

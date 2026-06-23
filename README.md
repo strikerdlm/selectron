@@ -36,14 +36,22 @@ Selectron combines four pieces that are kept in one source tree:
 
 - **Stage A: uncertain-weight MCDA selection scoring** in `src/engine/`. Candidate totals are score distributions induced by Dirichlet-distributed criterion weights and normalized criterion scores. They are not learned Bayesian posteriors unless a separate elicitation/inference model is added.
 - **Stage B: analog mission medical-event simulation** in `src/imm/`. The current IMM-style calculator uses a 101-condition prior set, structured analog mission profiles, resource-kit configuration, and chronological event processing.
-- **A browser application** in Vite + React + Tailwind + ECharts. The main surfaces are Dashboard, Wizard, Sim, Crew Composition, Calibration, and Analysis.
-- **Evidence and reproducibility tooling** in `research/`, `python/`, `paper/`, and `docs/`. Release fitting now reads only adjudicated rows from `research/evidence_extracted/evidence_ledger.csv`; proposal CSVs require an explicit exploratory flag.
+- **A browser application** in Vite + React + Tailwind + ECharts. The main surfaces are Dashboard, Wizard, Crew Composition, Calibration, and Analysis.
+- **Evidence and reproducibility tooling** in `research/`, `python/`, `paper/`, and `docs/`. Release fitting reads only adjudicated rows from `research/evidence_extracted/evidence_ledger.csv`; proposal CSVs require an explicit exploratory flag. The current ledger has no accepted rows, so the existing prior catalog must be treated as unadjudicated for analog-outcome validation claims.
 
 The public repository is `https://github.com/strikerdlm/selectron`. The public software archive is on Zenodo at `https://doi.org/10.5281/zenodo.20693257`. The version of record remains **v0.5.6** across `package.json`, `CITATION.cff`, `src/version.ts`, app chrome, and the manuscript source. `CHANGELOG.md` also documents a post-release **0.5.7 frontend pass**: persisted light/dark theme, +2 pt live-app type scale, and a five-figure Analysis tab.
 
 ## Current State
 
-`STATUS.md` is the live tracker. As of **2026-06-22**, the active application branch has been retargeted to space-analog missions only. The Crew Composition workflow defaults to analog mission profiles, default-off trait-to-incidence coupling, analog outcome estimates, and accepted-only evidence fitting. ISS remains available as a developer benchmark, not as the primary analog workflow.
+`STATUS.md` is the live tracker. As of **2026-06-23**, the active application branch has been retargeted to space-analog missions only. The Wizard stops at Stage-A candidate scoring and hands off to Crew Composition for team-level scenario analysis. Crew Composition defaults to analog mission profiles, default-off trait-to-incidence coupling, and analog outcome estimates. ISS remains available as a developer benchmark, not as the primary analog workflow.
+
+Evidence status is machine-readable at `research/evidence_extracted/evidence_status.json` and can be regenerated with:
+
+```bash
+npm run evidence:status -- --write
+```
+
+Current status: `acceptedCount = 0`, `proposalRefCount = 7`, `releasePriorsAdjudicated = false`. Do not describe release priors as accepted-ledger-derived until independently adjudicated rows are added.
 
 The rendered files in `paper/submission/manuscript.docx` and `paper/submission/cover-letter.docx` are stale because they were rebuilt on 2026-06-11 before later Acta-source and analog-only implementation revisions. Rebuild them before any journal upload.
 
@@ -137,7 +145,7 @@ where `x_i,k` is the raw score for criterion `k`, `z(...)` is the criterion-spec
 
 The TypeScript sampler uses the standard Dirichlet construction: independent Gamma(alpha_k, 1) draws are normalized by their sum. The implementation is tested against closed-form Dirichlet moments, Kolmogorov-Smirnov marginal checks, effective-sample diagnostics, and alpha0 robustness cases in `tests/engine/`.
 
-Incomplete Stage-A records are blocked in the wizard. Missing criterion values are no longer silently replaced with worst-case scores.
+Incomplete Stage-A records are blocked in the wizard. Missing criterion values are no longer silently replaced with worst-case scores. The candidate Wizard does not run Stage-B medical simulation and does not clone a candidate into a synthetic crew.
 
 ### Stage B: Analog Mission Simulation
 

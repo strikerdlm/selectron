@@ -78,10 +78,10 @@ export function ScenarioSelector({ value, onChange, disabled = false }: Props) {
 
       <p className="mt-3 mono text-[12px] text-ink-3 leading-relaxed">
         switching tier changes BOTH the criteria list AND the instrument used for each one.
-        The Bayesian MCDA aggregation runs against whatever subset is active — the posterior
-        is always internally honest about which tests the program actually measured.
-        Mathematical detail: the Dirichlet mean weight per criterion is 1/K (K = number of
-        active criteria), so a Tier-1 criterion carries weight 1/8 vs 1/12 at Tier-3.
+        The uncertain-weight MCDA aggregation runs against whatever subset is active, so the
+        score distribution is conditional on which tests the program actually measured.
+        Mathematical detail: production uses a symmetric Dirichlet(1,…,1) weight prior.
+        Its mean weight per criterion is 1/K, where K is the number of active criteria.
       </p>
     </div>
   );

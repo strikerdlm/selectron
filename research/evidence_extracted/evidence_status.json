@@ -1,0 +1,19 @@
+{
+  "ledgerPath": "research/evidence_extracted/evidence_ledger.csv",
+  "priorsPath": "src/data/imm-priors.json",
+  "acceptedCount": 0,
+  "proposalCount": 0,
+  "proposalRefCount": 7,
+  "proposalRefConditionIds": [
+    "ankle-sprain-strain",
+    "anxiety",
+    "dental-abscess",
+    "dental-caries",
+    "herpes-zoster-reactivation-shingles",
+    "nephrolithiasis",
+    "urinary-tract-infection"
+  ],
+  "releasePriorsAdjudicated": false,
+  "status": "unadjudicated",
+  "message": "No adjudicated analog evidence release is available; proposal-stage references remain exploratory."
+}

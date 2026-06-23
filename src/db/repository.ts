@@ -58,10 +58,7 @@ export async function updateCandidate(
 export async function deleteCandidate(id: string): Promise<void> {
   await db.transaction(
     "rw",
-    db.candidates,
-    db.criterionEntries,
-    db.simSessions,
-    db.attachments,
+    [db.candidates, db.criterionEntries, db.simSessions, db.immSessions, db.attachments],
     async () => {
       // Collect attachment ids referenced by this candidate's entries before deletion.
       const entries = await db.criterionEntries.where("candidateId").equals(id).toArray();
@@ -72,6 +69,7 @@ export async function deleteCandidate(id: string): Promise<void> {
       await db.candidates.delete(id);
       await db.criterionEntries.where("candidateId").equals(id).delete();
       await db.simSessions.where("candidateId").equals(id).delete();
+      await db.immSessions.where("candidateId").equals(id).delete();
 
       // For each attachment that was referenced by the deleted entries, check
       // whether any OTHER entry (from a different candidate) still references it.
@@ -308,6 +306,7 @@ export type DbDump = {
   criterionEntries: CriterionEntry[];
   attachments: Array<Omit<Attachment, "blob"> & { blobBase64: string }>;
   simSessions: SimSession[];
+  immSessions: IMMSession[];
 };
 
 async function blobToBase64(blob: Blob): Promise<string> {
@@ -326,10 +325,11 @@ function base64ToBlob(b64: string, mime: string): Blob {
 }
 
 export async function exportDb(): Promise<DbDump> {
-  const [candidates, criterionEntries, simSessions, attachments] = await Promise.all([
+  const [candidates, criterionEntries, simSessions, immSessions, attachments] = await Promise.all([
     db.candidates.toArray(),
     db.criterionEntries.toArray(),
     db.simSessions.toArray(),
+    db.immSessions.toArray(),
     db.attachments.toArray(),
   ]);
   const encodedAttachments = await Promise.all(
@@ -348,6 +348,7 @@ export async function exportDb(): Promise<DbDump> {
     candidates,
     criterionEntries,
     simSessions,
+    immSessions,
     attachments: encodedAttachments,
   };
 }
@@ -360,18 +361,17 @@ export async function importDb(dump: DbDump): Promise<void> {
   }
   await db.transaction(
     "rw",
-    db.candidates,
-    db.criterionEntries,
-    db.simSessions,
-    db.attachments,
+    [db.candidates, db.criterionEntries, db.simSessions, db.immSessions, db.attachments],
     async () => {
       await db.candidates.clear();
       await db.criterionEntries.clear();
       await db.simSessions.clear();
+      await db.immSessions.clear();
       await db.attachments.clear();
       await db.candidates.bulkAdd(dump.candidates);
       await db.criterionEntries.bulkAdd(dump.criterionEntries);
       await db.simSessions.bulkAdd(dump.simSessions);
+      await db.immSessions.bulkAdd(dump.immSessions ?? []);
       const restoredAttachments = dump.attachments.map((a) => ({
         id: a.id,
         filename: a.filename,

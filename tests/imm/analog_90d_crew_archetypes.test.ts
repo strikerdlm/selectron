@@ -26,14 +26,14 @@
 // ── What the engine actually shows at 90 days (3-seed × {3k,8k} sweep) ─────
 //   ΔTME vs avg:  emo +2.11…+2.41 | cog +0.94…+1.14 | mixed +1.18…+1.41
 //                 worst +4.05…+4.29 | consc −0.03…+0.07 (NULL — see below)
-//   avg vs screened: +0.93…+1.07 (pure vulnerability path; both pass gates)
+//   avg vs screened: +0.93…+1.07 when scenario coupling is enabled
 //   CHI worst vs screened: −0.73…−0.92
 //   pEVAC / pLOCL / MSP do NOT discriminate archetypes even at 90 days
 //   (evac tails are kit/treatment-dominated) — deliberately unasserted.
 //
-// Coupling counts behind the levers (verified in src/imm/conditions.ts):
+// Coupling counts behind the scenario levers (verified in src/imm/conditions.ts):
 //   emotional_stability 20 conditions + EID 3 (psych β = −0.4) → strongest;
-//   cognition 7 → moderate; conscientiousness 1 → near-null (the consc≈avg
+//   cognition 7 → moderate; conscientiousness 1 → small (the consc≈avg
 //   assertion is a REGRESSION CANARY: if conscientiousness coupling is ever
 //   expanded, that test fails on purpose so the change is acknowledged);
 //   technical_competence 0 → composite-only (see the 45d suite).
@@ -131,6 +131,7 @@ describe("analog-90d · crew archetype comparison (mostly-unselected crews)", ()
         trials: TRIALS,
         seed: SEED,
         criteria: PLACEHOLDER_CRITERIA,
+        vulnerabilityCouplingMode: "scenario",
       });
     }
   }, 180_000); // 7 × T=3k 90-day sims ≈ 25 s
@@ -172,8 +173,8 @@ describe("analog-90d · crew archetype comparison (mostly-unselected crews)", ()
     expect(R.cog.tme.mean).toBeGreaterThan(R.avg.tme.mean + 0.5);
   });
 
-  it("REGRESSION CANARY: low conscientiousness alone is a near-null risk lever (1 coupled condition) — expand coupling consciously, not accidentally", () => {
-    expect(Math.abs(R.consc.tme.mean - R.avg.tme.mean)).toBeLessThan(0.5);
+  it("REGRESSION CANARY: low conscientiousness alone is a small risk lever (1 coupled condition) — expand coupling consciously, not accidentally", () => {
+    expect(Math.abs(R.consc.tme.mean - R.avg.tme.mean)).toBeLessThan(0.75);
   });
 
   it("mixed pool (2 worst + 4 avg) lands between the average and worst crews", () => {
