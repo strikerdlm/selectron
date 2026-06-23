@@ -3,7 +3,7 @@ import type { ConditionSummary, ConditionsListResponse, Provenance } from "@/api
 import { listConditions } from "@/api/calibration";
 
 const PROVENANCE_META: Record<Provenance, { label: string; color: string }> = {
-  "tierA-nasa": { label: "NASA", color: "text-sky-400" },
+  "tierA-nasa": { label: "NASA-attributed", color: "text-sky-400" },
   "tierB-lit": { label: "Lit", color: "text-signal" },
   "tierB-pymc": { label: "PyMC", color: "text-signal-bright" },
   "tierC-synth": { label: "Synth", color: "text-ink-3" },
@@ -20,8 +20,9 @@ function provenanceBadge(p: Provenance) {
 }
 
 // The Status column reflects HOW a condition's prior was produced, not its quality.
-// tier-A NASA values are authoritative and intentionally not refit, so they must
-// read as "NASA-sourced" rather than a bare "—" (which looks like missing data).
+// Public NASA papers do not expose per-condition iMED rates, so tier-A rows are
+// NASA-publication-attributed Selectron priors rather than authoritative NASA
+// database values.
 function statusCell(c: ConditionSummary) {
   if (c.fitted) {
     return (
@@ -49,10 +50,10 @@ function statusCell(c: ConditionSummary) {
     return (
       <span
         className="flex items-center gap-1.5"
-        title="Authoritative NASA Integrated Medical Model value — no PyMC fit required (tier A is above tier B)."
+        title="NASA-publication-attributed Selectron prior. Public IMM papers do not expose per-condition iMED rates; no PyMC refit is run for this tier."
       >
         <span className="w-2 h-2 rounded-full bg-sky-400/60" />
-        <span className="mono text-[12px] uppercase tracking-cap text-sky-400/80">NASA-sourced</span>
+        <span className="mono text-[12px] uppercase tracking-cap text-sky-400/80">NASA-attributed</span>
       </span>
     );
   }
@@ -131,7 +132,7 @@ export function ConditionsPanel() {
         <div className="flex items-baseline gap-x-3">
           <h3 className="display text-xl text-ink-0 tracking-tight">Conditions</h3>
           <span className="label text-ink-3">
-            {data?.n_total} total · {data?.n_fitted ?? 0} fitted · {provCounts["tierA-nasa"] ?? 0} NASA-sourced · {data?.n_fittable} fittable
+            {data?.n_total} total · {data?.n_fitted ?? 0} fitted · {provCounts["tierA-nasa"] ?? 0} NASA-attributed · {data?.n_fittable} fittable
           </span>
         </div>
         <div className="flex items-center gap-3">

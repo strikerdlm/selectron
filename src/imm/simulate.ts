@@ -65,7 +65,7 @@ import type { Criterion } from "../types";
  * Negative β: HIGH-quality candidate (z>0 on higherIsBetter criteria) → exp(β·z) < 1 → λ↓.
  * Magnitudes calibrated so a ±2 SD spread produces a 2–4× incidence multiplier spread.
  * Same values as SYNTHETIC_PRIORS in src/data/synthetic-iter3.ts — these are the
- * authoritative operational values pending Phase 3B PyMC fit.
+ * operator-supplied scenario defaults, not accepted-ledger calibrated coefficients.
  */
 export const FAMILY_BETA: Partial<Record<IMMConditionFamily, number>> = {
   psychiatric:      -0.4,
@@ -149,6 +149,13 @@ export type IMMTrialOpts = {
    */
   criteriaIndex?: ReadonlyMap<string, Criterion>;
   /**
+   * Scenario-analysis-only multiplier for FAMILY_BETA magnitudes.
+   * Ignored unless vulnerabilityCouplingMode === "scenario". 0 disables
+   * trait-to-incidence modulation; 1 keeps the current operator-supplied
+   * defaults. Negative and non-finite values fall back to 1.
+   */
+  familyBetaScale?: number;
+  /**
    * peer-review-2 §4.5: Leave-calibrated-out sensitivity analysis.
    * When provided, only conditions for which this callback returns true are
    * included in the simulation. Applied once before the trial loop for performance.
@@ -180,7 +187,7 @@ export type IMMTrialOpts = {
  *   2. Z-score the member's raw score: zScoreAgainstScale(raw, scale).
  *   3. Apply sign convention: higherIsBetter ? z : -z
  *      (HIGH raw on higherIsBetter=true → z>0; with β<0 → exp<1 → λ↓).
- *   4. Look up family β from FAMILY_BETA (default -0.2).
+ *   4. Look up the operator-supplied scenario β from FAMILY_BETA (default -0.2).
  *
  * Returns modifiedLambda = applyVulnerabilityMultiplier(baseLambda, beta, z).
  * Falls through to baseLambda when no criteria are present or no stageAScores.
@@ -194,12 +201,14 @@ export function applyStageAVulnerabilityMultiplier(
   family: IMMConditionFamily,
   vulnerabilityCriteria: string[],
   criteriaIndex: ReadonlyMap<string, Criterion>,
+  familyBetaScale = 1.0,
 ): number {
   if (vulnerabilityCriteria.length === 0 || !member.stageAScores) return baseLambda;
 
   const beta: Record<string, number> = {};
   const z: Record<string, number> = {};
-  const familyBeta = FAMILY_BETA[family] ?? FAMILY_BETA_DEFAULT;
+  const safeScale = Number.isFinite(familyBetaScale) && familyBetaScale >= 0 ? familyBetaScale : 1.0;
+  const familyBeta = (FAMILY_BETA[family] ?? FAMILY_BETA_DEFAULT) * safeScale;
 
   for (const cid of vulnerabilityCriteria) {
     const raw = member.stageAScores[cid];
@@ -331,12 +340,13 @@ function sampleGeneralPoissonCount(
   vulnerabilityCriteria: string[],
   criteriaIndex: ReadonlyMap<string, Criterion>,
   tierMult: number = 1.0,
+  familyBetaScale = 1.0,
 ): number {
   const inc = prior.incidence;
   if (inc.distribution === "Lognormal-Poisson") {
     const lambdaPerDay = sampleLognormal(rng, inc.mu_log_lambda!, inc.sigma_log_lambda!);
     const rfmLambda = applyRiskFactorMultiplier(lambdaPerDay, member, prior);
-    const modLambda = applyStageAVulnerabilityMultiplier(rfmLambda, member, family, vulnerabilityCriteria, criteriaIndex);
+    const modLambda = applyStageAVulnerabilityMultiplier(rfmLambda, member, family, vulnerabilityCriteria, criteriaIndex, familyBetaScale);
     // rev3-b-followup: tierMult applied at the λ-sampling site → Poisson(λ · tierMult)
     // preserves both mean *and* variance (Var = λ · tierMult, not mult² · λ which
     // is what post-count stochastic rounding produced).
@@ -345,7 +355,7 @@ function sampleGeneralPoissonCount(
   if (inc.distribution === "Gamma-Poisson") {
     const lambdaPerDay = sampleGamma(inc.alpha!, rng) / inc.beta!;
     const rfmLambda = applyRiskFactorMultiplier(lambdaPerDay, member, prior);
-    const modLambda = applyStageAVulnerabilityMultiplier(rfmLambda, member, family, vulnerabilityCriteria, criteriaIndex);
+    const modLambda = applyStageAVulnerabilityMultiplier(rfmLambda, member, family, vulnerabilityCriteria, criteriaIndex, familyBetaScale);
     return samplePoisson(rng, modLambda * durationDays * tierMult);
   }
   // Fixed: already handled inline in the caller (lambda_fixed is a rate-per-day too)
@@ -399,6 +409,13 @@ export function runIMMTrial(
     opts.vulnerabilityCouplingMode === "scenario"
       ? opts.criteriaIndex ?? new Map()
       : new Map();
+  const familyBetaScale =
+    opts.vulnerabilityCouplingMode === "scenario" &&
+    opts.familyBetaScale !== undefined &&
+    Number.isFinite(opts.familyBetaScale) &&
+    opts.familyBetaScale >= 0
+      ? opts.familyBetaScale
+      : 1.0;
   // peer-review-2 §4.5 + 2026-06-05 terrestrial guard: filter active conditions
   // once per trial (not per-crew-member) for O(|conditions|) overhead.
   // For terrestrial analog missions, space-only processTypes and ECLSS-specific
@@ -466,12 +483,12 @@ export function runIMMTrial(
           // 2026-06-04: kindMult threaded into effectiveMult.
           const baseLambdaPerDay = prior.incidence.lambda_fixed!;
           const rfmLambdaPerDay = applyRiskFactorMultiplier(baseLambdaPerDay, member, prior);
-          const modLambdaPerDay = applyStageAVulnerabilityMultiplier(rfmLambdaPerDay, member, cond.family, cond.vulnerabilityCriteria, criteriaIndex);
+          const modLambdaPerDay = applyStageAVulnerabilityMultiplier(rfmLambdaPerDay, member, cond.family, cond.vulnerabilityCriteria, criteriaIndex, familyBetaScale);
           count = samplePoisson(rng, modLambdaPerDay * mission.durationDays * effectiveMult);
         } else {
           // Gamma-Poisson / Lognormal-Poisson: draw λ/day from hierarchical prior, apply RFM,
           // optional scenario Stage A multiplier, then scale by mission duration before Poisson sampling.
-          count = sampleGeneralPoissonCount(rng, prior, member, mission.durationDays, cond.family, cond.vulnerabilityCriteria, criteriaIndex, effectiveMult);
+          count = sampleGeneralPoissonCount(rng, prior, member, mission.durationDays, cond.family, cond.vulnerabilityCriteria, criteriaIndex, effectiveMult, familyBetaScale);
         }
       } else if (cond.processType === "space-adaptation-once") {
         // T24: once-per-mission cap — skip if this crew member already had this condition.
@@ -674,6 +691,11 @@ export function simulateIMM(opts: {
   criteria?: readonly Criterion[];
   vulnerabilityCouplingMode?: VulnerabilityCouplingMode;
   /**
+   * Scenario-analysis-only multiplier for FAMILY_BETA magnitudes.
+   * Ignored unless vulnerabilityCouplingMode === "scenario".
+   */
+  familyBetaScale?: number;
+  /**
    * When true, returns per-trial CHI samples (percent scale) in
    * `outcome.diagnostics.chiSamples`. Used by R-hat convergence tests.
    * Omit or set false in production to avoid retaining a large array.
@@ -735,6 +757,7 @@ export function simulateIMM(opts: {
       // Empty object / missing keys → 1.0 fallthrough in runIMMTrial.
       kindMultipliers: effectiveKindMults,
       vulnerabilityCouplingMode: opts.vulnerabilityCouplingMode ?? "off",
+      familyBetaScale: opts.familyBetaScale,
       criteriaIndex,
       conditionFilter: opts.conditionFilter,
     });

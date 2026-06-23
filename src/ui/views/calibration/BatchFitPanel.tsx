@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { ConditionCombobox } from "./ConditionCombobox";
 import { type FitResult } from "@/api/calibration";
 import { useCalibrationJobs } from "@/contexts/CalibrationJobsContext";
+import evidenceStatus from "@/data/evidence-status.json";
 
 function fmtDuration(ms: number): string {
   const s = Math.floor(ms / 1000);
@@ -55,6 +56,17 @@ export function BatchFitPanel() {
           <h3 className="display text-xl text-ink-0 tracking-tight">Batch Fit</h3>
           <span className="label text-ink-3">PyMC NUTS · Gamma-Poisson</span>
         </div>
+
+        {!evidenceStatus.releasePriorsAdjudicated && (
+          <div className="border border-warn/40 bg-warn/5 px-3 py-2 mb-5">
+            <p className="mono text-[12px] uppercase tracking-cap text-warn mb-1">
+              Evidence ledger not release-ready
+            </p>
+            <p className="text-sm text-ink-2">
+              Fitting uses accepted rows only and skips uncovered conditions unless they are run through proposal tooling outside this UI.
+            </p>
+          </div>
+        )}
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-5">
           {[

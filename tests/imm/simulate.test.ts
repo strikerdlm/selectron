@@ -468,6 +468,42 @@ describe("applyStageAVulnerabilityMultiplier (IC-5)", () => {
     expect(result).toBeGreaterThan(1.0);
   });
 
+  it("familyBetaScale=0 disables scenario trait modulation", () => {
+    const member: IMMCrewMember = {
+      id: "m", sex: "male", contacts: false, crowns: false,
+      CAC_positive: false, abdominal_surgery_history: false,
+      EVA_eligible: false, EVA_count: 0,
+      stageAScores: { "psych.score_a": 0 },
+    };
+    const result = applyStageAVulnerabilityMultiplier(
+      1.0,
+      member,
+      "psychiatric" as IMMConditionFamily,
+      ["psych.score_a"],
+      criteriaIndex,
+      0,
+    );
+    expect(result).toBeCloseTo(1.0, 5);
+  });
+
+  it("familyBetaScale linearly scales the β exponent", () => {
+    const member: IMMCrewMember = {
+      id: "m", sex: "male", contacts: false, crowns: false,
+      CAC_positive: false, abdominal_surgery_history: false,
+      EVA_eligible: false, EVA_count: 0,
+      stageAScores: { "psych.score_a": 0 },
+    };
+    const result = applyStageAVulnerabilityMultiplier(
+      1.0,
+      member,
+      "psychiatric" as IMMConditionFamily,
+      ["psych.score_a"],
+      criteriaIndex,
+      0.5,
+    );
+    expect(result).toBeCloseTo(Math.exp(0.4 * 2 * 0.5), 5);
+  });
+
   it("midpoint score produces multiplier ≈ 1.0 (no modulation at z=0)", () => {
     // score=50 → z=0 → exp(0) = 1.0 → no modulation
     const member: IMMCrewMember = {

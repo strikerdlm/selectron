@@ -62,6 +62,7 @@ export type PosteriorPredictiveOpts = {
   tierBMultiplier?: number;
   tierCMultiplier?: number;
   vulnerabilityCouplingMode?: VulnerabilityCouplingMode;
+  familyBetaScale?: number;
 };
 
 /**
@@ -206,6 +207,7 @@ export function posteriorPredictiveSimulateIMM(
       tierBMultiplier: opts.tierBMultiplier,
       tierCMultiplier: opts.tierCMultiplier,
       vulnerabilityCouplingMode: opts.vulnerabilityCouplingMode ?? "off",
+      familyBetaScale: opts.familyBetaScale,
     });
 
     pEvacByDraw.push(out.pEvac.mean);

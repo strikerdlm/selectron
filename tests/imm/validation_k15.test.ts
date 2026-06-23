@@ -31,6 +31,8 @@
 // K15_TABLE1_REF in src/imm/calibration.ts; the CI₉₅ brackets match the
 // verbatim K15 paper §III ranges captured in
 // research/imm_sources/architecture/K15_keenan_2015_imm_probabilistic_simulation.md.
+// Accepted regression brackets are loaded from src/data/k15-accepted-brackets.json,
+// which is also consumed by the Python validator and calibration UI.
 //
 // Current accepted state (peer-review R4, 2026-05-29):
 //   4 of 12 metrics within K15 CI₉₅:
@@ -63,6 +65,7 @@ import { describe, it, expect, beforeAll } from "vitest";
 import { simulateIMM } from "../../src/imm/simulate";
 import { IMM_KITS } from "../../src/imm/kits";
 import { IMM_MISSIONS } from "../../src/data/imm-missions";
+import k15AcceptedBrackets from "../../src/data/k15-accepted-brackets.json";
 import type { IMMOutcome, IMMCrewMember } from "../../src/imm/types";
 
 // ── K15 reference values + CI₉₅ brackets (verbatim from Keenan 2015 §III) ──
@@ -99,32 +102,43 @@ type Bracket = {
   tracking?: string; // open backlog item that owns the divergence
 };
 
+type ScenarioId = keyof typeof K15;
+type MetricKey = "tme" | "chi" | "pEvac" | "pLocl";
+
+const METRIC_JSON_KEYS = {
+  tme: "tme",
+  chi: "chi",
+  pEvac: "p_evac",
+  pLocl: "p_locl",
+} as const;
+
+function acceptedBracket(scenario: ScenarioId, metric: MetricKey): Bracket {
+  const raw = k15AcceptedBrackets[scenario][METRIC_JSON_KEYS[metric]];
+  return {
+    status: raw.status as Bracket["status"],
+    accepted: raw.accepted as [number, number],
+    tracking: raw.tracking,
+  };
+}
+
 const ACCEPTED: Record<keyof typeof K15, Record<"tme" | "chi" | "pEvac" | "pLocl", Bracket>> = {
   none: {
-    tme:   { status: "within-k15-ci95", accepted: K15.none.tme.ci95 },
-    chi:   { status: "documented-divergent", accepted: [70.0, 95.0],
-             tracking: "rev3-d revealed untreated.fi_cp1/cp2 priors are under-elicited; backlog #1" },
-    pEvac: { status: "documented-divergent", accepted: [8.0, 22.0],
-             tracking: "'none' pEVAC under-elicited; K15-model-construct artifact per scope decision (limitations §4.1)" },
-    pLocl: { status: "documented-divergent", accepted: [0.10, 1.00],
-             tracking: "same as 'none' pEVAC — limitations §4.1" },
+    tme: acceptedBracket("none", "tme"),
+    chi: acceptedBracket("none", "chi"),
+    pEvac: acceptedBracket("none", "pEvac"),
+    pLocl: acceptedBracket("none", "pLocl"),
   },
   issHMS: {
-    tme:   { status: "within-k15-ci95", accepted: K15.issHMS.tme.ci95 },
-    chi:   { status: "documented-divergent", accepted: [78.0, 99.0],
-             tracking: "issHMS CHI ~82.8 vs K15 ref 94.93; divergence from untreated fi_cp1/cp2 under-elicitation, same root cause as 'none' CHI" },
-    pEvac: { status: "documented-divergent", accepted: [4.0, 12.0],
-             tracking: "issHMS pEVAC close to K15 CI₉₅; outcome tuning (rev3-f) next" },
-    pLocl: { status: "documented-divergent", accepted: [0.08, 0.55],
-             tracking: "issHMS pLOCL under K15 CI₉₅ lower bound; severity-axis backlog" },
+    tme: acceptedBracket("issHMS", "tme"),
+    chi: acceptedBracket("issHMS", "chi"),
+    pEvac: acceptedBracket("issHMS", "pEvac"),
+    pLocl: acceptedBracket("issHMS", "pLocl"),
   },
   unlimited: {
-    tme:   { status: "within-k15-ci95", accepted: K15.unlimited.tme.ci95 },
-    chi:   { status: "within-k15-ci95",      accepted: K15.unlimited.chi.ci95 },
-    pEvac: { status: "documented-divergent", accepted: [1.0, 6.0],
-             tracking: "unlimited pEVAC under K15 ref; treated.p_evac per-condition audit (rev3-f scope)" },
-    pLocl: { status: "documented-divergent", accepted: [0.08, 0.55],
-             tracking: "unlimited pLOCL under K15 ref; rev3-f scope" },
+    tme: acceptedBracket("unlimited", "tme"),
+    chi: acceptedBracket("unlimited", "chi"),
+    pEvac: acceptedBracket("unlimited", "pEvac"),
+    pLocl: acceptedBracket("unlimited", "pLocl"),
   },
 };
 

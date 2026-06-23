@@ -205,6 +205,24 @@ function main(): number {
   const json = JSON.stringify(status, null, 2);
   if (process.argv.includes("--write")) {
     writeFileSync(resolve(REPO_ROOT, "research/evidence_extracted/evidence_status.json"), `${json}\n`);
+    const frontendSummary = {
+      status: status.status,
+      releasePriorsAdjudicated: status.releasePriorsAdjudicated,
+      acceptedCount: status.acceptedCount,
+      proposalCount: status.proposalCount,
+      proposalRefCount: status.proposalRefCount,
+      proposalRefConditionIds: status.proposalRefConditionIds,
+      activeParameterCount: status.activeParameterCount,
+      acceptedCoveredParameterCount: status.acceptedCoveredParameterCount,
+      uncoveredParameterCount: status.uncoveredParameterCount,
+      malformedAcceptedRowCount: status.malformedAcceptedRows.length,
+      message: status.message,
+      generatedAt: new Date().toISOString(),
+    };
+    writeFileSync(
+      resolve(REPO_ROOT, "src/data/evidence-status.json"),
+      `${JSON.stringify(frontendSummary, null, 2)}\n`,
+    );
   }
   console.log(json);
   if (process.argv.includes("--require-adjudicated") && !status.releasePriorsAdjudicated) {

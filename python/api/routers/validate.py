@@ -35,8 +35,13 @@ async def _run_validation(job_id: str, trials: int, seed: int) -> None:
                 "reference": round(m.reference, 4),
                 "ci95_low": round(m.ci95[0], 4),
                 "ci95_high": round(m.ci95[1], 4),
+                "accepted_low": round(m.accepted[0], 4),
+                "accepted_high": round(m.accepted[1], 4),
                 "delta": round(m.delta, 4),
                 "within_ci95": m.within_ci95,
+                "k15_status": m.k15_status,
+                "within_accepted": m.within_accepted,
+                "tracking": m.tracking,
             })
         store.update(
             job_id,

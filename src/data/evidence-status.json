@@ -1,0 +1,22 @@
+{
+  "status": "unadjudicated",
+  "releasePriorsAdjudicated": false,
+  "acceptedCount": 0,
+  "proposalCount": 0,
+  "proposalRefCount": 7,
+  "proposalRefConditionIds": [
+    "ankle-sprain-strain",
+    "anxiety",
+    "dental-abscess",
+    "dental-caries",
+    "herpes-zoster-reactivation-shingles",
+    "nephrolithiasis",
+    "urinary-tract-infection"
+  ],
+  "activeParameterCount": 4846,
+  "acceptedCoveredParameterCount": 0,
+  "uncoveredParameterCount": 4846,
+  "malformedAcceptedRowCount": 0,
+  "message": "No complete adjudicated analog evidence release is available; active prior parameters remain uncovered or proposal-stage references remain exploratory.",
+  "generatedAt": "2026-06-23T16:55:34.707Z"
+}

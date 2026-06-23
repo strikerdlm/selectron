@@ -394,12 +394,12 @@ function immSteps(args: {
       ),
       concrete: (
         <span>
-          crew size {mission.crewSize} · per-condition β vector from the elicitation audit ·
-          z = normalized scores from Stage A
+          crew size {mission.crewSize} · scenario β vector from operator defaults ·
+          z = normalized Stage A scores when coupling is explicitly enabled
         </span>
       ),
       lay:
-        "Two crew members with the same mission don't have the same risk — a calmer person has lower psychiatric-incident odds, a fitter person has fewer musculoskeletal injuries. We multiply the base rate by a vulnerability factor exp(β·z). β is a Cox-style coefficient elicited from the literature: positive β means high score increases risk, negative β means high score protects. The exp() keeps the rate positive.",
+        "Trait-to-incidence coupling is an explicit scenario-analysis lever, not the default scientific mode. When enabled, the app multiplies the base rate by exp(β·z), where β is an operator-supplied stress-test coefficient and z is the crew member's normalized Stage A score. The accepted evidence ledger does not currently calibrate these β values against analog outcome data.",
       citation: {
         id: "Cox 1972 / [M18 §2.1.1 extension]",
         label: "Log-linear vulnerability multiplier",

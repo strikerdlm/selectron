@@ -23,8 +23,12 @@ class TestMetricResult:
             ci95=(87.0, 126.0),
             delta=0.0,
             within_ci95=True,
+            accepted=(87.0, 126.0),
+            k15_status="within-k15-ci95",
+            within_accepted=True,
         )
         assert m.within_ci95 is True
+        assert m.within_accepted is True
 
     def test_outside_ci95(self) -> None:
         m = MetricResult(
@@ -35,8 +39,12 @@ class TestMetricResult:
             ci95=(73.0, 122.0),
             delta=101.7,
             within_ci95=False,
+            accepted=(73.0, 122.0),
+            k15_status="within-k15-ci95",
+            within_accepted=False,
         )
         assert m.within_ci95 is False
+        assert m.within_accepted is False
 
 
 class TestValidateK15:

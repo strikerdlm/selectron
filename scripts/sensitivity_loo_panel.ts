@@ -2,7 +2,7 @@
 //
 // Leave-calibrated-out (LOO) sensitivity analysis for manuscript §3.
 // Two panels:
-//   A — tier-A-nasa only (34 conditions): baseline from NASA-sourced priors
+//   A — tier-A-nasa only (34 conditions): NASA-publication-attributed Selectron priors
 //   B — parametric tier-B multiplier sweep {0.25, 0.5, 0.75, 1.0, 1.5, 2.0}
 //
 // Run: npx tsx scripts/sensitivity_loo_panel.ts

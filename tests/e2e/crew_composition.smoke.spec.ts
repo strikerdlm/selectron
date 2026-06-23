@@ -65,4 +65,16 @@ test.describe("CrewComposition smoke", () => {
     // Pre-sim: badge is hidden (it requires an `outcome`).
     await expect(page.getByRole("status", { name: /K15 Table 1 reproduction badge/i })).toHaveCount(0);
   });
+
+  test("scenario trait coupling exposes beta scale control", async ({ page }) => {
+    await page.goto("/");
+    await page.getByRole("button", { name: /^Crew$/i }).click();
+    await expect(page.getByRole("heading", { name: /^Crew Composition$/i })).toBeVisible();
+
+    await expect(page.getByText("off for scientific mode")).toBeVisible();
+    await page.getByRole("switch", { name: /off/i }).click();
+    await expect(page.getByText("operator-supplied scenario analysis")).toBeVisible();
+    await expect(page.getByLabel("scenario beta coefficient scale")).toBeVisible();
+    await expect(page.getByText("scenario levers")).toBeVisible();
+  });
 });

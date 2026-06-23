@@ -54,6 +54,18 @@ _SCENARIO_RESOURCES: dict[str, dict[str, Any]] = {
     "unlimited": _UNLIMITED_RESOURCES,
 }
 
+_K15_ACCEPTED_BRACKETS_PATH = (
+    Path(__file__).resolve().parents[3] / "src" / "data" / "k15-accepted-brackets.json"
+)
+
+
+def _load_k15_accepted_brackets() -> dict[str, dict[str, dict[str, Any]]]:
+    with open(_K15_ACCEPTED_BRACKETS_PATH) as f:
+        return json.load(f)
+
+
+_K15_ACCEPTED_BRACKETS = _load_k15_accepted_brackets()
+
 
 @dataclass
 class MetricResult:
@@ -66,6 +78,10 @@ class MetricResult:
     ci95: tuple[float, float]
     delta: float
     within_ci95: bool
+    accepted: tuple[float, float]
+    k15_status: str
+    within_accepted: bool
+    tracking: str = ""
 
 
 @dataclass
@@ -98,15 +114,16 @@ class K15ValidationReport:
             f"**Seed:** 0x{self.seed:X}",
             f"**Metrics within CI95:** {self.n_within_ci95}/{self.n_total}",
             "",
-            "| Scenario | Metric | Observed | Reference | CI95 | Delta | Status |",
-            "|----------|--------|----------|-----------|------|-------|--------|",
+            "| Scenario | Metric | Observed | Reference | CI95 | Accepted | Delta | Status |",
+            "|----------|--------|----------|-----------|------|----------|-------|--------|",
         ]
         for m in self.metrics:
-            status = "PASS" if m.within_ci95 else "FAIL"
+            status = "PASS" if m.within_accepted else "FAIL"
             lines.append(
                 f"| {m.scenario} | {m.metric} | {m.observed:.2f} | "
                 f"{m.reference:.2f} | [{m.ci95[0]:.2f}, {m.ci95[1]:.2f}] | "
-                f"{m.delta:+.2f} | {status} |"
+                f"[{m.accepted[0]:.2f}, {m.accepted[1]:.2f}] | "
+                f"{m.delta:+.2f} | {status} ({m.k15_status}) |"
             )
         lines.append("")
         return "\n".join(lines)
@@ -159,6 +176,9 @@ def validate_k15(
             ci_bounds = getattr(ci, metric_to_ci_key[metric])
             delta = observed - ref_val
             within = ci_bounds[0] <= observed <= ci_bounds[1]
+            accepted_meta = _K15_ACCEPTED_BRACKETS[scenario][metric]
+            accepted = tuple(accepted_meta["accepted"])
+            within_accepted = accepted[0] <= observed <= accepted[1]
 
             report.metrics.append(MetricResult(
                 metric=metric,
@@ -168,6 +188,10 @@ def validate_k15(
                 ci95=ci_bounds,
                 delta=delta,
                 within_ci95=within,
+                accepted=accepted,
+                k15_status=accepted_meta["status"],
+                within_accepted=within_accepted,
+                tracking=accepted_meta.get("tracking", ""),
             ))
 
     report.n_total = len(report.metrics)

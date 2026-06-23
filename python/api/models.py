@@ -53,8 +53,13 @@ class MetricResult(BaseModel):
     reference: float
     ci95_low: float
     ci95_high: float
+    accepted_low: float
+    accepted_high: float
     delta: float
     within_ci95: bool
+    k15_status: str
+    within_accepted: bool
+    tracking: str
 
 class ValidateResponse(BaseModel):
     timestamp: str

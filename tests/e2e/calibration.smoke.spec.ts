@@ -60,6 +60,7 @@ test.describe("Calibration view — Python API integration", () => {
     await page.click("button:has-text('Batch Fit')");
     await expect(page.locator("h3:has-text('Batch Fit')")).toBeVisible();
     await expect(page.locator("text=PyMC NUTS")).toBeVisible();
+    await expect(page.locator("text=Evidence ledger not release-ready")).toBeVisible();
     await expect(page.locator("label:has-text('draws')")).toBeVisible();
     await expect(page.locator("label:has-text('chains')")).toBeVisible();
     await expect(page.locator("label:has-text('seed')")).toBeVisible();
@@ -69,6 +70,8 @@ test.describe("Calibration view — Python API integration", () => {
 
   test("V&V tab shows validation and sensitivity panels", async ({ page }) => {
     await page.click("button:has-text('V&V')");
+    await expect(page.locator("h3:has-text('Evidence Ledger Status')")).toBeVisible();
+    await expect(page.locator("text=unadjudicated")).toBeVisible();
     await expect(page.locator("h3:has-text('K15 Validation Gate')")).toBeVisible();
     await expect(page.locator("h3:has-text('Sensitivity Analysis')")).toBeVisible();
   });

@@ -53,7 +53,10 @@ describe("active analog workflow guards", () => {
       "src/ui/components/CrewMemberCard.tsx",
       "src/ui/components/ScoreCard.tsx",
       "src/ui/figures/IMMHeadlineCard.tsx",
+      "src/ui/figures/CalculationTrace.tsx",
       "src/ui/wizard/StepReview.tsx",
+      "src/ui/views/calibration/BatchFitPanel.tsx",
+      "src/ui/views/calibration/ConditionsPanel.tsx",
     ];
     const forbidden = [
       "NASA-standard",
@@ -62,6 +65,12 @@ describe("active analog workflow guards", () => {
       "posterior certainty",
       "estimate precision",
       "HSRB risk posture",
+      "Authoritative NASA Integrated Medical Model value",
+      "NASA-sourced",
+      "β is a Cox-style coefficient elicited from the literature",
+      "Cox-style coefficient elicited from the literature",
+      "authoritative operational values",
+      "release priors are adjudicated",
     ];
 
     for (const path of checkedFiles) {
@@ -70,5 +79,11 @@ describe("active analog workflow guards", () => {
         expect(source, `${path} must not contain ${token}`).not.toContain(token);
       }
     }
+
+    expect(readRepoFile("src/ui/views/CrewComposition.tsx")).toContain("scenario levers");
+    expect(readRepoFile("src/ui/figures/CalculationTrace.tsx")).toContain("operator-supplied stress-test coefficient");
+    expect(readRepoFile("src/ui/figures/CalculationTrace.tsx")).toContain("accepted evidence ledger does not currently calibrate");
+    expect(readRepoFile("src/ui/views/calibration/ConditionsPanel.tsx")).toContain("NASA-publication-attributed Selectron prior");
+    expect(readRepoFile("src/ui/views/calibration/BatchFitPanel.tsx")).toContain("Evidence ledger not release-ready");
   });
 });

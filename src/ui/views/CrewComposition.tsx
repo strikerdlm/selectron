@@ -177,6 +177,7 @@ interface CrewState {
   aggregator: CrewCompositeMethod;
   chiStar: number;
   couplingMode: VulnerabilityCouplingMode;
+  familyBetaScale: number;
 }
 
 const INITIAL_STATE: CrewState = {
@@ -188,6 +189,7 @@ const INITIAL_STATE: CrewState = {
   aggregator: "worst-link",
   chiStar: 0.7,
   couplingMode: "off",
+  familyBetaScale: 1.0,
 };
 
 // ─── localStorage autosave (Diego 2026-05-29) ────────────────────────────────
@@ -210,6 +212,7 @@ function persistCrewState(s: CrewState): void {
         aggregator: s.aggregator,
         chiStar: s.chiStar,
         couplingMode: s.couplingMode,
+        familyBetaScale: s.familyBetaScale,
       }),
     );
   } catch {
@@ -230,6 +233,7 @@ function loadPersistedCrewState(): CrewState | null {
       aggregator: CrewCompositeMethod;
       chiStar: number;
       couplingMode: VulnerabilityCouplingMode;
+      familyBetaScale: number;
     }>;
     if (!Array.isArray(p.members) || !p.mission) return null;
     const kit =
@@ -245,6 +249,7 @@ function loadPersistedCrewState(): CrewState | null {
       aggregator: p.aggregator ?? INITIAL_STATE.aggregator,
       chiStar: p.chiStar ?? INITIAL_STATE.chiStar,
       couplingMode: p.couplingMode ?? INITIAL_STATE.couplingMode,
+      familyBetaScale: p.familyBetaScale ?? INITIAL_STATE.familyBetaScale,
     };
   } catch {
     return null;
@@ -390,13 +395,14 @@ export function CrewComposition() {
         crew: state.members, mission: state.mission, kit: state.kit,
         trials: 5000, seed: state.seed, chiStar: state.chiStar, criteria: ACTIVE_CRITERIA,
         vulnerabilityCouplingMode: state.couplingMode,
+        familyBetaScale: state.familyBetaScale,
       });
     }, 400);
     return () => {
       clearTimeout(handle);
       if (previewWorkerRef.current) { previewWorkerRef.current.terminate(); previewWorkerRef.current = null; }
     };
-  }, [state.members, state.mission, state.kit, state.seed, state.chiStar, state.couplingMode]);
+  }, [state.members, state.mission, state.kit, state.seed, state.chiStar, state.couplingMode, state.familyBetaScale]);
 
   // ── I6 (2026-06-04): analog prior-uncertainty predictive effect ───────────
   // Fetch per-condition λ draws from the Python calibration API, then
@@ -474,6 +480,7 @@ export function CrewComposition() {
               seed: state.seed,
               kindMultipliers,
               vulnerabilityCouplingMode: state.couplingMode,
+              familyBetaScale: state.familyBetaScale,
             },
           });
         })
@@ -490,7 +497,7 @@ export function CrewComposition() {
       if (ppAbortRef.current) { ppAbortRef.current.abort(); ppAbortRef.current = null; }
       if (ppWorkerRef.current) { ppWorkerRef.current.terminate(); ppWorkerRef.current = null; }
     };
-  }, [state.members, state.mission, state.kit, state.seed, state.couplingMode, kindMultipliers]);
+  }, [state.members, state.mission, state.kit, state.seed, state.couplingMode, state.familyBetaScale, kindMultipliers]);
 
   function toggleMember(id: string) {
     setExpandedIds((prev) => {
@@ -621,8 +628,9 @@ export function CrewComposition() {
       chiStar: state.chiStar,
       criteria: ACTIVE_CRITERIA,
       vulnerabilityCouplingMode: state.couplingMode,
+      familyBetaScale: state.familyBetaScale,
     });
-  }, [simState, state.members, state.mission, state.kit, state.trials, state.seed, state.chiStar, state.couplingMode]);
+  }, [simState, state.members, state.mission, state.kit, state.trials, state.seed, state.chiStar, state.couplingMode, state.familyBetaScale]);
 
   // ── worker cleanup on unmount ───────────────────────────────────────────
   useEffect(() => {
@@ -758,7 +766,7 @@ export function CrewComposition() {
                     </span>
                   )}
                   <span className="mono text-[11px] text-ink-3">
-                    trait coupling: {state.couplingMode === "scenario" ? "scenario" : "off"}
+                    trait coupling: {state.couplingMode === "scenario" ? `scenario x${state.familyBetaScale.toFixed(2)}` : "off"}
                   </span>
                 </div>
               )}
@@ -947,7 +955,7 @@ export function CrewComposition() {
                 <div className="flex flex-col">
                   <span className="mono text-[12px] text-ink-2">Trait coupling</span>
                   <span className="mono text-[10px] text-ink-3">
-                    {state.couplingMode === "scenario" ? "scenario analysis" : "off for scientific mode"}
+                    {state.couplingMode === "scenario" ? "operator-supplied scenario analysis" : "off for scientific mode"}
                   </span>
                 </div>
                 <button
@@ -972,6 +980,33 @@ export function CrewComposition() {
                   {state.couplingMode === "scenario" ? "scenario" : "off"}
                 </button>
               </div>
+
+              {state.couplingMode === "scenario" && (
+                <div className="flex flex-col gap-1 border border-amber-400/30 rounded px-3 py-2 bg-amber-400/5">
+                  <label className="mono text-[12px] text-amber-200">
+                    β scenario scale: {state.familyBetaScale.toFixed(2)}x
+                  </label>
+                  <input
+                    type="range"
+                    min={0}
+                    max={1.5}
+                    step={0.25}
+                    value={state.familyBetaScale}
+                    className="instrument w-full"
+                    onChange={(e) => {
+                      const next = Number(e.target.value);
+                      setState((s) => ({ ...s, familyBetaScale: next }));
+                      setOutcome(undefined);
+                      setSimState("idle");
+                    }}
+                    aria-label="scenario beta coefficient scale"
+                  />
+                  <p className="text-[11px] text-ink-3 leading-relaxed">
+                    β values are scenario levers, not accepted-ledger calibrated coefficients.
+                    Use 0x to remove trait modulation and 1x for the current operator defaults.
+                  </p>
+                </div>
+              )}
 
               <div className="flex flex-col gap-1">
                 <label className="mono text-[12px] text-ink-3">
