@@ -60,6 +60,7 @@ describe("active analog workflow guards", () => {
       "src/ui/views/calibration/BatchFitPanel.tsx",
       "src/ui/views/calibration/ConditionsPanel.tsx",
       "src/ui/views/calibration/VVPanel.tsx",
+      "src/imm/types.ts",
     ];
     const forbidden = [
       "NASA-standard",
@@ -75,6 +76,7 @@ describe("active analog workflow guards", () => {
       "authoritative operational values",
       "release priors are adjudicated",
       "Run Validation",
+      "calibrated and validated",
     ];
 
     for (const path of checkedFiles) {

@@ -124,8 +124,9 @@ export type IMMCrewMember = {
 
 /**
  * Mission taxonomy. Selectron v1 supports analog-isolation / analog-controlled /
- * antarctic-station / leo-iss — these are the operational scope for which the
- * IMM Calculator is calibrated and validated.
+ * antarctic-station / leo-iss. LEO/ISS runs have K15 reference-model anchors;
+ * terrestrial analog runs are conditional scenarios and are not empirically
+ * validated against observed analog outcomes.
  *
  * v2026-06-04 — split `analog-isolation` into `analog-controlled` (heated,
  * climate-stable habitats: MDRS, HI-SEAS, EMMPOL, THOR) and `antarctic-station`

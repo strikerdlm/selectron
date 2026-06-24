@@ -6,6 +6,7 @@ import type {
   IMMConditionOutcomes,
   IMMMissionKind,
   IMMPrior,
+  IMMProcessType,
   IMMRiskFactor,
 } from "./types";
 
@@ -92,6 +93,18 @@ const INACTIVE_KIND_MULTIPLIER_KEYS = new Set([
   "hypoxia-related-headache",
   "seasonal-affective-disorder",
 ]);
+const EXPECTED_LAMBDA_UNIT_BY_PROCESS: Record<IMMProcessType, string> = {
+  "general-Poisson": "events-per-person-day",
+  "space-adaptation-once": "events-per-person-day",
+  "SA-VIIP-late": "events-per-person-day",
+  "EVA-coupled": "events-per-EVA",
+  "SPE-coupled": "events-per-SPE",
+};
+const RATE_COMPATIBLE_DISTRIBUTIONS = new Set([
+  "Lognormal-Poisson",
+  "Gamma-Poisson",
+  "Fixed",
+]);
 
 function fail(message: string): never {
   throw new Error(`E_BAD_PRIORS: ${message}`);
@@ -160,6 +173,8 @@ function validateOutcomes(value: unknown, path: string): IMMConditionOutcomes {
 function validatePrior(id: string, value: unknown): void {
   const prior = requireRecord(value, `conditions.${id}`);
   if (!CONDITION_IDS.has(id)) fail(`conditions.${id} is not in IMM_CONDITIONS`);
+  const condition = IMM_CONDITIONS.find((c) => c.id === id);
+  if (!condition) fail(`conditions.${id} is not in IMM_CONDITIONS`);
   const conditionId = requireNonEmptyString(prior.conditionId, `conditions.${id}.conditionId`);
   if (conditionId !== id) fail(`conditions.${id}.conditionId must match key`);
 
@@ -175,6 +190,18 @@ function validatePrior(id: string, value: unknown): void {
   const lambdaUnit = requireNonEmptyString(incidence.lambda_unit, `conditions.${id}.incidence.lambda_unit`);
   if (!ALLOWED_LAMBDA_UNITS.has(lambdaUnit)) {
     fail(`conditions.${id}.incidence.lambda_unit is unsupported: ${lambdaUnit}`);
+  }
+  const expectedLambdaUnit = EXPECTED_LAMBDA_UNIT_BY_PROCESS[condition.processType];
+  if (lambdaUnit !== expectedLambdaUnit) {
+    fail(
+      `conditions.${id}.incidence.lambda_unit must be ${expectedLambdaUnit} for ${condition.processType} conditions`,
+    );
+  }
+  if (condition.processType === "SPE-coupled" && distribution !== "Beta-Bernoulli") {
+    fail(`conditions.${id}.incidence.distribution must be Beta-Bernoulli for SPE-coupled conditions`);
+  }
+  if (condition.processType !== "SPE-coupled" && !RATE_COMPATIBLE_DISTRIBUTIONS.has(distribution)) {
+    fail(`conditions.${id}.incidence.distribution ${distribution} is not supported for ${condition.processType} conditions`);
   }
   if (distribution === "Lognormal-Poisson") {
     requireFiniteNumber(incidence.mu_log_lambda, `conditions.${id}.incidence.mu_log_lambda`);

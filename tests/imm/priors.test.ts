@@ -159,4 +159,21 @@ describe("IMM priors", () => {
     badKind.global_calibration.kind_multipliers["unsupported-kind"] = {};
     expect(() => validatePriorsJson(badKind)).toThrow(/unsupported-kind.*mission kind/);
   });
+
+  it("rejects process/exposure mismatches that would hit the wrong runtime sampler", () => {
+    const badEvaUnit = priorsFixture();
+    badEvaUnit.conditions["decompression-sickness-secondary-to-extravehicular-activity"].incidence.lambda_unit =
+      "events-per-person-day";
+    expect(() => validatePriorsJson(badEvaUnit)).toThrow(/decompression-sickness.*events-per-EVA.*EVA-coupled/);
+
+    const badSpeDistribution = priorsFixture();
+    badSpeDistribution.conditions["acute-radiation-syndrome"].incidence.distribution = "Gamma-Poisson";
+    expect(() => validatePriorsJson(badSpeDistribution)).toThrow(/acute-radiation-syndrome.*Beta-Bernoulli.*SPE-coupled/);
+
+    const badGeneralDistribution = priorsFixture();
+    badGeneralDistribution.conditions["acute-sinusitis"].incidence.distribution = "Beta-Bernoulli";
+    badGeneralDistribution.conditions["acute-sinusitis"].incidence.alpha = 1;
+    badGeneralDistribution.conditions["acute-sinusitis"].incidence.beta = 100;
+    expect(() => validatePriorsJson(badGeneralDistribution)).toThrow(/acute-sinusitis.*Beta-Bernoulli.*general-Poisson/);
+  });
 });
