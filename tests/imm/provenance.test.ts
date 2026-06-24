@@ -3,9 +3,10 @@
 // F3/F4: locks the session/exports provenance helpers. The SHA-256 helpers
 // must be deterministic so a reloaded session can detect prior/multiplier
 // drift, and the evidence-coverage statement must report the operative
-// 0/4,846 fact and the "variability, not calibration" disclaimer.
+// 0/4,849 fact and the "variability, not calibration" disclaimer.
 
 import { describe, it, expect } from "vitest";
+import { execFileSync } from "node:child_process";
 import {
   EVIDENCE_COVERAGE_STATEMENT,
   EVIDENCE_STATUS_SNAPSHOT,
@@ -17,9 +18,31 @@ import {
   classifySavedOutcomeStatus,
   PROFILE_MAPPING_VERSION,
 } from "../../src/imm/provenance";
-import { SELECTRON_SOURCE_COMMIT, SELECTRON_VERSION } from "../../src/version";
+import {
+  FIGURE_GENERATION_COMMIT,
+  SELECTRON_SOURCE_COMMIT,
+  SELECTRON_VERSION,
+} from "../../src/version";
+
+function expectedSourceCommit(): string {
+  const explicit = process.env.VITE_GIT_COMMIT?.trim();
+  if (explicit) return explicit;
+  return execFileSync("git", ["rev-parse", "HEAD"], {
+    encoding: "utf8",
+    stdio: ["ignore", "pipe", "ignore"],
+  }).trim();
+}
 
 describe("provenance — SHA-256 helpers (F3)", () => {
+  it("source commit provenance is injected from the current build, not the figure-generation fallback", () => {
+    const expected = expectedSourceCommit();
+    expect(SELECTRON_SOURCE_COMMIT).toBe(expected);
+    expect(SELECTRON_SOURCE_COMMIT).toMatch(/^[0-9a-f]{40}$/);
+    if (expected !== FIGURE_GENERATION_COMMIT) {
+      expect(SELECTRON_SOURCE_COMMIT).not.toBe(FIGURE_GENERATION_COMMIT);
+    }
+  });
+
   it("sha256Hex is deterministic and matches the known digest of 'abc'", async () => {
     const a = await sha256Hex("abc");
     const b = await sha256Hex("abc");
