@@ -6,6 +6,8 @@
 **Engine config (all runs):** `simulateIMM`, kit = `medium` ("Analog / Antarctic Station Level II–III"), seed `0xc0ffee`, T = 3 000 trials, `criteria = PLACEHOLDER_CRITERIA` (vulnerability path active), auto-loaded `analog-controlled` kind multipliers.
 **Stability protocol:** every asserted contrast was swept across 3 seeds (`0xc0ffee`, `1234`, `99`) × 2 trial counts (3 000, 8 000) before margins were locked. Metrics that sign-inverted anywhere in the sweep were deliberately left unasserted.
 
+> **Historical report boundary:** This archived report predates v0.6 audit containment. Treat its numbers as exploratory sensitivity outputs under old fixtures. It is not evidence of validated crew selection, medical clearance, calibrated analog pEVAC/pLOCL/CHI, or operational planning guidance. Current boundaries are in `docs/model_card.md` and `docs/iter5_scientific_limitations.md`.
+
 ---
 
 ## 1. What was done
@@ -102,7 +104,7 @@ Sweep-durable contrasts (all 6 seed/T configs), as asserted in the test:
 
 ## 4. Model-adjustment assessment
 
-**Verdict: the core model is sound for its stated purpose.** K15-validated incidence engine; monotone, seed-stable crew discrimination; gates behaving as designed. The simulations exposed three targeted **calibration/coverage** candidates — none urgent, none affecting the K15 validation numbers (validation crews carry no Stage-A scores).
+**Historical verdict:** the run showed internally consistent scenario behavior under old fixtures. K15 is an inter-model verification benchmark, not analog-outcome validation; the seed-stable crew contrasts are sensitivity findings, not validated crew discrimination. The simulations exposed three targeted **calibration/coverage** candidates that remain claim-boundary issues rather than submission-ready validation details.
 
 ### Recommended (ranked)
 
@@ -123,7 +125,7 @@ Sweep-durable contrasts (all 6 seed/T configs), as asserted in the test:
 
 ### Timing
 
-None of the three candidates block or improve the ASR submission. Recommended batching: **post-submission v0.6 "vulnerability-path refinement"** (items 1–3 together, each with its own evidence dossier and the K15 invariance canary as the safety net), keeping manuscript and code in sync.
+These candidates should be treated as prerequisites for stronger scientific claims, not as post-submission polish. Recommended batching: **v0.6 "vulnerability-path refinement"** (items 1–3 together, each with its own evidence dossier and the K15 invariance canary as the safety net), keeping manuscript and code in sync.
 
 ---
 

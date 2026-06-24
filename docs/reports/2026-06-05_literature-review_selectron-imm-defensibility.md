@@ -1,22 +1,24 @@
-# Literature Review: Defensibility of Selectron IMM Analog-Mission Simulator Assumptions Against Published Evidence
+# Literature Review: Historical Context for Selectron IMM Analog-Mission Simulator Assumptions
 
 **Date:** 2026-06-05
-**Prepared for:** Selectron IMM model validation (analog-mission calculator)
+**Prepared for:** historical Selectron IMM model-context review (analog-mission calculator)
 **Scope:** Five core model assumptions assessed against Antarctic, submarine, space-analog, and spaceflight epidemiology literature
+
+> **Historical report boundary:** This archived report predates v0.6 audit containment. Treat its numbers as exploratory sensitivity outputs under old fixtures. It is not evidence of validated crew selection, medical clearance, calibrated analog pEVAC/pLOCL/CHI, or operational planning guidance. Current boundaries are in `docs/model_card.md` and `docs/iter5_scientific_limitations.md`.
 
 ---
 
 ## Executive Summary
 
-Five key assumptions of the Selectron IMM Monte Carlo analog-mission simulator were assessed against the published literature. The overall verdict is that the model is broadly defensible, with one assumption that requires attention and two that can be stated with greater precision to match empirical benchmarks.
+Five key assumptions of the historical Selectron IMM Monte Carlo analog-mission simulator were assessed against the published literature. The overall verdict is that several assumptions are directionally plausible, but this report does not establish calibration or external analog validation.
 
 | Assumption | Verdict |
 |---|---|
 | 1. ~11× psychiatric/behavioral event ratio (screened vs unscreened) | Plausible upper bound, not directly testable but directionally consistent |
-| 2. P(≥1 medical event) ≈ 100% at ≥45 days | **Well-supported** — empirically near-certain across all analog datasets |
+| 2. P(≥1 medical event) ≈ 100% at ≥45 days | **Directionally supported** — empirically common across analog datasets |
 | 3. pEVAC superlinear growth (~1.9–2.1% at 90 d → ~14% at 500 d) | **Plausible** for 90 d; the 500 d range lacks direct validation data but is not implausible |
-| 4. pLOCL null difference between crews (0.005% → ~0.5–0.6% at 500 d) | **Supported** — literature confirms crew selection does not meaningfully reduce mortality from catastrophic causes |
-| 5. Crew selection primarily reducing psychiatric morbidity, not mortality | **Well-supported** — consistent with the entire psychosocial screening literature |
+| 4. pLOCL null difference between crews (0.005% → ~0.5–0.6% at 500 d) | **Directionally supported** — literature suggests crew selection affects behavioral morbidity more than catastrophic mortality |
+| 5. Crew selection primarily reducing psychiatric morbidity, not mortality | **Directionally supported** — consistent with psychosocial screening literature |
 
 ---
 
@@ -66,7 +68,7 @@ The figure from the National Academies synthesis (IOM, 2001; per the Wikipedia a
 
 ### Assessment
 
-The assumption that P(≥1 medical event) ≈ 100% at ≥45 days for a 6-person crew is **well-supported** by the Antarctic epidemiology. The JARE and ANARE datasets consistently show multiple medical encounters per person-year, making near-certainty over any 45+ day mission trivial to establish. This may even be slightly conservative (the model could state "essentially guaranteed" rather than "≥95%").
+The assumption that P(≥1 medical event) ≈ 100% at ≥45 days for a 6-person crew is **directionally supported** by Antarctic epidemiology. The JARE and ANARE datasets consistently show multiple medical encounters per person-year, making high cumulative event probability plausible. This does not calibrate the Selectron absolute probability.
 
 **Verdict: Well-supported.** No adjustment needed.
 
@@ -86,7 +88,7 @@ Walton & Kerstman (2020) confirmed this in the peer-reviewed literature: "A comp
 
 For a 90-day mission with the Selectron screened crew producing ~1.9–2.1% pEVAC: this is below the 4.43% the NASA IMM predicts for 180 days on ISS, which is directionally consistent if somewhat lower (shorter mission + analog rather than ISS-specific conditions). The model's 90-day pEVAC of 1.9–2.1% is plausible.
 
-The superlinear growth observed in the Selectron model is attributed to medical kit depletion, which is a mechanistically sound assumption — the NASA IMM explicitly models resource consumption and optimization, and lower resource availability is known to increase pEVAC (Antonsen et al., 2022). Antonsen et al. (2022) found that "unlike EVAC results, the LOCL results show almost no difference between" limited and unlimited medical capability scenarios, suggesting that kit availability drives EVAC but not mortality.
+The superlinear growth observed in the Selectron model is attributed to medical kit depletion, which is a plausible mechanism — the NASA IMM explicitly models resource consumption and optimization, and lower resource availability is known to increase pEVAC (Antonsen et al., 2022). Antonsen et al. (2022) found that "unlike EVAC results, the LOCL results show almost no difference between" limited and unlimited medical capability scenarios, suggesting that kit availability drives EVAC more than mortality.
 
 **500-day predictions (13–16% pEVAC):** Direct empirical data for crews sustained over 500 days is nearly absent. MARS-500 (a 520-day simulated Mars mission) had one participant develop a severe sleep disorder during the study but no formal medical evacuation was possible by design. Extrapolating from the IMM's ~4.43% per 180 days, a linear extrapolation to 500 days would yield ~12.3% (not accounting for kit depletion). The Selectron model predicts ~14%, which is ~13–14% above the linear projection, largely driven by kit depletion effects.
 
@@ -124,9 +126,9 @@ The 0% to negligible difference between screened and unscreened crews for LOCL i
 
 ### Assessment
 
-The model's pLOCL output is **well-calibrated against the NASA IMM ISS data** when adjusted for crew size. The null difference between crews for LOCL is **strongly supported** by the mechanistic rationale (LOCL is driven by catastrophic events unaffected by psychological profile) and by the pattern seen in Antonsen et al. (2022) where even variation in medical capability had minimal LOCL impact.
+The model's pLOCL output is **numerically similar to a back-of-envelope NASA IMM ISS scaling** when adjusted for crew size. That similarity is not analog-outcome calibration. The null difference between crew fixtures for LOCL is mechanistically plausible (LOCL is driven by catastrophic events weakly affected by psychological profile) and directionally compatible with Antonsen et al. (2022), where variation in medical capability had minimal LOCL impact.
 
-**Verdict: Well-supported.** The 0.5–0.6% per-crewmember LOCL at 500 days aligns with IMM ISS-derived estimates. No adjustment needed.
+**Verdict: Directionally plausible, not validated.** The 0.5–0.6% per-crewmember LOCL at 500 days aligns with a rough IMM ISS-derived scaling, but this is not a calibrated analog prediction.
 
 ---
 
@@ -152,7 +154,7 @@ The BPS review on Antarctic psychology confirms: "Only rarely do these reactions
 
 ### Assessment
 
-This assumption is **well-supported** by the totality of the literature. Crew selection, psychological screening, and MMPI-based instruments reduce behavioral and psychiatric morbidity in ICE environments; their effect on mortality from catastrophic physiological events (trauma, cardiac, toxic exposure) is negligible. The model correctly captures this distinction.
+This assumption is **directionally supported** by the literature. Crew selection, psychological screening, and MMPI-based instruments are associated with lower behavioral and psychiatric morbidity in ICE environments; their effect on mortality from catastrophic physiological events (trauma, cardiac, toxic exposure) is likely much smaller. The historical model encodes this distinction, but this report does not validate its magnitude.
 
 **Verdict: Well-supported.** No adjustment needed.
 
@@ -173,10 +175,10 @@ This assumption is **well-supported** by the totality of the literature. Crew se
 ### Fix Plan
 
 **Assumption 1 — Psychiatric/behavioral ratio:**
-No structural model change is required. The manuscript should clarify that the ~11× ratio represents a *bounding sensitivity analysis* comparing an extreme pathological profile (MMPI-2-RF EID T = 90, equivalent to an individual with active major depressive/anxiety disorder at the clinical ceiling) against an optimally screened crew (EID T = 35, well below the normal-range threshold). It should not be described as a calibrated estimate of any real unscreened cohort. The 5% DSM-IV disorder rate in screened Antarctic crews (Palinkas & Suedfeld, 2008) can be cited as the empirical lower bound for real-world screened populations, providing a reference point for the model's screened-crew output.
+Any structural-model decision requires current evidence review. The manuscript should clarify that the ~11× ratio represents a *bounding sensitivity analysis* comparing an extreme pathological profile (MMPI-2-RF EID T = 90, equivalent to an individual with active major depressive/anxiety disorder at the clinical ceiling) against an optimally screened fixture (EID T = 35, well below the normal-range threshold). It should not be described as a calibrated estimate of any real unscreened cohort. The 5% DSM-IV disorder rate in screened Antarctic crews (Palinkas & Suedfeld, 2008) can be cited as contextual background, not as Selectron calibration.
 
 **Assumption 3 — pEVAC at 500 days:**
-The 90-day pEVAC of 1.9–2.1% is defensible. For 500-day predictions, the manuscript should include the explicit caveat that no empirical analog mission data exist for crew sustained in an analog environment for 500 days without any option of resupply or medical evacuation; the IMM's kit-depletion mechanism is theoretically sound but the 500-day output is a model extrapolation, not a validated prediction. The NASA IMM ISS 180-day pEVAC of 4.43% (Walton & Kerstman, 2020) provides the closest empirical anchor.
+The 90-day pEVAC of 1.9–2.1% is a historical scenario output, not a calibrated estimate. For 500-day projections, the manuscript should include the explicit caveat that no empirical analog mission data exist for crew sustained in an analog environment for 500 days without any option of resupply or medical evacuation; the IMM's kit-depletion mechanism is plausible but the 500-day output is a model extrapolation, not a validated prediction. The NASA IMM ISS 180-day pEVAC of 4.43% (Walton & Kerstman, 2020) provides context only.
 
 **No other assumptions require structural adjustment.** The model's outputs are broadly consistent with the available analog epidemiology.
 

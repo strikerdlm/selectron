@@ -234,6 +234,50 @@ describe("active analog workflow guards", () => {
     expect(readRepoFile("paper/supplementary/S-Methods-2-nasa-mc-audit.md")).not.toContain("simulateMission");
   });
 
+  it("marks archived analysis reports as historical and removes current-sounding validation claims", () => {
+    const reportsReadme = readRepoFile("docs/reports/README.md");
+    expect(reportsReadme).toContain("archived exploratory analyses");
+    expect(reportsReadme).toContain("Valid accepted active-parameter evidence coverage is 0/4,849");
+
+    const reportPaths = [
+      "docs/reports/2026-06-05_report_selectron-kit-training-study.md",
+      "docs/reports/2026-06-05_report_selectron-duration-study-screened-vs-unscreened.md",
+      "docs/reports/2026-06-05_analysis_analog-crew-simulations-vs-literature.md",
+      "docs/reports/2026-06-05_report_selectron-analog-crew-simulations.md",
+      "docs/reports/2026-06-05_report_variable-sweep-4vars.md",
+      "docs/reports/2026-06-05_literature-review_selectron-imm-defensibility.md",
+      "docs/reports/2026-06-05_literature-review_selectron-kit-training-study.md",
+    ];
+
+    for (const path of reportPaths) {
+      const source = readRepoFile(path);
+      expect(source, `${path} must carry the archive boundary`).toContain("Historical report boundary");
+      for (const forbidden of [
+        "sound planning tool for analog-mission crew selection",
+        "direct operational implication",
+        "Operational implication",
+        "well-calibrated against the NASA IMM ISS data",
+        "validates the wider sweep's machinery",
+        "core model is sound for its stated purpose",
+        "The reports are not over-claiming",
+        "planning-relevant",
+        "most useful for planning",
+        "strongest possible internal-validation",
+        "operational case for screening",
+        "operationally critical",
+        "operationally relevant",
+        "matter operationally",
+        "lending authority to the IMM methodology from which the Selectron simulations are derived",
+        "This is the finding most ready for direct citation in the manuscript",
+        "model correctly captures this distinction",
+        "No structural model change is required",
+        "The 90-day pEVAC of 1.9–2.1% is defensible",
+      ]) {
+        expect(source, `${path} must not contain stale claim ${forbidden}`).not.toContain(forbidden);
+      }
+    }
+  });
+
   it("keeps the slow validation workflow archiving release-verification artifacts", () => {
     const workflow = readRepoFile(".github/workflows/nightly.yml");
 

@@ -39,7 +39,7 @@ GOOD passes both clearance gates. BAD fails both (EID 90T > 65; cognition −2.5
 
 Kit depletion is the engine's mechanism for superlinear evacuation risk over time; the 3-kit sweep brackets realistic configurations.
 
-**Statistics.** Per cell: TME and CHI (means across trials); pEVAC and pLOCL as **Wilson 95% CIs** on per-trial Bernoulli outcomes; per-family event aggregation across the 19 families from `IMM_CONDITIONS`; top-5 psych and top-5 med conditions by `tmeContrib`. All stats helpers (`wilson`, `twoPropZ`, `riskRatio`, Poisson p(≥1) approximation, Haldane–Anscombe 0.5 correction) are **copied verbatim** from the 7-day reproducer for the validation comparison to be exact.
+**Statistics.** Per cell: TME and CHI (means across trials); pEVAC and pLOCL as **Wilson 95% CIs** on per-trial Bernoulli outcomes; per-family event aggregation across the 19 families from `IMM_CONDITIONS`; top-5 psych and top-5 med conditions by `tmeContrib`. All stats helpers (`wilson`, `twoPropZ`, `riskRatio`, Poisson p(≥1) approximation, Haldane–Anscombe 0.5 correction) are **copied verbatim** from the 7-day reproducer so the historical regression comparison is exact.
 
 **Per-cell seed:** `SEED + cellIndex` (0xc0ffee, 0xc0ffef, … 0xc0ff46 for cells 0..89). The engine consumes the full PRNG stream within one cell, so the 90 starting states yield 90 independent 50 000-trial runs.
 
@@ -155,7 +155,7 @@ All 90 cells, grouped by `(missionKind, durationDays, kit)`. Screened = GOOD, un
 
 ## 3. Validation against the 7-cell duration study
 
-The 4-var sweep's `analog-controlled / 90d / kit=medium / screened` and `unscreened` cells are identical in configuration to the 7-day reproducer's `analog-90d / medium / GOOD (BAD)` rows, but with T=50 000 vs T=20 000. Per the 7-day study's analysis (T=20 000 → T=50 000 tightens 95% CIs by √2.5 ≈ 1.6×), differences of <0.1% on TME and <0.2pp on pEVAC are within MC noise. The validation:
+The 4-var sweep's `analog-controlled / 90d / kit=medium / screened` and `unscreened` cells are identical in configuration to the 7-day reproducer's `analog-90d / medium / GOOD (BAD)` rows, but with T=50 000 vs T=20 000. Per the 7-day study's analysis (T=20 000 → T=50 000 tightens 95% CIs by √2.5 ≈ 1.6×), differences of <0.1% on TME and <0.2pp on pEVAC are within MC noise. The regression comparison:
 
 | metric | 7-day (T=20k) | 4-var (T=50k) | abs diff | rel diff |
 |---|---|---|---|---|
@@ -186,7 +186,7 @@ Other 3 variables at reference (analog/screened/medium/90d):
 
 **leo-iss and interplanetary-mars-future are nearly identical at 90 d** (TME 42.01 vs 42.11; pEVAC 4.90% vs 4.94%; pLOCL 0.112% vs 0.104%). At 90 d and 180 d, the two kinds are statistically indistinguishable in their event burden. They diverge only at 365 d (see §8 interaction grids). This is a **structural finding**: the 90-d Mars simulation produces outcomes that look like an ISS expedition, not like a Mars mission. The 426/923-d Mars catalog missions would have shown the EVA-driven TME escalation that 90 d does not.
 
-**Literature coherence.** The Antarctic / polar-station analog is the most operationally relevant proxy for LEO-class missions in the published literature, while Mars-class missions (≥ 6 months) are typically compared to Antarctic winter-over for behavioral-health endpoints. The model correctly puts analog at lower TME than ISS / Mars because the analog kind multiplier profile is conservative; this matches the qualitative literature finding that polar-station crews have *less* medical burden than ISS crews (no EVAs, less radiation, less microgravity) but similar psychiatric burden. The 10-point CHI gap between analog and ISS is at the high end of what the literature describes.
+**Literature coherence.** The Antarctic / polar-station analog is a commonly discussed terrestrial proxy for LEO-class mission questions in the published literature, while Mars-class missions (≥ 6 months) are typically compared to Antarctic winter-over for behavioral-health endpoints. The historical run puts analog at lower TME than ISS / Mars because the analog kind multiplier profile is conservative; this is directionally compatible with the qualitative literature finding that polar-station crews have *less* medical burden than ISS crews (no EVAs, less radiation, less microgravity) but similar psychiatric burden. The 10-point CHI gap between analog and ISS is at the high end of what the literature describes.
 
 ---
 
@@ -267,7 +267,7 @@ Other 3 at reference:
 
 **The screening effect is much larger on ISS and Mars (ΔTME = +35) than on analog (ΔTME = +5).** This is because the ISS / Mars baseline has a higher event burden, so a ~11× psychiatric event multiplier on top produces a larger absolute difference. The relative screening effect (1.66× for analog vs 1.85× for ISS/Mars) is similar; the absolute effect scales with baseline.
 
-**Literature coherence.** The absolute-magnitude scaling of the screening effect is **the operational case for screening on long-duration missions.** The Antarctic literature describes smaller absolute event reductions because the baseline is lower; the ISS literature describes larger absolute reductions because the baseline is higher. The model captures this scaling correctly.
+**Literature coherence.** The absolute-magnitude scaling of the screening fixture is an exploratory sensitivity pattern for long-duration missions. The Antarctic literature describes smaller absolute event reductions because the baseline is lower; the ISS literature describes larger absolute reductions because the baseline is higher. This run is directionally consistent with that scaling but does not validate it.
 
 ### 8.2 missionKind × kit — pEVAC
 
@@ -281,7 +281,7 @@ Other 3 at reference:
 
 **The `medium → unlimited` gap is much larger than the `none → medium` gap on ISS and Mars** (analog: 1.96% → 0.75% is a 62% reduction; ISS: 4.93% → 0.83% is an 83% reduction). This is the **ISS-HMS dividend**: the marginal value of an unlimited kit is higher on long-duration, high-baseline missions.
 
-**Literature coherence.** The "ISS-HMS dividend" finding is operationally critical: the marginal return on investing in a more capable medical kit is **substantially higher on a Mars mission than on a 90-d Antarctic expedition.** This is consistent with the NASA-IMM catalog (Keenan 2015) and the Walton-Kerstman 2020 ISS quantification, which both emphasize that the consumables cliff dominates at long durations.
+**Literature coherence.** The "ISS-HMS dividend" finding is a scenario sensitivity: the marginal return on a more capable medical kit is **substantially higher on a Mars fixture than on a 90-d Antarctic fixture.** This is consistent with the NASA-IMM catalog (Keenan 2015) and the Walton-Kerstman 2020 ISS quantification, which both emphasize that the consumables cliff dominates at long durations.
 
 ### 8.3 crew × duration — TME
 
@@ -353,9 +353,11 @@ Comparing the 4-var sweep's qualitative behavior against the published analog-mi
 | Interpersonal conflict as condition | Folded into anxiety/depression | Top-3 driver in real analogs | △ (coverage gap) |
 | Frostbite / SAD | Dead key (kind multiplier, no catalog entry) | Top Antarctic drivers | ✗ (coverage gap) |
 | Conscientiousness effect | Near-null (1/100 conditions coupled) | Should be material for safety/incidents | ✗ (coverage gap) |
-| The ~11× psych ratio | Stable across all 90 cells, 1.29–1.85 TME ratio | Selection = categorical, not linear | ✓✓ |
+| The ~11× psych ratio | Stable across all 90 cells, 1.29–1.85 TME ratio | Extreme fixture contrast, not population effect | ✓✓ |
 
-**Verdict: the engine's qualitative behavior is sound and matches the published analog-mission science on the dimensions the catalog can represent.** The three coverage gaps (Antarctic catalog, conscientiousness, interpersonal conflict) are documented and bounded. The 4.4× pEVAC ratio (none vs unlimited) and the 44× `medium → unlimited` gap scaling (22 d → 365 d) are the two strongest findings: both reproduce the consumables-cliff and ISS-HMS-dividend literature without explicit tuning.
+> **Historical report boundary:** This archived report predates v0.6 audit containment. Treat its numbers as exploratory sensitivity outputs under old fixtures. It is not evidence of validated crew selection, medical clearance, calibrated analog pEVAC/pLOCL/CHI, or operational planning guidance. Current boundaries are in `docs/model_card.md` and `docs/iter5_scientific_limitations.md`.
+
+**Verdict:** the historical run is internally coherent and directionally consistent with selected analog-mission themes on dimensions the catalog can represent. This is not external validation. The three coverage gaps (Antarctic catalog, conscientiousness, interpersonal conflict) are documented and bounded. The 4.4× pEVAC ratio (none vs unlimited) and the 44× `medium → unlimited` gap scaling (22 d → 365 d) are exploratory scenario findings, not calibrated analog-risk estimates.
 
 ---
 
@@ -370,15 +372,15 @@ Comparing the 4-var sweep's qualitative behavior against the published analog-mi
 4. **Engine is fitting terrestrial base rates**, not astronaut-specific ones. Absolute magnitudes (especially pLOCL at 0.31% person-years vs ISS cumulative < 0.1%) are conservative planning cases, not outcome predictions.
 5. **Validation comparison diverges on the unscreened pLOCL by 0.022pp** (4 vs 22 events: the 7-day study counted 22 LOCL events in 20 000 trials; the 4-var sweep counted 44 in 50 000 trials. The 0.022pp gap is ~11 events of MC noise on the 4-var side, ~4 on the 7-day side). Tails are inherently noisy; the 20% relative difference is 11 events.
 6. **The 426-d Mars catalog mission was not used** because the V4 grid is 22/45/90/180/365 d. The 4-var sweep is interpolative in kind-space (the `kind_multipliers` apply across the 100 conditions) but extrapolative in Mars duration beyond 365 d.
-7. **90 cells × 50 000 trials is below the threshold for some tail-event p-values** (e.g. 22-d pLOCL with k=8 events has Wilson CI of 0.007–0.034% at 50 000, which is wide in absolute terms). The 4-var sweep matches the 7-day study's MC noise floors, and the validation comparison confirms it.
+7. **90 cells × 50 000 trials is below the threshold for some tail-event p-values** (e.g. 22-d pLOCL with k=8 events has Wilson CI of 0.007–0.034% at 50 000, which is wide in absolute terms). The 4-var sweep matches the 7-day study's MC noise floors, and the regression comparison confirms it.
 
 ---
 
 ## 12. Bottom line
 
-The 4-variable MCMC sweep (90 cells × 50 000 trials = 4.5M total) reproduces the 7-day study's findings, validates the wider sweep's machinery, and surfaces two new operationally important results: **(1) the screening effect's absolute magnitude scales with mission kind — long ISS and Mars missions see much larger absolute TME reductions than short Antarctic missions**; and **(2) the medical-kit × duration interaction is the dominant driver of pEVAC, with the `medium → unlimited` gap widening 44× from 22 d to 365 d** — a quantitative restatement of the Antarctic / polar-station consumables cliff. The top-1 psychiatric event is `late-insomnia` in 90/90 cells, and the top-5 medical conditions (barotrauma, CO2-headache, altitude-sickness, sinusitis, late-headache) match the Antarctic ASTRAP / USAP / Concordia clinical records without explicit Antarctic tuning. The three documented coverage gaps (Antarctic catalog, conscientiousness, interpersonal conflict) bound the model's completeness but do not affect the qualitative findings on the dimensions the catalog can represent.
+The 4-variable MCMC sweep (90 cells × 50 000 trials = 4.5M total) regression-checks the wider sweep machinery against the 7-day study and surfaces two exploratory sensitivities: **(1) the extreme crew-quality fixture's absolute magnitude scales with mission kind**, and **(2) the medical-kit × duration interaction is the dominant driver of pEVAC in this conditional run, with the `medium → unlimited` gap widening 44× from 22 d to 365 d**. The top-1 psychiatric event is `late-insomnia` in 90/90 cells, and the top-5 medical conditions (barotrauma, CO2-headache, altitude-sickness, sinusitis, late-headache) are directionally compatible with Antarctic ASTRAP / USAP / Concordia records. Those matches do not establish calibration. The three documented coverage gaps (Antarctic catalog, conscientiousness, interpersonal conflict) bound the model's completeness and limit any claim beyond exploratory scenario analysis.
 
-For the manuscript discussion: lead with the `medium → unlimited` pEVAC gap scaling (the consumables-cliff in numerical form) and the screening × duration absolute-magnitude scaling (the case for psychological screening on long missions). Add the top-5 medical ordering as a piece of evidence that the model is qualitatively correct on the closed-habitat / polar-station use case. Name the three coverage gaps by name in the limitations. Do not claim that the model reproduces Mars-500 or SIRIUS data — it does not, and trying to fit to those tiny n is a trap.
+For any manuscript discussion, qualify the `medium → unlimited` pEVAC gap scaling and the crew-quality × duration absolute-magnitude scaling as scenario sensitivities. Add the top-5 medical ordering only as a qualitative plausibility check, not as evidence that the model is validated on the closed-habitat / polar-station use case. Name the three coverage gaps by name in the limitations. Do not claim that the model reproduces Mars-500 or SIRIUS data -- it does not, and trying to fit to those tiny n is a trap.
 
 ---
 

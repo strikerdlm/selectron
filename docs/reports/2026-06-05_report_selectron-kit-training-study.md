@@ -1,10 +1,12 @@
 # Selectron — Medical Resources × Crew Quality: Factorial Study
-## How kit level and crew selection interact to modulate pEVAC and pLOCL in analog missions
+## Historical sensitivity study of kit level and extreme crew-quality fixtures
 
 **Date:** 2026-06-05
 **Engine:** `simulateIMM` (`src/imm/`), 100-condition NASA-IMM-aligned catalog, `analog-controlled` kind multipliers auto-loaded, vulnerability path active.
 **Design:** 4 kit levels × 2 crew types × 3 durations = **24 arms × T = 20 000 trials** (480 000 mission trials total), seed `0xc0ffee`.
 **Reproducer (committed):** `scripts/kit_training_study.ts` · raw data: `exports/2026-06-05_data_selectron-kit-training-study.json`
+
+> **Historical report boundary:** This archived report predates v0.6 audit containment. Treat its numbers as exploratory sensitivity outputs under old fixtures. It is not evidence of validated crew selection, medical clearance, calibrated analog pEVAC/pLOCL/CHI, or operational planning guidance. Current boundaries are in `docs/model_card.md` and `docs/iter5_scientific_limitations.md`.
 
 ---
 
@@ -34,7 +36,7 @@ Same fixture as the duration study (`scripts/duration_study_screened_vs_unscreen
 | NASA Cognition battery (z, gate < −2) | −2.5 | +1.0 |
 | All other criteria | mid-scale | mid-scale |
 
-The unscreened crew fails both clearance gates; the screened crew qualifies. Both are run without gating — the comparison shows what selection prevents. "Trained" and "untrained" map to the screened/unscreened distinction: the screened crew has high emotional competence, low psychiatric pathology, and cognitive reserve; the unscreened crew has clinical-range pathology.
+The unscreened fixture fails both demonstration gates; the screened fixture qualifies. Both are run without gating, so the comparison shows sensitivity to two extreme input fixtures rather than what a validated selection process prevents. Historical "trained" and "untrained" labels map to this screened/unscreened contrast: the screened fixture has high emotional competence, low psychiatric pathology, and cognitive reserve; the unscreened fixture has clinical-range pathology.
 
 These are deliberate **bounding extremes** (EID T = 35, a near-ideal screened profile, vs EID T = 90, the clinical ceiling — +4 SD above the normative mean of 50), not representative populations. Every screened-vs-unscreened ratio below — in particular the ~11× psychiatric figure of §7 — bounds the *sensitivity* of the selection criterion and is not a calibrated estimate of any real unscreened cohort; no analog mission has ever flown an unscreened control arm. See the duration-study report (§6 finding 2) and the defensibility review (§1) for the full treatment.
 
@@ -154,7 +156,7 @@ The crew effect on pEVAC is **not monotonic with kit level**:
 
 ### pLOCL interaction (120-day asymmetry)
 
-The most operationally significant finding is a significant **LOCL reduction for the screened crew under good resources at 120 days**, with no equivalent benefit for the unscreened crew:
+The most notable historical sensitivity finding is a significant **LOCL reduction for the screened fixture under good resources at 120 days**, with no equivalent benefit for the unscreened fixture:
 
 | Duration | Kit | Crew | pLOCL | RR crew (unscr/scr) | p |
 |---|---|---|---|---|---|
@@ -184,7 +186,7 @@ The ~11× psychiatric-event ratio from the duration study is **completely invari
 
 **The 11× is a bounding contrast, not a population effect** (EID T = 35 vs the T = 90 clinical extreme; see §1.2). What is resource-independent is the *mechanism* — selection acts on incidence, kit acts on outcome — not a measured screened-vs-unscreened gap in any real cohort. The screened arm's modeled burden has an empirical anchor: ~5% per-expedition DSM/ICD psychiatric-disorder prevalence is repeatedly reported for *already-screened* polar winter-over crews (Palinkas & Suedfeld, 2008; Lugg, 2005; Friedman & Bui, 2017).
 
-This has a direct operational implication: **medical resources buy evacuation-risk reduction; crew selection buys psychiatric-burden reduction**. A well-stocked base with a poorly-selected crew will have near-normal pEVAC but a much higher behavioral/psychiatric event load than a well-selected one — with associated performance degradation, interpersonal conflict, and mission-objective risk that the evacuation metric does not capture. (The *magnitude* of that load difference is a sensitivity bound, not a calibrated forecast.)
+Under the historical model assumptions, this produces a scenario-analysis implication: **medical resources mainly move evacuation-risk outputs, while crew-quality fixture inputs mainly move psychiatric-burden outputs**. This is a conditional sensitivity result, not operational guidance. The magnitude of the load difference is a sensitivity bound, not a calibrated forecast.
 
 ---
 
@@ -205,7 +207,7 @@ At 90 days (the canonical long analog campaign):
 
 *Medium kit for screened crew at 45d (0.72%) vs no-kit (1.72%) — the 90-day medium numbers show a smaller absolute spread. The percentage reductions above are rounded.
 
-**Conclusion**: Kit level produces a 4–6× pEVAC reduction (none → unlimited) compared to a 10–35% crew-quality effect. **Medical resources are the dominant modulator of pEVAC; crew selection is a secondary modifier that is most visible at intermediate resource levels and nearly eliminated at unlimited care.** Neither lever meaningfully changes pLOCL at campaigns ≤ 90 days; at 120 days, the combination of good resources + screened crew produces the lowest LOCL.
+**Historical sensitivity conclusion**: Kit level produces a 4–6× pEVAC reduction (none → unlimited) compared to a 10–35% crew-quality fixture effect. **Medical resources are the dominant pEVAC lever in this conditional run; the crew-quality fixture is a secondary modifier most visible at intermediate resource levels and nearly eliminated at unlimited care.** Neither lever meaningfully changes pLOCL at campaigns <= 90 days; at 120 days, the combination of good resources + screened fixture produces the lowest simulated LOCL.
 
 ---
 
@@ -215,13 +217,13 @@ At 90 days (the canonical long analog campaign):
 
 2. **Crew quality matters most at intermediate resource levels** (analog station kit). At a well-stocked station, the screened crew's lower event rate preserves kit integrity and maintains the treated pathway for later events — a compounding advantage. At no-resources, both crews are equally poorly treated; at unlimited resources, both are equally well treated.
 
-3. **At unlimited resources, crew selection has no significant pEVAC effect at 45 or 120 days** (RR 1.02 and 1.07, both p > 0.48). The evacuations that occur despite unlimited care are driven by a residual untreatable fraction that is similar for both crews. Selection does not prevent those.
+3. **At unlimited resources, the crew-quality fixture has no significant pEVAC effect at 45 or 120 days** (RR 1.02 and 1.07, both p > 0.48). The evacuations that occur despite unlimited care are driven by a residual untreatable fraction that is similar for both fixtures. This input contrast does not affect those simulated tails.
 
-4. **Crew selection retains its psychiatric-burden effect regardless of resources** (the modeled ratio holds at ~11× throughout). This is the dimension where selection is irreplaceable: medical resources can treat a behavioral event once it occurs, but they cannot prevent it. The ~11× is a **best-/worst-case sensitivity bound** (EID T = 35 vs T = 90), not a calibrated population effect — but the *qualitative* claim (psychiatric burden is the most selection-sensitive endpoint, and it is resource-independent) is robust and literature-supported, and these events affect mission performance in ways that pEVAC does not capture.
+4. **The crew-quality fixture retains its psychiatric-burden effect regardless of resources** (the modeled ratio holds at ~11× throughout). This is where the input contrast dominates the sensitivity analysis: medical resources can treat a behavioral event once it occurs, but they do not change incidence in this model. The ~11× is a **best-/worst-case sensitivity bound** (EID T = 35 vs T = 90), not a calibrated population effect. The qualitative direction is plausible but not externally validated by this report.
 
 5. **The combination of screened crew + issHMS/unlimited resources produces the lowest pLOCL at 120 days** (0.035–0.045%), significantly below all other conditions. The interaction is asymmetric: good resources do not rescue the unscreened crew's LOCL risk (0.100–0.110% remains constant), suggesting a residual pathway driven by the crew's psychiatric event load that medical care cannot fully close.
 
-6. **Operational implication**: resource investment reduces evacuation risk for any crew. Crew selection reduces psychiatric burden for any resource level. They are complementary investments targeting different endpoints. A minimum viable mission requires both: a no-resources scenario produces 3–5% pEVAC regardless of crew quality; an unscreened crew produces 80%+ probability of a behavioral event on a 120-day mission regardless of kit size.
+6. **Scenario implication**: resource assumptions reduce simulated evacuation risk for either crew fixture. Crew-quality inputs reduce simulated psychiatric burden for any resource level. They are complementary scenario levers targeting different endpoints, not validated requirements for a minimum viable mission.
 
 ---
 
@@ -231,7 +233,7 @@ At 90 days (the canonical long analog campaign):
 - 120-day LOCL contrasts are based on 18–39 events per arm — adequate for significance at the sizes shown but imprecise for the RR point estimates.
 - Common-random-numbers seeding makes between-arm tests conservative; the crew × kit interaction pattern is consistent across durations, supporting robustness.
 - The "unlimited" kit eliminates supply constraints but does not model provider skill, telemedicine latency, or procedural complexity — all of which would attenuate its real-world benefit.
-- Psychiatric events are counted but not mapped to performance metrics; the 11× ratio translates operationally to mission degradation beyond what pEVAC/pLOCL capture.
+- Psychiatric events are counted but not mapped to performance metrics; do not translate the 11× fixture ratio into mission-degradation magnitude without external validation.
 
 ---
 

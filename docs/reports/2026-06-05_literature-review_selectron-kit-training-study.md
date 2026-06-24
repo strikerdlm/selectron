@@ -1,9 +1,11 @@
-# Literature Review: Validation of Selectron IMM 24-Arm Monte Carlo Factorial Study Outputs Against Published Evidence
+# Literature Review: Context for Selectron IMM 24-Arm Monte Carlo Factorial Study Outputs
 
 **Date:** 2026-06-05  
 **Reviewer:** Selectron project (automated literature review)  
 **Scope:** Five findings from a 24-arm factorial Monte Carlo study (4 kit levels × 2 crew types × 3 durations) of analog mission medical risk  
 **Output file:** `2026-06-05_literature-review_selectron-kit-training-study.md`
+
+> **Historical report boundary:** This archived report predates v0.6 audit containment. Treat its numbers as exploratory sensitivity outputs under old fixtures. It is not evidence of validated crew selection, medical clearance, calibrated analog pEVAC/pLOCL/CHI, or operational planning guidance. Current boundaries are in `docs/model_card.md` and `docs/iter5_scientific_limitations.md`.
 
 ---
 
@@ -13,7 +15,7 @@
 
 The Selectron IMM simulator runs probabilistic risk assessments for analog-astronaut candidates across mission configurations spanning resource level (none, limited, issHMS, unlimited) and crew phenotype (screened vs. unscreened via psychological pre-screening). The factorial design yields 24 arms (4 kit × 2 crew × 3 durations: 45d, 90d, 120d). Primary outputs are pEVAC (probability of at least one medical evacuation), pLOCL (probability of loss of crew life), CHI (Crew Health Index), and the psychiatric burden sub-score.
 
-This review evaluates five simulation findings against the published peer-reviewed literature. The search strategy combined PubMed (mcp__paper-search__search_pubmed), open-access full-text retrieval via PMC URLs (mcp__fetch__fetch), and supplementary Brave web search (mcp__brave__brave_web_search). Papers were included only if full text or at minimum a substantive abstract was directly retrieved; no citation was fabricated or inferred from secondary mentions.
+This review places five simulation findings alongside the published peer-reviewed literature. It does not validate the Selectron outputs against held-out analog outcomes. The search strategy combined PubMed (mcp__paper-search__search_pubmed), open-access full-text retrieval via PMC URLs (mcp__fetch__fetch), and supplementary Brave web search (mcp__brave__brave_web_search). Papers were included only if full text or at minimum a substantive abstract was directly retrieved; no citation was fabricated or inferred from secondary mentions.
 
 ### Papers Retrieved and Evaluated
 
@@ -40,17 +42,17 @@ Seven papers provided usable evidence for this review:
 
 **What the literature says:**
 
-Antonsen et al. (2022) provide the most direct validation point available in the published literature. Their Table 1 and Fig. 4 present pEVAC stratified by mission duration and medical capability class for missions ranging from 14 to 1195 days. For missions at or below 42 days: No Medical Capability yields pEVAC consistently above 10%; Limited ISS Medical Capability substantially reduces this; Unlimited ISS Medical Capability reduces EVAC to 0.3–1% for the same durations. This represents approximately a 10–30× reduction from the no-capability extreme to the unlimited ceiling — exceeding, if anything, the 4–6× reported by the simulation.
+Antonsen et al. (2022) provide the most direct literature context available in the published literature. Their Table 1 and Fig. 4 present pEVAC stratified by mission duration and medical capability class for missions ranging from 14 to 1195 days. For missions at or below 42 days: No Medical Capability yields pEVAC consistently above 10%; Limited ISS Medical Capability substantially reduces this; Unlimited ISS Medical Capability reduces EVAC to 0.3–1% for the same durations. This represents approximately a 10–30× reduction from the no-capability extreme to the unlimited ceiling -- larger than the 4–6× reported by the simulation.
 
 The authors state directly: "within the limits of this study, for shorter-duration missions, the stringent medical criteria for astronaut selection provide meaningful risk mitigation. As missions extend beyond several months, the results suggest that the relative benefits from selecting very healthy people do not mitigate the potential for more and varied medical events with increasing time" (Antonsen et al., 2022). They characterize medical capability as overtaking selection as the dominant risk lever somewhere between 42 and 180 days of mission duration.
 
-This is a strong match. The simulation's 4–6× resource effect is conservative relative to Antonsen's modeled range, which is appropriate because Antonsen uses ISS-grade mission profiles while the Selectron study uses analog (ICE) environments with substantially lower acuity and fewer high-stakes conditions. The qualitative structure — resources dominate, selection contributes but is secondary — is directly confirmed.
+This is a directional match, not validation. The simulation's 4–6× resource effect is smaller than Antonsen's modeled range, which may reflect context differences because Antonsen uses ISS-grade mission profiles while the Selectron study uses analog (ICE) environments with substantially lower acuity and fewer high-stakes conditions. The qualitative structure -- resources dominate the EVAC output while crew-quality fixtures contribute secondarily -- is consistent with the literature.
 
-Walton & Kerstman (2020) validated the IMM against actual ISS medical experience and confirmed "IMM outputs were comparable with actual experience," lending authority to the IMM methodology from which the Selectron simulations are derived.
+Walton & Kerstman (2020) validated the NASA IMM against actual ISS medical experience and confirmed "IMM outputs were comparable with actual experience." That supports NASA IMM as a methodological reference, but it does not validate these Selectron analog scenarios.
 
 Thomas et al. (2003) offer a complementary data point from Navy submarine patrols in a highly screened healthy population: among a crew of seven officers on a 6-month patrol, only approximately one medical event per mission is expected. This establishes a baseline for what extreme pre-selection achieves in isolation — supporting the view that screened-crew pEVAC should be meaningfully lower than unscreened, but also that the absolute event rate in analog ICE environments with adequate resources is low.
 
-**Verdict: Well-supported.** The directional finding (resources dominate EVAC; crew quality is secondary) is confirmed by Antonsen et al. (2022) with quantitative specificity. The magnitude (4–6× in the simulation vs. 10–30× in Antonsen) may reflect appropriate context adaptation to analog vs. spaceflight risk profiles.
+**Verdict: Directionally supported only.** The direction (resources dominate EVAC; crew-quality fixtures are secondary in this run) is consistent with Antonsen et al. (2022). The magnitude (4–6× in the simulation vs. 10–30× in Antonsen) is not externally calibrated here.
 
 ---
 
@@ -122,7 +124,7 @@ Palinkas & Suedfeld (2008) support the domain-separation aspect for psychiatric 
 
 Basner et al. (2014) contribute supporting evidence through the Mars-500 heterogeneity data: even under controlled, resourced conditions, behavioral outcomes were highly individual-dependent — the person with 93% symptomatic weeks could not have been managed to the same outcome as the asymptomatic crew members by resources alone, at least without prohibitive intervention. This illustrates the ceiling on what resources achieve against constitutional psychiatric vulnerability.
 
-**Verdict: Well-supported.** The complementary-countermeasures framing, domain separation (pEVAC vs. psychiatric outcomes), and the two-lines-of-defense concept are all confirmed by multiple retrieved papers. This is the finding most ready for direct citation in the manuscript.
+**Verdict: Directionally supported framing.** The complementary-countermeasures framing, domain separation (pEVAC vs. psychiatric outcomes), and the two-lines-of-defense concept are consistent with multiple retrieved papers. This remains contextual support, not Selectron outcome validation.
 
 ---
 
@@ -134,7 +136,7 @@ Basner et al. (2014) contribute supporting evidence through the Mars-500 heterog
 | F2: Crew quality effect peaks at intermediate kit levels | **Plausible** | None (model-emergent) | No direct empirical support for the non-monotonic interaction shape |
 | F3: Psychiatric burden 11× higher unscreened; resource-independent | **Supported in direction only** | Palinkas & Suedfeld (2008); Basner et al. (2014) | 11× magnitude not externally validated; 46–81% vs. 5% denominator gap requires explicit reconciliation |
 | F4: pLOCL RR 2.22–3.14 screened vs. unscreened at 120d, high resources | **Plausible** | Ikeda et al. (2019); Antonsen et al. (2022) | Directly challenged by Antonsen Fig. 5 (LOCL insensitive to capability at high end); requires mechanistic clarification |
-| F5: Resources and crew quality are complementary, different outcome domains | **Well-supported** | Tran et al. (2021); Antonsen et al. (2022) | No substantive caveat — framing is broadly confirmed |
+| F5: Resources and crew quality are complementary, different outcome domains | **Directionally supported** | Tran et al. (2021); Antonsen et al. (2022) | Contextual framing only; not Selectron outcome validation |
 
 ---
 
