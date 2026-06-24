@@ -255,6 +255,18 @@ export type MonteCarloErrorSummary = {
   pEvacMcsePct: number;
   pLoclMcsePct: number;
   healthCriterionMcsePct: number;
+  /** Number of trials with at least one EVAC terminal outcome. */
+  pEvacEventCount: number;
+  /** Number of trials without an EVAC terminal outcome. */
+  pEvacNonEventCount: number;
+  /** Number of trials with at least one LOCL terminal outcome. */
+  pLoclEventCount: number;
+  /** Number of trials without a LOCL terminal outcome. */
+  pLoclNonEventCount: number;
+  /** Number of trials satisfying the composite health criterion. */
+  healthCriterionEventCount: number;
+  /** Number of trials failing the composite health criterion. */
+  healthCriterionNonEventCount: number;
   /** Wilson score 95% interval for the binary pEVAC estimator, percent scale. */
   pEvacWilson95Pct: [number, number];
   /** Wilson score 95% interval for the binary pLOCL estimator, percent scale. */
@@ -281,6 +293,8 @@ export type MonteCarloPrecisionTargets = {
   healthCriterionMcseMaxPp: number;
   /** Maximum Wilson 95% interval width for binary probabilities, percentage-point scale. */
   binaryWilsonWidthMaxPp: number;
+  /** Minimum count required in both binary tails before rare-event precision is treated as stable. */
+  minBinaryEventCount: number;
   /** Minimum independent seeds required before a run is treated as replicated. */
   minIndependentSeeds: number;
   /** Maximum across-seed spread for percent-scale means, percentage-point scale. */
@@ -289,10 +303,10 @@ export type MonteCarloPrecisionTargets = {
 
 export type MonteCarloPrecisionCheck = {
   metric: "tme" | "chi" | "pEvac" | "pLocl" | "healthCriterion";
-  criterion: "relativeMcse" | "absoluteMcse" | "wilsonWidth";
+  criterion: "relativeMcse" | "absoluteMcse" | "wilsonWidth" | "eventCount";
   observed: number | null;
   target: number;
-  unit: "ratio" | "pp";
+  unit: "ratio" | "pp" | "count";
   passed: boolean;
   recommendedTrials: number | null;
 };

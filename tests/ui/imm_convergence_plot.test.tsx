@@ -37,6 +37,12 @@ function makeOutcome(checkpoints: number[], sigmaChi: number[], sigmaPevac: numb
       pEvacMcsePct: 0.02,
       pLoclMcsePct: 0.01,
       healthCriterionMcsePct: 0.04,
+      pEvacEventCount: 5570,
+      pEvacNonEventCount: 94_430,
+      pLoclEventCount: 12,
+      pLoclNonEventCount: 99_988,
+      healthCriterionEventCount: 80_000,
+      healthCriterionNonEventCount: 20_000,
       pEvacWilson95Pct: [5.43, 5.71],
       pLoclWilson95Pct: [0.39, 0.50],
       healthCriterionWilson95Pct: [79.75, 80.25],
@@ -54,6 +60,7 @@ function makeOutcome(checkpoints: number[], sigmaChi: number[], sigmaPevac: numb
         pLoclMcseMaxPp: 0.1,
         healthCriterionMcseMaxPp: 0.25,
         binaryWilsonWidthMaxPp: 1,
+        minBinaryEventCount: 30,
         minIndependentSeeds: 3,
         maxSeedMeanSpreadPp: 0.5,
       },
@@ -104,6 +111,8 @@ describe("IMMConvergencePlot (I4)", () => {
     expect(text).toContain("Independent seeds");
     expect(text).toContain("not assessed");
     expect(text).toContain("Wilson 95%");
+    expect(text).toContain("12 events / 100,000 trials");
+    expect(text).toContain("rare-event flag");
     expect(text).toContain("historical 5 pp batch-SD reference");
   });
 

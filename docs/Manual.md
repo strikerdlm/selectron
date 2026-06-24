@@ -293,7 +293,7 @@ Failed gates are **review flags**; the sim can still run unless you choose to ex
 3. On completion, the **Outcome** panel shows:
    - TME, CHI, pEVAC, pLOCL (with simulation intervals and MCSE)
    - Composite crew health criterion attainment
-   - MCSE/Wilson stopping-rule status and independent-seed replication status
+   - MCSE/Wilson/sparse-tail stopping-rule status and independent-seed replication status
    - CHI clamp count/proportion
    - Expected duty hours lost
    - Evidence coverage statement (`accepted: N / M params · unadjudicated`)
@@ -480,7 +480,7 @@ npm run evidence:require-adjudicated # release gate (fails until full coverage)
 | **MCDA interval** | Percentile band of Stage A score under weight uncertainty |
 | **Simulation interval** | Percentile band of simulated mission-to-mission variability under current assumptions; not a confidence interval for real analog outcomes |
 | **MCSE** | Monte Carlo standard error of the displayed mean/probability estimate; small MCSE means the simulation estimate is numerically stable, not empirically validated |
-| **Stopping rule** | Declared MCSE/Wilson precision target for displayed estimators; independent-seed replication is reported separately and is required before a run is treated as replicated |
+| **Stopping rule** | Declared MCSE, Wilson-width, and sparse-tail count target for displayed estimators; independent-seed replication is reported separately and is required before a run is treated as replicated |
 | **CHI clamp** | Count/proportion of trials where raw CHI was clipped to the 0–100 display scale |
 | **Kind multiplier** | Per-(mission-kind, condition) incidence scaler from prior catalog |
 | **Profile multiplier** | Registry-controlled I&C profile effect; communications delay is proposal-stage and applies only in exploratory mode |

@@ -57,6 +57,7 @@ export const DEFAULT_MONTE_CARLO_PRECISION_TARGETS: MonteCarloPrecisionTargets =
   pLoclMcseMaxPp: 0.1,
   healthCriterionMcseMaxPp: 0.25,
   binaryWilsonWidthMaxPp: 1,
+  minBinaryEventCount: 30,
   minIndependentSeeds: 3,
   maxSeedMeanSpreadPp: 0.5,
 };
@@ -776,6 +777,10 @@ function wilson95Pct(flags: number[]): [number, number] {
   ];
 }
 
+function eventCount(flags: number[]): number {
+  return flags.reduce((a, b) => a + b, 0);
+}
+
 function monteCarloErrorSummary(args: {
   tmes: number[];
   chis: number[];
@@ -794,6 +799,9 @@ function monteCarloErrorSummary(args: {
   const pEvacMcsePct = sampleMcse(evacs.map(x => x * 100));
   const pLoclMcsePct = sampleMcse(locls.map(x => x * 100));
   const healthCriterionMcsePct = sampleMcse(healthCriterionFlags.map(x => x * 100));
+  const pEvacEventCount = eventCount(evacs);
+  const pLoclEventCount = eventCount(locls);
+  const healthCriterionEventCount = eventCount(healthCriterionFlags);
 
   return {
     trials: tmes.length,
@@ -802,6 +810,12 @@ function monteCarloErrorSummary(args: {
     pEvacMcsePct,
     pLoclMcsePct,
     healthCriterionMcsePct,
+    pEvacEventCount,
+    pEvacNonEventCount: evacs.length - pEvacEventCount,
+    pLoclEventCount,
+    pLoclNonEventCount: locls.length - pLoclEventCount,
+    healthCriterionEventCount,
+    healthCriterionNonEventCount: healthCriterionFlags.length - healthCriterionEventCount,
     pEvacWilson95Pct: wilson95Pct(evacs),
     pLoclWilson95Pct: wilson95Pct(locls),
     healthCriterionWilson95Pct: wilson95Pct(healthCriterionFlags),
@@ -828,15 +842,29 @@ function resolvePrecisionTargets(overrides?: Partial<MonteCarloPrecisionTargets>
       minIndependentSeeds: targets.minIndependentSeeds,
     });
   }
+  if (!Number.isInteger(targets.minBinaryEventCount) || targets.minBinaryEventCount < 1) {
+    throw new SelectronError("E_BAD_SCENARIO_CONTROL", "precision target minBinaryEventCount must be a positive integer", {
+      minBinaryEventCount: targets.minBinaryEventCount,
+    });
+  }
   return targets;
 }
 
-function recommendedTrials(currentTrials: number, observed: number | null, target: number, passed: boolean): number | null {
+function recommendedTrials(
+  currentTrials: number,
+  observed: number | null,
+  target: number,
+  passed: boolean,
+  passDirection: "max" | "min",
+): number | null {
   if (passed) return currentTrials;
   if (observed === null || !Number.isFinite(observed) || observed <= 0 || !Number.isFinite(target) || target <= 0) {
     return null;
   }
-  return Math.max(currentTrials, Math.ceil(currentTrials * (observed / target) ** 2));
+  const scale = passDirection === "max"
+    ? (observed / target) ** 2
+    : target / observed;
+  return Math.max(currentTrials, Math.ceil(currentTrials * scale));
 }
 
 function makePrecisionCheck(args: {
@@ -847,11 +875,17 @@ function makePrecisionCheck(args: {
   unit: MonteCarloPrecisionCheck["unit"];
   trials: number;
   passWhenUnavailable?: boolean;
+  passDirection?: "max" | "min";
 }): MonteCarloPrecisionCheck {
   const observed = args.observed;
+  const passDirection = args.passDirection ?? "max";
   const passed = observed === null
     ? args.passWhenUnavailable === true
-    : Number.isFinite(observed) && observed <= args.target;
+    : Number.isFinite(observed) && (
+      passDirection === "max"
+        ? observed <= args.target
+        : observed >= args.target
+    );
   return {
     metric: args.metric,
     criterion: args.criterion,
@@ -859,7 +893,7 @@ function makePrecisionCheck(args: {
     target: args.target,
     unit: args.unit,
     passed,
-    recommendedTrials: recommendedTrials(args.trials, observed, args.target, passed),
+    recommendedTrials: recommendedTrials(args.trials, observed, args.target, passed, passDirection),
   };
 }
 
@@ -939,6 +973,33 @@ export function assessMonteCarloPrecision(
       unit: "pp",
       trials: mcse.trials,
     }),
+    makePrecisionCheck({
+      metric: "pEvac",
+      criterion: "eventCount",
+      observed: Math.min(mcse.pEvacEventCount, mcse.pEvacNonEventCount),
+      target: targets.minBinaryEventCount,
+      unit: "count",
+      trials: mcse.trials,
+      passDirection: "min",
+    }),
+    makePrecisionCheck({
+      metric: "pLocl",
+      criterion: "eventCount",
+      observed: Math.min(mcse.pLoclEventCount, mcse.pLoclNonEventCount),
+      target: targets.minBinaryEventCount,
+      unit: "count",
+      trials: mcse.trials,
+      passDirection: "min",
+    }),
+    makePrecisionCheck({
+      metric: "healthCriterion",
+      criterion: "eventCount",
+      observed: Math.min(mcse.healthCriterionEventCount, mcse.healthCriterionNonEventCount),
+      target: targets.minBinaryEventCount,
+      unit: "count",
+      trials: mcse.trials,
+      passDirection: "min",
+    }),
   ];
   const stoppingRulePassed = checks.every((check) => check.passed);
   const requiredTrials = Math.max(
@@ -958,7 +1019,7 @@ export function assessMonteCarloPrecision(
     stoppingRulePassed,
     requiredTrials,
     stoppingRule:
-      "Pass requires every displayed estimator MCSE to meet its target; binary probabilities also require Wilson 95% interval width within target.",
+      "Pass requires every displayed estimator MCSE to meet its target; binary probabilities also require Wilson 95% interval width within target and enough events/non-events to avoid sparse-tail precision.",
     independentSeedReplication: replication,
     passed: stoppingRulePassed && replication.passed === true,
   };

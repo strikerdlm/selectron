@@ -349,6 +349,11 @@ describe("simulateIMM", () => {
     expect(out.monteCarloError?.chiMeanMcse).toBeGreaterThanOrEqual(0);
     expect(out.monteCarloError?.pEvacMcsePct).toBeGreaterThanOrEqual(0);
     const mcse = out.monteCarloError!;
+    expect(mcse.pEvacEventCount + mcse.pEvacNonEventCount).toBe(2000);
+    expect(mcse.pLoclEventCount + mcse.pLoclNonEventCount).toBe(2000);
+    expect(mcse.healthCriterionEventCount + mcse.healthCriterionNonEventCount).toBe(2000);
+    expect(mcse.pEvacEventCount).toBe(Math.round(out.pEvac.mean * 20));
+    expect(mcse.pLoclEventCount).toBe(Math.round(out.pLocl.mean * 20));
     expect(mcse.pEvacWilson95Pct[0]).toBeGreaterThanOrEqual(0);
     expect(mcse.pEvacWilson95Pct[0]).toBeLessThanOrEqual(out.pEvac.mean);
     expect(mcse.pEvacWilson95Pct[1]).toBeGreaterThanOrEqual(out.pEvac.mean);
@@ -371,6 +376,10 @@ describe("simulateIMM", () => {
     expect(out.analogFieldExposure?.spaceEvaPriorsReused).toBe(false);
     expect(out.analogFieldExposure?.omittedAnalogProcessFamilies).toContain("analog-terrain-EVA");
     expect(out.precisionAssessment?.checks.some((check) => check.criterion === "wilsonWidth")).toBe(true);
+    const eventCountChecks = out.precisionAssessment?.checks.filter((check) => check.criterion === "eventCount") ?? [];
+    expect(eventCountChecks).toHaveLength(3);
+    expect(eventCountChecks.every((check) => check.unit === "count")).toBe(true);
+    expect(eventCountChecks.every((check) => check.target === 30)).toBe(true);
     expect(out.precisionAssessment?.requiredTrials).toBeGreaterThanOrEqual(2000);
     expect(out.precisionAssessment?.independentSeedReplication.observedSeeds).toBe(1);
     expect(out.precisionAssessment?.independentSeedReplication.passed).toBeNull();

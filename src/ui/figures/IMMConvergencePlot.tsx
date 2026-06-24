@@ -50,11 +50,38 @@ function fmtTrials(n: number): string {
   return Math.ceil(n).toLocaleString();
 }
 
+function fmtCount(n: number): string {
+  return n.toLocaleString();
+}
+
+function sparseTailLabel(events: number | undefined, nonEvents: number | undefined, threshold: number): string {
+  if (
+    typeof events !== "number" ||
+    typeof nonEvents !== "number" ||
+    !Number.isFinite(events) ||
+    !Number.isFinite(nonEvents)
+  ) {
+    return "counts unavailable";
+  }
+  const sparseTail = Math.min(events, nonEvents) < threshold;
+  const base = `${fmtCount(events)} events / ${fmtCount(events + nonEvents)} trials`;
+  return sparseTail ? `${base} · rare-event flag` : base;
+}
+
 function PrecisionPanel({ outcome }: { outcome: IMMOutcome }) {
   const mcse = outcome.monteCarloError;
   if (!mcse) return null;
   const precision = outcome.precisionAssessment;
   const replication = precision?.independentSeedReplication;
+  const hasUnestimableFailedCheck = precision?.checks.some((check) => !check.passed && check.recommendedTrials == null) ?? false;
+  const stoppingRuleLabel = precision
+    ? precision.stoppingRulePassed
+      ? "pass"
+      : hasUnestimableFailedCheck
+        ? "needs more rare-tail events"
+        : `needs T >= ${fmtTrials(precision.requiredTrials)}`
+    : null;
+  const minTailCount = precision?.targets.minBinaryEventCount ?? 30;
   const replicationLabel = replication
     ? replication.passed === true
       ? `pass (${replication.observedSeeds}/${replication.requiredSeeds} seeds)`
@@ -70,7 +97,7 @@ function PrecisionPanel({ outcome }: { outcome: IMMOutcome }) {
           <div className="mono text-[10px] text-ink-2">
             MCSE stopping rule{" "}
             <span className="tabular-nums text-ink-1">
-              {precision.stoppingRulePassed ? "pass" : `needs T >= ${fmtTrials(precision.requiredTrials)}`}
+              {stoppingRuleLabel}
             </span>
           </div>
           <div className="mono text-[10px] text-ink-2">
@@ -88,16 +115,28 @@ function PrecisionPanel({ outcome }: { outcome: IMMOutcome }) {
           pEVAC MCSE <span className="tabular-nums text-ink-1">{fmtPp(mcse.pEvacMcsePct)}</span>
           <span className="text-ink-3"> · Wilson 95% </span>
           <span className="tabular-nums text-ink-1">{fmtInterval(mcse.pEvacWilson95Pct)}</span>
+          <span className="text-ink-3"> · </span>
+          <span className="tabular-nums text-ink-1">
+            {sparseTailLabel(mcse.pEvacEventCount, mcse.pEvacNonEventCount, minTailCount)}
+          </span>
         </div>
         <div className="mono text-[10px] text-ink-2">
           pLOCL MCSE <span className="tabular-nums text-ink-1">{fmtPp(mcse.pLoclMcsePct)}</span>
           <span className="text-ink-3"> · Wilson 95% </span>
           <span className="tabular-nums text-ink-1">{fmtInterval(mcse.pLoclWilson95Pct)}</span>
+          <span className="text-ink-3"> · </span>
+          <span className="tabular-nums text-ink-1">
+            {sparseTailLabel(mcse.pLoclEventCount, mcse.pLoclNonEventCount, minTailCount)}
+          </span>
         </div>
         <div className="mono text-[10px] text-ink-2">
           Health MCSE <span className="tabular-nums text-ink-1">{fmtPp(mcse.healthCriterionMcsePct)}</span>
           <span className="text-ink-3"> · Wilson 95% </span>
           <span className="tabular-nums text-ink-1">{fmtInterval(mcse.healthCriterionWilson95Pct)}</span>
+          <span className="text-ink-3"> · </span>
+          <span className="tabular-nums text-ink-1">
+            {sparseTailLabel(mcse.healthCriterionEventCount, mcse.healthCriterionNonEventCount, minTailCount)}
+          </span>
         </div>
       </div>
     </div>
@@ -121,7 +160,7 @@ export function IMMConvergencePlot({ outcome, trials, chiStar }: IMMConvergenceP
           block={{
             figureId: "I4",
             oneLine: `Batch σ(CHI) and σ(pEVAC) vs cumulative trials — T=${trials.toLocaleString()} (insufficient for batch diagnostics).`,
-            methods: "Requires T ≥ 1 000 trials for the 1 000-trial rolling-window σ diagnostic. Estimator precision is reported separately by MCSE, Wilson intervals, stopping-rule status, and independent-seed replication status when available.",
+            methods: "Requires T ≥ 1 000 trials for the 1 000-trial rolling-window σ diagnostic. Estimator precision is reported separately by MCSE, Wilson intervals, sparse-tail event counts, stopping-rule status, and independent-seed replication status when available.",
             source: "Antonsen et al. (2022) [A22]; Musson & Heaton (2018) [M18].",
             reproducibility: `trials=${trials.toLocaleString()}, chiStar=${chiStar.toFixed(2)}`,
           }}
@@ -229,7 +268,7 @@ export function IMMConvergencePlot({ outcome, trials, chiStar }: IMMConvergenceP
       "simulation (simulate.ts). σ values are in the native 0–100% scale (percentage-point " +
       "absolute SD) and describe batch outcome variability, not estimator precision. The 5 pp " +
       "line is retained as a historical M18/A22-style batch-stability reference only; MCSE, " +
-      "relative MCSE, Wilson intervals, stopping-rule status, and independent-seed replication " +
+      "relative MCSE, Wilson intervals, sparse-tail event counts, stopping-rule status, and independent-seed replication " +
       "status are the displayed estimator-precision diagnostics. " +
       `χ*=${chiStar.toFixed(2)} (composite health criterion).`,
     source:
