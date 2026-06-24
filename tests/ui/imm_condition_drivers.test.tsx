@@ -108,7 +108,7 @@ describe("IMMConditionDrivers (I3)", () => {
         topN={3}
       />,
     );
-    expect(container.textContent).toMatch(/Top 3 of 10[01] conditions/i);
+    expect(container.textContent).toMatch(/Top 3 of 10[01] condition attributions/i);
   });
 
   it("caption mentions the active metric (default pEVAC)", () => {
@@ -122,6 +122,7 @@ describe("IMMConditionDrivers (I3)", () => {
       />,
     );
     expect(container.textContent).toContain("pEVAC");
+    expect(container.textContent).toMatch(/not an additive probability decomposition/i);
   });
 
   it("metric toggle: clicking pLOCL updates the caption to mention pLOCL", () => {
@@ -135,14 +136,14 @@ describe("IMMConditionDrivers (I3)", () => {
       />,
     );
     // Default caption mentions pEVAC and leads with Nephrolithiasis (highest pEvacContrib)
-    expect(container.textContent).toMatch(/driving pEVAC/i);
+    expect(container.textContent).toMatch(/attributions for pEVAC/i);
 
     const pLoclBtn = getByRole("button", { name: /pLocl/i });
     fireEvent.click(pLoclBtn);
 
     // After toggle, the caption references pLOCL and the new leader is Altitude Sickness
     // (highest pLoclContrib=0.05 in the fixture).
-    expect(container.textContent).toMatch(/driving pLOCL/i);
+    expect(container.textContent).toMatch(/attributions for pLOCL/i);
     expect(container.textContent).toContain("Altitude Sickness");
   });
 

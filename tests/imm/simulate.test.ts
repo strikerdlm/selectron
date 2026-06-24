@@ -352,6 +352,32 @@ describe("simulateIMM", () => {
     expect(out.chiClamp?.proportion).toBeGreaterThanOrEqual(0);
     expect(out.chiClamp?.proportion).toBeLessThanOrEqual(1);
   });
+
+  it("reports pEVAC and pLOCL drivers on the same percent scale as headline probabilities", () => {
+    const realPriors = priorsModule.loadIMMPriors();
+    vi.spyOn(priorsModule, "loadIMMPriors").mockReturnValue({
+      ...realPriors,
+      conditions: {
+        ...realPriors.conditions,
+        "acute-sinusitis": makeSinusPrior(0.1),
+      },
+    });
+
+    const out = simulateIMM({
+      crew: oneCrew,
+      mission: oneDayMission,
+      kit: IMM_KITS.none,
+      trials: 4_000,
+      seed: 0x5151,
+      conditionFilter: (c) => c.id === "acute-sinusitis",
+    });
+    const sinus = out.perConditionDrivers.find((d) => d.conditionId === "acute-sinusitis");
+    expect(sinus).toBeDefined();
+    expect(sinus!.pEvacContrib).toBeGreaterThan(1);
+    expect(Math.abs(sinus!.pEvacContrib - out.pEvac.mean)).toBeLessThan(2);
+    expect(Math.abs(sinus!.pLoclContrib - out.pLocl.mean)).toBeLessThan(0.2);
+  });
+
   it("deterministic on the same seed", () => {
     const a = simulateIMM({ crew: oneCrew, mission: oneDayMission, kit: IMM_KITS.issHMS, trials: 1000, seed: 12345 });
     const b = simulateIMM({ crew: oneCrew, mission: oneDayMission, kit: IMM_KITS.issHMS, trials: 1000, seed: 12345 });

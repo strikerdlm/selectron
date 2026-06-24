@@ -83,7 +83,7 @@ It runs 101 evidence-tagged conditions with analog mission profiles, resource ki
 - The **Wizard** scores individual candidates (Stage A only).
 - **Crew Composition** simulates team-level medical outcomes (Stage B).
 - Optional **trait coupling** (default **off**) can modulate incidence by Stage A z-scores — enabled only as explicit scenario analysis.
-- **Profile effects** (pilot: comms delay → behavioral/psychiatric incidence) apply accepted I&C drivers where adjudicated.
+- **Profile effects** are default-off unless an effect is explicitly adjudicated; the current communications-delay coefficient is proposal-stage and applies only in exploratory mode.
 
 ---
 
@@ -300,7 +300,9 @@ Failed gates are **review flags**; the sim can still run unless you choose to ex
 
 Scroll to **Condition drivers** (I3 chart):
 
-- Per-condition contribution to pEVAC / pLOCL / TME
+- pEVAC / pLOCL event-attribution rates on the same percent scale as the headline probabilities
+- TME expected event counts per trial
+- Driver values are diagnostic attributions, not an additive decomposition of the headline probability
 - Kind-multiplier pills for the active mission kind
 - Terrestrial analog missions **exclude** space-only conditions automatically (radiation syndrome, space adaptation, EVA-only paths, etc.)
 

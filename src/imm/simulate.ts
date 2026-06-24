@@ -1022,8 +1022,8 @@ export function simulateIMM(opts: {
     : IMM_CONDITIONS;
   const drivers = driverConditions.map(c => ({
     conditionId: c.id,
-    pEvacContrib: (perConditionEvacSum[c.id] ?? 0) / trials,
-    pLoclContrib: (perConditionLoclSum[c.id] ?? 0) / trials,
+    pEvacContrib: ((perConditionEvacSum[c.id] ?? 0) / trials) * 100,
+    pLoclContrib: ((perConditionLoclSum[c.id] ?? 0) / trials) * 100,
     tmeContrib:   (perConditionCountsSum[c.id] ?? 0) / trials,
   }));
 

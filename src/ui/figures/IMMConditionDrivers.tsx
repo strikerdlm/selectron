@@ -1,15 +1,17 @@
 // I3 IMMConditionDrivers — horizontal lollipop chart of per-condition risk drivers.
 //
-// Renders the top-N conditions ranked by their contribution to either pEVAC or
-// pLOCL (toggleable). Each row is a thin stem (line, 2px) plus a colored scatter
+// Renders the top-N conditions ranked by their pEVAC or pLOCL event-attribution
+// rate (toggleable). Each row is a thin stem (line, 2px) plus a colored scatter
 // dot (size 12px), styled by IMMConditionFamily using the Okabe-Ito categorical
 // palette from ./theme.ts. Sort order is descending by the active metric, so the
-// worst driver sits at the top.
+// largest diagnostic attribution sits at the top.
 //
 // Contract:
 //   - `perConditionDrivers` is mission-aggregate (not per-crew), with `pEvacContrib`
-//     / `pLoclContrib` already expressed as percentage-point shares of the headline
-//     pEVAC / pLOCL. Values are shown raw — no division by the headline.
+//     / `pLoclContrib` expressed as percent-scale event-attribution rates per
+//     trial. They are diagnostic attributions, not additive decompositions of
+//     the headline pEVAC / pLOCL probabilities. Values are shown raw — no
+//     division by the headline.
 //   - Conditions outside the top N are dropped from the chart and the caption.
 //   - Friendly labels come from IMM_CONDITIONS; unknown IDs fall back to the raw id.
 //
@@ -233,7 +235,7 @@ export function IMMConditionDrivers({
         const lines = [
           `<b>${e.label}</b>`,
           `<span style="color:#9ca3af">family</span> <span style="color:${e.color}">${famText}</span>`,
-          `<span style="color:#9ca3af">${METRIC_LABEL[metric]} contrib</span> ${e.value.toFixed(3)}%`,
+          `<span style="color:#9ca3af">${METRIC_LABEL[metric]} attribution</span> ${e.value.toFixed(3)}%`,
           `<span style="color:#9ca3af">id</span> ${e.id}`,
         ];
         // 2026-06-04: surface the kind multiplier in the tooltip when active.
@@ -248,7 +250,7 @@ export function IMMConditionDrivers({
 
     xAxis: {
       type: "value" as const,
-      name: `${METRIC_LABEL[metric]} contribution (%)`,
+      name: `${METRIC_LABEL[metric]} attribution rate (%)`,
       nameLocation: "middle" as const,
       nameGap: 26,
       axisLabel: { fontSize: 10 },
@@ -300,16 +302,17 @@ export function IMMConditionDrivers({
   const captionBlock = {
     figureId: "I3",
     oneLine: isEmpty
-      ? `No driver data — run a simulation to populate the top condition contributors to ${METRIC_LABEL[metric]}.`
-      : `Top ${shownCount} of ${totalCatalog} conditions driving ${METRIC_LABEL[metric]}${missionPart} — leaders: ${top3 || "n/a"}.`,
+      ? `No driver data — run a simulation to populate the top condition attributions for ${METRIC_LABEL[metric]}.`
+      : `Top ${shownCount} of ${totalCatalog} condition attributions for ${METRIC_LABEL[metric]}${missionPart}; diagnostic, not an additive probability decomposition — leaders: ${top3 || "n/a"}.`,
     methods:
       "Horizontal lollipop chart: stem (thin line) + family-colored scatter dot per " +
-      "condition, sorted descending by the active metric so the worst driver is at " +
-      "the top. Contributions are mission-aggregate (not per-crew-member) and are " +
-      "sampling-noise-perturbed shares of the headline pEVAC/pLOCL — they sum " +
-      "approximately, not exactly, to the headline value because of Monte Carlo " +
-      "noise and non-additive interaction paths. Conditions outside the top N are " +
-      "not shown. The metric toggle re-sorts the chart and updates this caption. " +
+      "condition, sorted descending by the active metric so the largest diagnostic " +
+      "attribution is at the top. Values are mission-aggregate event-attribution " +
+      "rates on the same percent scale as pEVAC/pLOCL, not an additive probability " +
+      "decomposition of the headline value. Trial termination, condition " +
+      "interactions, Monte Carlo noise, and top-N truncation can all make the " +
+      "headline probability differ from the sum of displayed rows. Conditions " +
+      "outside the top N are not shown. The metric toggle re-sorts the chart and updates this caption. " +
       "Source: per-condition driver aggregation inside the IMM trial loop " +
       "(src/imm/simulate.ts → outcomes.perConditionDrivers).",
     source:
@@ -322,9 +325,10 @@ export function IMMConditionDrivers({
       `metric=${metric}, commit=${FIGURE_GENERATION_COMMIT}`,
     interpretation:
       "Out of 100 medical conditions modelled, only a handful drive most of the " +
-      "simulated emergencies. This chart shows the worst offenders — the conditions " +
-      "with the largest contribution to either the chance of emergency evacuation " +
-      "(EVAC) or the chance of crew loss (LOCL). Toggling between EVAC and LOCL can " +
+      "simulated terminal-event attributions. This chart shows the conditions " +
+      "most often associated with emergency evacuation (EVAC) or crew loss (LOCL) " +
+      "events in the scenario, without claiming that they add up to the headline probability. " +
+      "Toggling between EVAC and LOCL can " +
       "shift the order because different conditions are dangerous in different ways: " +
       "something painful and incapacitating might dominate EVAC risk without being " +
       "life-threatening, while a rare but lethal event dominates LOCL. Bar colour " +

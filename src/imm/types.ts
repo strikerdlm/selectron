@@ -251,6 +251,16 @@ export type IMMOutcome = {
    * should use healthCriterionAttainment terminology.
    */
   missionSuccess: ScenarioSummary;
+  /**
+   * Per-condition diagnostic attribution rates.
+   *
+   * pEvacContrib and pLoclContrib are percent-scale expected counts of
+   * terminal events attributed to each condition per trial, so they are
+   * comparable to pEvac/pLocl means but are not an additive probability
+   * decomposition. A trial-level headline probability can differ from the sum
+   * of condition attributions because of termination paths, interactions, and
+   * top-N display truncation. tmeContrib remains expected events per trial.
+   */
   perConditionDrivers: {
     conditionId: string;
     pEvacContrib: number; pLoclContrib: number; tmeContrib: number;
