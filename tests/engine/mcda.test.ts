@@ -96,4 +96,22 @@ describe("scoreCandidate", () => {
       SelectronError,
     );
   });
+
+  it("closed-form moments reject malformed alpha vectors instead of returning NaN", () => {
+    expect(() =>
+      closedFormMoments({
+        candidate: demo,
+        criteria: PLACEHOLDER_CRITERIA,
+        alpha: ALPHA.slice(1),
+      }),
+    ).toThrow(SelectronError);
+
+    expect(() =>
+      closedFormMoments({
+        candidate: demo,
+        criteria: PLACEHOLDER_CRITERIA,
+        alpha: [1, Number.POSITIVE_INFINITY, ...ALPHA.slice(2)],
+      }),
+    ).toThrow(SelectronError);
+  });
 });

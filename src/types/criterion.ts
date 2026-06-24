@@ -15,7 +15,7 @@ export type CriterionInstrument = {
     multiplier?: number;
     note?: string;
   };
-  /** Tier-specific operational caveats — e.g. "DASS-21 is TRIAGE, not a psychiatric select-out gate". */
+  /** Tier-specific caveats, such as triage-only instruments that require external clinical review. */
   notes?: string;
 };
 
@@ -50,9 +50,9 @@ export type Criterion = {
    */
   minimumTier?: AccessTier;
   /**
-   * Hard binary gate threshold. When set, a candidate score that violates the
-   * operator condition results in immediate disqualification regardless of the
-   * weighted MCDA score. Criteria without this field are modulating criteria only.
+   * Demo-threshold review flag. When set, a candidate score that violates the
+   * operator condition is surfaced for human review. It is not a validated
+   * eligibility, clearance, or selection boundary.
    */
   gateThreshold?: { operator: "fail-if-below" | "fail-if-above"; value: number };
 };

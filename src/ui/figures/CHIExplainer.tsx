@@ -50,7 +50,7 @@ function severityBucket(chiMean: number, chiStar: number): {
   tone: string;
   blurb: string;
 } {
-  // Distance below the χ* threshold drives the qualitative judgement.
+  // Distance below the configured χ* threshold drives the qualitative label.
   // χ ≥ χ* + 0.05 → strong; ≥ χ* → adequate; within 0.05 below → marginal; below → degraded.
   const delta = chiMean - chiStar;
   if (delta >= 0.05) {
@@ -58,7 +58,7 @@ function severityBucket(chiMean: number, chiStar: number): {
       label: "STRONG",
       tone: "text-emerald-300 border-emerald-400/40",
       blurb:
-        "Simulated crew health holds comfortably above the operational floor under the configured assumptions.",
+        "Simulated crew health holds comfortably above the configured threshold under the modeled assumptions.",
     };
   }
   if (delta >= 0) {
@@ -66,7 +66,7 @@ function severityBucket(chiMean: number, chiStar: number): {
       label: "ADEQUATE",
       tone: "text-signal border-signal/40",
       blurb:
-        "Simulated crew health sits at or just above the operational floor. The margin is thin, so small adverse assumption changes could move the result into degraded territory.",
+        "Simulated crew health sits at or just above the configured threshold. The margin is thin, so small adverse assumption changes could move the result into degraded territory.",
     };
   }
   if (delta >= -0.05) {
@@ -74,14 +74,14 @@ function severityBucket(chiMean: number, chiStar: number): {
       label: "MARGINAL",
       tone: "text-amber-300 border-amber-400/40",
       blurb:
-        "Simulated crew health is slightly below the χ* floor. Review mitigations and assumptions before treating this scenario as acceptable.",
+        "Simulated crew health is slightly below the configured χ* threshold. Review mitigations and assumptions before treating this scenario as acceptable.",
     };
   }
   return {
     label: "DEGRADED",
     tone: "text-warn border-warn/40",
     blurb:
-      "Simulated crew health is clearly below the operational floor. This run flags a mission-profile mismatch or insufficient evidence under the modeled priors.",
+      "Simulated crew health is clearly below the configured threshold. This run flags a mission-profile mismatch or insufficient evidence under the modeled priors.",
   };
 }
 
@@ -118,10 +118,10 @@ export function CHIExplainer({ posterior, chiStar, missionId, gate }: Props) {
           data-testid="disqualified-banner"
         >
           <div className="font-semibold text-red-900 mb-2">
-            REVIEW REQUIRED — clearance gate flag
+            REVIEW REQUIRED — demo-threshold flag
           </div>
           <p className="text-sm text-red-800 mb-2">
-            One or more binary clearance gates were flagged. The Stage B Monte
+            One or more demonstration thresholds were flagged. The Stage B Monte
             Carlo result is not converted into an applicant verdict; this panel
             only shows the flagged inputs for human review.
           </p>
@@ -250,13 +250,13 @@ export function CHIExplainer({ posterior, chiStar, missionId, gate }: Props) {
         </div>
         <div>
           <div className="mono text-[10px] uppercase tracking-cap text-ink-3 mb-1">
-            χ* — Operational Floor
+            χ* — Configured Health Threshold
           </div>
           <p className="text-sm text-ink-1 leading-relaxed">
             <span className="mono text-ink-0">χ* = {chiStar.toFixed(2)}</span> · the minimum CHI
             this run is configured to accept. Adjustable on the previous step.
-            Tighter floors (0.8+) raise the bar for demanding scenarios; looser
-            floors (0.6) suit lower-risk analog campaigns. The simulated
+            Higher thresholds (0.8+) make the scenario criterion stricter; lower
+            thresholds (0.6) make it less strict. The simulated
             probability that <span className="mono">χ &lt; χ*</span> is reported as{" "}
             <em>threshold-failure risk</em> below.
           </p>
@@ -284,10 +284,10 @@ export function CHIExplainer({ posterior, chiStar, missionId, gate }: Props) {
             · <span className={`mono uppercase tracking-cap text-[10px] ${etBucket.tone}`}>
               {etBucket.label}
             </span>{" "}
-            — fraction of Monte-Carlo trials in which the crew fell below the operational
-            floor at some point in the mission. Interpret as a literal "what fraction of
+            — fraction of Monte-Carlo trials in which the crew fell below the configured
+            health threshold at some point in the mission. Interpret as a literal "what fraction of
             possible futures fall below the configured health threshold" —
-            below 5 % is operationally low, above 30 % is a hard re-think signal.
+            not as a validated operational acceptance rule.
           </li>
           <li>
             <span className="mono text-ink-0">E[lost crew-days] = {lcd.toFixed(1)} d</span>{" "}
@@ -306,7 +306,7 @@ export function CHIExplainer({ posterior, chiStar, missionId, gate }: Props) {
           This is a research scenario tool, not an autonomous selector. The CHI
           and threshold-failure probability are inputs to human review. A STRONG
           status means the configured model does not flag the scenario; a
-          MARGINAL or DEGRADED status does not categorically disqualify a crew,
+          MARGINAL or DEGRADED status does not categorically reject a crew,
           but it does require documented review of assumptions and mitigations.
         </p>
       </div>

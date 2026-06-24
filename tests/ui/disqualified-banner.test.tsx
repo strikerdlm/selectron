@@ -1,8 +1,9 @@
 // @vitest-environment jsdom
-// Smoke test: DISQUALIFIED banner renders with failed gate ids.
+// Smoke test: review-flag banner renders with failed gate ids.
 // Uses a minimal mock render of the banner JSX only — not the full Sim view
 // (which depends on Dexie, ECharts, and many context providers). This tests
-// the markup structure that CHIExplainer emits when gate.verdict === "disqualified".
+// the markup structure that CHIExplainer emits when the internal gate verdict
+// indicates a demo-threshold review flag.
 
 import { describe, it, expect, afterEach } from "vitest";
 import { render, screen, cleanup } from "@testing-library/react";
@@ -21,10 +22,10 @@ function DisqualifiedBanner({ gate }: { gate: GateResult }) {
       data-testid="disqualified-banner"
     >
       <div className="font-semibold text-red-900 mb-2">
-        ⛔ DISQUALIFIED — clearance gate failed
+        REVIEW REQUIRED — demo-threshold flag
       </div>
       <p className="text-sm text-red-800 mb-2">
-        The candidate failed one or more binary clearance gates.
+        One or more demonstration thresholds were flagged.
       </p>
       <ul className="mt-2 list-disc list-inside text-sm text-red-800 font-mono">
         {gate.failedGates.map((g) => (
@@ -38,7 +39,7 @@ function DisqualifiedBanner({ gate }: { gate: GateResult }) {
   );
 }
 
-describe("DISQUALIFIED banner", () => {
+describe("demo-threshold review banner", () => {
   it("renders when gate verdict is disqualified and lists failed gates", () => {
     const gate: GateResult = {
       verdict: "disqualified",
@@ -48,7 +49,7 @@ describe("DISQUALIFIED banner", () => {
     render(<DisqualifiedBanner gate={gate} />);
     expect(screen.getByTestId("disqualified-banner")).toBeDefined();
     expect(screen.getByRole("alert")).toBeDefined();
-    expect(screen.getByText(/DISQUALIFIED — clearance gate failed/i)).toBeDefined();
+    expect(screen.getByText(/REVIEW REQUIRED — demo-threshold flag/i)).toBeDefined();
     expect(screen.getByText("psych.mmpi2rf_eid")).toBeDefined();
   });
 

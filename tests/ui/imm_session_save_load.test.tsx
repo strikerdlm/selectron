@@ -283,8 +283,8 @@ describe("CrewComposition · IMM-50 save / load / export toolbar", () => {
     fireEvent.change(select, { target: { value: seededOptionValue } });
 
     // The crew zone shows the loaded member id (not INITIAL_CREW). The id may
-    // appear in both the crew card AND the screen-reader disqualified list
-    // (loaded crews have no stageAScores → fail gate), so use queryAllByText.
+    // appear in both the crew card and the screen-reader review-flag list
+    // (loaded crews have no stageAScores → internal gate flag), so use queryAllByText.
     await waitFor(() => {
       expect(screen.queryAllByText(/loaded-Alpha/).length).toBeGreaterThanOrEqual(1);
     });

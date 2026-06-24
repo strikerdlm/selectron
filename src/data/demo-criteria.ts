@@ -82,7 +82,7 @@ export const DEMO_CRITERIA: readonly Criterion[] = [
       elite: {
         instrument: "Maximal CPET with metabolic cart (VO2peak direct measure, mL/kg/min)",
         citations: ["10.1152/japplphysiol.00756.2017"],
-        notes: "OCHMO-STD-100.1A spaceflight medical clearance.",
+        notes: "OCHMO-STD-100.1A reference; not a Selectron medical-clearance determination.",
       },
     },
   },
@@ -152,10 +152,9 @@ export const DEMO_CRITERIA: readonly Criterion[] = [
     // Operational range of the composite z relative to astronaut-cohort norms ≈ [-3, +3]
     scale: { min: -3, max: 3 },
     higherIsBetter: true,
-    // Gate B — cognitive floor: composite z < -2.0 (2 SDs below the astronaut-cohort norm) is the
-    // select-out threshold derived from Basner et al. 2015 normative data for the NASA Cognition
-    // Battery. A z ≤ -2 corresponds to the 2nd percentile of the astronaut-cohort distribution —
-    // operationally inconsistent with mission-critical decision-making under sleep restriction / G-load.
+    // Demo-threshold review flag: composite z < -2.0 (2 SDs below the astronaut-cohort norm).
+    // This is not a validated Selectron eligibility boundary; it only surfaces an extreme
+    // score for expert review in the demonstration catalog.
     // Authority: Basner M, Mollicone D, Dinges DF (2011); Basner M et al. (2015) 10.3357/amhp.4343.2015.
     gateThreshold: { operator: "fail-if-below", value: -2.0 },
     citations: ["10.3357/amhp.4343.2015", "10.3389/fphys.2024.1451269", "10.1038/s41526-020-00124-6"],
@@ -183,8 +182,8 @@ export const DEMO_CRITERIA: readonly Criterion[] = [
     label: "Sensorimotor balance (SOT-5 Equilibrium Score)",
     description:
       "NeuroCom Equitest SOT condition-5 score — sway-referenced platform with eyes closed, " +
-      "isolates vestibular contribution. Required by NASA OCHMO; low pre-flight EQ predicts post-G-" +
-      "transition fall risk on R+0 (91% in challenged subjects). Operational floor: EQ ≥ 50.",
+      "isolates vestibular contribution. NASA OCHMO uses sensorimotor standards in astronaut medical " +
+      "screening; this demo catalog does not implement those standards as validated clearance boundaries.",
     instrument: "SOT-5 Equilibrium Score (NeuroCom CDP; Reschke et al. 2009)",
     scale: { min: 0, max: 100 },
     higherIsBetter: true,
@@ -207,7 +206,7 @@ export const DEMO_CRITERIA: readonly Criterion[] = [
       elite: {
         instrument: "NeuroCom Equitest CDP — SOT-5 Equilibrium Score (sway-referenced platform; eyes closed)",
         citations: ["10.3389/fphys.2018.01680", "10.3389/fncir.2021.723504"],
-        notes: "OCHMO standard; 91% fall rate on R+0 in SOT-5M-challenged subjects.",
+        notes: "OCHMO reference context; 91% fall rate on R+0 in SOT-5M-challenged subjects.",
       },
     },
   },
@@ -255,7 +254,7 @@ export const DEMO_CRITERIA: readonly Criterion[] = [
       "Five. Matters disproportionately in small isolated crews where misreading social signals " +
       "amplifies conflict.",
     instrument: "MSCEIT v2.0 standard score (M=100, SD=15); z-score input",
-    // Standard-score range; z-score input via (raw - 100) / 15 → operational [-3, +3].
+    // Standard-score range; z-score input via (raw - 100) / 15 → bounded demo range [-3, +3].
     scale: { min: -3, max: 3 },
     higherIsBetter: true,
     citations: ["10.1037/1528-3542.3.1.97"],
@@ -281,18 +280,16 @@ export const DEMO_CRITERIA: readonly Criterion[] = [
     family: "psychological",
     label: "Psychiatric screen — MMPI-2-RF EID",
     description:
-      "Emotional-Internalising Dysfunction higher-order score from the MMPI-2-RF — the primary " +
-      "psychiatric select-out instrument in NASA / ESA / Antarctic winter-over programs. Clinical " +
-      "threshold ≥ 65T triggers specialist disposition; sub-clinical 60–64T elevates the " +
-      "pMentalHealthIncident IMM vulnerability β. Reversed: lower T-score → higher Selectron z.",
+      "Emotional-Internalising Dysfunction higher-order score from the MMPI-2-RF. NASA / ESA / " +
+      "Antarctic programs use clinician-administered psychological screening, but Selectron only " +
+      "uses this demo threshold as a review flag. Reversed: lower T-score → higher Selectron z.",
     instrument: "MMPI-2-RF EID T-score (M=50, SD=10); reversed",
     scale: { min: 30, max: 120 },
     higherIsBetter: false,
-    // Gate A — psychiatric select-out: EID T ≥ 65 is the NASA/ESA/Antarctic operational
-    // disqualification threshold (2 SDs above population mean on an internalizingdysfunction scale).
-    // fail-if-above: 65 means any candidate with raw EID T-score > 65 is disqualified.
+    // Demo-threshold review flag: EID T > 65. This is not a Selectron psychiatric
+    // disposition, exclusion rule, or clearance boundary.
     // Authority: Ben-Porath & Tellegen (2008/2011) MMPI-2-RF manual; Santy (1994) astronaut selection
-    // psychiatric standards; NASA OCHMO-STD-100.1A §4.3 behavioural health clearance criteria.
+    // psychiatric standards; NASA OCHMO-STD-100.1A §4.3 behavioural health context.
     gateThreshold: { operator: "fail-if-above", value: 65 },
     citations: ["10.1037/0033-2909.130.5.661"],
     minimumTier: "elite",
@@ -301,8 +298,8 @@ export const DEMO_CRITERIA: readonly Criterion[] = [
         instrument: "DASS-21 (Depression Anxiety Stress Scales, 21-item; free, public domain; Lovibond & Lovibond 1995) — TRIAGE FLAG ONLY",
         citations: [],
         notes:
-          "NOT a psychiatric select-out gate at this tier. DASS-21 depression subscale ≥ 14 (severe) " +
-          "MUST trigger external referral to a licensed mental-health professional before mission deployment. " +
+          "NOT a psychiatric disposition boundary at this tier. DASS-21 depression subscale ≥ 14 (severe) " +
+          "should trigger external referral to a licensed mental-health professional before any real deployment decision. " +
           "Lovibond & Lovibond 1995 — original monograph, not DOI-indexed.",
       },
       medium: {
@@ -323,7 +320,7 @@ export const DEMO_CRITERIA: readonly Criterion[] = [
       "Beck Depression Inventory-II total score at baseline. Captures emerging mood state " +
       "complementary to MMPI-2-RF (state vs trait). In Mars-500 the crew member whose BDI-II " +
       "trajectory climbed into the moderate range also produced the worst PVT lapses and the most " +
-      "MC conflict. Threshold ≥ 20 → specialist flag. Reversed: lower score → higher z.",
+      "MC conflict. Demo threshold ≥ 20 → review flag. Reversed: lower score → higher z.",
     instrument: "BDI-II total score 0–63, 21 items (Beck et al. 1996); reversed",
     scale: { min: 0, max: 63 },
     higherIsBetter: false,

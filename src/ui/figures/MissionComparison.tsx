@@ -42,12 +42,13 @@ const LXC_CHIP_FILL: Record<"green" | "yellow" | "red" | "gray", string> = {
 // mission (Diego 2026-05-29). The comparison ranks by this so longer / more
 // EVA-intensive missions read as worse — unlike CHI, which is a per-time quality
 // fraction and makes short missions look bad. Thresholds are interpretable
-// crew-day budgets (tunable); a disqualified gate forces the top band.
+// crew-day budgets (tunable); demo-threshold review flags are shown as flags,
+// not as applicant disqualification outcomes.
 function cumulativeRiskBand(
   lostCrewDays: number,
   gate?: GateResult,
 ): { label: string; color: "green" | "yellow" | "red" } {
-  if (gate?.verdict === "disqualified") return { label: "DQ", color: "red" };
+  if (gate?.verdict === "disqualified") return { label: "flag", color: "red" };
   if (lostCrewDays >= 25) return { label: "high", color: "red" };
   if (lostCrewDays >= 8) return { label: "moderate", color: "yellow" };
   return { label: "low", color: "green" };

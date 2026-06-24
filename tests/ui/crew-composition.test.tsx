@@ -58,17 +58,17 @@ describe("aggregateCrewComposite — unit", () => {
   });
 });
 
-describe("evaluateCrewGates — gate pass/fail", () => {
-  it("crew with all safe defaults qualifies", () => {
+describe("evaluateCrewGates — demo-threshold flags", () => {
+  it("crew with all safe defaults has no internal disqualified verdict", () => {
     const crew = [makeMember("A", 0.7), makeMember("B", 0.6)];
     const result = evaluateCrewGates(crew, PLACEHOLDER_CRITERIA);
     expect(result.crewVerdict).toBe("qualified");
     expect(result.disqualifiedMemberIds).toHaveLength(0);
   });
 
-  it("crew member with EID T-score > 65 disqualifies crew", () => {
+  it("crew member with EID T-score > 65 is surfaced as a review flag", () => {
     const member = makeMember("C", 0.7);
-    // Set EID score above gate threshold (65)
+    // Set EID score above the demo-threshold review flag (65).
     member.stageAScores = { ...member.stageAScores, "psych.mmpi2rf_eid": 80 };
     const crew = [makeMember("A", 0.7), member];
     const result = evaluateCrewGates(crew, PLACEHOLDER_CRITERIA);
@@ -77,7 +77,7 @@ describe("evaluateCrewGates — gate pass/fail", () => {
     expect(result.disqualifiedMemberIds).not.toContain("A");
   });
 
-  it("crew member with NASA cognition z < -2 disqualifies crew", () => {
+  it("crew member with NASA cognition z < -2 is surfaced as a review flag", () => {
     const member = makeMember("D", 0.7);
     member.stageAScores = { ...member.stageAScores, "cognitive.nasa_cognition_battery": -2.5 };
     const crew = [member, makeMember("E", 0.6)];
@@ -86,7 +86,7 @@ describe("evaluateCrewGates — gate pass/fail", () => {
     expect(result.disqualifiedMemberIds).toContain("D");
   });
 
-  it("single member crew with all defaults qualifies", () => {
+  it("single member crew with all defaults has no internal disqualified verdict", () => {
     const crew = [makeMember("Solo", 0.65)];
     const result = evaluateCrewGates(crew, PLACEHOLDER_CRITERIA);
     expect(result.crewVerdict).toBe("qualified");

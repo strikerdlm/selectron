@@ -39,13 +39,7 @@ function quantile(sortedAsc: Float64Array, q: number): number {
   return sortedAsc[lo] * (1 - frac) + sortedAsc[hi] * frac;
 }
 
-export function scoreCandidate(input: ScoreInput): Posterior {
-  const { candidate, criteria, alpha, iterations, seed } = input;
-  if (!Number.isInteger(iterations) || iterations <= 0) {
-    throw new SelectronError("E_BAD_ITERATIONS", `iterations must be a positive integer, got ${iterations}`, {
-      iterations,
-    });
-  }
+function validateAlphaForCriteria(alpha: readonly number[], criteria: readonly Criterion[]): void {
   if (alpha.length !== criteria.length) {
     throw new SelectronError("E_BAD_WEIGHT", "alpha length must equal criteria length", {
       alpha: alpha.length,
@@ -61,6 +55,16 @@ export function scoreCandidate(input: ScoreInput): Posterior {
       });
     }
   }
+}
+
+export function scoreCandidate(input: ScoreInput): Posterior {
+  const { candidate, criteria, alpha, iterations, seed } = input;
+  if (!Number.isInteger(iterations) || iterations <= 0) {
+    throw new SelectronError("E_BAD_ITERATIONS", `iterations must be a positive integer, got ${iterations}`, {
+      iterations,
+    });
+  }
+  validateAlphaForCriteria(alpha, criteria);
 
   const z = normalizedScoreVector(candidate, criteria);
   const rng = makeRng(seed);
@@ -94,6 +98,7 @@ export type ClosedFormInput = {
 
 export function closedFormMoments(input: ClosedFormInput): { mean: number; variance: number } {
   const { candidate, criteria, alpha } = input;
+  validateAlphaForCriteria(alpha, criteria);
   const z = normalizedScoreVector(candidate, criteria);
   const muW = dirichletMean(alpha);
   const varW = dirichletVariance(alpha);

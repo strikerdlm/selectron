@@ -24,19 +24,12 @@ function sliderStep(c: Criterion): number {
   return Math.max(range / 100, 0.01);
 }
 
-/** Gate status for display. */
+/** Demo-threshold status for display. */
 function gateStatus(c: Criterion, raw: number): "pass" | "fail" | "none" {
   if (!c.gateThreshold) return "none";
   const { operator, value } = c.gateThreshold;
   const fails = operator === "fail-if-below" ? raw < value : raw > value;
   return fails ? "fail" : "pass";
-}
-
-/** Colour for the normalised score bar. */
-function scoreColor(normScore: number): string {
-  if (normScore >= 0.7) return "var(--go)";
-  if (normScore >= 0.45) return "var(--signal)";
-  return "var(--warn)";
 }
 
 function FamilyBadge({ family }: { family: string }) {
@@ -104,12 +97,12 @@ export function PerScoreCard({ criterion, rawScore, onScoreChange, figure }: Per
               <span
                 className="mono text-[11px] uppercase tracking-cap px-1.5 py-0.5 rounded-full border"
                 style={{
-                  color: gate === "fail" ? "var(--warn)" : "var(--go)",
-                  borderColor: gate === "fail" ? "var(--warn)" : "var(--go)",
-                  background: gate === "fail" ? "rgba(255,107,94,0.08)" : "rgba(86,214,160,0.06)",
+                  color: gate === "fail" ? "var(--warn)" : "var(--ink-2)",
+                  borderColor: gate === "fail" ? "var(--warn)" : "var(--line)",
+                  background: gate === "fail" ? "rgba(255,107,94,0.08)" : "transparent",
                 }}
               >
-                {gate === "fail" ? "✗ gate DQ" : "✓ gate pass"}
+                {gate === "fail" ? "review flag" : "no flag"}
               </span>
             )}
           </div>
@@ -123,7 +116,7 @@ export function PerScoreCard({ criterion, rawScore, onScoreChange, figure }: Per
         <div className="shrink-0 flex flex-col items-end">
           <span
             className="mono text-[18px] tabular-nums font-medium"
-            style={{ color: scoreColor(normScore) }}
+            style={{ color: "var(--ink-1)" }}
           >
             {Math.round(normScore * 100)}%
           </span>
@@ -176,8 +169,8 @@ export function PerScoreCard({ criterion, rawScore, onScoreChange, figure }: Per
           }}
         >
           {criterion.gateThreshold.operator === "fail-if-above"
-            ? `gate: fail if above ${criterion.gateThreshold.value}`
-            : `gate: fail if below ${criterion.gateThreshold.value}`}
+            ? `demo threshold: review if above ${criterion.gateThreshold.value}`
+            : `demo threshold: review if below ${criterion.gateThreshold.value}`}
           {" · "}
           <span className="text-ink-3">{criterion.higherIsBetter ? "↑ higher = better" : "↓ lower = better"}</span>
         </div>
@@ -193,7 +186,7 @@ export function PerScoreCard({ criterion, rawScore, onScoreChange, figure }: Per
         )}
         {gateCitation && gateCitation !== primaryCitation && (
           <div className="flex items-baseline gap-1.5">
-            <span className="mono text-[11px] uppercase tracking-cap text-ink-3">gate:</span>
+            <span className="mono text-[11px] uppercase tracking-cap text-ink-3">threshold:</span>
             <CitationChip citation={gateCitation} />
           </div>
         )}

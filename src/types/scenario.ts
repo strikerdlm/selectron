@@ -49,8 +49,8 @@ export const TIER_LONG_DESCRIPTION: Record<AccessTier, string> = {
   minimum:
     "Free, open-source, or paper-based instruments on commodity hardware. IPIP-NEO-120, PEBL, " +
     "Cooper 12-min run, mCTSIB obstacle course, CD-RISC-10, TEIQue-SF, DASS-21 (triage only), PHQ-9. " +
-    "DASS-21 positive screens MUST be referred to a licensed mental-health professional — DASS-21 " +
-    "is not a psychiatric select-out gate at this tier.",
+    "DASS-21 positive screens must be referred to a licensed mental-health professional — DASS-21 " +
+    "is not a Selectron psychiatric disposition boundary.",
   medium:
     "Adds commercial computerized tools + clinical-psychology consultation. NEO-FFI, CogScreen-AE, " +
     "submaximal cycle ergometer, Wii Balance Board sway, CD-RISC-25, EQ-i 2.0, MMPI-2-RF (licensed " +
@@ -58,5 +58,5 @@ export const TIER_LONG_DESCRIPTION: Record<AccessTier, string> = {
   elite:
     "Full Tier-3 battery. NEO-PI-R (240-item with facets), NASA Cognition Battery (Joggle Research), " +
     "CPET with metabolic cart, NeuroCom Equitest CDP SOT-5, MSCEIT v2.0 ability-based EI, MMPI-2-RF + " +
-    "specialist psychiatric interview, BDI-II serial trajectory. NASA/ESA/JAXA/Roscosmos selection grade.",
+    "specialist psychiatric interview, BDI-II serial trajectory. This tier mirrors agency-grade instrumentation but remains demo-only.",
 };
