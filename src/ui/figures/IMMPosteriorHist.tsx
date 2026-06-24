@@ -1,4 +1,4 @@
-// I2 IMMPosteriorHist — 4-panel small-multiples for IMM Monte Carlo summaries.
+// I2 IMMScenarioDistributions — 4-panel small-multiples for IMM Monte Carlo summaries.
 //
 // Renders parametric Gaussian PDF curves (not histograms of raw samples) for
 // TME, CHI, pEVAC, and pLOCL based on ScenarioSummary (mean + sd).
@@ -7,7 +7,7 @@
 // is stated explicitly in the caption.
 //
 // Layout: 2×2 ECharts multi-grid.
-// Shading: CI₉₀ band via markArea; dashed μ markLine.
+// Shading: 90% simulation interval via markArea; dashed μ markLine.
 // Degenerate case (sd=0): renders a vertical spike at μ with a label.
 
 import ReactEChartsCore from "echarts-for-react/lib/core";
@@ -135,7 +135,7 @@ function panelOption(
         label: { show: false },
         data: [
           [
-            { xAxis: ci90LoLabel, name: "CI₉₀" },
+            { xAxis: ci90LoLabel, name: "sim 90%" },
             { xAxis: ci90HiLabel },
           ],
         ],
@@ -157,7 +157,7 @@ function panelOption(
   };
 }
 
-export type IMMPosteriorHistProps = {
+export type IMMScenarioDistributionsProps = {
   outcome: IMMOutcome;
   trials: number;
   seed: number;
@@ -165,12 +165,12 @@ export type IMMPosteriorHistProps = {
   accessTier?: string;
 };
 
-export function IMMPosteriorHist({
+export function IMMScenarioDistributions({
   outcome,
   trials,
   seed,
   mission,
-}: IMMPosteriorHistProps) {
+}: IMMScenarioDistributionsProps) {
   const { themeName } = useFigureTheme();
   const metrics: Array<{
     key: keyof Pick<IMMOutcome, "tme" | "chi" | "pEvac" | "pLocl">;
@@ -220,7 +220,7 @@ export function IMMPosteriorHist({
       "mission. Each curve represents how often the model predicts a particular level of total " +
       "medical events (TME), crew health index (CHI), probability of emergency evacuation " +
       "(pEVAC), and probability of crew loss (pLOCL). Wider curves mean more uncertainty; " +
-      "the shaded band covers 90% of predictions. The dashed line marks the most likely " +
+      "the shaded band covers the central 90% simulation interval. The dashed line marks the most likely " +
       "value. Lower pEVAC and pLOCL, and higher CHI, indicate a healthier crew.",
   };
 
@@ -237,3 +237,8 @@ export function IMMPosteriorHist({
     </div>
   );
 }
+
+export type IMMPosteriorHistProps = IMMScenarioDistributionsProps;
+
+/** @deprecated Use IMMScenarioDistributions for ordinary non-posterior IMM runs. */
+export const IMMPosteriorHist = IMMScenarioDistributions;

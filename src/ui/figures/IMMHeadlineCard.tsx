@@ -1,7 +1,7 @@
 // I1 IMMHeadlineCard — at-a-glance hero composite for an IMM Monte Carlo run.
 //
 // Layout: 4 large stat cards (TME / CHI / pEVAC / pLOCL), one row, each card
-// showing the Monte Carlo mean as the headline number plus a CI₉₅ whisker.
+// showing the Monte Carlo mean as the headline number plus a 95% simulation-interval whisker.
 // Below the grid: a slim inline row for composite health-criterion attainment,
 // followed by a small batch σ(CHI) sparkline (full diagnostic lives in I4).
 //
@@ -18,7 +18,7 @@ import { FigureCaption } from "./FigureCaption";
 import type { IMMOutcome, ScenarioSummary } from "../../imm/types";
 import { FIGURE_GENERATION_COMMIT } from "../../version";
 
-// Okabe-Ito palette assignments per metric (match I2 IMMPosteriorHist exactly)
+// Okabe-Ito palette assignments per metric (match I2 IMMScenarioDistributions exactly)
 const COLORS = {
   tme:   "#0072B2", // Blue
   chi:   "#009E73", // Bluish green
@@ -49,10 +49,11 @@ function fmtPctInterval(ci: [number, number] | undefined): string | undefined {
   return `${fmtPct(ci[0])} -> ${fmtPct(ci[1])}`;
 }
 
-// ── CI₉₅ whisker ─────────────────────────────────────────────────────────────
+// ── Simulation-interval whisker ──────────────────────────────────────────────
 // A styled div, NOT ECharts. Renders a thin horizontal bar with a tick at the
-// Monte Carlo mean and the CI₉₅ low/high values as monospaced labels at the
-// extremes. Width-normalised so the visual range is anchored to the CI₉₅ span,
+// Monte Carlo mean and the 95% simulation-interval low/high values as
+// monospaced labels at the extremes. Width-normalised so the visual range is
+// anchored to the interval span,
 // not the absolute scale (per-card local frame; the absolute axis lives in I2).
 type WhiskerProps = {
   ci95: [number, number];
@@ -64,13 +65,13 @@ type WhiskerProps = {
 function Whisker({ ci95, mean, fmt, color }: WhiskerProps) {
   const [lo, hi] = ci95;
   const span = Math.max(hi - lo, 1e-9);
-  // Tick position as percent of the CI₉₅ span (clamped to [0, 100]).
+  // Tick position as percent of the simulation-interval span (clamped to [0, 100]).
   const meanPct = Math.max(0, Math.min(100, ((mean - lo) / span) * 100));
 
   return (
     <div className="mt-3" data-testid="imm-headline-whisker">
       <div className="mono mb-1 flex items-baseline justify-between text-[10px] text-ink-3">
-        <span>CI₉₅</span>
+        <span>sim 95%</span>
         <span className="tabular-nums text-ink-2">
           {fmt(lo)} <span className="text-ink-3">→</span> {fmt(hi)}
         </span>
@@ -164,7 +165,7 @@ function HealthCriterionRow({
           {fmtPct(summary.mean)}
         </span>
         <span className="mono text-[10px] text-ink-3">
-          CI₉₅{" "}
+          sim 95%{" "}
           <span className="tabular-nums text-ink-2">
             {fmtPct(summary.ci95[0])} <span className="text-ink-3">→</span> {fmtPct(summary.ci95[1])}
           </span>
@@ -309,7 +310,7 @@ export function IMMHeadlineCard({
       "Hero composite: four stat cards (TME, CHI, pEVAC, pLOCL) plus a composite " +
       "health-criterion row. Each headline number is the Monte Carlo mean " +
       "across T trials; the whisker below shows the 95% simulation " +
-      "interval (CI₉₅) span with a tick at the mean. MCSE and relative MCSE values " +
+      "interval span with a tick at the mean. MCSE and relative MCSE values " +
       "report estimator precision for displayed means/probabilities; Wilson 95% " +
       "intervals report binomial estimator precision for binary probabilities. " +
       "These diagnostics are not empirical validation. The health criterion is the joint probability " +

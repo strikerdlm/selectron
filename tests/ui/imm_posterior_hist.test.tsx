@@ -1,10 +1,10 @@
 // @vitest-environment jsdom
-// RTL smoke tests for IMMPosteriorHist (I2).
+// RTL smoke tests for IMMScenarioDistributions (I2).
 // ECharts does not render meaningfully in jsdom; tests assert on wrapper DOM structure.
 
 import { describe, it, expect, afterEach, vi } from "vitest";
-import { render, cleanup } from "@testing-library/react";
-import { IMMPosteriorHist } from "@/ui/figures/IMMPosteriorHist";
+import { render, cleanup, fireEvent } from "@testing-library/react";
+import { IMMScenarioDistributions } from "@/ui/figures/IMMPosteriorHist";
 import type { IMMOutcome } from "@/imm/types";
 
 afterEach(cleanup);
@@ -44,11 +44,11 @@ function makeOutcome(
   };
 }
 
-describe("IMMPosteriorHist (I2)", () => {
+describe("IMMScenarioDistributions (I2)", () => {
   it("renders all 4 metric labels in the DOM", () => {
     const outcome = makeOutcome();
     const { container } = render(
-      <IMMPosteriorHist
+      <IMMScenarioDistributions
         outcome={outcome}
         trials={100_000}
         seed={0xc0ffee}
@@ -66,7 +66,7 @@ describe("IMMPosteriorHist (I2)", () => {
     const outcome = makeOutcome(106, 94.93, 5.57, 0.44, 0);
     expect(() =>
       render(
-        <IMMPosteriorHist
+        <IMMScenarioDistributions
           outcome={outcome}
           trials={100_000}
           seed={0xc0ffee}
@@ -79,7 +79,7 @@ describe("IMMPosteriorHist (I2)", () => {
   it("renders the figure caption with mission label", () => {
     const outcome = makeOutcome();
     const { container } = render(
-      <IMMPosteriorHist
+      <IMMScenarioDistributions
         outcome={outcome}
         trials={50_000}
         seed={0xdeadbeef}
@@ -92,7 +92,7 @@ describe("IMMPosteriorHist (I2)", () => {
   it("caption mentions trial count", () => {
     const outcome = makeOutcome();
     const { container } = render(
-      <IMMPosteriorHist
+      <IMMScenarioDistributions
         outcome={outcome}
         trials={20_000}
         seed={0xc0ffee}
@@ -101,5 +101,23 @@ describe("IMMPosteriorHist (I2)", () => {
     );
     // 20,000 formatted with thousands separator
     expect(container.textContent).toMatch(/20[,.]?000/);
+  });
+
+  it("caption uses scenario simulation-interval language, not posterior wording", () => {
+    const outcome = makeOutcome();
+    const { container } = render(
+      <IMMScenarioDistributions
+        outcome={outcome}
+        trials={20_000}
+        seed={0xc0ffee}
+        mission={{ id: "iss-6mo", label: "ISS 6-month" }}
+      />,
+    );
+    fireEvent.click(container.querySelector("button")!);
+    const expandedText = container.textContent ?? "";
+    expect(expandedText).toContain("ScenarioSummary");
+    expect(expandedText).toContain("central 90% simulation interval");
+    expect(expandedText).not.toMatch(/posterior/i);
+    expect(expandedText).not.toContain("CI₉₀");
   });
 });

@@ -23,7 +23,7 @@ import { CrewMemberCard } from "../components/CrewMemberCard";
 import { CompositeCrewPanel } from "../components/CompositeCrewPanel";
 import { CriterionMiniFigure } from "../figures/CriterionMiniFigure";
 import { IMMHeadlineCard } from "../figures/IMMHeadlineCard";
-import { IMMPosteriorHist } from "../figures/IMMPosteriorHist";
+import { IMMScenarioDistributions } from "../figures/IMMPosteriorHist";
 import { IMMConditionDrivers } from "../figures/IMMConditionDrivers";
 import { IMMConvergencePlot } from "../figures/IMMConvergencePlot";
 import { IMMValidationCompare } from "../figures/IMMValidationCompare";
@@ -1252,9 +1252,9 @@ export function CrewComposition() {
 
           <div className="panel">
             <h3 className="label text-ink-1 uppercase tracking-cap mb-4">
-              I2 · Posterior Distributions
+              I2 · Scenario Distributions
             </h3>
-            <IMMPosteriorHist
+            <IMMScenarioDistributions
               outcome={outcome}
               trials={state.trials}
               seed={state.seed}
@@ -1590,8 +1590,8 @@ export function CrewComposition() {
 // ─── IMM-46 · K15 Table 1 reference-model benchmark badge ───────────────────
 // Compact in-UI badge that compares the current sim's IMMOutcome to K15 Table 1
 // (Keenan et al. 2015 ICES-2015-123) for the corresponding kit scenario. Shows
-// ✓/✗ per metric (TME, CHI, pEVAC, pLOCL) based on whether the run's posterior
-// mean falls inside K15's 95% confidence interval.
+// ✓/✗ per metric (TME, CHI, pEVAC, pLOCL) based on whether the run's scenario
+// mean falls inside K15's published 95% benchmark interval.
 //
 // K15 Table 1 means + CI₉₅ brackets are INLINED here because importing
 // `calibration.ts` pulls in `node:fs`, which breaks the browser bundle. This

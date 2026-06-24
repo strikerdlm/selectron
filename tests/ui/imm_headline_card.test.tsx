@@ -3,7 +3,7 @@
 // ECharts does not render meaningfully in jsdom; the sparkline is mocked.
 
 import { describe, it, expect, afterEach, vi } from "vitest";
-import { render, cleanup } from "@testing-library/react";
+import { render, cleanup, fireEvent } from "@testing-library/react";
 import { IMMHeadlineCard } from "@/ui/figures/IMMHeadlineCard";
 import { RAF_TREATMENT_MODEL_DISCLOSURE } from "@/imm/treatment";
 import type { AnalogFieldExposureDisclosure, IMMOutcome } from "@/imm/types";
@@ -161,6 +161,22 @@ describe("IMMHeadlineCard (I1)", () => {
     expect(text).toContain("Wilson 95%");
     expect(text).toContain("CHI clamp");
     expect(text).toContain("3 / 100,000 trials");
+  });
+
+  it("labels ordinary IMM spread as simulation intervals, not confidence intervals", () => {
+    const outcome = makeOutcome();
+    const { container } = render(
+      <IMMHeadlineCard
+        outcome={outcome}
+        trials={100_000}
+        mission={{ id: "iss-6mo", label: "ISS 6-month" }}
+      />,
+    );
+    expect(container.textContent ?? "").toContain("sim 95%");
+    fireEvent.click(container.querySelector("button")!);
+    const expandedText = container.textContent ?? "";
+    expect(expandedText).toContain("95% simulation interval");
+    expect(expandedText).not.toContain("CI₉₅");
   });
 
   it("renders the RAF treatment-model qualification", () => {
