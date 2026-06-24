@@ -1,6 +1,7 @@
 // tests/imm/composite.test.ts
 import { describe, it, expect } from "vitest";
 import { aggregateCrewComposite } from "../../src/imm/composite";
+import { SelectronError } from "../../src/engine/errors";
 import type { IMMCrewMember } from "../../src/imm/types";
 import type { Criterion } from "../../src/types";
 
@@ -121,5 +122,15 @@ describe("aggregateCrewComposite", () => {
     expect(resultMean.compositeScore).toBeCloseTo(0.5, 6);
     expect(resultMean.perMemberScores[1]).toBe(0);
     expect(resultMean.weakestMemberId).toBe("b");
+  });
+
+  it("rejects out-of-range Stage-A scores instead of clamping them", () => {
+    const crew = [makeMember("bad", 101, 50)];
+    expect(() => aggregateCrewComposite(crew, CRITERIA, "mean")).toThrow(SelectronError);
+  });
+
+  it("rejects nonfinite Stage-A scores instead of omitting them", () => {
+    const crew = [makeMember("bad", NaN, 50)];
+    expect(() => aggregateCrewComposite(crew, CRITERIA, "mean")).toThrow(SelectronError);
   });
 });

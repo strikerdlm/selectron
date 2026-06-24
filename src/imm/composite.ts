@@ -26,8 +26,8 @@ import type { CrewComposite, CrewCompositeMethod } from "./types";
  * - Return the arithmetic mean of those values.
  * - If no scores are present, returns 0.
  *
- * Out-of-range raw scores are clamped before normalisation to avoid
- * SelectronError propagation inside an aggregate loop.
+ * Invalid raw scores propagate SelectronError from normalizeScore so imported
+ * Stage-A data fail closed instead of silently clamping.
  */
 function memberCompositeScore(member: IMMCrewMember, criteria: readonly Criterion[]): number {
   if (!member.stageAScores || Object.keys(member.stageAScores).length === 0) return 0;
@@ -37,10 +37,8 @@ function memberCompositeScore(member: IMMCrewMember, criteria: readonly Criterio
 
   for (const c of criteria) {
     const raw = member.stageAScores[c.id];
-    if (raw === undefined || !Number.isFinite(raw)) continue;
-    // Clamp to criterion scale so normalizeScore does not throw E_BAD_SCORE.
-    const clamped = Math.max(c.scale.min, Math.min(c.scale.max, raw));
-    sum += normalizeScore(clamped, c.scale, c.higherIsBetter);
+    if (raw === undefined) continue;
+    sum += normalizeScore(raw, c.scale, c.higherIsBetter);
     count++;
   }
 
