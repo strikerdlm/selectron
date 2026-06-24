@@ -69,6 +69,7 @@ type SourceCatalogEntry = {
   path: string;
   title?: string;
   doi: string | null;
+  text: string;
 };
 
 function normalizeDoi(value: string): string {
@@ -141,12 +142,14 @@ function sourceCatalog(root: string): Map<string, SourceCatalogEntry> {
   const catalog = new Map<string, SourceCatalogEntry>();
   for (const dir of SOURCE_CATALOG_DIRS) {
     for (const path of markdownFiles(root, dir)) {
-      const frontmatter = parseFrontmatter(readFileSync(resolve(root, path), "utf8"));
+      const text = readFileSync(resolve(root, path), "utf8");
+      const frontmatter = parseFrontmatter(text);
       if (Object.keys(frontmatter).length === 0) continue;
       const entry: SourceCatalogEntry = {
         path,
         title: frontmatter.title,
         doi: optionalDoi(frontmatter.doi),
+        text,
       };
       const slug = basename(path, ".md");
       const relativeSlug = path.replace(/\.md$/, "");
@@ -311,6 +314,16 @@ function isPositiveInteger(value: number | null): value is number {
   return value !== null && value > 0 && Number.isInteger(value);
 }
 
+function normalizeQuoteText(value: string): string {
+  return value.trim().replace(/\s+/g, " ");
+}
+
+function sourceContainsQuote(sourceText: string, quote: string): boolean {
+  const normalizedQuote = normalizeQuoteText(quote);
+  if (normalizedQuote.length < 20) return false;
+  return normalizeQuoteText(sourceText).includes(normalizedQuote);
+}
+
 function malformedAcceptedRowIds(
   rows: EvidenceLedgerRow[],
   headerColumnCount: number,
@@ -382,6 +395,13 @@ function malformedAcceptedRowIds(
         } else if (source.doi !== null && studyDoi !== source.doi) {
           const title = source.title ? `; title: ${source.title}` : "";
           reasons.push(`study_doi ${row.study_doi ?? ""} does not match ${studySlug} (${source.doi}${title})`);
+        }
+        if (
+          typeof row.extraction_quote === "string" &&
+          row.extraction_quote.trim().length > 0 &&
+          !sourceContainsQuote(source.text, row.extraction_quote)
+        ) {
+          reasons.push(`extraction_quote is not found verbatim in ${source.path}`);
         }
       }
     }

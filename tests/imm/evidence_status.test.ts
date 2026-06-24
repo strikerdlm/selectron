@@ -38,7 +38,7 @@ function writeSourceFixture(root: string, slug = "fixture-source", doi = "10.000
   mkdirSync(join(root, "research/evidence"), { recursive: true });
   writeFileSync(
     join(root, `research/evidence/${slug}.md`),
-    `---\ntitle: "Fixture source"\ndoi: ${doi}\n---\n\n# Fixture source\n`,
+    `---\ntitle: "Fixture source"\ndoi: ${doi}\n---\n\n# Fixture source\n\nFixture source reports 1 event over 10 person-days.\n`,
   );
 }
 
@@ -75,7 +75,7 @@ function writeSingleParameterFixture(root: string, rowOverrides: Record<string, 
     events: "1",
     exposure_time: "fixture exposure",
     repeated_measure_structure: "independent",
-    extraction_quote: "fixture quote",
+    extraction_quote: "Fixture source reports 1 event over 10 person-days.",
     extractor: "extractor-a",
     verifier: "verifier-b",
     risk_of_bias: "low",
@@ -181,7 +181,7 @@ describe("evidence status gate", () => {
       "1",
       "fixture exposure",
       "independent",
-      "fixture quote",
+      "Fixture source reports 1 event over 10 person-days.",
       "extractor-a",
       "verifier-b",
       "low",
@@ -225,6 +225,16 @@ describe("evidence status gate", () => {
     expect(status.releasePriorsAdjudicated).toBe(false);
     expect(status.acceptedCoveredParameterCount).toBe(0);
     expect(status.malformedAcceptedRows.join("\n")).toMatch(/study_slug missing-source does not resolve/);
+  });
+
+  it("rejects accepted rows whose extraction quote is not in the resolved source", () => {
+    const root = mkdtempSync(join(tmpdir(), "selectron-evidence-"));
+    writeSingleParameterFixture(root, { extraction_quote: "A different source reports no usable count data." });
+
+    const status = buildEvidenceStatus(root);
+    expect(status.releasePriorsAdjudicated).toBe(false);
+    expect(status.acceptedCoveredParameterCount).toBe(0);
+    expect(status.malformedAcceptedRows.join("\n")).toMatch(/extraction_quote is not found verbatim/);
   });
 
   it("rejects accepted condition rows whose mapped prior id does not match the parameter path", () => {
