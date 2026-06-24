@@ -87,6 +87,7 @@ import { RAF_TREATMENT_MODEL_DISCLOSURE, interpolateBetaPertByRAF, selectSeverit
 import { computeRAF } from "./kits";
 import { gateAvailable } from "./health-support";
 import { profileIncidenceMultiplier } from "./apply-profile-effects";
+import { buildAnalogFieldExposureDisclosure } from "./analog-field-exposure";
 import type { Criterion } from "../types";
 
 /**
@@ -1280,6 +1281,9 @@ export function simulateIMM(opts: SimulateIMMOptions): IMMOutcome {
     ? IMM_CONDITIONS.filter(c =>
         !SPACE_ONLY_PROCESS_TYPES.has(c.processType) && !ECLSS_CONDITION_IDS.has(c.id))
     : IMM_CONDITIONS;
+  const excludedSpaceEvaConditions = isTerrestrialForDrivers
+    ? IMM_CONDITIONS.filter(c => c.processType === "EVA-coupled")
+    : [];
   const drivers = driverConditions.map(c => ({
     conditionId: c.id,
     pEvacContrib: ((perConditionEvacSum[c.id] ?? 0) / trials) * 100,
@@ -1306,6 +1310,13 @@ export function simulateIMM(opts: SimulateIMMOptions): IMMOutcome {
       proportion: chiClampCount / trials,
     },
     treatmentModel: RAF_TREATMENT_MODEL_DISCLOSURE,
+    analogFieldExposure: isTerrestrialForDrivers
+      ? buildAnalogFieldExposureDisclosure({
+          mission,
+          crew,
+          excludedSpaceEvaConditions,
+        })
+      : undefined,
   };
   if (opts.diagnostics) {
     outcome.diagnostics = { chiSamples: chis };

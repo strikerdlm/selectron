@@ -292,6 +292,7 @@ export function IMMHeadlineCard({
   const mcse = outcome.monteCarloError;
   const chiClamp = outcome.chiClamp;
   const treatmentModel = outcome.treatmentModel;
+  const analogFieldExposure = outcome.analogFieldExposure;
   const missionLabel = mission?.label ?? "(mission not specified)";
   const seedHex = `0x${seed.toString(16).toUpperCase()}`;
 
@@ -404,6 +405,20 @@ export function IMMHeadlineCard({
             : "not reported"}
         </span>
       </div>
+
+      {analogFieldExposure && (
+        <div
+          className="panel mt-4 px-3 py-2 flex flex-wrap items-start justify-between gap-3 border-warn/40 bg-warn/5"
+          data-testid="imm-analog-field-exposure-disclosure"
+        >
+          <span className="mono text-[10px] text-ink-3 uppercase tracking-cap">Analog field EVA</span>
+          <span className="text-right text-[11px] text-ink-2 max-w-[760px]">
+            {analogFieldExposure.label} ({analogFieldExposure.evidenceStatus}; {analogFieldExposure.status}).
+            Space-EVA priors are excluded, not reused. Missing families:{" "}
+            {analogFieldExposure.omittedAnalogProcessFamilies.join(", ")}.
+          </span>
+        </div>
+      )}
 
       <div className="mt-4">
         <ConvergenceSparkline

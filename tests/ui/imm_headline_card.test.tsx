@@ -6,7 +6,7 @@ import { describe, it, expect, afterEach, vi } from "vitest";
 import { render, cleanup } from "@testing-library/react";
 import { IMMHeadlineCard } from "@/ui/figures/IMMHeadlineCard";
 import { RAF_TREATMENT_MODEL_DISCLOSURE } from "@/imm/treatment";
-import type { IMMOutcome } from "@/imm/types";
+import type { AnalogFieldExposureDisclosure, IMMOutcome } from "@/imm/types";
 
 afterEach(cleanup);
 
@@ -67,6 +67,26 @@ function makeOutcome(opts?: {
     treatmentModel: RAF_TREATMENT_MODEL_DISCLOSURE,
   };
 }
+
+const analogFieldExposure: AnalogFieldExposureDisclosure = {
+  id: "analog-field-exposure-gap-v1",
+  label: "Analog field-EVA hazards not modeled",
+  status: "not-modeled",
+  evidenceStatus: "unsupported",
+  appliesWhen: "terrestrial-analog",
+  profileEvaType: "terrain-field",
+  crewEvaEventCount: 3,
+  missionTotalEVAs: 3,
+  spaceEvaPriorsReused: false,
+  excludedSpaceEvaConditionIds: ["decompression-sickness-eva"],
+  omittedAnalogProcessFamilies: [
+    "analog-field-exposure",
+    "analog-terrain-EVA",
+    "polar-outside-operation",
+  ],
+  limitations: [],
+  requiredUpgrade: "Add analog-specific exposure denominators and priors.",
+};
 
 describe("IMMHeadlineCard (I1)", () => {
   it("renders without crashing when a full outcome is provided", () => {
@@ -158,6 +178,25 @@ describe("IMMHeadlineCard (I1)", () => {
     expect(text).toContain("proposal-stage screening-approximation");
     expect(text).toContain("not a treatment-state model");
     expect(text).toContain("Non-substitutable resources");
+  });
+
+  it("renders the terrestrial analog field-EVA omission disclosure", () => {
+    const outcome = {
+      ...makeOutcome(),
+      analogFieldExposure,
+    };
+    const { container } = render(
+      <IMMHeadlineCard
+        outcome={outcome}
+        trials={100_000}
+        mission={{ id: "analog-field", label: "Analog field campaign" }}
+      />,
+    );
+    const text = container.textContent ?? "";
+    expect(text).toContain("Analog field EVA");
+    expect(text).toContain("Analog field-EVA hazards not modeled");
+    expect(text).toContain("Space-EVA priors are excluded, not reused");
+    expect(text).toContain("analog-terrain-EVA");
   });
 
   it("caption falls back gracefully when mission is omitted", () => {

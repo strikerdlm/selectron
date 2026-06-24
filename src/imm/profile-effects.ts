@@ -62,7 +62,7 @@ export const PROFILE_EFFECTS: readonly ProfileEffect[] = [
     estimate: 1.0,
     evidenceStatus: "accepted",
     sourceIds: ["imm-k15"],
-    note: "EVA-coupled conditions sampled at scheduled EVA times.",
+    note: "Space-EVA-coupled conditions sampled at scheduled EVA times for ISS/future space runs; terrestrial analogs exclude these priors.",
   },
   {
     profilePath: "kit.resources",
@@ -147,6 +147,15 @@ export const PROFILE_EFFECTS: readonly ProfileEffect[] = [
     evidenceStatus: "unsupported",
     sourceIds: [],
     note: "Descriptive only; no modeled effect.",
+  },
+  {
+    profilePath: "profile.eva.type",
+    target: "incidence",
+    model: "exposure-time",
+    estimate: null,
+    evidenceStatus: "unsupported",
+    sourceIds: [],
+    note: "Descriptive only; terrestrial analog field-EVA hazards require separate analog-specific exposure denominators and priors.",
   },
 ];
 

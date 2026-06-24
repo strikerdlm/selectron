@@ -367,6 +367,9 @@ describe("simulateIMM", () => {
     expect(out.treatmentModel?.id).toBe("raf-linear-interpolation-v1");
     expect(out.treatmentModel?.status).toBe("screening-approximation");
     expect(out.treatmentModel?.evidenceStatus).toBe("proposal");
+    expect(out.analogFieldExposure?.status).toBe("not-modeled");
+    expect(out.analogFieldExposure?.spaceEvaPriorsReused).toBe(false);
+    expect(out.analogFieldExposure?.omittedAnalogProcessFamilies).toContain("analog-terrain-EVA");
     expect(out.precisionAssessment?.checks.some((check) => check.criterion === "wilsonWidth")).toBe(true);
     expect(out.precisionAssessment?.requiredTrials).toBeGreaterThanOrEqual(2000);
     expect(out.precisionAssessment?.independentSeedReplication.observedSeeds).toBe(1);
@@ -389,6 +392,20 @@ describe("simulateIMM", () => {
     expect(summary.assessment.requiredSeeds).toBe(3);
     expect(summary.assessment.passed).toBe(true);
     expect(summary.assessment.maxMeanSpreadPp).toBeGreaterThanOrEqual(0);
+  });
+
+  it("does not report an analog field-EVA gap for a LEO/ISS reference run", () => {
+    const leoMission: IMMMission = {
+      id: "leo-test",
+      label: "LEO test",
+      kind: "leo-iss",
+      durationDays: 1,
+      crewSize: 1,
+      totalEVAs: 0,
+      evaSchedule: [],
+    };
+    const out = simulateIMM({ crew: oneCrew, mission: leoMission, kit: IMM_KITS.issHMS, trials: 100, seed: 0x2026 });
+    expect(out.analogFieldExposure).toBeUndefined();
   });
 
   it("reports pEVAC and pLOCL drivers on the same percent scale as headline probabilities", () => {

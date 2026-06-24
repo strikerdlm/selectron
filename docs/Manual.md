@@ -80,6 +80,8 @@ It runs 101 evidence-tagged conditions with analog mission profiles, resource ki
 
 The current treatment/resource pathway is a proposal-stage RAF screening approximation: required resources collapse to one scalar and treated/untreated Beta-PERT parameters are linearly interpolated. It does not model non-substitutable components, thresholds, contraindications, treatment delays, provider skill, failure states, or depletion interactions.
 
+For terrestrial analog missions, orbital/pressurized-suit `EVA-coupled` priors are excluded rather than reused. Terrain-field, polar-field, habitat-egress, climbing, vehicle, and analog-suit hazards are reported as not modeled until separate analog-specific exposure denominators and priors are adjudicated.
+
 ### How the layers connect
 
 - The **Wizard** scores individual candidates (Stage A only).
@@ -313,7 +315,7 @@ Scroll to **Condition drivers** (I3 chart):
 
 The **Mission profile → modeled effects** panel lists:
 
-- **Accepted** mechanical effects currently wired (duration exposure and EVA schedule)
+- **Accepted** mechanical effects currently wired (duration exposure and ISS/future space-EVA schedule; terrestrial analog field-EVA remains unsupported)
 - **Proposal** effects documented for explicit exploratory mode, including the communications-delay pilot coefficient
 - **Unsupported** I&C fields stored descriptively only
 

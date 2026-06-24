@@ -865,7 +865,7 @@ export function CrewComposition() {
                   {ISOLATION_CONFINEMENT_EXPOSURE_MODELED ? " · I&C pilot active" : ""}
                 </summary>
                 <p className="leading-relaxed mt-1 text-ink-2">
-                  Duration, mission kind, EVA schedule, kit, and{" "}
+                  Duration, mission kind, ISS/future space-EVA schedule, kit, and{" "}
                   <span className="text-ink-1">comms delay → behavioral/psychiatric incidence</span>{" "}
                   (pilot) drive the simulator. Remaining profile fields are{" "}
                   <span className="text-warn">descriptive only; no modeled effect</span>{" "}

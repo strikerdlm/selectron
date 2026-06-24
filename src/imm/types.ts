@@ -47,6 +47,22 @@ export type TreatmentModelDisclosure = {
   requiredUpgrade: string;
 };
 
+export type AnalogFieldExposureDisclosure = {
+  id: "analog-field-exposure-gap-v1";
+  label: string;
+  status: "not-modeled";
+  evidenceStatus: "unsupported";
+  appliesWhen: "terrestrial-analog";
+  profileEvaType: string;
+  crewEvaEventCount: number;
+  missionTotalEVAs: number;
+  spaceEvaPriorsReused: false;
+  excludedSpaceEvaConditionIds: readonly string[];
+  omittedAnalogProcessFamilies: readonly string[];
+  limitations: readonly string[];
+  requiredUpgrade: string;
+};
+
 export type IMMSeverityScenarioOutcomes = {
   treated: IMMConditionOutcomes;
   untreated: IMMConditionOutcomes;
@@ -359,6 +375,13 @@ export type IMMOutcome = {
    * sessions created before model-disclosure provenance was added.
    */
   treatmentModel?: TreatmentModelDisclosure;
+  /**
+   * Terrestrial analog EVA/field-exposure provenance. Populated for terrestrial
+   * analog missions to make clear that space-EVA priors were not reused and
+   * terrain/polar field hazards remain unsupported until analog-specific
+   * exposure denominators and event priors are adjudicated.
+   */
+  analogFieldExposure?: AnalogFieldExposureDisclosure;
   /**
    * Raw per-trial CHI samples (percent scale, 0–100).
    * Only populated when `diagnostics: true` is passed to `simulateIMM`.
