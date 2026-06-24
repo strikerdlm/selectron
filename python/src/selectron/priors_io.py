@@ -28,6 +28,26 @@ _PROPOSAL_FILES = [
     "incidence_rates.proposals_p-k.csv",
 ]
 
+_REQUIRED_ACCEPTED_EVIDENCE_FIELDS = (
+    "endpoint_definition",
+    "numerator",
+    "person_days",
+    "events",
+    "exposure_time",
+    "repeated_measure_structure",
+    "extraction_quote",
+    "extractor",
+    "verifier",
+    "risk_of_bias",
+    "transportability",
+    "holdout_design",
+    "calibration_metrics",
+    "uncertainty_distribution",
+    "model_version",
+    "acceptance_version",
+    "prior_value_hash",
+)
+
 
 def _validate_priors(data: dict[str, Any]) -> None:
     if not isinstance(data, dict):
@@ -152,9 +172,10 @@ def load_accepted_evidence(
 
     Proposal CSVs are intentionally excluded from this release-scientific path.
     Rows enter fitting only when status == accepted, extractor and verifier are
-    populated, and person_days/events are present (count extracts). Accepted
-    parameter-path rows without incidence counts are tracked by the TS evidence
-    gate but skipped here.
+    independently populated, person_days/events are present (count extracts),
+    and the accepted-row protocol metadata is complete. Accepted parameter-path
+    rows without incidence counts are tracked by the TS evidence gate but
+    skipped here.
     """
     p = ledger_path or _ACCEPTED_LEDGER
     if not p.exists():
@@ -166,7 +187,9 @@ def load_accepted_evidence(
         for row in reader:
             if row.get("status", "").strip().lower() != "accepted":
                 continue
-            if not row.get("extractor") or not row.get("verifier"):
+            if any(not (row.get(field) or "").strip() for field in _REQUIRED_ACCEPTED_EVIDENCE_FIELDS):
+                continue
+            if row.get("extractor", "").strip() == row.get("verifier", "").strip():
                 continue
 
             person_days_raw = (row.get("person_days") or "").strip()
@@ -200,7 +223,11 @@ def load_accepted_evidence(
                     "transportability": row.get("transportability", ""),
                     "transformation": row.get("transformation", ""),
                     "uncertainty_distribution": row.get("uncertainty_distribution", ""),
+                    "holdout_design": row.get("holdout_design", ""),
+                    "calibration_metrics": row.get("calibration_metrics", ""),
                     "model_version": row.get("model_version", ""),
+                    "acceptance_version": row.get("acceptance_version", ""),
+                    "prior_value_hash": row.get("prior_value_hash", ""),
                     "notes": row.get("notes", ""),
                 }
             )

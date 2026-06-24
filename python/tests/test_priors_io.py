@@ -141,13 +141,18 @@ class TestLoadAcceptedEvidence:
             "status,condition_id,mapped_prior_id,mission_type,study_doi,study_slug,"
             "endpoint_definition,numerator,denominator,person_days,events,exposure_time,"
             "repeated_measure_structure,extraction_quote,extractor,verifier,risk_of_bias,"
-            "transportability,transformation,uncertainty_distribution,model_version,notes\n"
+            "transportability,holdout_design,calibration_metrics,transformation,"
+            "uncertainty_distribution,model_version,acceptance_version,prior_value_hash,notes\n"
             "accepted,depression,,analog-controlled,10.1/demo,demo-study,events,2,10,1000,2,1000,"
-            "participant-level,table 1,alice,bob,moderate,partial,none,gamma,v0.6,\n"
+            "participant-level,table 1,alice,bob,moderate,partial,source-family-a,coverage+brier,none,gamma,v0.6,accepted-v1,hash-1,\n"
             "subagent-proposal,skin-rash,,analog-controlled,,proposal-study,events,1,5,500,1,500,"
-            "unclear,estimate,alice,bob,high,low,none,gamma,v0.6,\n"
+            "unclear,estimate,alice,bob,high,low,source-family-b,coverage,none,gamma,v0.6,accepted-v1,hash-2,\n"
             "accepted,respiratory-infection,,analog-controlled,,unverified,events,1,5,500,1,500,"
-            "participant-level,table 2,alice,,moderate,partial,none,gamma,v0.6,\n"
+            "participant-level,table 2,alice,,moderate,partial,source-family-c,coverage,none,gamma,v0.6,accepted-v1,hash-3,\n"
+            "accepted,anxiety,,analog-controlled,,same-person,events,1,5,500,1,500,"
+            "participant-level,table 3,alice,alice,moderate,partial,source-family-d,coverage,none,gamma,v0.6,accepted-v1,hash-4,\n"
+            "accepted,dental-caries,,analog-controlled,,missing-validation,events,1,5,500,1,500,"
+            "participant-level,table 4,alice,bob,moderate,partial,,coverage,none,gamma,v0.6,accepted-v1,hash-5,\n"
         )
 
         rows = load_accepted_evidence(ledger)
@@ -157,6 +162,8 @@ class TestLoadAcceptedEvidence:
         assert rows[0]["mapped_prior_id"] == "depression"
         assert rows[0]["person_days"] == 1000
         assert rows[0]["events"] == 2
+        assert rows[0]["holdout_design"] == "source-family-a"
+        assert rows[0]["calibration_metrics"] == "coverage+brier"
 
     def test_missing_ledger_returns_empty_list(self, tmp_path: Path) -> None:
         assert load_accepted_evidence(tmp_path / "missing.csv") == []

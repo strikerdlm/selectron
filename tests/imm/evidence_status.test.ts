@@ -24,6 +24,8 @@ const LEDGER_HEADER = [
   "verifier",
   "risk_of_bias",
   "transportability",
+  "holdout_design",
+  "calibration_metrics",
   "transformation",
   "uncertainty_distribution",
   "model_version",
@@ -78,6 +80,8 @@ function writeSingleParameterFixture(root: string, rowOverrides: Record<string, 
     verifier: "verifier-b",
     risk_of_bias: "low",
     transportability: "direct",
+    holdout_design: "hold out fixture-source-family",
+    calibration_metrics: "coverage; calibration-in-the-large; brier",
     transformation: "none",
     uncertainty_distribution: "fixed",
     model_version: "fixture-v1",
@@ -182,6 +186,8 @@ describe("evidence status gate", () => {
       "verifier-b",
       "low",
       "direct",
+      "hold out fixture-source-family",
+      "coverage; calibration-in-the-large; brier",
       "none",
       "fixed",
       "fixture-v1",
@@ -229,5 +235,15 @@ describe("evidence status gate", () => {
     expect(status.releasePriorsAdjudicated).toBe(false);
     expect(status.acceptedCoveredParameterCount).toBe(0);
     expect(status.malformedAcceptedRows.join("\n")).toMatch(/mapped_prior_id different-condition does not match/);
+  });
+
+  it("rejects accepted rows missing validation-design metadata", () => {
+    const root = mkdtempSync(join(tmpdir(), "selectron-evidence-"));
+    writeSingleParameterFixture(root, { holdout_design: "", calibration_metrics: "" });
+
+    const status = buildEvidenceStatus(root);
+    expect(status.releasePriorsAdjudicated).toBe(false);
+    expect(status.acceptedCoveredParameterCount).toBe(0);
+    expect(status.malformedAcceptedRows.join("\n")).toMatch(/missing holdout_design\|calibration_metrics/);
   });
 });

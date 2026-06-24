@@ -38,6 +38,8 @@ const REQUIRED_ACCEPTED_FIELDS = [
   "verifier",
   "risk_of_bias",
   "transportability",
+  "holdout_design",
+  "calibration_metrics",
   "uncertainty_distribution",
   "model_version",
   "acceptance_version",

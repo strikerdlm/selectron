@@ -26,6 +26,8 @@ Only rows in this file with `status=accepted`, a named `extractor`, and a named
 | verifier | string | Independent verifier/adjudicator. |
 | risk_of_bias | string | Risk-of-bias assessment. |
 | transportability | string | Population/context transportability assessment. |
+| holdout_design | string | Predeclared held-out mission/source family or explicit rationale when no predictive claim is made. |
+| calibration_metrics | string | Predeclared predictive-comparison metrics or explicit `not-claimed` rationale for non-predictive rows. |
 | transformation | string | Any transformation from source endpoint to model endpoint. |
 | uncertainty_distribution | string | Distribution or uncertainty model assigned to the parameter. |
 | model_version | string | Model/release version using the row. |
@@ -67,7 +69,8 @@ accepted-ledger-derived. The gate is intentionally conservative:
 - Accepted rows must include extractor, independent verifier, endpoint
   definition, numerator/events, a usable denominator/person-time/exposure field,
   repeated-measure structure, extraction quote, risk-of-bias, transportability,
-  uncertainty distribution, acceptance version, and prior-value hash.
+  holdout design, calibration metrics, uncertainty distribution, acceptance
+  version, and prior-value hash.
 - Accepted `study_slug` values must resolve to source markdown in
   `research/evidence/` or `research/imm_sources/`, and any DOI in the ledger
   must match that source file's frontmatter.
