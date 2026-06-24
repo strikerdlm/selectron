@@ -48,7 +48,7 @@ test.describe("Crew Composition view", () => {
     await expect(page.getByText("Alpha").first()).toBeVisible();
     await expect(page.getByText("Foxtrot").first()).toBeVisible();
     // Composite panel heading should be present (use getByRole to avoid the
-    // screen-reader "Crew composite: NN%, qualified." sr-only live region also
+    // screen-reader "Crew composite: NN%, no demo-threshold flags." sr-only live region also
     // matching the regex).
     await expect(page.getByRole("heading", { name: /crew composite/i })).toBeVisible();
     // Run simulation button should be present (the button's accessible name

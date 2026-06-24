@@ -440,20 +440,22 @@ export type CrewComposite = {
   method: CrewCompositeMethod;
 };
 
+export type CrewGateVerdict = "clear" | "review-flagged";
+
 /**
  * Result of `evaluateCrewGates`.
- * The crew passes only if ALL members individually pass (weakest-link gate logic).
+ * This demo-threshold gate only reports whether review flags are present.
  */
 export type CrewGateResult = {
-  /** "qualified" iff every crew member individually qualifies. */
-  crewVerdict: "qualified" | "disqualified";
+  /** "clear" iff no crew member triggered a demo-threshold review flag. */
+  crewVerdict: CrewGateVerdict;
   /** Per-member gate results keyed by member.id. */
   perMemberResults: Record<string, import("../types/gate").GateResult>;
   /**
-   * IDs of crew members that individually failed their gate evaluation.
-   * Empty when crewVerdict === "qualified".
+   * IDs of crew members that triggered at least one demo-threshold review flag.
+   * Empty when crewVerdict === "clear".
    */
-  disqualifiedMemberIds: string[];
+  flaggedMemberIds: string[];
 };
 
 export type IMMSession = {

@@ -49,9 +49,9 @@ export type IMMLxCAssessment = {
   // Inputs that drove the assessment — surfaced for the UI explanation.
   pMissionFailure: number;   // 1 − missionSuccess.mean/100 (likelihood input)
   fractionLost: number;      // 1 − chi.mean/100 (consequence input)
-  /** Set to true when the crew was disqualified by a binary clearance gate. */
-  disqualified?: boolean;
-  /** Human-readable reason string when disqualified is true. */
+  /** Set to true when the crew triggered at least one demo-threshold review flag. */
+  reviewFlagged?: boolean;
+  /** Human-readable reason string when reviewFlagged is true. */
   reason?: string;
 };
 
@@ -98,7 +98,7 @@ export function assessIMMLxC(
   const Lband = LIKELIHOOD_BANDS_IN_MISSION[L - 1];
   const Cband = CONSEQUENCE_BANDS_MISSION_OBJ[C - 1];
 
-  const flagged = crewGate?.crewVerdict === "disqualified";
+  const flagged = crewGate?.crewVerdict === "review-flagged";
   return {
     likelihood: L,
     likelihoodLabel: Lband.label,
@@ -112,8 +112,8 @@ export function assessIMMLxC(
     fractionLost,
     ...(flagged
       ? {
-          disqualified: true,
-          reason: `crew review flags: ${crewGate.disqualifiedMemberIds.join(", ")}`,
+          reviewFlagged: true,
+          reason: `crew review flags: ${crewGate.flaggedMemberIds.join(", ")}`,
         }
       : {}),
   };

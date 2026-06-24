@@ -8,13 +8,13 @@
 //   multipliers + EVA-coupled conditions), so editing them recomputes risk.
 
 import type { IMMCrewMember } from "../../imm/types";
-import type { Criterion } from "../../types";
+import type { Criterion, GateVerdict } from "../../types";
 import { PerScoreCard } from "./PerScoreCard";
 
 interface CrewMemberCardProps {
   member: IMMCrewMember;
   compositeScore: number;          // [0, 1] — computed by parent
-  gateVerdict: "qualified" | "disqualified";
+  gateVerdict: GateVerdict;
   failedGates: string[];
   expanded: boolean;
   onToggle: () => void;
@@ -46,8 +46,8 @@ export function CrewMemberCard({
   onRemove,
 }: CrewMemberCardProps) {
   const pct = Math.round(compositeScore * 100);
-  const qualified = gateVerdict === "qualified";
-  const flagLabel = qualified ? "no demo-threshold flags" : "demo-threshold review flag present";
+  const clear = gateVerdict === "clear";
+  const flagLabel = clear ? "no demo-threshold flags" : "demo-threshold review flag present";
 
   const scoreColor = "var(--ink-1)";
 
@@ -70,7 +70,7 @@ export function CrewMemberCard({
   return (
     <div
       className="panel transition-all duration-200"
-      style={{ borderColor: !qualified ? "var(--warn)" : undefined }}
+      style={{ borderColor: !clear ? "var(--warn)" : undefined }}
     >
       {/* ── collapsed header (always visible) ─────────────────────────────── */}
       <div className="flex items-center gap-2">
@@ -86,8 +86,8 @@ export function CrewMemberCard({
             {/* Gate verdict dot */}
             <span
               className="shrink-0 w-2.5 h-2.5 rounded-full"
-              style={{ background: qualified ? "var(--ink-3)" : "var(--warn)" }}
-              title={qualified ? "no demo-threshold flags" : `demo-threshold review flags: ${failedGates.join(", ")}`}
+              style={{ background: clear ? "var(--ink-3)" : "var(--warn)" }}
+              title={clear ? "no demo-threshold flags" : `demo-threshold review flags: ${failedGates.join(", ")}`}
             />
             {/* Member ID */}
             <span className="mono text-[15px] text-ink-0 truncate">{member.id}</span>
@@ -99,8 +99,8 @@ export function CrewMemberCard({
 
           {/* Right cluster */}
           <div className="flex items-center gap-3 shrink-0">
-            {/* DQ badge */}
-            {!qualified && (
+            {/* Review-flag badge */}
+            {!clear && (
               <span
                 className="mono text-[11px] uppercase tracking-cap px-1.5 py-0.5 rounded-full border"
                 style={{ color: "var(--warn)", borderColor: "var(--warn)", background: "rgba(255,107,94,0.08)" }}
@@ -217,7 +217,7 @@ export function CrewMemberCard({
           )}
 
           {/* Gate failure notice */}
-          {!qualified && failedGates.length > 0 && (
+          {!clear && failedGates.length > 0 && (
             <div
               className="mono text-[13px] rounded border px-3 py-2 mb-4"
               style={{ borderColor: "var(--warn)", color: "var(--warn)", background: "rgba(255,107,94,0.06)" }}

@@ -48,7 +48,7 @@ function cumulativeRiskBand(
   lostCrewDays: number,
   gate?: GateResult,
 ): { label: string; color: "green" | "yellow" | "red" } {
-  if (gate?.verdict === "disqualified") return { label: "flag", color: "red" };
+  if (gate?.verdict === "review-flagged") return { label: "flag", color: "red" };
   if (lostCrewDays >= 25) return { label: "high", color: "red" };
   if (lostCrewDays >= 8) return { label: "moderate", color: "yellow" };
   return { label: "low", color: "green" };

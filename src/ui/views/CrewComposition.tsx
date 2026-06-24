@@ -705,9 +705,9 @@ export function CrewComposition() {
         className="sr-only"
       >
         Crew composite: {Math.round(composite.compositeScore * 100)}%,{" "}
-        {gateResult.crewVerdict === "qualified" ? "no demo-threshold flags" : "demo-threshold review flag present"}.
-        {gateResult.disqualifiedMemberIds.length > 0
-          ? ` Demo-threshold review flags: ${gateResult.disqualifiedMemberIds.join(", ")}.`
+        {gateResult.crewVerdict === "clear" ? "no demo-threshold flags" : "demo-threshold review flag present"}.
+        {gateResult.flaggedMemberIds.length > 0
+          ? ` Demo-threshold review flags: ${gateResult.flaggedMemberIds.join(", ")}.`
           : ""}
       </div>
 
@@ -790,9 +790,9 @@ export function CrewComposition() {
                   <span className="mono uppercase tracking-cap text-xs px-2 py-1 rounded bg-signal/10 text-signal">
                     {state.mission.profile?.evidenceGrade ?? "development"}
                   </span>
-                  {gateResult.crewVerdict === "disqualified" && (
+                  {gateResult.crewVerdict === "review-flagged" && (
                     <span className="mono text-xs text-red-300">
-                      demo-threshold review flag present: {gateResult.disqualifiedMemberIds.join(", ")}
+                      demo-threshold review flag present: {gateResult.flaggedMemberIds.join(", ")}
                     </span>
                   )}
                   <span className="mono text-[11px] text-ink-3">
@@ -1190,7 +1190,7 @@ export function CrewComposition() {
                   key={member.id}
                   member={member}
                   compositeScore={memberScore}
-                  gateVerdict={memberGate?.verdict ?? "qualified"}
+                  gateVerdict={memberGate?.verdict ?? "clear"}
                   failedGates={memberGate?.failedGates ?? []}
                   expanded={isExpanded}
                   onToggle={() => toggleMember(member.id)}
@@ -1213,7 +1213,7 @@ export function CrewComposition() {
             weakestMemberId={composite.weakestMemberId}
             method={state.aggregator}
             crewVerdict={gateResult.crewVerdict}
-            disqualifiedMemberIds={gateResult.disqualifiedMemberIds}
+            flaggedMemberIds={gateResult.flaggedMemberIds}
             onMethodChange={(m) => setState((s) => ({ ...s, aggregator: m }))}
             simState={simState}
             simError={simError}

@@ -4,8 +4,7 @@
 // `evaluateCrewGates` runs `evaluateGates` (from src/engine/gates.ts) on each
 // crew member individually, then aggregates into a `CrewGateResult`.
 //
-// The crew qualifies only when EVERY member individually qualifies
-// (weakest-link gate logic: one DQ member disqualifies the whole crew).
+// The crew is clear only when no member triggers a demo-threshold review flag.
 //
 // Members without stageAScores receive a gate evaluation where all gated
 // criteria are treated as missing scores — they will fail every gated criterion
@@ -19,8 +18,7 @@ import { evaluateGates } from "../engine/gates";
 /**
  * Evaluate Selectron Stage A gate criteria for each crew member individually.
  *
- * The crew-level verdict is "qualified" iff every per-member verdict is
- * "qualified" (weakest-link: a single DQ disqualifies the crew).
+ * The crew-level verdict is "clear" iff every per-member verdict is "clear".
  *
  * @param crew - Array of IMMCrewMember objects. Each member is evaluated
  *   using `member.stageAScores ?? {}` as the score map.
@@ -29,14 +27,14 @@ import { evaluateGates } from "../engine/gates";
  *   criteria without one are still listed under `evaluated` in the individual
  *   GateResult but do not contribute to failures.
  * @returns CrewGateResult with crewVerdict, per-member results keyed by
- *   member.id, and the list of disqualified member IDs.
+ *   member.id, and the list of flagged member IDs.
  */
 export function evaluateCrewGates(
   crew: readonly IMMCrewMember[],
   criteria: readonly Criterion[],
 ): CrewGateResult {
   const perMemberResults: CrewGateResult["perMemberResults"] = {};
-  const disqualifiedMemberIds: string[] = [];
+  const flaggedMemberIds: string[] = [];
 
   for (const member of crew) {
     // Build a minimal Candidate shape compatible with evaluateGates.
@@ -51,13 +49,13 @@ export function evaluateCrewGates(
     const gateResult = evaluateGates(candidate, criteria);
     perMemberResults[member.id] = gateResult;
 
-    if (gateResult.verdict === "disqualified") {
-      disqualifiedMemberIds.push(member.id);
+    if (gateResult.verdict === "review-flagged") {
+      flaggedMemberIds.push(member.id);
     }
   }
 
   const crewVerdict: CrewGateResult["crewVerdict"] =
-    disqualifiedMemberIds.length === 0 ? "qualified" : "disqualified";
+    flaggedMemberIds.length === 0 ? "clear" : "review-flagged";
 
-  return { crewVerdict, perMemberResults, disqualifiedMemberIds };
+  return { crewVerdict, perMemberResults, flaggedMemberIds };
 }

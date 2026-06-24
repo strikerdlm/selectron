@@ -1,4 +1,4 @@
-export type GateVerdict = "qualified" | "disqualified";
+export type GateVerdict = "clear" | "review-flagged";
 
 export type GateResult = {
   verdict: GateVerdict;

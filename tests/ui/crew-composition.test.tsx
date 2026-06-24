@@ -59,11 +59,11 @@ describe("aggregateCrewComposite — unit", () => {
 });
 
 describe("evaluateCrewGates — demo-threshold flags", () => {
-  it("crew with all safe defaults has no internal disqualified verdict", () => {
+  it("crew with all safe defaults has no demo-threshold review flags", () => {
     const crew = [makeMember("A", 0.7), makeMember("B", 0.6)];
     const result = evaluateCrewGates(crew, PLACEHOLDER_CRITERIA);
-    expect(result.crewVerdict).toBe("qualified");
-    expect(result.disqualifiedMemberIds).toHaveLength(0);
+    expect(result.crewVerdict).toBe("clear");
+    expect(result.flaggedMemberIds).toHaveLength(0);
   });
 
   it("crew member with EID T-score > 65 is surfaced as a review flag", () => {
@@ -72,9 +72,9 @@ describe("evaluateCrewGates — demo-threshold flags", () => {
     member.stageAScores = { ...member.stageAScores, "psych.mmpi2rf_eid": 80 };
     const crew = [makeMember("A", 0.7), member];
     const result = evaluateCrewGates(crew, PLACEHOLDER_CRITERIA);
-    expect(result.crewVerdict).toBe("disqualified");
-    expect(result.disqualifiedMemberIds).toContain("C");
-    expect(result.disqualifiedMemberIds).not.toContain("A");
+    expect(result.crewVerdict).toBe("review-flagged");
+    expect(result.flaggedMemberIds).toContain("C");
+    expect(result.flaggedMemberIds).not.toContain("A");
   });
 
   it("crew member with NASA cognition z < -2 is surfaced as a review flag", () => {
@@ -82,14 +82,14 @@ describe("evaluateCrewGates — demo-threshold flags", () => {
     member.stageAScores = { ...member.stageAScores, "cognitive.nasa_cognition_battery": -2.5 };
     const crew = [member, makeMember("E", 0.6)];
     const result = evaluateCrewGates(crew, PLACEHOLDER_CRITERIA);
-    expect(result.crewVerdict).toBe("disqualified");
-    expect(result.disqualifiedMemberIds).toContain("D");
+    expect(result.crewVerdict).toBe("review-flagged");
+    expect(result.flaggedMemberIds).toContain("D");
   });
 
-  it("single member crew with all defaults has no internal disqualified verdict", () => {
+  it("single member crew with all defaults has no demo-threshold review flags", () => {
     const crew = [makeMember("Solo", 0.65)];
     const result = evaluateCrewGates(crew, PLACEHOLDER_CRITERIA);
-    expect(result.crewVerdict).toBe("qualified");
+    expect(result.crewVerdict).toBe("clear");
   });
 });
 

@@ -66,27 +66,27 @@ function makeMember(id: string, scores: Record<string, number> = {}): IMMCrewMem
 // ── Tests ─────────────────────────────────────────────────────────────────────
 
 describe("evaluateCrewGates", () => {
-  it("all members qualified → crewVerdict qualified, empty disqualifiedMemberIds", () => {
+  it("all members clear → crewVerdict clear, empty flaggedMemberIds", () => {
     const crew = [
       makeMember("c1", { "psych.eid": 55, "cog.composite": 0.5, "behav.teamwork": 80 }),
       makeMember("c2", { "psych.eid": 60, "cog.composite": -1.0, "behav.teamwork": 70 }),
     ];
     const result = evaluateCrewGates(crew, CRITERIA);
-    expect(result.crewVerdict).toBe("qualified");
-    expect(result.disqualifiedMemberIds).toHaveLength(0);
-    expect(result.perMemberResults["c1"].verdict).toBe("qualified");
-    expect(result.perMemberResults["c2"].verdict).toBe("qualified");
+    expect(result.crewVerdict).toBe("clear");
+    expect(result.flaggedMemberIds).toHaveLength(0);
+    expect(result.perMemberResults["c1"].verdict).toBe("clear");
+    expect(result.perMemberResults["c2"].verdict).toBe("clear");
   });
 
-  it("one member fails psych gate → crewVerdict disqualified", () => {
+  it("one member fails psych gate → crewVerdict review-flagged", () => {
     const crew = [
       makeMember("c1", { "psych.eid": 55, "cog.composite": 0.5 }), // passes
       makeMember("c2", { "psych.eid": 70, "cog.composite": 0.0 }), // fails: 70 > 65
     ];
     const result = evaluateCrewGates(crew, CRITERIA);
-    expect(result.crewVerdict).toBe("disqualified");
-    expect(result.disqualifiedMemberIds).toEqual(["c2"]);
-    expect(result.perMemberResults["c2"].verdict).toBe("disqualified");
+    expect(result.crewVerdict).toBe("review-flagged");
+    expect(result.flaggedMemberIds).toEqual(["c2"]);
+    expect(result.perMemberResults["c2"].verdict).toBe("review-flagged");
     expect(result.perMemberResults["c2"].failedGates).toContain("psych.eid");
   });
 
@@ -100,24 +100,24 @@ describe("evaluateCrewGates", () => {
       // stageAScores intentionally absent
     };
     const result = evaluateCrewGates([noScores], CRITERIA);
-    expect(result.crewVerdict).toBe("disqualified");
-    expect(result.disqualifiedMemberIds).toContain("c-bare");
+    expect(result.crewVerdict).toBe("review-flagged");
+    expect(result.flaggedMemberIds).toContain("c-bare");
     // Both gated criteria should be in failedGates
     expect(result.perMemberResults["c-bare"].failedGates).toContain("psych.eid");
     expect(result.perMemberResults["c-bare"].failedGates).toContain("cog.composite");
   });
 
-  it("multiple members disqualified → all listed in disqualifiedMemberIds", () => {
+  it("multiple members review-flagged → all listed in flaggedMemberIds", () => {
     const crew = [
       makeMember("c1", { "psych.eid": 70, "cog.composite": 0.0 }), // fails psych
       makeMember("c2", { "psych.eid": 55, "cog.composite": -2.5 }), // fails cog
       makeMember("c3", { "psych.eid": 55, "cog.composite": 0.0 }), // passes both
     ];
     const result = evaluateCrewGates(crew, CRITERIA);
-    expect(result.crewVerdict).toBe("disqualified");
-    expect(result.disqualifiedMemberIds).toHaveLength(2);
-    expect(result.disqualifiedMemberIds).toContain("c1");
-    expect(result.disqualifiedMemberIds).toContain("c2");
-    expect(result.perMemberResults["c3"].verdict).toBe("qualified");
+    expect(result.crewVerdict).toBe("review-flagged");
+    expect(result.flaggedMemberIds).toHaveLength(2);
+    expect(result.flaggedMemberIds).toContain("c1");
+    expect(result.flaggedMemberIds).toContain("c2");
+    expect(result.perMemberResults["c3"].verdict).toBe("clear");
   });
 });

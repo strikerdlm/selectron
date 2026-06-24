@@ -154,7 +154,7 @@ describe("End-to-end posterior → (L, C, score, color)", () => {
 import type { GateResult } from "@/types";
 
 describe("assessLxC with gate verdict", () => {
-  it("disqualified gate reports review flags without overriding CHI/posterior inputs", () => {
+  it("review-flagged gate reports review flags without overriding CHI/posterior inputs", () => {
     const post = {
       chi: { mean: 0.99, ci90: [0.99, 0.99] as [number, number], ci95: [0.99, 0.99] as [number, number] },
       pEarlyTermination: { mean: 0, ci90: [0, 0] as [number, number] },
@@ -163,16 +163,16 @@ describe("assessLxC with gate verdict", () => {
       ess: 1000,
       trials: 1000,
     } as any;
-    const gate: GateResult = { verdict: "disqualified", failedGates: ["psych.mmpi2rf_eid"], evaluated: ["psych.mmpi2rf_eid"] };
+    const gate: GateResult = { verdict: "review-flagged", failedGates: ["psych.mmpi2rf_eid"], evaluated: ["psych.mmpi2rf_eid"] };
     const result = assessLxC(post, gate);
     expect(result.color).toBe("green");
     expect(result.likelihood).toBe(1);
     expect(result.consequence).toBe(1);
     expect(result.score).toBe(1);
-    expect(result.disqualified).toBe(true);
+    expect(result.reviewFlagged).toBe(true);
     expect(result.reason).toMatch(/psych\.mmpi2rf_eid/);
   });
-  it("qualified gate → normal LxC computation (same as no gate)", () => {
+  it("clear gate → normal LxC computation (same as no gate)", () => {
     const post = {
       chi: { mean: 0.99, ci90: [0.99, 0.99] as [number, number], ci95: [0.99, 0.99] as [number, number] },
       pEarlyTermination: { mean: 0, ci90: [0, 0] as [number, number] },
@@ -181,10 +181,10 @@ describe("assessLxC with gate verdict", () => {
       ess: 1000,
       trials: 1000,
     } as any;
-    const gate: GateResult = { verdict: "qualified", failedGates: [], evaluated: [] };
+    const gate: GateResult = { verdict: "clear", failedGates: [], evaluated: [] };
     const result = assessLxC(post, gate);
     expect(result.color).toBe("green");
-    expect(result.disqualified).toBeFalsy();
+    expect(result.reviewFlagged).toBeFalsy();
   });
   it("no gate arg → normal LxC computation (backwards compat)", () => {
     const post = {
@@ -197,6 +197,6 @@ describe("assessLxC with gate verdict", () => {
     } as any;
     const result = assessLxC(post);
     expect(result.color).toBe("green");
-    expect(result.disqualified).toBeFalsy();
+    expect(result.reviewFlagged).toBeFalsy();
   });
 });

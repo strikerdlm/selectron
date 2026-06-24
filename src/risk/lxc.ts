@@ -35,9 +35,9 @@ export type LxCAssessment = {
   // Inputs that drove the assessment — surfaced for the UI explanation.
   pEarlyTermination: number; // P(χ < χ*) used as likelihood
   fractionLost: number;      // 1 − χ_mean used as consequence
-  /** Set to true when the candidate was disqualified by a binary gate. */
-  disqualified?: boolean;
-  /** Human-readable reason string when disqualified is true. */
+  /** Set to true when the candidate triggered a demo-threshold review flag. */
+  reviewFlagged?: boolean;
+  /** Human-readable reason string when reviewFlagged is true. */
   reason?: string;
 };
 
@@ -78,7 +78,7 @@ export function assessLxC(posterior: RiskPosterior, gate?: GateResult): LxCAsses
   const Lband = LIKELIHOOD_BANDS_IN_MISSION[L - 1];
   const Cband = CONSEQUENCE_BANDS_MISSION_OBJ[C - 1];
 
-  const flagged = gate?.verdict === "disqualified";
+  const flagged = gate?.verdict === "review-flagged";
   return {
     likelihood: L,
     likelihoodLabel: Lband.label,
@@ -92,7 +92,7 @@ export function assessLxC(posterior: RiskPosterior, gate?: GateResult): LxCAsses
     fractionLost,
     ...(flagged
       ? {
-          disqualified: true,
+          reviewFlagged: true,
           reason: `review flags: ${gate.failedGates.join(", ")}`,
         }
       : {}),

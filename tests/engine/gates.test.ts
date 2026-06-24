@@ -28,31 +28,31 @@ const noGate: Criterion = {
 };
 
 describe("evaluateGates", () => {
-  it("qualified when all gates pass", () => {
+  it("clear when all demo-threshold gates pass", () => {
     const r = evaluateGates({ id: "c1", alias: "c1", scores: { "psych.psychopathology_clearance": 1, "cognitive.gma_threshold": 70 } }, [mmpi, gma, noGate]);
-    expect(r.verdict).toBe("qualified");
+    expect(r.verdict).toBe("clear");
     expect(r.failedGates).toEqual([]);
     expect(r.evaluated).toEqual(["psych.psychopathology_clearance", "cognitive.gma_threshold"]);
   });
-  it("disqualified on MMPI fail", () => {
+  it("review-flagged on MMPI threshold fail", () => {
     const r = evaluateGates({ id: "c2", alias: "c2", scores: { "psych.psychopathology_clearance": 0, "cognitive.gma_threshold": 70 } }, [mmpi, gma]);
-    expect(r.verdict).toBe("disqualified");
+    expect(r.verdict).toBe("review-flagged");
     expect(r.failedGates).toContain("psych.psychopathology_clearance");
   });
-  it("disqualified collects ALL failed gates, not just first", () => {
+  it("review-flagged collects ALL failed gates, not just first", () => {
     const r = evaluateGates({ id: "c3", alias: "c3", scores: { "psych.psychopathology_clearance": 0, "cognitive.gma_threshold": 30 } }, [mmpi, gma]);
     expect(r.failedGates.length).toBe(2);
   });
-  it("missing score for a gated criterion → disqualified with notes", () => {
+  it("missing score for a gated criterion → review-flagged with notes", () => {
     const r = evaluateGates({ id: "c4", alias: "c4", scores: {} }, [mmpi]);
-    expect(r.verdict).toBe("disqualified");
+    expect(r.verdict).toBe("review-flagged");
     expect(r.failedGates).toContain("psych.psychopathology_clearance");
     expect(r.notes).toMatch(/missing/i);
   });
   it("skip criteria without gateThreshold", () => {
     const r = evaluateGates({ id: "c5", alias: "c5", scores: { "psych.bigfive.conscientiousness": 50 } }, [noGate]);
     expect(r.evaluated).toEqual([]);
-    expect(r.verdict).toBe("qualified");
+    expect(r.verdict).toBe("clear");
   });
 });
 
@@ -91,13 +91,13 @@ describe("tier/construct-set stability (analog audit)", () => {
 
     // MMPI-2-RF EID scale is 50..100 → mid 75, above the fail-if-above:65 gate.
     const result = evaluateGates({ id: "mid-tier", alias: "mid-tier", scores }, visibleAtMin);
-    expect(result.verdict).toBe("disqualified");
+    expect(result.verdict).toBe("review-flagged");
     expect(result.failedGates).toContain("psych.mmpi2rf_eid");
     // nasa_cognition mid (0) is above its fail-if-below:-2.0 gate, so it passes.
     expect(result.failedGates).not.toContain("cognitive.nasa_cognition_battery");
   });
 
-  it("elite-tier candidate with MMPI EID > 65 is still disqualified at elite tier", async () => {
+  it("elite-tier candidate with MMPI EID > 65 is still review-flagged at elite tier", async () => {
     const { PLACEHOLDER_CRITERIA } = await import("../../src/data/placeholder-criteria");
     const { isCriterionAvailableAtTier } = await import("../../src/types/scenario");
 
@@ -112,7 +112,7 @@ describe("tier/construct-set stability (analog audit)", () => {
     scores["psych.mmpi2rf_eid"] = 70;
 
     const result = evaluateGates({ id: "elite-fail", alias: "elite-fail", scores }, eliteCriteria);
-    expect(result.verdict).toBe("disqualified");
+    expect(result.verdict).toBe("review-flagged");
     expect(result.failedGates).toContain("psych.mmpi2rf_eid");
   });
 
@@ -128,7 +128,7 @@ describe("tier/construct-set stability (analog audit)", () => {
     for (const c of minTierOnly) scores[c.id] = (c.scale.min + c.scale.max) / 2;
 
     const result = evaluateGates({ id: "min-tier", alias: "min-tier", scores }, PLACEHOLDER_CRITERIA);
-    expect(result.verdict).toBe("disqualified");
+    expect(result.verdict).toBe("review-flagged");
     expect(result.failedGates).toContain("psych.mmpi2rf_eid");
     expect(result.failedGates).toContain("cognitive.nasa_cognition_battery");
     expect(result.notes).toMatch(/missing/i);

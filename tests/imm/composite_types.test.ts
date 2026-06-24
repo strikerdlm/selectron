@@ -87,34 +87,34 @@ describe("IMM composite-crew types", () => {
     expect(cc.perMemberScores).toHaveLength(0);
   });
 
-  it("CrewGateResult shape — all qualified", () => {
+  it("CrewGateResult shape — all clear", () => {
     const gateOk: GateResult = {
-      verdict: "qualified", failedGates: [], evaluated: ["psych.mmpi2rf_eid"],
+      verdict: "clear", failedGates: [], evaluated: ["psych.mmpi2rf_eid"],
     };
     const cgr: CrewGateResult = {
-      crewVerdict: "qualified",
+      crewVerdict: "clear",
       perMemberResults: { "c1": gateOk, "c2": gateOk },
-      disqualifiedMemberIds: [],
+      flaggedMemberIds: [],
     };
-    expect(cgr.crewVerdict).toBe("qualified");
-    expect(cgr.disqualifiedMemberIds).toHaveLength(0);
+    expect(cgr.crewVerdict).toBe("clear");
+    expect(cgr.flaggedMemberIds).toHaveLength(0);
   });
 
-  it("CrewGateResult shape — one member disqualified", () => {
+  it("CrewGateResult shape — one member review-flagged", () => {
     const gateFail: GateResult = {
-      verdict: "disqualified",
+      verdict: "review-flagged",
       failedGates: ["psych.mmpi2rf_eid"],
       evaluated: ["psych.mmpi2rf_eid"],
     };
     const gateOk: GateResult = {
-      verdict: "qualified", failedGates: [], evaluated: ["psych.mmpi2rf_eid"],
+      verdict: "clear", failedGates: [], evaluated: ["psych.mmpi2rf_eid"],
     };
     const cgr: CrewGateResult = {
-      crewVerdict: "disqualified",
+      crewVerdict: "review-flagged",
       perMemberResults: { "c1": gateFail, "c2": gateOk },
-      disqualifiedMemberIds: ["c1"],
+      flaggedMemberIds: ["c1"],
     };
-    expect(cgr.crewVerdict).toBe("disqualified");
-    expect(cgr.disqualifiedMemberIds).toEqual(["c1"]);
+    expect(cgr.crewVerdict).toBe("review-flagged");
+    expect(cgr.flaggedMemberIds).toEqual(["c1"]);
   });
 });

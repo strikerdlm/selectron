@@ -14,7 +14,7 @@
 //   - poor technical ability → professional.technical_competence at floor (1/10)
 //   - low conscientiousness  → psych.conscientiousness at scale floor (0/100)
 //                              (plus cognitive.nasa_cognition_battery z = −2.5,
-//                              below the −2.0 gate, reinforcing the DQ verdict)
+//                              below the -2.0 gate, reinforcing the review flag)
 //
 // What each trait actually moves in the engine (verified 2026-06-05):
 //   - psych.emotional_stability and psych.conscientiousness appear in IMM
@@ -27,7 +27,7 @@
 //     mission-risk numbers. The test narrative is explicit about this.
 //   - psych.mmpi2rf_eid / cognitive.nasa_cognition_battery are DUAL-ROLE:
 //     they are the two wired clearance gates (gate-then-modulate: selection
-//     WOULD have hard-DQ'd this crew before any Stage B / IMM run) AND they
+//     would have review-flagged this crew before any Stage B / IMM run) AND they
 //     are themselves λ-coupled via vulnerabilityCriteria (EID on 3 conditions,
 //     cognition on 7 — verified 2026-06-05 in src/imm/conditions.ts). So the
 //     risk elevation asserted below is driven by all four psych/cognitive
@@ -129,12 +129,12 @@ describe("analog-45d · unscreened high-risk crew (no Stage-A selection)", () =>
 
   it("selection gates would hard-disqualify the unscreened crew (EID > 65T, cognition < −2.0) and pass the screened control", () => {
     const dq = evaluateCrewGates(unscreenedCrew, PLACEHOLDER_CRITERIA);
-    expect(dq.crewVerdict).toBe("disqualified");
-    // Whole-crew DQ: every member carries the failing scores.
-    expect(dq.disqualifiedMemberIds).toHaveLength(mission.crewSize);
+    expect(dq.crewVerdict).toBe("review-flagged");
+    // Whole-crew review flag: every member carries the failing scores.
+    expect(dq.flaggedMemberIds).toHaveLength(mission.crewSize);
 
     const ok = evaluateCrewGates(screenedCrew, PLACEHOLDER_CRITERIA);
-    expect(ok.crewVerdict).toBe("qualified");
+    expect(ok.crewVerdict).toBe("clear");
   });
 
   it("Stage-A crew composite degrades (this is where poor technical competence bites — it is not λ-coupled)", () => {

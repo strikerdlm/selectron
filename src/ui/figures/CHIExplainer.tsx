@@ -111,11 +111,11 @@ export function CHIExplainer({ posterior, chiStar, missionId, gate }: Props) {
   return (
     <section className={`panel p-6 border-l-2 ${lxcBorder}`}>
       {/* ── REVIEW-FLAG BANNER ──────────────────────────────────────────── */}
-      {gate?.verdict === "disqualified" && (
+      {gate?.verdict === "review-flagged" && (
         <div
           role="alert"
           className="mb-5 panel border border-red-500 bg-red-50 rounded-md p-4"
-          data-testid="disqualified-banner"
+          data-testid="review-flag-banner"
         >
           <div className="font-semibold text-red-900 mb-2">
             REVIEW REQUIRED — demo-threshold flag

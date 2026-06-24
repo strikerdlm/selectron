@@ -21,7 +21,7 @@ export function evaluateGates(candidate: Candidate, criteria: readonly Criterion
   }
 
   return {
-    verdict: failedGates.length === 0 ? "qualified" : "disqualified",
+    verdict: failedGates.length === 0 ? "clear" : "review-flagged",
     failedGates,
     evaluated,
     ...(missingNotes.length > 0 ? { notes: missingNotes.join("; ") } : {}),

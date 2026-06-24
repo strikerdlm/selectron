@@ -20,7 +20,7 @@ function StatusBadge({ metric }: { metric: MetricResult }) {
   // Two independent statuses. Green is reserved for true K15 agreement
   // (within_ci95). A documented-divergent metric that is still inside its
   // frozen regression envelope is "regression stable · K15 divergent" —
-  // amber, never an unqualified pass. Drift outside the envelope is a
+  // amber, never an unconditional pass. Drift outside the envelope is a
   // regression failure.
   if (metric.within_ci95) {
     return (

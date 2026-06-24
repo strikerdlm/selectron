@@ -1,16 +1,16 @@
 // src/ui/components/CompositeCrewPanel.tsx
-// Displays crew-level composite score + gate verdict + aggregator method selector.
+// Displays crew-level composite score + demo-threshold review flags + aggregator method selector.
 // CC-4: Run Simulation button + IMMOutcome results panel.
 
-import type { CrewCompositeMethod, IMMOutcome, ScenarioSummary } from "../../imm/types";
+import type { CrewCompositeMethod, CrewGateVerdict, IMMOutcome, ScenarioSummary } from "../../imm/types";
 
 interface CompositeCrewPanelProps {
   compositeScore: number;          // [0, 1]
   perMemberScores: number[];       // same order as crew array
   weakestMemberId: string | null;
   method: CrewCompositeMethod;
-  crewVerdict: "qualified" | "disqualified";
-  disqualifiedMemberIds: string[];
+  crewVerdict: CrewGateVerdict;
+  flaggedMemberIds: string[];
   onMethodChange: (m: CrewCompositeMethod) => void;
   /** CC-4: simulation state */
   simState: "idle" | "running" | "done" | "error";
@@ -86,7 +86,7 @@ export function CompositeCrewPanel({
   weakestMemberId,
   method,
   crewVerdict,
-  disqualifiedMemberIds,
+  flaggedMemberIds,
   onMethodChange,
   simState,
   simError,
@@ -94,8 +94,8 @@ export function CompositeCrewPanel({
   onRunSim,
 }: CompositeCrewPanelProps) {
   const pct = Math.round(compositeScore * 100);
-  const qualified = crewVerdict === "qualified";
-  const thresholdFlagLabel = qualified
+  const clear = crewVerdict === "clear";
+  const thresholdFlagLabel = clear
     ? "no demo-threshold flags"
     : "demo-threshold review flag present";
 
@@ -104,13 +104,13 @@ export function CompositeCrewPanel({
       {/* Header */}
       <div className="flex items-center justify-between">
         <h3 className="label text-ink-1 uppercase tracking-cap">Crew Composite</h3>
-        {/* Gate verdict badge */}
+        {/* Demo-threshold review flag badge */}
         <span
           className="mono text-[12px] uppercase tracking-cap px-2 py-0.5 rounded-full border"
           style={{
-            color: qualified ? "var(--ink-2)" : "var(--warn)",
-            borderColor: qualified ? "var(--line)" : "var(--warn)",
-            background: qualified ? "transparent" : "rgba(255,107,94,0.08)",
+            color: clear ? "var(--ink-2)" : "var(--warn)",
+            borderColor: clear ? "var(--line)" : "var(--warn)",
+            background: clear ? "transparent" : "rgba(255,107,94,0.08)",
           }}
         >
           {thresholdFlagLabel}
@@ -163,13 +163,13 @@ export function CompositeCrewPanel({
         </div>
       )}
 
-      {/* DQ member list */}
-      {disqualifiedMemberIds.length > 0 && (
+      {/* Demo-threshold flagged member list */}
+      {flaggedMemberIds.length > 0 && (
         <div className="flex flex-col gap-1">
           <span className="label text-[12px] uppercase tracking-cap" style={{ color: "var(--warn)" }}>
             Demo-threshold review flags
           </span>
-          {disqualifiedMemberIds.map((id) => (
+          {flaggedMemberIds.map((id) => (
             <div
               key={id}
               className="mono text-[13px] border rounded px-3 py-1.5"

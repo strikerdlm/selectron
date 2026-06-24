@@ -142,21 +142,20 @@ describe("analog-90d · crew archetype comparison (mostly-unselected crews)", ()
     expect(mission.crewSize).toBe(6);
   });
 
-  it("gate verdicts: clinical select-out, not quality select-in — average and low-conscientiousness crews PASS; emo/cog/worst whole-crew DQ; mixed pool DQ(2)", () => {
-    expect(evaluateCrewGates(CREWS.screened, PLACEHOLDER_CRITERIA).crewVerdict).toBe("qualified");
+  it("gate verdicts: demo-threshold review flags, not quality select-in — average and low-conscientiousness crews clear; emo/cog/worst whole-crew flagged; mixed pool flagged(2)", () => {
+    expect(evaluateCrewGates(CREWS.screened, PLACEHOLDER_CRITERIA).crewVerdict).toBe("clear");
     // An average unselected person (EID 50T, cognition z 0) fails no gate —
     // the gates exist to catch clinical elevations, not to rank quality.
-    expect(evaluateCrewGates(CREWS.avg, PLACEHOLDER_CRITERIA).crewVerdict).toBe("qualified");
-    // Conscientiousness has no gate: a sloppy-but-stable crew is NOT DQ'd.
-    expect(evaluateCrewGates(CREWS.consc, PLACEHOLDER_CRITERIA).crewVerdict).toBe("qualified");
-    expect(evaluateCrewGates(CREWS.emo, PLACEHOLDER_CRITERIA).crewVerdict).toBe("disqualified");
-    expect(evaluateCrewGates(CREWS.cog, PLACEHOLDER_CRITERIA).crewVerdict).toBe("disqualified");
-    expect(evaluateCrewGates(CREWS.worst, PLACEHOLDER_CRITERIA).crewVerdict).toBe("disqualified");
-    // Realistic pool: exactly the 2 worst-combined members DQ — whole-crew
-    // verdict flips on the weakest links.
+    expect(evaluateCrewGates(CREWS.avg, PLACEHOLDER_CRITERIA).crewVerdict).toBe("clear");
+    // Conscientiousness has no gate: a sloppy-but-stable crew is not review-flagged.
+    expect(evaluateCrewGates(CREWS.consc, PLACEHOLDER_CRITERIA).crewVerdict).toBe("clear");
+    expect(evaluateCrewGates(CREWS.emo, PLACEHOLDER_CRITERIA).crewVerdict).toBe("review-flagged");
+    expect(evaluateCrewGates(CREWS.cog, PLACEHOLDER_CRITERIA).crewVerdict).toBe("review-flagged");
+    expect(evaluateCrewGates(CREWS.worst, PLACEHOLDER_CRITERIA).crewVerdict).toBe("review-flagged");
+    // Realistic pool: exactly the 2 worst-combined members are flagged.
     const mixedGates = evaluateCrewGates(CREWS.mixed, PLACEHOLDER_CRITERIA);
-    expect(mixedGates.crewVerdict).toBe("disqualified");
-    expect(mixedGates.disqualifiedMemberIds.sort()).toEqual(["m1", "m2"]);
+    expect(mixedGates.crewVerdict).toBe("review-flagged");
+    expect(mixedGates.flaggedMemberIds.sort()).toEqual(["m1", "m2"]);
   });
 
   it("average unselected crew passes gates yet still carries ~+1 TME vs screened — the vulnerability path acts below the gate threshold", () => {

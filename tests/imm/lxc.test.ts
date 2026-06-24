@@ -72,15 +72,15 @@ describe("assessIMMLxC — happy paths", () => {
 });
 
 describe("assessIMMLxC — crew gate review flags", () => {
-  it("crewVerdict=disqualified reports review flags without overriding the IMM result", () => {
+  it("crewVerdict=review-flagged reports review flags without overriding the IMM result", () => {
     const greatOutcome = fakeOutcome({ chiPct: 99, missionSuccessPct: 99 });
     const failedCrew: CrewGateResult = {
-      crewVerdict: "disqualified",
+      crewVerdict: "review-flagged",
       perMemberResults: {},
-      disqualifiedMemberIds: ["mike", "alice"],
+      flaggedMemberIds: ["mike", "alice"],
     };
     const r = assessIMMLxC(greatOutcome, failedCrew);
-    expect(r.disqualified).toBe(true);
+    expect(r.reviewFlagged).toBe(true);
     expect(r.likelihood).toBeLessThan(5);
     expect(r.consequence).toBeLessThan(5);
     expect(r.score).toBeLessThan(25);
@@ -88,16 +88,16 @@ describe("assessIMMLxC — crew gate review flags", () => {
     expect(r.reason).toMatch(/alice/);
   });
 
-  it("crewVerdict=qualified does NOT short-circuit — Monte Carlo result drives verdict", () => {
-    // Very-low-failure path: pure-IMM result must come through (no disqualified flag).
+  it("crewVerdict=clear does NOT short-circuit — Monte Carlo result drives verdict", () => {
+    // Very-low-failure path: pure-IMM result must come through (no review flag).
     const greatOutcome = fakeOutcome({ chiPct: 99.9, missionSuccessPct: 99.999 });
-    const qualifiedCrew: CrewGateResult = {
-      crewVerdict: "qualified",
+    const clearCrew: CrewGateResult = {
+      crewVerdict: "clear",
       perMemberResults: {},
-      disqualifiedMemberIds: [],
+      flaggedMemberIds: [],
     };
-    const r = assessIMMLxC(greatOutcome, qualifiedCrew);
-    expect(r.disqualified).toBeUndefined();
+    const r = assessIMMLxC(greatOutcome, clearCrew);
+    expect(r.reviewFlagged).toBeUndefined();
     expect(r.color).toBe("green");
     expect(r.score).toBe(1); // L1×C1
   });
@@ -105,7 +105,7 @@ describe("assessIMMLxC — crew gate review flags", () => {
   it("no gate supplied → uses Monte Carlo result", () => {
     const r = assessIMMLxC(fakeOutcome({ chiPct: 50, missionSuccessPct: 50 }));
     // 50% loss + 50% failure should land mid-matrix; specific cell depends on JSC bands.
-    expect(r.disqualified).toBeUndefined();
+    expect(r.reviewFlagged).toBeUndefined();
     expect(r.fractionLost).toBe(0.5);
     expect(r.pMissionFailure).toBe(0.5);
   });

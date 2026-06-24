@@ -4,8 +4,8 @@ import type { GateResult, Criterion } from "../../src/types";
 
 describe("Gate types", () => {
   it("GateResult shape", () => {
-    const r: GateResult = { verdict: "qualified", failedGates: [], evaluated: ["psych.psychopathology_clearance"] };
-    expect(r.verdict).toBe("qualified");
+    const r: GateResult = { verdict: "clear", failedGates: [], evaluated: ["psych.psychopathology_clearance"] };
+    expect(r.verdict).toBe("clear");
   });
   it("Criterion.gateThreshold optional field", () => {
     const c: Criterion = {
