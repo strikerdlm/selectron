@@ -3,13 +3,12 @@
 // Layout: 4 large stat cards (TME / CHI / pEVAC / pLOCL), one row, each card
 // showing the Monte Carlo mean as the headline number plus a CI₉₅ whisker.
 // Below the grid: a slim inline row for composite health-criterion attainment,
-// followed by a small σ(CHI) convergence sparkline (the "did this run converge?"
-// glance — full diagnostic lives in I4).
+// followed by a small batch σ(CHI) sparkline (full diagnostic lives in I4).
 //
 // Whiskers are styled divs (no ECharts) per spec. The sparkline IS ECharts but
-// stripped of legend / axis labels — it shows only the σ(CHI) trajectory.
+// stripped of legend / axis labels — it shows only the batch σ(CHI) trajectory.
 //
-// Empty convergence (T < 1 000): cards + health-criterion row render
+// Empty batch diagnostics (T < 1 000): cards + health-criterion row render
 // normally; the sparkline area shows a small placeholder.
 
 import ReactEChartsCore from "echarts-for-react/lib/core";
@@ -185,9 +184,9 @@ function HealthCriterionRow({
   );
 }
 
-// ── σ(CHI) convergence sparkline ─────────────────────────────────────────────
+// ── Batch σ(CHI) sparkline ───────────────────────────────────────────────────
 // Tiny line chart — no legend, no axis labels, no tooltip frame. Just the
-// trajectory of σ(CHI) over cumulative trials. The "did it converge?" glance.
+// trajectory of 1 000-trial batch σ(CHI) over cumulative trials.
 type SparklineProps = {
   trialCheckpoints: number[];
   sigmaChi: number[];
@@ -199,7 +198,7 @@ function ConvergenceSparkline({ trialCheckpoints, sigmaChi }: SparklineProps) {
   if (sigmaChi.length === 0) {
     return (
       <div className="panel px-3 py-2 flex items-center justify-between gap-3" data-testid="imm-headline-sparkline-placeholder">
-        <span className="mono text-[10px] text-ink-3 uppercase tracking-cap">σ(CHI) convergence</span>
+        <span className="mono text-[10px] text-ink-3 uppercase tracking-cap">batch σ(CHI)</span>
         <span className="mono text-[10px] text-ink-3">
           T &lt; 1 000 — no diagnostic
         </span>
@@ -242,7 +241,7 @@ function ConvergenceSparkline({ trialCheckpoints, sigmaChi }: SparklineProps) {
 
     series: [
       {
-        name: "σ(CHI)",
+        name: "batch σ(CHI)",
         type: "line" as const,
         data: sigmaChi,
         showSymbol: false,
@@ -256,7 +255,7 @@ function ConvergenceSparkline({ trialCheckpoints, sigmaChi }: SparklineProps) {
   return (
     <div className="panel px-3 py-2 flex items-center gap-3" data-testid="imm-headline-sparkline">
       <span className="mono text-[10px] text-ink-3 uppercase tracking-cap whitespace-nowrap">
-        σ(CHI) trajectory
+        batch σ(CHI)
       </span>
       <div style={{ flex: 1, height: 40, minWidth: 120 }}>
         <ReactEChartsCore
@@ -268,7 +267,7 @@ function ConvergenceSparkline({ trialCheckpoints, sigmaChi }: SparklineProps) {
         />
       </div>
       <span className="mono text-[10px] tabular-nums text-ink-2 whitespace-nowrap">
-        final σ = {sigmaChi[sigmaChi.length - 1]?.toFixed(2) ?? "—"}%
+        final batch σ = {sigmaChi[sigmaChi.length - 1]?.toFixed(2) ?? "—"} pp
       </span>
     </div>
   );
@@ -312,9 +311,9 @@ export function IMMHeadlineCard({
       "report estimator precision for displayed means/probabilities; Wilson 95% " +
       "intervals report binomial estimator precision for binary probabilities. " +
       "These diagnostics are not empirical validation. The health criterion is the joint probability " +
-      "P(no LOCL ∧ no EVAC ∧ CHI ≥ χ*). The σ(CHI) sparkline at the bottom is the " +
-      "convergence glance: a flat trajectory near zero indicates a converged run; " +
-      "rising or jagged σ means insufficient trials. See I4 for the full diagnostic.",
+      "P(no LOCL ∧ no EVAC ∧ CHI ≥ χ*). The batch σ(CHI) sparkline at the bottom " +
+      "shows 1 000-trial batch outcome variability; it is not an MCSE or proof of convergence. " +
+      "See I4 for the full diagnostic.",
     source:
       "Antonsen et al. (2022) npj Microgravity 8(1) [A22, doi:10.1038/s41526-022-00193-9] " +
       "(4-step IMM trial); Keenan et al. (2015) ICES-2015-123 [K15] (IMM framework). " +

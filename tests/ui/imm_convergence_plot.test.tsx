@@ -30,11 +30,27 @@ function makeOutcome(checkpoints: number[], sigmaChi: number[], sigmaPevac: numb
     missionSuccess: makeSummary(80),
     perConditionDrivers: [],
     convergence: { trialCheckpoints: checkpoints, sigmaChi, sigmaPevac },
+    monteCarloError: {
+      trials: 100_000,
+      tmeMeanMcse: 0.12,
+      chiMeanMcse: 0.03,
+      pEvacMcsePct: 0.02,
+      pLoclMcsePct: 0.01,
+      healthCriterionMcsePct: 0.04,
+      pEvacWilson95Pct: [5.43, 5.71],
+      pLoclWilson95Pct: [0.39, 0.50],
+      healthCriterionWilson95Pct: [79.75, 80.25],
+      tmeRelativeMcse: 0.001,
+      chiRelativeMcse: 0.0003,
+      pEvacRelativeMcse: 0.003,
+      pLoclRelativeMcse: 0.02,
+      healthCriterionRelativeMcse: 0.0005,
+    },
   };
 }
 
 describe("IMMConvergencePlot (I4)", () => {
-  it("renders placeholder when no convergence checkpoints (T < 1000)", () => {
+  it("renders placeholder when no batch checkpoints (T < 1000)", () => {
     const outcome = makeOutcome([], [], []);
     const { container } = render(
       <IMMConvergencePlot outcome={outcome} trials={500} chiStar={0.7} />,
@@ -51,6 +67,17 @@ describe("IMMConvergencePlot (I4)", () => {
       <IMMConvergencePlot outcome={outcome} trials={5000} chiStar={0.7} />,
     );
     expect(container.querySelector("[data-testid='echarts-mock']")).not.toBeNull();
+  });
+
+  it("renders estimator precision separately from batch sigma", () => {
+    const outcome = makeOutcome([1000, 2000], [7.5, 5.2], [3.0, 2.4]);
+    const { container } = render(
+      <IMMConvergencePlot outcome={outcome} trials={2000} chiStar={0.75} />,
+    );
+    const text = container.textContent ?? "";
+    expect(text).toContain("Estimator precision");
+    expect(text).toContain("Wilson 95%");
+    expect(text).toContain("historical 5 pp batch-SD reference");
   });
 
   it("caption includes chiStar value", () => {

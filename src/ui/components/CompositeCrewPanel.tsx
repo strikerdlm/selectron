@@ -251,10 +251,10 @@ export function CompositeCrewPanel({
             </div>
           </div>
 
-          {/* Convergence info */}
+          {/* Batch-variability info */}
           <div className="mono text-[11px] text-ink-3 mt-1">
-            σ CHI {(outcome.convergence.sigmaChi.at(-1) ?? 0).toFixed(3)} ·{" "}
-            σ P(evac) {(outcome.convergence.sigmaPevac.at(-1) ?? 0).toFixed(3)}
+            batch σ CHI {(outcome.convergence.sigmaChi.at(-1) ?? 0).toFixed(3)} ·{" "}
+            batch σ P(evac) {(outcome.convergence.sigmaPevac.at(-1) ?? 0).toFixed(3)}
           </div>
         </div>
       )}
