@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import json
 from typing import Any
 
 import numpy as np
@@ -67,38 +66,18 @@ class TestBasePriorIdempotency:
         }
         assert base_prior_for(inc) == (2.0, 5000.0)
 
-    def test_merge_then_refit_does_not_double_count(self, tmp_path) -> None:
+    def test_merge_then_refit_does_not_double_count(self, tmp_priors) -> None:
         """fit -> merge -> (would-be) refit: the base is unchanged after merge."""
-        priors_path = tmp_path / "imm-priors.json"
-        priors_path.write_text(
-            json.dumps(
-                {
-                    "schema_version": 1,
-                    "conditions": {
-                        "demo": {
-                            "provenance": "tierB-lit",
-                            "source_ref": "fixture",
-                            "incidence": {
-                                "distribution": "Gamma-Poisson",
-                                "alpha": 2.0,
-                                "beta": 1000.0,
-                            },
-                        }
-                    },
-                }
-            )
-        )
-
-        inc_before = json.loads(priors_path.read_text())["conditions"]["demo"]["incidence"]
+        inc_before = load_priors(tmp_priors)["conditions"]["depression"]["incidence"]
         base_before = base_prior_for(inc_before)
 
         # Run 1: merge a fitted posterior into the file.
         merge_fitted_priors(
-            fitted={"demo": _fit_result("demo", alpha=55.5, beta=378240.0)},
-            priors_path=priors_path,
+            fitted={"depression": _fit_result("depression", alpha=55.5, beta=378240.0)},
+            priors_path=tmp_priors,
         )
 
-        inc_after = json.loads(priors_path.read_text())["conditions"]["demo"]["incidence"]
+        inc_after = load_priors(tmp_priors)["conditions"]["depression"]["incidence"]
         # The posterior was written...
         assert inc_after["alpha"] == 55.5
         assert inc_after["beta"] == 378240.0

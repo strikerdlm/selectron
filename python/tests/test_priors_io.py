@@ -63,6 +63,64 @@ class TestLoadPriors:
         with pytest.raises(ValueError, match="schema_version"):
             load_priors(p)
 
+    def test_rejects_missing_active_condition_prior(self, priors_json: dict[str, Any], tmp_path: Path) -> None:
+        del priors_json["conditions"]["acute-sinusitis"]
+        with pytest.raises(ValueError, match="missing prior for acute-sinusitis"):
+            save_priors(priors_json, tmp_path / "bad.json")
+
+    def test_rejects_unknown_active_condition_prior(self, priors_json: dict[str, Any], tmp_path: Path) -> None:
+        priors_json["conditions"]["not-a-condition"] = {
+            **priors_json["conditions"]["acute-sinusitis"],
+            "conditionId": "not-a-condition",
+        }
+        with pytest.raises(ValueError, match="not-a-condition.*active IMM condition catalog"):
+            save_priors(priors_json, tmp_path / "bad.json")
+
+    def test_rejects_mismatched_condition_id(self, priors_json: dict[str, Any], tmp_path: Path) -> None:
+        priors_json["conditions"]["acute-sinusitis"]["conditionId"] = "depression"
+        with pytest.raises(ValueError, match="acute-sinusitis.*conditionId.*match"):
+            save_priors(priors_json, tmp_path / "bad.json")
+
+    def test_rejects_malformed_incidence_parameters(self, priors_json: dict[str, Any], tmp_path: Path) -> None:
+        priors_json["conditions"]["acute-sinusitis"]["incidence"]["alpha"] = float("nan")
+        with pytest.raises(ValueError, match="acute-sinusitis.*incidence\\.alpha.*finite"):
+            save_priors(priors_json, tmp_path / "bad.json")
+
+    def test_rejects_invalid_pert_ranges(self, priors_json: dict[str, Any], tmp_path: Path) -> None:
+        priors_json["conditions"]["acute-sinusitis"]["treated"]["p_evac"]["max"] = 1.2
+        with pytest.raises(ValueError, match="acute-sinusitis.*treated\\.p_evac\\.max"):
+            save_priors(priors_json, tmp_path / "bad.json")
+
+        priors_json["conditions"]["acute-sinusitis"]["treated"]["p_evac"]["max"] = 0.1
+        priors_json["conditions"]["acute-sinusitis"]["treated"]["p_evac"]["min"] = 0.2
+        with pytest.raises(ValueError, match="acute-sinusitis.*treated\\.p_evac.*min <= mode <= max"):
+            save_priors(priors_json, tmp_path / "bad.json")
+
+    def test_rejects_invalid_risk_factor_and_resource_values(self, priors_json: dict[str, Any], tmp_path: Path) -> None:
+        priors_json["conditions"]["acute-sinusitis"]["risk_factor_multipliers"]["unsupported-factor"] = 1.0
+        with pytest.raises(ValueError, match="unsupported-factor.*risk factor"):
+            save_priors(priors_json, tmp_path / "bad.json")
+
+        del priors_json["conditions"]["acute-sinusitis"]["risk_factor_multipliers"]["unsupported-factor"]
+        priors_json["conditions"]["acute-sinusitis"]["required_resources"]["antibiotic"] = -1
+        with pytest.raises(ValueError, match="required_resources\\.antibiotic.*>= 0"):
+            save_priors(priors_json, tmp_path / "bad.json")
+
+    def test_rejects_invalid_global_calibration_values(self, priors_json: dict[str, Any], tmp_path: Path) -> None:
+        priors_json["global_calibration"]["tierA_multiplier"] = float("inf")
+        with pytest.raises(ValueError, match="global_calibration\\.tierA_multiplier.*finite"):
+            save_priors(priors_json, tmp_path / "bad.json")
+
+        priors_json["global_calibration"]["tierA_multiplier"] = 1.0
+        priors_json["global_calibration"]["kind_multipliers"]["unsupported-kind"] = {}
+        with pytest.raises(ValueError, match="unsupported-kind.*mission kind"):
+            save_priors(priors_json, tmp_path / "bad.json")
+
+        del priors_json["global_calibration"]["kind_multipliers"]["unsupported-kind"]
+        priors_json["global_calibration"]["kind_multipliers"]["antarctic-station"]["not-a-condition"] = 1.0
+        with pytest.raises(ValueError, match="not-a-condition.*active IMM condition"):
+            save_priors(priors_json, tmp_path / "bad.json")
+
 
 class TestSavePriors:
     def test_round_trip(self, tmp_priors: Path) -> None:
