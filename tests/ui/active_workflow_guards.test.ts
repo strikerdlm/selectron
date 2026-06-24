@@ -277,6 +277,7 @@ describe("active analog workflow guards", () => {
       "docs/reports/2026-06-05_report_variable-sweep-4vars.md",
       "docs/reports/2026-06-05_literature-review_selectron-imm-defensibility.md",
       "docs/reports/2026-06-05_literature-review_selectron-kit-training-study.md",
+      "docs/reports/2026-06-09_peer-review_selectron-publication-readiness.md",
     ];
 
     for (const path of reportPaths) {
@@ -302,6 +303,12 @@ describe("active analog workflow guards", () => {
         "model correctly captures this distinction",
         "No structural model change is required",
         "The 90-day pEVAC of 1.9–2.1% is defensible",
+        "Bayesian MCDA for analog-astronaut selection",
+        "K15 validation gate",
+        "K15 validation and posterior-predictive checks",
+        "Minor Revision / Submit",
+        "publication-ready for v0.5.6 packaging",
+        "portal upload package is not final",
       ]) {
         expect(source, `${path} must not contain stale claim ${forbidden}`).not.toContain(forbidden);
       }
