@@ -33,6 +33,10 @@ function countProvenance(): Record<string, number> {
   return counts;
 }
 
+function priorsFixture(): any {
+  return JSON.parse(readFileSync(PRIORS_PATH, "utf8"));
+}
+
 describe("IMM priors", () => {
   it("loads imm-priors.json", () => {
     const priors = loadIMMPriors();
@@ -105,5 +109,54 @@ describe("IMM priors", () => {
   it("validatePriorsJson catches malformed input", () => {
     expect(() => validatePriorsJson({})).toThrow();
     expect(() => validatePriorsJson({ schema_version: 0 })).toThrow();
+  });
+
+  it("validates the complete runtime schema for the frozen catalog", () => {
+    expect(() => validatePriorsJson(priorsFixture())).not.toThrow();
+  });
+
+  it("rejects malformed incidence parameters", () => {
+    const priors = priorsFixture();
+    priors.conditions["acute-sinusitis"].incidence.alpha = Number.NaN;
+    expect(() => validatePriorsJson(priors)).toThrow(/acute-sinusitis.*incidence\.alpha/);
+  });
+
+  it("rejects probability and duration PERT triples outside runtime bounds", () => {
+    const badProbability = priorsFixture();
+    badProbability.conditions["acute-sinusitis"].treated.p_evac.max = 1.2;
+    expect(() => validatePriorsJson(badProbability)).toThrow(/acute-sinusitis.*treated\.p_evac\.max/);
+
+    const badDuration = priorsFixture();
+    badDuration.conditions["acute-sinusitis"].treated.dt_cp1_hours.min = -1;
+    expect(() => validatePriorsJson(badDuration)).toThrow(/acute-sinusitis.*treated\.dt_cp1_hours\.min/);
+  });
+
+  it("rejects unknown prior ids and undocumented kind-multiplier sensitivity keys", () => {
+    const unknownPrior = priorsFixture();
+    unknownPrior.conditions["not-a-real-condition"] = {
+      ...unknownPrior.conditions["acute-sinusitis"],
+      conditionId: "not-a-real-condition",
+    };
+    expect(() => validatePriorsJson(unknownPrior)).toThrow(/not-a-real-condition.*IMM_CONDITIONS/);
+
+    const unknownMultiplier = priorsFixture();
+    unknownMultiplier.global_calibration.kind_multipliers["antarctic-station"]["not-a-real-condition"] = 1;
+    expect(() => validatePriorsJson(unknownMultiplier)).toThrow(/not-a-real-condition.*inactive sensitivity key/);
+  });
+
+  it("rejects missing generated-condition priors", () => {
+    const priors = priorsFixture();
+    delete priors.conditions["acute-sinusitis"];
+    expect(() => validatePriorsJson(priors)).toThrow(/missing prior for acute-sinusitis/);
+  });
+
+  it("rejects unsupported risk-factor and mission-kind keys", () => {
+    const badRiskFactor = priorsFixture();
+    badRiskFactor.conditions["acute-sinusitis"].risk_factor_multipliers["unsupported-factor"] = 1.1;
+    expect(() => validatePriorsJson(badRiskFactor)).toThrow(/unsupported-factor.*risk factor/);
+
+    const badKind = priorsFixture();
+    badKind.global_calibration.kind_multipliers["unsupported-kind"] = {};
+    expect(() => validatePriorsJson(badKind)).toThrow(/unsupported-kind.*mission kind/);
   });
 });
