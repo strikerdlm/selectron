@@ -64,6 +64,8 @@ S_i = \sum_k w_k \cdot z(x_{i,k}), \quad w \sim \mathrm{Dirichlet}(\alpha)
 
 The v0.6 demo prior uses equal means \(m_k = 1/K\) with concentration \(\kappa = K\) (equivalent to `Dirichlet(1,\ldots,1)`). This propagates **weight uncertainty**, not learned suitability from observed mission outcomes.
 
+Because the current prior is applied per listed criterion, domains with more demo criteria receive more aggregate influence than domains represented by fewer criteria. The v0.6 Wizard does not implement hierarchical domain-to-construct weighting; treat domain-level comparisons as catalog-dependent limitations until an expert-ratified weighting model is added.
+
 **Literature context:** Multi-criteria decision models have long supported human spaceflight crew and mission planning trade studies (e.g., priority-assessment MCDA for exploration simulation facilities). Analog astronaut programs apply multi-factor selection processes combining medical, psychological, and operational criteria — Selectron formalizes the **scoring math** separately from any real selection committee workflow.
 
 ### Stage B — IMM-style mission simulation
@@ -226,7 +228,8 @@ The Wizard has **four steps**. It scores **one candidate** under the demo MCDA c
 
 1. Inspect normalized scores and induced MCDA intervals.
 2. Confirm citations and score direction (`higherIsBetter` / reversed scales handled correctly).
-3. Click **Continue to mission handoff**.
+3. Review the displayed catalog limitations, including the per-criterion weighting imbalance.
+4. Click **Continue to mission handoff**.
 
 ### Step 4 — Mission handoff
 

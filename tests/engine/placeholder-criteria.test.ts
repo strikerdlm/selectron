@@ -18,6 +18,13 @@ describe("DEMO_CRITERIA", () => {
     expect(joined).not.toContain("double-weighted");
   });
 
+  it("documents that equal per-criterion weights are not domain-balanced", () => {
+    const joined = ACTIVE_CRITERION_CATALOG.knownLimitations!.join(" ");
+    expect(joined).toContain("Equal per-criterion Dirichlet weighting");
+    expect(joined).toContain("hierarchical domain-to-construct weighting");
+    expect(joined).toContain("catalog-dependent");
+  });
+
   it("each has unique id, sane scale, and at least one citation", () => {
     const ids = new Set<string>();
     for (const c of DEMO_CRITERIA) {

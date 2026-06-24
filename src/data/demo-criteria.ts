@@ -356,6 +356,7 @@ export const DEMO_CRITERION_CATALOG: CriterionCatalog = {
   intendedUse:
     "Research demonstration of uncertain-weight MCDA scoring only; not a ratified eligibility or selection instrument.",
   knownLimitations: [
+    "Equal per-criterion Dirichlet weighting gives more aggregate influence to domains with more demo criteria. This catalog has not implemented hierarchical domain-to-construct weighting; interpret domain comparisons as catalog-dependent until expert-ratified weighting is added.",
     // F10 resolved (2026-06-23): standalone PVT-B removed from the demo catalog;
     // vigilance is represented only via the PVT-B subtest inside the NASA Cognition
     // composite, matching the Tier-3 instrument note and avoiding double-weighting

@@ -103,6 +103,8 @@ describe("active analog workflow guards", () => {
     expect(readRepoFile("src/ui/views/CrewComposition.tsx")).toContain("accepted coverage");
     expect(readRepoFile("src/ui/views/calibration/VVPanel.tsx")).toContain("Run K15 Benchmark");
     expect(readRepoFile("src/ui/wizard/StepReview.tsx")).toContain("scoreDistribution");
+    expect(readRepoFile("src/ui/wizard/StepReview.tsx")).toContain("Catalog limitations");
+    expect(readRepoFile("src/ui/wizard/StepReview.tsx")).toContain("knownLimitations");
     expect(readRepoFile("src/ui/wizard/StepReview.tsx")).not.toContain("PosteriorPlot");
     expect(readRepoFile("src/ui/components/ScoreCard.tsx")).toContain("interval₉₀");
     expect(readRepoFile("src/ui/components/ScoreCard.tsx")).not.toContain("CI₉₀");

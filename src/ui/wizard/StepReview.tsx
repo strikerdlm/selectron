@@ -97,6 +97,16 @@ export function StepReview() {
           <p className="mono mt-2 text-[12px] text-ink-3">
             weight prior · source {weightPrior.source} · kappa {weightPrior.kappa.toFixed(0)} · alpha=[1,...,1]
           </p>
+          {ACTIVE_CRITERION_CATALOG.knownLimitations && ACTIVE_CRITERION_CATALOG.knownLimitations.length > 0 && (
+            <div className="mt-3 border-t border-warn/20 pt-3">
+              <p className="mono text-[12px] uppercase tracking-cap text-ink-3">Catalog limitations</p>
+              <ul className="mt-2 space-y-1 text-[12px] leading-relaxed text-ink-2">
+                {ACTIVE_CRITERION_CATALOG.knownLimitations.map((limitation) => (
+                  <li key={limitation}>- {limitation}</li>
+                ))}
+              </ul>
+            </div>
+          )}
         </div>
         <table className="mono w-full text-[13px]">
           <thead>
