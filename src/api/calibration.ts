@@ -73,6 +73,7 @@ export interface FitRequest {
   draws: number;
   chains: number;
   seed: number;
+  sampler_diagnostic?: boolean;
 }
 
 export interface FitJobResponse {
@@ -93,6 +94,8 @@ export interface FitResult {
   n_studies: number;
   total_person_days: number;
   total_events: number;
+  calibration_method: string;
+  sampler_diagnostic: string;
 }
 
 export interface BatchFitResult {

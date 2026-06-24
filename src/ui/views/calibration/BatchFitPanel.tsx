@@ -23,6 +23,7 @@ export function BatchFitPanel() {
   const [draws, setDraws] = useState(2000);
   const [chains, setChains] = useState(4);
   const [seed, setSeed] = useState(42);
+  const [samplerDiagnostic, setSamplerDiagnostic] = useState(false);
   const [conditionId, setConditionId] = useState<string | null>(null);
 
   // Job state lives in the app-root CalibrationJobsProvider so it survives
@@ -41,7 +42,13 @@ export function BatchFitPanel() {
   const elapsed = fit.startedAt ? (fit.finishedAt ?? Date.now()) - fit.startedAt : 0;
 
   function handleStart() {
-    void startFitJob({ draws, chains, seed, condition_id: conditionId });
+    void startFitJob({
+      draws,
+      chains,
+      seed,
+      condition_id: conditionId,
+      sampler_diagnostic: samplerDiagnostic,
+    });
   }
 
   const fittedEntries: [string, FitResult][] = fit.result?.fitted
@@ -54,7 +61,7 @@ export function BatchFitPanel() {
       <div className="panel p-6">
         <div className="flex items-baseline gap-x-3 mb-5">
           <h3 className="display text-xl text-ink-0 tracking-tight">Batch Fit</h3>
-          <span className="label text-ink-3">PyMC NUTS · Gamma-Poisson</span>
+          <span className="label text-ink-3">Analytic Gamma-Poisson</span>
         </div>
 
         {!evidenceStatus.releasePriorsAdjudicated && (
@@ -70,9 +77,9 @@ export function BatchFitPanel() {
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-5">
           {[
-            { label: "draws", value: draws, min: 100, max: 20000, onChange: setDraws },
-            { label: "chains", value: chains, min: 1, max: 8, onChange: setChains },
-            { label: "seed", value: seed, min: 0, max: 999999, onChange: setSeed },
+            { label: "draws", value: draws, min: 100, max: 20000, onChange: setDraws, disabled: !samplerDiagnostic },
+            { label: "chains", value: chains, min: 1, max: 8, onChange: setChains, disabled: !samplerDiagnostic },
+            { label: "seed", value: seed, min: 0, max: 999999, onChange: setSeed, disabled: !samplerDiagnostic },
           ].map((f) => (
             <div key={f.label} className="flex flex-col gap-1">
               <label className="label text-ink-3">{f.label}</label>
@@ -81,8 +88,9 @@ export function BatchFitPanel() {
                 min={f.min}
                 max={f.max}
                 value={f.value}
+                disabled={f.disabled}
                 onChange={(e) => f.onChange(Number(e.target.value))}
-                className="mono text-[13px] bg-bg-1 border border-line text-ink-1 px-2 py-1.5 rounded-sm focus:outline-none focus:border-signal"
+                className="mono text-[13px] bg-bg-1 border border-line text-ink-1 px-2 py-1.5 rounded-sm focus:outline-none focus:border-signal disabled:text-ink-3 disabled:opacity-60"
               />
             </div>
           ))}
@@ -92,7 +100,16 @@ export function BatchFitPanel() {
           </div>
         </div>
 
-        <div className="flex items-center gap-3">
+        <div className="flex flex-wrap items-center gap-3">
+          <label className="inline-flex items-center gap-2">
+            <input
+              type="checkbox"
+              checked={samplerDiagnostic}
+              onChange={(e) => setSamplerDiagnostic(e.target.checked)}
+              className="h-4 w-4 accent-signal"
+            />
+            <span className="label text-ink-2">Sampler diagnostic</span>
+          </label>
           <button
             type="button"
             disabled={running}
@@ -144,6 +161,8 @@ export function BatchFitPanel() {
                   <tr className="border-b border-line">
                     {[
                       "Condition",
+                      "Method",
+                      "Sampler",
                       "λ mean",
                       "α",
                       "β",
@@ -161,34 +180,43 @@ export function BatchFitPanel() {
                   </tr>
                 </thead>
                 <tbody>
-                  {fittedEntries.map(([cid, r]) => (
-                    <tr
-                      key={cid}
-                      className="border-b border-line/50 hover:bg-bg-2/50 transition-colors"
-                    >
-                      <td className="px-3 py-2">
-                        <div className="mono text-[13px] text-ink-0">{cid}</div>
-                      </td>
-                      <td className="px-3 py-2 mono text-[13px] text-ink-1">
-                        {r.posterior_lambda_mean.toExponential(3)}
-                      </td>
-                      <td className="px-3 py-2 mono text-[13px] text-ink-1">
-                        {r.posterior_alpha.toFixed(2)}
-                      </td>
-                      <td className="px-3 py-2 mono text-[13px] text-ink-1">
-                        {r.posterior_beta.toFixed(2)}
-                      </td>
-                      <td className={`px-3 py-2 mono text-[13px] ${classForRhat(r.r_hat)}`}>
-                        {r.r_hat.toFixed(4)}
-                      </td>
-                      <td className="px-3 py-2 mono text-[13px] text-ink-1">
-                        {Math.round(r.ess_bulk)}
-                      </td>
-                      <td className={`px-3 py-2 mono text-[13px] ${classForDivs(r.divergences)}`}>
-                        {r.divergences}
-                      </td>
-                    </tr>
-                  ))}
+                  {fittedEntries.map(([cid, r]) => {
+                    const hasSampler = r.sampler_diagnostic !== "not-run";
+                    return (
+                      <tr
+                        key={cid}
+                        className="border-b border-line/50 hover:bg-bg-2/50 transition-colors"
+                      >
+                        <td className="px-3 py-2">
+                          <div className="mono text-[13px] text-ink-0">{cid}</div>
+                        </td>
+                        <td className="px-3 py-2 mono text-[13px] text-ink-1">
+                          {r.calibration_method.replace("gamma-poisson-", "")}
+                        </td>
+                        <td className="px-3 py-2 mono text-[13px] text-ink-1">
+                          {r.sampler_diagnostic}
+                        </td>
+                        <td className="px-3 py-2 mono text-[13px] text-ink-1">
+                          {r.posterior_lambda_mean.toExponential(3)}
+                        </td>
+                        <td className="px-3 py-2 mono text-[13px] text-ink-1">
+                          {r.posterior_alpha.toFixed(2)}
+                        </td>
+                        <td className="px-3 py-2 mono text-[13px] text-ink-1">
+                          {r.posterior_beta.toFixed(2)}
+                        </td>
+                        <td className={`px-3 py-2 mono text-[13px] ${hasSampler ? classForRhat(r.r_hat) : "text-ink-3"}`}>
+                          {hasSampler ? r.r_hat.toFixed(4) : "n/a"}
+                        </td>
+                        <td className="px-3 py-2 mono text-[13px] text-ink-1">
+                          {hasSampler ? Math.round(r.ess_bulk) : "n/a"}
+                        </td>
+                        <td className={`px-3 py-2 mono text-[13px] ${hasSampler ? classForDivs(r.divergences) : "text-ink-3"}`}>
+                          {hasSampler ? r.divergences : "n/a"}
+                        </td>
+                      </tr>
+                    );
+                  })}
                 </tbody>
               </table>
             </div>

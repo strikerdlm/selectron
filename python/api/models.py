@@ -10,6 +10,7 @@ class FitRequest(BaseModel):
     draws: int = 2000
     chains: int = 4
     seed: int = 42
+    sampler_diagnostic: bool = False
 
 class FitJobResponse(BaseModel):
     job_id: str
@@ -36,6 +37,8 @@ class FitResultResponse(BaseModel):
     n_studies: int
     total_person_days: int
     total_events: int
+    calibration_method: str = "gamma-poisson-analytic"
+    sampler_diagnostic: str = "not-run"
 
 class ValidateRequest(BaseModel):
     trials: int = 100_000

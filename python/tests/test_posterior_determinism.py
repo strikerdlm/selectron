@@ -14,6 +14,7 @@ import sys
 from pathlib import Path
 
 PRIORS_PATH = Path(__file__).resolve().parents[2] / "src" / "data" / "imm-priors.json"
+PYTHON_SRC = Path(__file__).resolve().parents[1] / "src"
 
 _SNIPPET = """
 import json, sys
@@ -28,7 +29,12 @@ print(json.dumps({cid: arr.tolist() for cid, arr in draws.lambdas.items()}))
 
 
 def _run_in_fresh_process(hash_seed: str) -> dict[str, list[float]]:
-    env = dict(os.environ, PYTHONHASHSEED=hash_seed)
+    existing_path = os.environ.get("PYTHONPATH", "")
+    env = dict(
+        os.environ,
+        PYTHONHASHSEED=hash_seed,
+        PYTHONPATH=f"{PYTHON_SRC}{os.pathsep}{existing_path}" if existing_path else str(PYTHON_SRC),
+    )
     out = subprocess.run(
         [sys.executable, "-c", _SNIPPET, str(PRIORS_PATH)],
         capture_output=True, text=True, check=True, env=env,

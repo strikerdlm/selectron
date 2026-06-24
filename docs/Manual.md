@@ -93,7 +93,7 @@ It runs 101 evidence-tagged conditions with analog mission profiles, resource ki
 
 - **Node.js** 18+ (20 LTS recommended)
 - **npm** 9+
-- Optional: **Python 3.12–3.14** for Calibration tab / PyMC pipeline
+- Optional: **Python 3.12–3.14** for Calibration tab / analytic Gamma-Poisson pipeline
 
 ### Browser application
 
@@ -346,16 +346,16 @@ Requires optional Python FastAPI service (`uvicorn api.main:app --reload`).
 1. Open **Calibration → Conditions**.
 2. Browse all **101 conditions** with provenance tags:
    - `tierA-nasa` — NASA IMM / K15 anchors
-   - `tierB-pymc` — PyMC NUTS-fitted from literature
+   - `tierB-pymc` — historical tag for Gamma-Poisson literature fits now evaluated analytically
    - `tierB-lit` — Hand-curated literature values
 3. Filter by provenance or search by condition ID.
 
 ### 8.2 Batch Fit panel
 
 1. Open **Calibration → Batch Fit**.
-2. Configure draws, tune, chains (defaults suit production; use smaller values for smoke tests).
+2. Configure fit controls; draws, tune, and chains apply only when sampler diagnostics are explicitly enabled.
 3. Click **Start batch fit** — job runs async; a pulsing dot on the nav button indicates background activity.
-4. Poll results: R-hat, ESS, divergences per condition.
+4. Poll results: analytic posterior parameters, with R-hat, ESS, and divergences populated only for optional sampler diagnostics.
 
 **Release constraint:** Batch fit reads **accepted** evidence rows from `research/evidence_extracted/evidence_ledger.csv`. Proposal CSVs require `--allow-proposals` in CLI mode.
 
@@ -428,7 +428,7 @@ npm run evidence:check               # CI freshness gate
 npm run evidence:require-adjudicated # release gate (fails until full coverage)
 ```
 
-4. Python release fitting (`python -m selectron` / `scripts/apply_fit.py`) reads **accepted count extracts** for PyMC; parameter-path acceptance rows are tracked by the TS gate separately.
+4. Python release fitting (`python -m selectron` / `scripts/apply_fit.py`) reads **accepted count extracts** for the analytic Gamma-Poisson fitter; parameter-path acceptance rows are tracked by the TS gate separately.
 
 **Current pilot state (v0.6):** 4 nominal accepted ledger rows exist, but all 4 are malformed and quarantined from accepted coverage; valid accepted coverage is 0/4,849 active parameter paths. Release remains **unadjudicated** until every active parameter path has accepted, independently verified coverage.
 
@@ -457,7 +457,7 @@ npm run evidence:require-adjudicated # release gate (fails until full coverage)
 | `npm run calibrate:imm` | TypeScript IMM prior calibration script |
 | `npm run e2e` | Playwright browser tests |
 | `cd python && pytest -m "not slow"` | Python unit tests |
-| `python -m selectron --dry-run` | PyMC batch fit dry-run |
+| `python -m selectron --dry-run` | Analytic Gamma-Poisson batch fit dry-run |
 
 **Determinism:** Seed `0xc0ffee` is canonical across tests, demo cohorts, and K15 invariance checks.
 

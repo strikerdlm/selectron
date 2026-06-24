@@ -11,7 +11,6 @@ beta_het, beta_weak, dyad_ref_n) are filled in by the TS layer, not fit here.
 """
 from __future__ import annotations
 import numpy as np
-import pymc as pm
 
 # Evidence rows (DOIs in the design spec §12).
 TU2024_UNSTABLE, TU2024_TOTAL = 133, 202          # latent-class split
@@ -19,6 +18,11 @@ BELL2019_WITH_CONFLICT, BELL2019_TEAMS = 71, 72    # ~all teams >=1 by 40%/90d
 BASNER_SHARE, BASNER_TOPK_FRAC = 0.85, 1 / 3       # 85% of conflicts from top-third
 
 def fit_conflict_team_priors(seed: int, draws: int, tune: int, team_condition_ids: list[str]) -> dict:
+    try:
+        import pymc as pm
+    except ImportError as exc:
+        raise RuntimeError("fit_conflict_team_priors requires optional PyMC dependency") from exc
+
     rng = np.random.default_rng(seed)
 
     with pm.Model():

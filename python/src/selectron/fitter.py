@@ -1,16 +1,19 @@
-"""PyMC Gamma-Poisson posterior fitter for tier-B conditions."""
+"""Analytic Gamma-Poisson posterior fitter for tier-B/tier-C conditions.
+
+The current calibration model is conjugate: λ ~ Gamma(α₀, β₀) and
+y_j ~ Poisson(λ T_j). The analytic posterior is therefore the authoritative fit
+for this single-rate model. PyMC/NUTS can still be run explicitly as a diagnostic
+canary, but ordinary fitting must not depend on sampler estimates.
+"""
 
 from __future__ import annotations
 
 import json
 import logging
+import math
 from dataclasses import dataclass, asdict
 from pathlib import Path
 from typing import Any
-
-import arviz as az
-import numpy as np
-import pymc as pm
 
 logger = logging.getLogger(__name__)
 
@@ -62,18 +65,41 @@ def gamma_poisson_conjugate_posterior(
     returned fit for the current single-rate model; NUTS is retained only as a
     diagnostic canary until hierarchical source models are introduced.
     """
+    _validate_gamma_poisson_inputs(alpha_0, beta_0, observations)
     total_events = sum(int(o["events"]) for o in observations)
     total_person_days = sum(int(o["person_days"]) for o in observations)
     posterior_alpha = float(alpha_0 + total_events)
     posterior_beta = float(beta_0 + total_person_days)
     posterior_mean = posterior_alpha / posterior_beta
-    posterior_sd = float(np.sqrt(posterior_alpha) / posterior_beta)
+    posterior_sd = float(math.sqrt(posterior_alpha) / posterior_beta)
     return posterior_alpha, posterior_beta, posterior_mean, posterior_sd
+
+
+def _validate_gamma_poisson_inputs(
+    alpha_0: float,
+    beta_0: float,
+    observations: list[dict[str, int]],
+) -> None:
+    if not math.isfinite(alpha_0) or alpha_0 <= 0:
+        raise ValueError(f"alpha_0 must be positive and finite, got {alpha_0}")
+    if not math.isfinite(beta_0) or beta_0 <= 0:
+        raise ValueError(f"beta_0 must be positive and finite, got {beta_0}")
+    if not observations:
+        raise ValueError("Gamma-Poisson fitting requires at least one observation")
+    for idx, obs in enumerate(observations):
+        if "person_days" not in obs or "events" not in obs:
+            raise ValueError(f"observation {idx} must contain person_days and events")
+        person_days = obs["person_days"]
+        events = obs["events"]
+        if not isinstance(person_days, int) or person_days <= 0:
+            raise ValueError(f"observation {idx}.person_days must be a positive integer, got {person_days!r}")
+        if not isinstance(events, int) or events < 0:
+            raise ValueError(f"observation {idx}.events must be a non-negative integer, got {events!r}")
 
 
 @dataclass
 class FitResult:
-    """Result of a single-condition PyMC Gamma-Poisson fit."""
+    """Result of a single-condition analytic Gamma-Poisson fit."""
 
     condition_id: str
     posterior_alpha: float
@@ -87,6 +113,8 @@ class FitResult:
     n_studies: int
     total_person_days: int
     total_events: int
+    calibration_method: str = "gamma-poisson-analytic"
+    sampler_diagnostic: str = "not-run"
 
     def to_dict(self) -> dict[str, Any]:
         return asdict(self)
@@ -117,14 +145,102 @@ def fit_gamma_poisson(
     tune: int = 1000,
     chains: int = 4,
     output_dir: Path | None = None,
+    run_sampler_diagnostic: bool = False,
 ) -> FitResult:
-    """Fit a Gamma-Poisson posterior for one condition."""
+    """Fit a Gamma-Poisson posterior for one condition.
+
+    By default this returns the exact conjugate posterior without running MCMC.
+    Set ``run_sampler_diagnostic=True`` to run the legacy PyMC/NUTS canary and
+    populate R-hat/ESS/divergence diagnostics from the sampler. The returned
+    posterior parameters remain analytic either way.
+    """
+    _validate_gamma_poisson_inputs(alpha_0, beta_0, observations)
+
+    post_alpha, post_beta, post_mean, post_sd = gamma_poisson_conjugate_posterior(
+        alpha_0,
+        beta_0,
+        observations,
+    )
+    total_person_days = sum(int(o["person_days"]) for o in observations)
+    total_events = sum(int(o["events"]) for o in observations)
+
+    r_hat = 1.0
+    ess_bulk = 1_000_000_000.0
+    ess_tail = 1_000_000_000.0
+    divergences = 0
+    sampler_diagnostic = "not-run"
+    idata = None
+
+    if run_sampler_diagnostic:
+        r_hat, ess_bulk, ess_tail, divergences, idata = _run_sampler_diagnostic(
+            condition_id=condition_id,
+            alpha_0=alpha_0,
+            beta_0=beta_0,
+            observations=observations,
+            seed=seed,
+            draws=draws,
+            tune=tune,
+            chains=chains,
+        )
+        sampler_diagnostic = "pymc-nuts"
+
+    result = FitResult(
+        condition_id=condition_id,
+        posterior_alpha=post_alpha,
+        posterior_beta=post_beta,
+        posterior_lambda_mean=post_mean,
+        posterior_lambda_sd=post_sd,
+        r_hat=r_hat,
+        ess_bulk=ess_bulk,
+        ess_tail=ess_tail,
+        divergences=divergences,
+        n_studies=len(observations),
+        total_person_days=total_person_days,
+        total_events=total_events,
+        calibration_method="gamma-poisson-analytic",
+        sampler_diagnostic=sampler_diagnostic,
+    )
+
+    if output_dir is not None:
+        output_dir.mkdir(parents=True, exist_ok=True)
+        if idata is not None:
+            try:
+                idata.to_netcdf(str(output_dir / f"{condition_id}.nc"))
+            except (ValueError, ImportError):
+                pass  # h5netcdf/netCDF4 not installed — skip trace save
+        with open(output_dir / f"{condition_id}.json", "w") as f:
+            json.dump(result.to_dict(), f, indent=2)
+
+    return result
+
+
+def _run_sampler_diagnostic(
+    *,
+    condition_id: str,
+    alpha_0: float,
+    beta_0: float,
+    observations: list[dict[str, int]],
+    seed: int,
+    draws: int,
+    tune: int,
+    chains: int,
+) -> tuple[float, float, float, int, Any]:
+    """Run the optional PyMC/NUTS diagnostic canary for the analytic fit."""
+    try:
+        import arviz as az
+        import numpy as np
+        import pymc as pm
+    except ImportError as exc:
+        raise RuntimeError(
+            "run_sampler_diagnostic=True requires optional PyMC/ArviZ/NumPy dependencies"
+        ) from exc
+
     person_days = np.array([o["person_days"] for o in observations], dtype=np.float64)
     events = np.array([o["events"] for o in observations], dtype=np.int64)
 
     with pm.Model() as model:
         lam = pm.Gamma("lambda", alpha=alpha_0, beta=beta_0)
-        obs = pm.Poisson("obs", mu=lam * person_days, observed=events)
+        pm.Poisson("obs", mu=lam * person_days, observed=events)
 
         try:
             idata = pm.sample(
@@ -151,47 +267,15 @@ def fit_gamma_poisson(
             )
 
     summary = az.summary(idata, var_names=["lambda"])
-
     r_hat = float(summary["r_hat"].iloc[0])
     ess_bulk = float(summary["ess_bulk"].iloc[0])
     ess_tail = float(summary["ess_tail"].iloc[0])
-
-    if hasattr(idata, "sample_stats") and "diverging" in idata.sample_stats:
-        divergences = int(idata.sample_stats["diverging"].values.sum())
-    else:
-        divergences = 0
-
-    post_alpha, post_beta, post_mean, post_sd = gamma_poisson_conjugate_posterior(
-        alpha_0,
-        beta_0,
-        observations,
+    divergences = (
+        int(idata.sample_stats["diverging"].values.sum())
+        if hasattr(idata, "sample_stats") and "diverging" in idata.sample_stats
+        else 0
     )
-
-    result = FitResult(
-        condition_id=condition_id,
-        posterior_alpha=post_alpha,
-        posterior_beta=post_beta,
-        posterior_lambda_mean=post_mean,
-        posterior_lambda_sd=post_sd,
-        r_hat=r_hat,
-        ess_bulk=ess_bulk,
-        ess_tail=ess_tail,
-        divergences=divergences,
-        n_studies=len(observations),
-        total_person_days=int(person_days.sum()),
-        total_events=int(events.sum()),
-    )
-
-    if output_dir is not None:
-        output_dir.mkdir(parents=True, exist_ok=True)
-        try:
-            idata.to_netcdf(str(output_dir / f"{condition_id}.nc"))
-        except (ValueError, ImportError):
-            pass  # h5netcdf/netCDF4 not installed — skip trace save
-        with open(output_dir / f"{condition_id}.json", "w") as f:
-            json.dump(result.to_dict(), f, indent=2)
-
-    return result
+    return r_hat, ess_bulk, ess_tail, divergences, idata
 
 
 # ── Batch fitting ───────────────────────────────────────────────────────────
@@ -239,6 +323,7 @@ def fit_all_tier_b(
     dry_run: bool = False,
     condition_filter: str | None = None,
     evidence_source: str = "accepted",
+    run_sampler_diagnostic: bool = False,
 ) -> BatchFitReport:
     """Fit all (or one) tier-B conditions that have evidence data."""
     if evidence_source not in {"accepted", "proposals"}:
@@ -301,6 +386,7 @@ def fit_all_tier_b(
             tune=tune,
             chains=chains,
             output_dir=output_dir / cond_id if output_dir else None,
+            run_sampler_diagnostic=run_sampler_diagnostic,
         )
 
         ok, reasons = check_convergence(result)
@@ -332,6 +418,7 @@ def fit_all_tier_c(
     dry_run: bool = False,
     condition_filter: str | None = None,
     evidence_source: str = "accepted",
+    run_sampler_diagnostic: bool = False,
 ) -> BatchFitReport:
     """Fit all (or one) tier-C conditions that have evidence data."""
     if evidence_source not in {"accepted", "proposals"}:
@@ -394,6 +481,7 @@ def fit_all_tier_c(
             tune=tune,
             chains=chains,
             output_dir=output_dir / cond_id if output_dir else None,
+            run_sampler_diagnostic=run_sampler_diagnostic,
         )
 
         ok, reasons = check_convergence(result)
@@ -430,6 +518,11 @@ def _cli() -> None:
     parser.add_argument("--chains", type=int, default=4)
     parser.add_argument("--seed", type=int, default=42)
     parser.add_argument("--output-dir", type=str, default=None)
+    parser.add_argument(
+        "--sampler-diagnostic",
+        action="store_true",
+        help="run optional PyMC/NUTS diagnostics; posterior parameters remain analytic",
+    )
 
     args = parser.parse_args()
     logging.basicConfig(level=logging.INFO, format="%(levelname)s: %(message)s")
@@ -444,6 +537,7 @@ def _cli() -> None:
         output_dir=out_dir,
         dry_run=args.dry_run,
         condition_filter=args.condition,
+        run_sampler_diagnostic=args.sampler_diagnostic,
     )
 
     print(f"\n{'='*60}")

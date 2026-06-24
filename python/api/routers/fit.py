@@ -16,6 +16,7 @@ async def _run_fit(
     draws: int,
     chains: int,
     seed: int,
+    sampler_diagnostic: bool,
 ) -> None:
     try:
         store.update(job_id, status="running")
@@ -26,6 +27,7 @@ async def _run_fit(
             seed=seed,
             output_dir=None,
             condition_filter=condition_id,
+            run_sampler_diagnostic=sampler_diagnostic,
         )
         fitted_dict: dict[str, dict] = {}
         for cid, result in report.fitted.items():
@@ -52,6 +54,7 @@ async def start_fit(request: FitRequest, background_tasks: BackgroundTasks):
         request.draws,
         request.chains,
         request.seed,
+        request.sampler_diagnostic,
     )
     return FitJobResponse(job_id=job.id, status=job.status)
 

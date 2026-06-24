@@ -55,7 +55,8 @@ def test_write_diagnostics_all_fields_present(tmp_path: Path):
     data = json.loads((tmp_path / "wrist-sprain-strain_fit_diagnostics.json").read_text())
     required = {"condition_id", "r_hat", "ess_bulk", "ess_tail", "divergences",
                 "posterior_alpha", "posterior_beta", "n_studies",
-                "total_person_days", "total_events", "reasons"}
+                "total_person_days", "total_events", "calibration_method",
+                "sampler_diagnostic", "reasons"}
     assert required <= set(data.keys())
 
 

@@ -1,6 +1,13 @@
 import json
+import importlib.util
 import numpy as np
+import pytest
 from selectron.conflict_fit import fit_conflict_team_priors
+
+pytestmark = pytest.mark.skipif(
+    importlib.util.find_spec("pymc") is None,
+    reason="optional PyMC dependency is not installed",
+)
 
 def test_pi_unstable_recovers_tu2024():
     out = fit_conflict_team_priors(seed=42, draws=500, tune=500, team_condition_ids=["conflict-event"])

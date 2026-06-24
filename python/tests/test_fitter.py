@@ -1,4 +1,4 @@
-"""Tests for the PyMC Gamma-Poisson fitter."""
+"""Tests for the analytic Gamma-Poisson fitter."""
 
 from __future__ import annotations
 
@@ -8,6 +8,7 @@ from typing import Any
 import numpy as np
 import pytest
 
+import selectron.fitter as fitter_module
 from selectron.fitter import (
     fit_gamma_poisson,
     FitResult,
@@ -108,8 +109,7 @@ class TestBasePriorIdempotency:
 
 
 class TestFitGammaPoisson:
-    @pytest.mark.slow
-    def test_single_study_converges_to_conjugate(self) -> None:
+    def test_single_study_returns_conjugate_posterior(self) -> None:
         alpha_0, beta_0 = 2.0, 10000.0
         observations = [
             {"person_days": 114245, "events": 13},
@@ -137,6 +137,53 @@ class TestFitGammaPoisson:
         assert result.posterior_beta == pytest.approx(beta_0 + sum_pdays)
         assert result.posterior_lambda_mean == pytest.approx(conjugate_mean)
         assert result.posterior_lambda_sd == pytest.approx(conjugate_sd)
+        assert result.calibration_method == "gamma-poisson-analytic"
+        assert result.sampler_diagnostic == "not-run"
+        assert result.r_hat == pytest.approx(1.0)
+        assert result.ess_bulk >= 400
+        assert result.ess_tail >= 400
+        assert result.divergences == 0
+
+    def test_default_fit_does_not_run_sampler_diagnostic(self, monkeypatch) -> None:
+        def fail_if_called(**_kwargs):
+            raise AssertionError("sampler diagnostic should not run by default")
+
+        monkeypatch.setattr(fitter_module, "_run_sampler_diagnostic", fail_if_called)
+        result = fit_gamma_poisson(
+            condition_id="depression",
+            alpha_0=2.0,
+            beta_0=10000.0,
+            observations=[{"person_days": 114245, "events": 13}],
+            seed=42,
+            draws=10,
+            tune=5,
+            chains=1,
+        )
+
+        assert result.posterior_alpha == pytest.approx(15.0)
+        assert result.sampler_diagnostic == "not-run"
+
+    def test_sampler_diagnostic_is_explicit(self, monkeypatch) -> None:
+        def fake_sampler(**_kwargs):
+            return 1.002, 900.0, 850.0, 0, None
+
+        monkeypatch.setattr(fitter_module, "_run_sampler_diagnostic", fake_sampler)
+        result = fit_gamma_poisson(
+            condition_id="depression",
+            alpha_0=2.0,
+            beta_0=10000.0,
+            observations=[{"person_days": 114245, "events": 13}],
+            seed=42,
+            draws=10,
+            tune=5,
+            chains=1,
+            run_sampler_diagnostic=True,
+        )
+
+        assert result.posterior_alpha == pytest.approx(15.0)
+        assert result.r_hat == pytest.approx(1.002)
+        assert result.ess_bulk == pytest.approx(900.0)
+        assert result.sampler_diagnostic == "pymc-nuts"
 
     def test_conjugate_posterior_oracle(self) -> None:
         observations = [
@@ -150,7 +197,6 @@ class TestFitGammaPoisson:
         assert mean == pytest.approx(5.0 / 160.0)
         assert sd == pytest.approx(np.sqrt(5.0) / 160.0)
 
-    @pytest.mark.slow
     def test_multi_study_converges(self) -> None:
         alpha_0, beta_0 = 2.0, 10000.0
         single = [{"person_days": 114245, "events": 13}]
@@ -278,7 +324,6 @@ class TestFitAllTierB:
                 evidence_source="proposal",
             )
 
-    @pytest.mark.slow
     def test_fits_remaining_tierb_lit_from_proposals(self) -> None:
         report = fit_all_tier_b(
             draws=500,
@@ -288,8 +333,11 @@ class TestFitAllTierB:
             dry_run=False,
             evidence_source="proposals",
         )
-        # Post-PyMC merge: only 6 tierB-lit remain (3 excluded outliers + 3 unfitted).
-        # 3 excluded outliers have evidence and should be fitted or failed.
-        # 3 unfitted (elbow/hip/wrist) have no evidence and should be skipped.
-        assert report.n_total == 6
-        assert report.n_skipped >= 3
+        # get_tier_b_conditions intentionally includes both tierB-lit and
+        # tierB-pymc rows so re-fitting is idempotent from the fixed base prior.
+        assert report.n_total == len(get_tier_b_conditions(load_priors()))
+        assert report.n_fitted > 0
+        assert report.n_failed == 0
+        assert report.n_skipped >= 1
+        assert all(r.calibration_method == "gamma-poisson-analytic" for r in report.fitted.values())
+        assert all(r.sampler_diagnostic == "not-run" for r in report.fitted.values())

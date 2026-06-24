@@ -42,6 +42,8 @@ def write_diagnostics(
         "n_studies": result.n_studies,
         "total_person_days": result.total_person_days,
         "total_events": result.total_events,
+        "calibration_method": result.calibration_method,
+        "sampler_diagnostic": result.sampler_diagnostic,
         "reasons": reasons,
     }
     out.write_text(json.dumps(data, indent=2))
@@ -68,6 +70,11 @@ def main() -> int:
         action="store_true",
         help="Exploratory only: fit from proposal CSVs instead of accepted evidence ledger",
     )
+    parser.add_argument(
+        "--sampler-diagnostic",
+        action="store_true",
+        help="Run optional PyMC/NUTS diagnostics; posterior parameters remain analytic",
+    )
     args = parser.parse_args()
 
     if not args.allow_proposals and accepted_evidence_count() == 0:
@@ -91,6 +98,7 @@ def main() -> int:
             condition_filter=args.condition,
             dry_run=args.dry_run,
             evidence_source="proposals" if args.allow_proposals else "accepted",
+            run_sampler_diagnostic=args.sampler_diagnostic,
         )
     else:
         logger.info("Running tier-C fit (dry_run=%s, condition_filter=%s)", args.dry_run, args.condition)
@@ -102,6 +110,7 @@ def main() -> int:
             condition_filter=args.condition,
             dry_run=args.dry_run,
             evidence_source="proposals" if args.allow_proposals else "accepted",
+            run_sampler_diagnostic=args.sampler_diagnostic,
         )
 
     logger.info(

@@ -168,7 +168,7 @@ def load_evidence_proposals(
 def load_accepted_evidence(
     ledger_path: Path | None = None,
 ) -> list[dict[str, Any]]:
-    """Load accepted, independently adjudicated evidence rows for PyMC fitting.
+    """Load accepted, independently adjudicated evidence rows for release fitting.
 
     Proposal CSVs are intentionally excluded from this release-scientific path.
     Rows enter fitting only when status == accepted, extractor and verifier are

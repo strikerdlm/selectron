@@ -5,7 +5,7 @@ import { listConditions } from "@/api/calibration";
 const PROVENANCE_META: Record<Provenance, { label: string; color: string }> = {
   "tierA-nasa": { label: "NASA-attributed", color: "text-sky-400" },
   "tierB-lit": { label: "Lit", color: "text-signal" },
-  "tierB-pymc": { label: "PyMC", color: "text-signal-bright" },
+  "tierB-pymc": { label: "Fitted", color: "text-signal-bright" },
   "tierC-synth": { label: "Synth", color: "text-ink-3" },
   "user-custom": { label: "Custom", color: "text-ink-2" },
 };
@@ -28,7 +28,7 @@ function statusCell(c: ConditionSummary) {
     return (
       <span
         className="flex items-center gap-1.5"
-        title="Posterior fitted via PyMC NUTS from terrestrial epidemiological base rates."
+        title="Posterior fitted by the analytic Gamma-Poisson solution from terrestrial epidemiological base rates."
       >
         <span className="w-2 h-2 rounded-full bg-sky-400" />
         <span className="mono text-[12px] uppercase tracking-cap text-sky-400">Fitted</span>
@@ -39,7 +39,7 @@ function statusCell(c: ConditionSummary) {
     return (
       <span
         className="flex items-center gap-1.5"
-        title="Tier-B literature prior eligible for PyMC fitting; not yet fitted."
+        title="Tier-B literature prior eligible for analytic Gamma-Poisson fitting; not yet fitted."
       >
         <span className="w-2 h-2 rounded-full bg-go" />
         <span className="mono text-[12px] uppercase tracking-cap text-go">Fittable</span>
@@ -50,7 +50,7 @@ function statusCell(c: ConditionSummary) {
     return (
       <span
         className="flex items-center gap-1.5"
-        title="NASA-publication-attributed Selectron prior. Public IMM papers do not expose per-condition iMED rates; no PyMC refit is run for this tier."
+        title="NASA-publication-attributed Selectron prior. Public IMM papers do not expose per-condition iMED rates; no release refit is run for this tier."
       >
         <span className="w-2 h-2 rounded-full bg-sky-400/60" />
         <span className="mono text-[12px] uppercase tracking-cap text-sky-400/80">NASA-attributed</span>
