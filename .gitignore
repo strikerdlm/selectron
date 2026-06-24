@@ -40,6 +40,7 @@ outputs/
 # Graphify skill generated artifacts
 research/graphify-out/
 # Manuscript and journal-submission content lives only in selectron_private.
-paper/
+paper/*
+!paper/REPRODUCIBILITY_LOCK.json
 Review*.md
 
