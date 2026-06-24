@@ -94,7 +94,8 @@ import type { Criterion } from "../types";
 /**
  * Family-specific β coefficients for Stage A scale-relative vulnerability multiplier.
  * Negative β: HIGH-quality candidate (z>0 on higherIsBetter criteria) → exp(β·z) < 1 → λ↓.
- * Magnitudes calibrated so a -2..+2 coordinate spread produces a 2–4× incidence multiplier spread.
+ * Magnitudes are operator-selected sensitivity defaults chosen so a -2..+2
+ * coordinate spread produces a 2–4× incidence multiplier spread.
  * Same values as SYNTHETIC_PRIORS in src/data/synthetic-iter3.ts — these are the
  * operator-supplied scenario defaults, not accepted-ledger calibrated coefficients.
  */
@@ -191,7 +192,7 @@ export type IMMTrialOpts = {
    * When provided, only conditions for which this callback returns true are
    * included in the simulation. Applied once before the trial loop for performance.
    * Use to exclude tier-B blanket-multiplier and tier-C back-fit conditions,
-   * leaving only evidence-based (tier-A + source-cited tier-B) priors active.
+   * leaving only source-attributed tier-A and source-cited tier-B priors active.
    */
   conditionFilter?: (c: import("./types").IMMCondition) => boolean;
   /**
@@ -366,7 +367,7 @@ export function applyRiskFactorMultiplier(baseLambda: number, member: IMMCrewMem
  *
  * For Gamma-Poisson and Lognormal-Poisson the prior encodes a RATE (λ per person-day).
  * The count must be scaled by mission duration before Poisson sampling:
- *   1. Draw λ_per_day from the prior's hierarchical distribution.
+ *   1. Draw λ_per_day from the stored rate distribution.
  *   2. Apply per-person risk-factor multipliers to λ_per_day.
  *   3. Apply Stage A scale-relative vulnerability multiplier only in scenario mode.
  *   4. Sample Poisson(λ_modulated × durationDays).
@@ -551,7 +552,7 @@ export function runIMMTrial(
           const modLambdaPerDay = applyStageAVulnerabilityMultiplier(rfmLambdaPerDay, member, cond.family, cond.vulnerabilityCriteria, criteriaIndex, familyBetaScale);
           count = samplePoisson(rng, modLambdaPerDay * mission.durationDays * effectiveMult);
         } else {
-          // Gamma-Poisson / Lognormal-Poisson: draw λ/day from hierarchical prior, apply RFM,
+          // Gamma-Poisson / Lognormal-Poisson: draw λ/day from the stored rate prior, apply RFM,
           // optional scenario Stage A multiplier, then scale by mission duration before Poisson sampling.
           count = sampleGeneralPoissonCount(
             rng,
@@ -1291,8 +1292,8 @@ export function simulateIMM(opts: SimulateIMMOptions): IMMOutcome {
   for (let t = 1; t <= trials; t++) {
     const r = runIMMTrial(rng, crew, mission, kit, {
       // priors-rev3-b: explicit opts override priors.json defaults; if opts not
-      // provided, fall back to global_calibration values (so the calibrated
-      // multipliers auto-apply without every caller knowing to pass them).
+      // provided, fall back to global_calibration values so configured
+      // multipliers auto-apply without every caller knowing to pass them.
       tierAMultiplier: opts.tierAMultiplier ?? globalCal.tierA_multiplier ?? 1.0,
       tierBMultiplier: opts.tierBMultiplier ?? globalCal.tierB_multiplier ?? 1.0,
       tierCMultiplier: opts.tierCMultiplier ?? globalCal.tierC_multiplier ?? 1.0,

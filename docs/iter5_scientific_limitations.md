@@ -32,9 +32,9 @@ These do not absolve the priors of the issues below.
 | Tier | Count | Source character |
 |------|-------|------------------|
 | `tierA-nasa` | **34** | Attributed to a NASA-published IMM source (K15, M18, G12, TM21, S20, A22). Per-condition incidence numbers remain Selectron elicitation when the public source does not publish the internal NASA value. |
-| `tierB-pymc` | **66** | Historical tag for Gamma-Poisson fitted or source-transcribed terrestrial/analog epidemiology. Current calibration code uses the analytic Gamma-Poisson posterior as the oracle where event and exposure data exist; source heterogeneity and transportability remain unmodeled. |
+| `tierB-pymc` | **66** | Historical provenance tag for source-transcribed or historically fitted terrestrial/analog epidemiology. Current calibration code uses the analytic Gamma-Poisson posterior as the oracle when valid event/exposure rows exist, but current valid accepted coverage is 0/4,849; source heterogeneity and transportability remain unmodeled. |
 | `tierB-lit` | **1** | Source-cited analog behavioral extension (`interpersonal-conflict`) retained as literature-anchored rather than PyMC-fitted because it is not represented in the proposal CSV evidence table. |
-| `tierC-synth` | 0 | Fully eliminated (2026-05-26). Final 2 conditions: acute-radiation-syndrome (literature-validated, Beta-Bernoulli retained) + smoke-inhalation (PyMC NUTS fit, Guibaud 2022). |
+| `tierC-synth` | 0 | Fully eliminated (2026-05-26). The former tier-C conditions are retained only as source-attributed priors; their numerical parameters do not count as valid accepted evidence coverage. |
 
 The K15 Appendix lists the 100 conditions with their incidence-source category and distribution family but **does NOT publish per-condition numerical incidence rates**. Those live in NASA's internal iMED SQL database which is not externally accessible.
 
@@ -58,9 +58,9 @@ This means: our K15 "reproduction" demonstrates that we can reproduce another mo
 
 Earlier rev3-b calibration used a blanket `global_calibration.tierB_multiplier = 0.55` to pull aggregate total medical events into the K15 CI95 envelope. That scalar was a calibration aid, not a scientific claim about every tier-B condition.
 
-The current manuscript-freeze prior file no longer relies on that blanket adjustment: tier-A, tier-B, and tier-C multipliers are all 1.0. The current aggregate fit comes from per-condition evidence passes and PyMC-fitted tier-B priors, not from a hidden global shrinkage factor.
+The current manuscript-freeze prior file no longer relies on that blanket adjustment: tier-A, tier-B, and tier-C multipliers are all 1.0. The current source-attributed prior file comes from per-condition source transcription and historical fitting passes, not from a hidden global shrinkage factor. Because valid accepted active-parameter coverage is 0/4,849, this is not an adjudicated empirical calibration.
 
-Residual limitation: several tier-B conditions remain fitted from small-n, single-cohort, or proxy-condition evidence. The limitation is input-data pedigree, not an undisclosed multiplier. Those weaker priors are identified by their `source_ref` strings in `src/data/imm-priors.json` and should be audited per condition before any operational use.
+Residual limitation: several tier-B conditions remain sourced or historically fit from small-n, single-cohort, or proxy-condition evidence. The limitation is input-data pedigree, not an undisclosed multiplier. Those weaker priors are identified by their `source_ref` strings in `src/data/imm-priors.json` and require independent per-condition adjudication before any stronger empirical claim.
 
 ### 3.3 Reproducibility depends on the exact priors file
 
@@ -85,9 +85,9 @@ The 'none' (no medical kit) scenario produces values that diverge from K15:
 
 **Decision (2026-05-22): accept the divergence as a principled limitation.** Rationale:
 
-1. **Operationally implausible.** No real Earth-analog or LEO mission has ever launched with zero medical resources.
+1. **Scenario-construct extreme.** No real Earth-analog or LEO mission has ever launched with zero medical resources.
 2. **K15 'none' is model-construct, not observed data.** NASA's iMED produces 'none' values by setting all resources to zero and running its internal untreated-outcome priors, which are not publicly published.
-3. **Operational scenarios have benchmark anchors.** issHMS and unlimited are retained for inter-model comparison, but the current K15 benchmark result is reported as 4/12 interval overlaps rather than a general validation pass.
+3. **Resource scenarios have benchmark anchors.** issHMS and unlimited are retained for inter-model comparison, but the current K15 benchmark result is reported as 4/12 interval overlaps rather than a general validation pass.
 4. **Closing the gap would over-correct operational scenarios.** Blanket inflation of `untreated.fi_cp1/cp2` / `untreated.p_evac` would propagate through the RAF-interpolated path on issHMS and break the CI₉₅ fit.
 5. **Per-condition `untreated.p_evac` anchored to Pattarini 2016.** Antarctic MEDEVAC rate (0.036/py) is the operational anchor.
 

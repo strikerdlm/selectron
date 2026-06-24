@@ -113,6 +113,21 @@ describe("active analog workflow guards", () => {
     expect(readRepoFile("src/imm/posterior-predictive.ts")).not.toContain("PosteriorSummary");
     expect(readRepoFile("src/ui/figures/IMMAnalogPosteriorPlot.tsx")).toContain("90% predictive interval");
     expect(readRepoFile("src/ui/figures/IMMAnalogPosteriorPlot.tsx")).not.toContain("90% CI");
+
+    const simulateSource = readRepoFile("src/imm/simulate.ts");
+    expect(simulateSource).toContain("operator-selected sensitivity defaults");
+    expect(simulateSource).toContain("stored rate distribution");
+    for (const forbidden of [
+      "Magnitudes calibrated so",
+      "prior's hierarchical distribution",
+      "draw λ/day from hierarchical prior",
+      "evidence-based (tier-A + source-cited tier-B)",
+      "so the calibrated\n      // multipliers auto-apply",
+    ]) {
+      expect(simulateSource, `src/imm/simulate.ts must not contain ${forbidden}`).not.toContain(
+        forbidden,
+      );
+    }
   });
 
   it("labels ordinary simulation spread as simulation intervals, reserving CI labels for K15 benchmarks", () => {
@@ -190,6 +205,8 @@ describe("active analog workflow guards", () => {
 
     expect(source).toContain("0/4,849 valid accepted active-parameter coverage");
     expect(source).toContain("releasePriorsAdjudicated = false");
+    expect(source).toContain("current valid accepted coverage is 0/4,849");
+    expect(source).toContain("not an adjudicated empirical calibration");
     expect(source).toContain("inter-model verification");
     expect(source).toContain("4/12 interval overlaps");
     expect(source).toContain("not external validation");
@@ -203,6 +220,9 @@ describe("active analog workflow guards", () => {
       "HSRB mapping are the publishable contribution",
       "same posterior",
       "evidence-based conditions only",
+      "PyMC-fitted tier-B priors",
+      "literature-validated",
+      "Operationally implausible",
     ]) {
       expect(source, `docs/iter5_scientific_limitations.md must not contain ${forbidden}`).not.toContain(
         forbidden,

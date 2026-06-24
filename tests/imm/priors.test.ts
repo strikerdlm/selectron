@@ -8,7 +8,7 @@ const REPRODUCIBILITY_LOCK_PATH = "paper/REPRODUCIBILITY_LOCK.json";
 const INTERPERSONAL_CONFLICT_EVIDENCE_PATH =
   "research/evidence/2026-06-06_interpersonal-conflict_ICE-prior.md";
 const EXPECTED_PRIORS_SHA256 =
-  "e5989341ef5c5dba29eefe57999b4e3843dbbe3bb60964f9c5236bde9341267b";
+  "7c6589d3e2ca9a3dc04178d08c8af83d5465d01dae035a5165912d498fa0fad3";
 const EXPECTED_PROVENANCE_COUNTS: Record<string, number> = {
   "tierA-nasa": 34,
   "tierB-pymc": 66,
@@ -22,6 +22,7 @@ const DISALLOWED_FREEZE_TOKENS = [
   /\bTODO\b/i,
   /fill in/i,
   /Van Fossen/i,
+  /literature-validated/i,
 ];
 
 function countProvenance(): Record<string, number> {
@@ -54,9 +55,11 @@ describe("IMM priors", () => {
     expect(counts["tierC-synth"] ?? 0).toBe(0);
   });
 
-  it("reproducibility lock matches the frozen prior catalog", () => {
+  it("retired paper reproducibility lock no longer presents active prior hashes", () => {
     const lock = JSON.parse(readFileSync(REPRODUCIBILITY_LOCK_PATH, "utf8")) as {
-      source_files: Record<
+      lock_status?: string;
+      current_use?: string;
+      source_files?: Record<
         string,
         {
           sha256: string;
@@ -65,14 +68,10 @@ describe("IMM priors", () => {
         }
       >;
     };
-    const lockedPriors = lock.source_files[PRIORS_PATH];
 
-    expect(lockedPriors.sha256).toBe(EXPECTED_PRIORS_SHA256);
-    expect(lockedPriors.condition_count).toBe(101);
-    expect(lockedPriors.provenance_counts).toEqual({
-      ...EXPECTED_PROVENANCE_COUNTS,
-      "tierC-synth": 0,
-    });
+    expect(lock.lock_status).toBe("retired");
+    expect(lock.current_use).toContain("Do not submit");
+    expect(lock.source_files?.[PRIORS_PATH]).toBeUndefined();
   });
 
   it("every prior carries a provenance tag and source_ref", () => {

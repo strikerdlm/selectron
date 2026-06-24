@@ -2,7 +2,8 @@
 // T31: Idempotency test for calibrateTierCMultipliers.
 // Runs the calibration loop end-to-end twice (writeBack=false to avoid file mutation)
 // and asserts the returned multipliers agree within 5%.
-// NOTE: All 101 current IMM conditions are now evidence-based (0 tierC-synth remaining).
+// NOTE: All 101 current IMM conditions now have source-attribution provenance
+// (0 tierC-synth remaining), but accepted evidence coverage remains separate.
 // The "residuals decrease" gate is skipped — no tierC conditions means the
 // multiplier has no effect, so residuals are stable (not improved, not worsened).
 import { describe, it, expect } from "vitest";

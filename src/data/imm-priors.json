@@ -8377,7 +8377,7 @@
     "acute-radiation-syndrome": {
       "conditionId": "acute-radiation-syndrome",
       "provenance": "tierB-pymc",
-      "source_ref": "literature-validated (2026-05-26): Kim & Cucinotta 2009 (Health Phys 97(1):68-81) ~90% SPEs medically inconsequential \u2192 supports Beta-Bernoulli p\u22480.10; Carnell 2016 NASA/TM-20160003870 ARS risk assessment; Hu 2020 Life Sci Space Res biomathematical models; Kennedy 2014 NSBRI CARR; Cliver 2016 Carrington return period ~90 yrs. Beta-Bernoulli \u03b1=2,\u03b2=18 retained \u2014 consistent with IMM architecture (K15) and literature. ISS zero-ARS (Crucian 2016, 20.57 flight-years) applies only to LEO magnetosphere-protected missions; deep-space risk per SPE is ~10% for E>30 MeV events. rev3-f (2026-05-26): severity tuned against persistent-impairment literature \u2014 treated mean=0.495, n_treated=6, n_untreated=1",
+      "source_ref": "source-attributed (2026-05-26): Kim & Cucinotta 2009 (Health Phys 97(1):68-81) ~90% SPEs medically inconsequential \u2192 supports Beta-Bernoulli p\u22480.10; Carnell 2016 NASA/TM-20160003870 ARS risk assessment; Hu 2020 Life Sci Space Res biomathematical models; Kennedy 2014 NSBRI CARR; Cliver 2016 Carrington return period ~90 yrs. Beta-Bernoulli \u03b1=2,\u03b2=18 retained \u2014 consistent with IMM architecture (K15) and literature. ISS zero-ARS (Crucian 2016, 20.57 flight-years) applies only to LEO magnetosphere-protected missions; deep-space risk per SPE is ~10% for E>30 MeV events. rev3-f (2026-05-26): severity tuned against persistent-impairment literature \u2014 treated mean=0.495, n_treated=6, n_untreated=1",
       "incidence": {
         "distribution": "Beta-Bernoulli",
         "alpha": 2,

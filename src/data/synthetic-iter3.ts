@@ -139,8 +139,9 @@ function buildSyntheticPriors(): PriorsJson {
                 cid,
                 // Family-specific β against z-scored higher-is-better criteria.
                 // Negative β: HIGH-quality candidate (z>0) → β·z<0 → exp<1 → λ↓.
-                // Magnitudes calibrated so worst-vs-best (4 SD spread, ±2 z units)
-                // produces a meaningful 2-4× incidence multiplier spread.
+                // Magnitudes are operator-selected defaults so worst-vs-best
+                // (4 SD spread, ±2 z units) produces a meaningful 2-4×
+                // incidence multiplier spread.
                 // Condition families present in ANALOG_CONDITIONS v2:
                 //   psychiatric, team, physiologic, musculoskeletal, performance.
                 // Future families (Iter-2+ ConditionFamily expansion) are cast via
