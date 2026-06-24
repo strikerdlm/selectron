@@ -1,4 +1,4 @@
-import type { Candidate, Criterion, Posterior } from "@/types";
+import type { Candidate, Criterion, ScoreDistribution } from "@/types";
 import { sampleDirichlet, dirichletMean, dirichletVariance } from "./dirichlet";
 import { normalizeScore } from "./normalize";
 import { makeRng } from "./prng";
@@ -57,7 +57,7 @@ function validateAlphaForCriteria(alpha: readonly number[], criteria: readonly C
   }
 }
 
-export function scoreCandidate(input: ScoreInput): Posterior {
+export function scoreCandidate(input: ScoreInput): ScoreDistribution {
   const { candidate, criteria, alpha, iterations, seed } = input;
   if (!Number.isInteger(iterations) || iterations <= 0) {
     throw new SelectronError("E_BAD_ITERATIONS", `iterations must be a positive integer, got ${iterations}`, {

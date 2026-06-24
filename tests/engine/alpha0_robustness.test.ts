@@ -35,13 +35,13 @@ function makeAlpha(alpha0: number): number[] {
 // Run all three alpha0 conditions at describe scope so every test in this block
 // can share the results without re-computing. Vitest may execute individual
 // `it` blocks in any order; computing at describe scope guarantees all three
-// posteriors are available before any assertion runs.
+// score distributions are available before any assertion runs.
 const T = 50_000;
 const SEED = 42;
 
 const alpha0Values = [1, 10, 100] as const;
 
-// Pre-compute closed-form moments and MC posteriors for each alpha0.
+// Pre-compute closed-form moments and MC score distributions for each alpha0.
 const results = alpha0Values.map((alpha0) => {
   const alpha = makeAlpha(alpha0);
   const cf = closedFormMoments({ candidate: HETERO, criteria: PLACEHOLDER_CRITERIA, alpha });
@@ -76,7 +76,7 @@ describe("alpha0 robustness panel {1, 10, 100}", () => {
     expect(relErr).toBeLessThan(0.02);
   });
 
-  it("CI90 width decreases monotonically as alpha0 increases", () => {
+  it("central 90% interval width decreases monotonically as alpha0 increases", () => {
     const width = (r: (typeof results)[number]) => r.post.ci90[1] - r.post.ci90[0];
     const w1 = width(r1);
     const w10 = width(r10);

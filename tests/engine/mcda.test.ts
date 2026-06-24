@@ -28,7 +28,7 @@ const demo: Candidate = {
 const ALPHA = Array.from({ length: 11 }, () => 1);
 
 describe("scoreCandidate", () => {
-  it("returns a Posterior with samples, ess, mean, ci90, ci95", () => {
+  it("returns a ScoreDistribution with samples, ess, mean, ci90, ci95", () => {
     const post = scoreCandidate({
       candidate: demo,
       criteria: PLACEHOLDER_CRITERIA,

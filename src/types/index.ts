@@ -1,7 +1,7 @@
 export type { Criterion, CriterionCatalog, CriterionCatalogStatus, CriterionInstrument } from "./criterion";
 export type { Candidate } from "./candidate";
 export type { GateVerdict, GateResult } from "./gate";
-export type { Posterior } from "./posterior";
+export type { Posterior, ScoreDistribution } from "./posterior";
 export type {
   AnalogMission,
   Condition,

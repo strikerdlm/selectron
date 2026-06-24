@@ -17,9 +17,7 @@
 // so they always render the full expanded chain.
 
 import { useState, type ReactNode } from "react";
-import type { Criterion } from "@/types";
-import type { Posterior } from "@/types";
-import type { AccessTier } from "@/types";
+import type { AccessTier, Criterion, ScoreDistribution } from "@/types";
 import { TIER_LABEL } from "@/types";
 import type { RiskPosterior, AnalogMission, Condition } from "@/types/risk";
 import { normalizeScore } from "@/engine";
@@ -112,14 +110,14 @@ const sup = (s: string) => (
 const fmt = (x: number, d = 2) => x.toFixed(d);
 
 function mcdaSteps(args: {
-  posterior: Posterior;
+  scoreDistribution: ScoreDistribution;
   criteria: readonly Criterion[];
   scores: Record<string, number>;
   alias: string;
   seed: number;
   accessTier: AccessTier;
 }): TraceStep[] {
-  const { posterior, criteria, scores } = args;
+  const { scoreDistribution, criteria, scores } = args;
   const K = criteria.length;
 
   // For step 1 demo: pick the first criterion with a non-null score
@@ -131,8 +129,8 @@ function mcdaSteps(args: {
     demoC.tierInstruments?.[args.accessTier]?.instrument ?? demoC.instrument;
 
   // For step 3 demo: compute a weighted sum on the first sampled score draw.
-  const samples = posterior.samples;
-  const firstDraw = samples[0] ?? posterior.mean;
+  const samples = scoreDistribution.samples;
+  const firstDraw = samples[0] ?? scoreDistribution.mean;
 
   return [
     {
@@ -193,8 +191,8 @@ function mcdaSteps(args: {
       ),
       concrete: (
         <span>
-          One Monte-Carlo draw out of {posterior.samples.length.toLocaleString()}:
-          S = {fmt(firstDraw, 3)} (this is sample #1 of {posterior.samples.length})
+          One Monte-Carlo draw out of {scoreDistribution.samples.length.toLocaleString()}:
+          S = {fmt(firstDraw, 3)} (this is sample #1 of {scoreDistribution.samples.length})
         </span>
       ),
       lay:
@@ -211,15 +209,15 @@ function mcdaSteps(args: {
         <span>
           {`{ S`}
           {sup("(1)")}, S{sup("(2)")}, …, S{sup("(N)")}
-          {` }, with N = ${posterior.samples.length.toLocaleString()}`}
+          {` }, with N = ${scoreDistribution.samples.length.toLocaleString()}`}
         </span>
       ),
       concrete: (
         <span>
-          MCDA mean μ = {fmt(posterior.mean, 3)} · interval₉₀ = [
-          {fmt(posterior.ci90[0], 3)}, {fmt(posterior.ci90[1], 3)}] · interval₉₅ = [
-          {fmt(posterior.ci95[0], 3)}, {fmt(posterior.ci95[1], 3)}] · draws ={" "}
-          {posterior.ess.toFixed(0)}
+          MCDA mean μ = {fmt(scoreDistribution.mean, 3)} · interval₉₀ = [
+          {fmt(scoreDistribution.ci90[0], 3)}, {fmt(scoreDistribution.ci90[1], 3)}] · interval₉₅ = [
+          {fmt(scoreDistribution.ci95[0], 3)}, {fmt(scoreDistribution.ci95[1], 3)}] · draws ={" "}
+          {scoreDistribution.ess.toFixed(0)}
         </span>
       ),
       lay:
@@ -298,7 +296,9 @@ function TraceShell({
 }
 
 export function MCDACalculationTrace(props: {
-  posterior: Posterior;
+  scoreDistribution?: ScoreDistribution;
+  /** @deprecated Use scoreDistribution. */
+  posterior?: ScoreDistribution;
   criteria: readonly Criterion[];
   scores: Record<string, number>;
   alias: string;
@@ -307,7 +307,18 @@ export function MCDACalculationTrace(props: {
   /** Interactive views collapse by default; paper figures pass false. */
   collapsible?: boolean;
 }) {
-  const steps = mcdaSteps(props);
+  const scoreDistribution = props.scoreDistribution ?? props.posterior;
+  if (!scoreDistribution) {
+    throw new Error("MCDACalculationTrace requires scoreDistribution");
+  }
+  const steps = mcdaSteps({
+    scoreDistribution,
+    criteria: props.criteria,
+    scores: props.scores,
+    alias: props.alias,
+    seed: props.seed,
+    accessTier: props.accessTier,
+  });
   return (
     <TraceShell
       collapsible={props.collapsible ?? true}

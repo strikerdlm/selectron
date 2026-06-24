@@ -2,7 +2,7 @@ import { useMemo } from "react";
 import { useWizard } from "@/contexts/WizardContext";
 import { ACTIVE_CRITERION_CATALOG } from "@/data/demo-criteria";
 import { buildEqualWeightPrior, scoreCandidate, normalizeScore } from "@/engine";
-import { PosteriorPlot } from "@/ui/figures/PosteriorPlot";
+import { ScoreDistributionPlot } from "@/ui/figures/ScoreDistributionPlot";
 import { ScoreCard } from "@/ui/components/ScoreCard";
 import { ScoreBreakdownRadar } from "@/ui/figures/ScoreBreakdownRadar";
 import { MCDACalculationTrace } from "@/ui/figures/CalculationTrace";
@@ -56,7 +56,7 @@ export function StepReview() {
     [candidate, scores],
   );
 
-  const posterior = useMemo(
+  const scoreDistribution = useMemo(
     () =>
       isComplete
         ? scoreCandidate({
@@ -151,12 +151,17 @@ export function StepReview() {
       </section>
 
       <aside className="lg:col-span-5 space-y-4">
-        {posterior ? (
+        {scoreDistribution ? (
           <>
             <div className="panel p-6">
-              <PosteriorPlot posterior={posterior} seed={SEED_SAMPLER} alias={candidate?.alias ?? "—"} accessTier={accessTier} />
+              <ScoreDistributionPlot
+                scoreDistribution={scoreDistribution}
+                seed={SEED_SAMPLER}
+                alias={candidate?.alias ?? "—"}
+                accessTier={accessTier}
+              />
             </div>
-            <ScoreCard posterior={posterior} alias={candidate?.alias ?? "—"} />
+            <ScoreCard scoreDistribution={scoreDistribution} alias={candidate?.alias ?? "—"} />
           </>
         ) : (
           <div className="panel p-6">
@@ -169,7 +174,7 @@ export function StepReview() {
             </p>
           </div>
         )}
-        {posterior && (
+        {scoreDistribution && (
           <div className="panel p-6">
             <ScoreBreakdownRadar data={radarData} />
           </div>
@@ -179,10 +184,10 @@ export function StepReview() {
 
     {/* CALCULATION TRACE — Diego scope expansion 2026-05-19: educational
         step-by-step walkthrough of Stage-A MCDA scoring, with lay layer. */}
-    {posterior && (
+    {scoreDistribution && (
       <section>
         <MCDACalculationTrace
-          posterior={posterior}
+          scoreDistribution={scoreDistribution}
           criteria={visibleCriteria}
           scores={scores}
           alias={candidate?.alias ?? "—"}

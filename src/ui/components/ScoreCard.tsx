@@ -1,16 +1,22 @@
-import type { Posterior } from "@/types";
+import type { ScoreDistribution } from "@/types";
 
 type Props = {
-  posterior: Posterior;
+  scoreDistribution?: ScoreDistribution;
+  /** @deprecated Use scoreDistribution. */
+  posterior?: ScoreDistribution;
   alias: string;
 };
 
 const pct = (x: number) => (100 * x).toFixed(1) + "%";
 
-export function ScoreCard({ posterior, alias }: Props) {
-  const { mean, ci90, ci95, ess } = posterior;
-  const ci90Width = ci90[1] - ci90[0];
-  const intervalWidthPct = Math.max(0, Math.min(1, ci90Width / 0.3));
+export function ScoreCard({ scoreDistribution, posterior, alias }: Props) {
+  const distribution = scoreDistribution ?? posterior;
+  if (!distribution) {
+    throw new Error("ScoreCard requires scoreDistribution");
+  }
+  const { mean, ci90, ci95, ess } = distribution;
+  const interval90Width = ci90[1] - ci90[0];
+  const intervalWidthPct = Math.max(0, Math.min(1, interval90Width / 0.3));
 
   return (
     <div className="panel p-6">
@@ -28,20 +34,20 @@ export function ScoreCard({ posterior, alias }: Props) {
       <div className="hairline my-5" />
 
       <dl className="mono grid grid-cols-[auto_1fr] gap-y-2 text-xs">
-        <dt className="text-ink-2">CI₉₀</dt>
+        <dt className="text-ink-2">interval₉₀</dt>
         <dd className="text-right tabular-nums text-ink-0">
           <span className="text-signal">{pct(ci90[0])}</span>
           <span className="mx-2 text-ink-3">→</span>
           <span className="text-signal">{pct(ci90[1])}</span>
         </dd>
 
-        <dt className="text-ink-2">CI₉₅</dt>
+        <dt className="text-ink-2">interval₉₅</dt>
         <dd className="text-right tabular-nums text-ink-1">
           {pct(ci95[0])} <span className="text-ink-3">→</span> {pct(ci95[1])}
         </dd>
 
         <dt className="text-ink-2">Δ width</dt>
-        <dd className="text-right tabular-nums text-ink-1">{pct(ci90Width)}</dd>
+        <dd className="text-right tabular-nums text-ink-1">{pct(interval90Width)}</dd>
 
         <dt className="text-ink-2">draws (IID)</dt>
         <dd className="text-right tabular-nums text-ink-1">{ess.toFixed(0)}</dd>
