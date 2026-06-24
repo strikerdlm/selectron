@@ -241,6 +241,67 @@ export type MonteCarloErrorSummary = {
   healthCriterionRelativeMcse: number | null;
 };
 
+export type MonteCarloPrecisionTargets = {
+  /** Relative MCSE ceiling for the total-medical-events mean. */
+  tmeRelativeMcseMax: number;
+  /** Absolute MCSE ceiling for the CHI mean, percentage-point scale. */
+  chiMcseMaxPp: number;
+  /** Absolute MCSE ceiling for pEVAC, percentage-point scale. */
+  pEvacMcseMaxPp: number;
+  /** Absolute MCSE ceiling for pLOCL, percentage-point scale. */
+  pLoclMcseMaxPp: number;
+  /** Absolute MCSE ceiling for the composite health criterion, percentage-point scale. */
+  healthCriterionMcseMaxPp: number;
+  /** Maximum Wilson 95% interval width for binary probabilities, percentage-point scale. */
+  binaryWilsonWidthMaxPp: number;
+  /** Minimum independent seeds required before a run is treated as replicated. */
+  minIndependentSeeds: number;
+  /** Maximum across-seed spread for percent-scale means, percentage-point scale. */
+  maxSeedMeanSpreadPp: number;
+};
+
+export type MonteCarloPrecisionCheck = {
+  metric: "tme" | "chi" | "pEvac" | "pLocl" | "healthCriterion";
+  criterion: "relativeMcse" | "absoluteMcse" | "wilsonWidth";
+  observed: number | null;
+  target: number;
+  unit: "ratio" | "pp";
+  passed: boolean;
+  recommendedTrials: number | null;
+};
+
+export type MonteCarloSeedReplicationAssessment = {
+  requiredSeeds: number;
+  observedSeeds: number;
+  targetMaxMeanSpreadPp: number;
+  maxMeanSpreadPp: number | null;
+  passed: boolean | null;
+};
+
+export type MonteCarloPrecisionAssessment = {
+  targets: MonteCarloPrecisionTargets;
+  checks: MonteCarloPrecisionCheck[];
+  stoppingRulePassed: boolean;
+  requiredTrials: number;
+  stoppingRule: string;
+  independentSeedReplication: MonteCarloSeedReplicationAssessment;
+  /** True only when the MCSE/Wilson stopping rule passes and seed replication passes. */
+  passed: boolean;
+};
+
+export type MonteCarloIndependentSeedSummary = {
+  seeds: number[];
+  trialsPerSeed: number;
+  metrics: {
+    tmeMeanRange: number;
+    chiMeanRangePp: number;
+    pEvacMeanRangePp: number;
+    pLoclMeanRangePp: number;
+    healthCriterionMeanRangePp: number;
+  };
+  assessment: MonteCarloSeedReplicationAssessment;
+};
+
 export type IMMOutcome = {
   tme: ScenarioSummary;
   chi: ScenarioSummary;
@@ -276,6 +337,7 @@ export type IMMOutcome = {
     sigmaChi: number[]; sigmaPevac: number[];
   };
   monteCarloError?: MonteCarloErrorSummary;
+  precisionAssessment?: MonteCarloPrecisionAssessment;
   chiClamp?: {
     count: number;
     proportion: number;

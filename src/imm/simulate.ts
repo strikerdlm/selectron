@@ -1,7 +1,16 @@
 // src/imm/simulate.ts
 import { makeRng } from "../engine/prng";
 import { SelectronError } from "../engine/errors";
-import type { IMMOutcome, MonteCarloErrorSummary, ScenarioSummary } from "./types";
+import type {
+  IMMOutcome,
+  MonteCarloErrorSummary,
+  MonteCarloIndependentSeedSummary,
+  MonteCarloPrecisionAssessment,
+  MonteCarloPrecisionCheck,
+  MonteCarloPrecisionTargets,
+  MonteCarloSeedReplicationAssessment,
+  ScenarioSummary,
+} from "./types";
 // Rng inlined — prng.ts does not export this type (matches incidence.ts convention)
 type Rng = () => number;
 
@@ -40,6 +49,17 @@ const RATE_OVERRIDE_PROCESS_TYPES = new Set<IMMProcessType>([
   "EVA-coupled",
   "SA-VIIP-late",
 ]);
+
+export const DEFAULT_MONTE_CARLO_PRECISION_TARGETS: MonteCarloPrecisionTargets = {
+  tmeRelativeMcseMax: 0.05,
+  chiMcseMaxPp: 0.25,
+  pEvacMcseMaxPp: 0.25,
+  pLoclMcseMaxPp: 0.1,
+  healthCriterionMcseMaxPp: 0.25,
+  binaryWilsonWidthMaxPp: 1,
+  minIndependentSeeds: 3,
+  maxSeedMeanSpreadPp: 0.5,
+};
 
 // General-Poisson conditions that are specific to ISS/ECLSS infrastructure
 // and therefore impossible in analog habitats with standard ventilation.
@@ -792,7 +812,212 @@ function monteCarloErrorSummary(args: {
   };
 }
 
-export function simulateIMM(opts: {
+function resolvePrecisionTargets(overrides?: Partial<MonteCarloPrecisionTargets>): MonteCarloPrecisionTargets {
+  const targets = { ...DEFAULT_MONTE_CARLO_PRECISION_TARGETS, ...(overrides ?? {}) };
+  for (const [key, value] of Object.entries(targets)) {
+    if (!Number.isFinite(value) || value <= 0) {
+      throw new SelectronError("E_BAD_SCENARIO_CONTROL", `precision target ${key} must be positive and finite`, {
+        key,
+        value,
+      });
+    }
+  }
+  if (!Number.isInteger(targets.minIndependentSeeds) || targets.minIndependentSeeds < 2) {
+    throw new SelectronError("E_BAD_SCENARIO_CONTROL", "precision target minIndependentSeeds must be an integer >= 2", {
+      minIndependentSeeds: targets.minIndependentSeeds,
+    });
+  }
+  return targets;
+}
+
+function recommendedTrials(currentTrials: number, observed: number | null, target: number, passed: boolean): number | null {
+  if (passed) return currentTrials;
+  if (observed === null || !Number.isFinite(observed) || observed <= 0 || !Number.isFinite(target) || target <= 0) {
+    return null;
+  }
+  return Math.max(currentTrials, Math.ceil(currentTrials * (observed / target) ** 2));
+}
+
+function makePrecisionCheck(args: {
+  metric: MonteCarloPrecisionCheck["metric"];
+  criterion: MonteCarloPrecisionCheck["criterion"];
+  observed: number | null;
+  target: number;
+  unit: MonteCarloPrecisionCheck["unit"];
+  trials: number;
+  passWhenUnavailable?: boolean;
+}): MonteCarloPrecisionCheck {
+  const observed = args.observed;
+  const passed = observed === null
+    ? args.passWhenUnavailable === true
+    : Number.isFinite(observed) && observed <= args.target;
+  return {
+    metric: args.metric,
+    criterion: args.criterion,
+    observed,
+    target: args.target,
+    unit: args.unit,
+    passed,
+    recommendedTrials: recommendedTrials(args.trials, observed, args.target, passed),
+  };
+}
+
+function wilsonWidth(ci: [number, number]): number {
+  return Math.max(0, ci[1] - ci[0]);
+}
+
+export function assessMonteCarloPrecision(
+  mcse: MonteCarloErrorSummary,
+  targetsInput?: Partial<MonteCarloPrecisionTargets>,
+  independentSeedReplication?: MonteCarloSeedReplicationAssessment,
+): MonteCarloPrecisionAssessment {
+  const targets = resolvePrecisionTargets(targetsInput);
+  const checks: MonteCarloPrecisionCheck[] = [
+    makePrecisionCheck({
+      metric: "tme",
+      criterion: "relativeMcse",
+      observed: mcse.tmeRelativeMcse,
+      target: targets.tmeRelativeMcseMax,
+      unit: "ratio",
+      trials: mcse.trials,
+      passWhenUnavailable: mcse.tmeMeanMcse === 0,
+    }),
+    makePrecisionCheck({
+      metric: "chi",
+      criterion: "absoluteMcse",
+      observed: mcse.chiMeanMcse,
+      target: targets.chiMcseMaxPp,
+      unit: "pp",
+      trials: mcse.trials,
+    }),
+    makePrecisionCheck({
+      metric: "pEvac",
+      criterion: "absoluteMcse",
+      observed: mcse.pEvacMcsePct,
+      target: targets.pEvacMcseMaxPp,
+      unit: "pp",
+      trials: mcse.trials,
+    }),
+    makePrecisionCheck({
+      metric: "pLocl",
+      criterion: "absoluteMcse",
+      observed: mcse.pLoclMcsePct,
+      target: targets.pLoclMcseMaxPp,
+      unit: "pp",
+      trials: mcse.trials,
+    }),
+    makePrecisionCheck({
+      metric: "healthCriterion",
+      criterion: "absoluteMcse",
+      observed: mcse.healthCriterionMcsePct,
+      target: targets.healthCriterionMcseMaxPp,
+      unit: "pp",
+      trials: mcse.trials,
+    }),
+    makePrecisionCheck({
+      metric: "pEvac",
+      criterion: "wilsonWidth",
+      observed: wilsonWidth(mcse.pEvacWilson95Pct),
+      target: targets.binaryWilsonWidthMaxPp,
+      unit: "pp",
+      trials: mcse.trials,
+    }),
+    makePrecisionCheck({
+      metric: "pLocl",
+      criterion: "wilsonWidth",
+      observed: wilsonWidth(mcse.pLoclWilson95Pct),
+      target: targets.binaryWilsonWidthMaxPp,
+      unit: "pp",
+      trials: mcse.trials,
+    }),
+    makePrecisionCheck({
+      metric: "healthCriterion",
+      criterion: "wilsonWidth",
+      observed: wilsonWidth(mcse.healthCriterionWilson95Pct),
+      target: targets.binaryWilsonWidthMaxPp,
+      unit: "pp",
+      trials: mcse.trials,
+    }),
+  ];
+  const stoppingRulePassed = checks.every((check) => check.passed);
+  const requiredTrials = Math.max(
+    mcse.trials,
+    ...checks.map((check) => check.recommendedTrials ?? mcse.trials),
+  );
+  const replication = independentSeedReplication ?? {
+    requiredSeeds: targets.minIndependentSeeds,
+    observedSeeds: 1,
+    targetMaxMeanSpreadPp: targets.maxSeedMeanSpreadPp,
+    maxMeanSpreadPp: null,
+    passed: null,
+  };
+  return {
+    targets,
+    checks,
+    stoppingRulePassed,
+    requiredTrials,
+    stoppingRule:
+      "Pass requires every displayed estimator MCSE to meet its target; binary probabilities also require Wilson 95% interval width within target.",
+    independentSeedReplication: replication,
+    passed: stoppingRulePassed && replication.passed === true,
+  };
+}
+
+function range(values: number[]): number {
+  if (values.length === 0) return 0;
+  return Math.max(...values) - Math.min(...values);
+}
+
+export function summarizeIndependentSeedOutcomes(
+  outcomes: readonly IMMOutcome[],
+  seeds: readonly number[],
+  trialsPerSeed: number,
+  targetsInput?: Partial<MonteCarloPrecisionTargets>,
+): MonteCarloIndependentSeedSummary {
+  if (outcomes.length === 0) {
+    throw new SelectronError("E_BAD_SCENARIO_CONTROL", "independent-seed replication requires at least one outcome");
+  }
+  if (outcomes.length !== seeds.length) {
+    throw new SelectronError("E_BAD_SCENARIO_CONTROL", "independent-seed outcomes and seeds must have the same length", {
+      outcomes: outcomes.length,
+      seeds: seeds.length,
+    });
+  }
+  if (!Number.isInteger(trialsPerSeed) || trialsPerSeed <= 0) {
+    throw new SelectronError("E_BAD_SCENARIO_CONTROL", `trialsPerSeed must be a positive integer, got ${trialsPerSeed}`, {
+      trialsPerSeed,
+    });
+  }
+  const targets = resolvePrecisionTargets(targetsInput);
+  const metrics = {
+    tmeMeanRange: range(outcomes.map((outcome) => outcome.tme.mean)),
+    chiMeanRangePp: range(outcomes.map((outcome) => outcome.chi.mean)),
+    pEvacMeanRangePp: range(outcomes.map((outcome) => outcome.pEvac.mean)),
+    pLoclMeanRangePp: range(outcomes.map((outcome) => outcome.pLocl.mean)),
+    healthCriterionMeanRangePp: range(outcomes.map((outcome) => outcome.healthCriterionAttainment?.mean ?? outcome.missionSuccess.mean)),
+  };
+  const maxMeanSpreadPp = Math.max(
+    metrics.chiMeanRangePp,
+    metrics.pEvacMeanRangePp,
+    metrics.pLoclMeanRangePp,
+    metrics.healthCriterionMeanRangePp,
+  );
+  const assessment: MonteCarloSeedReplicationAssessment = {
+    requiredSeeds: targets.minIndependentSeeds,
+    observedSeeds: outcomes.length,
+    targetMaxMeanSpreadPp: targets.maxSeedMeanSpreadPp,
+    maxMeanSpreadPp,
+    passed: outcomes.length >= targets.minIndependentSeeds && maxMeanSpreadPp <= targets.maxSeedMeanSpreadPp,
+  };
+  return {
+    seeds: [...seeds],
+    trialsPerSeed,
+    metrics,
+    assessment,
+  };
+}
+
+export type SimulateIMMOptions = {
   crew: IMMCrewMember[];
   mission: IMMMission;
   kit: IMMKitScenario;
@@ -853,9 +1078,22 @@ export function simulateIMM(opts: {
    * effects. Default is "adjudicated".
    */
   profileEffectMode?: ProfileEffectMode;
-}): IMMOutcome {
+  /**
+   * Optional numerical-precision acceptance targets. Defaults are declared in
+   * DEFAULT_MONTE_CARLO_PRECISION_TARGETS and are model-precision controls only.
+   */
+  precisionTargets?: Partial<MonteCarloPrecisionTargets>;
+};
+
+export type SimulateIMMIndependentSeedsOptions = Omit<SimulateIMMOptions, "seed" | "trials" | "diagnostics"> & {
+  seeds: readonly number[];
+  trialsPerSeed: number;
+};
+
+export function simulateIMM(opts: SimulateIMMOptions): IMMOutcome {
   const { crew, mission, kit, trials, seed } = opts;
   const chiStar = opts.chiStar ?? 0.7;
+  const precisionTargets = resolvePrecisionTargets(opts.precisionTargets);
   // F9: fail-closed input validation. The UI constrains most of these, but the
   // public simulation API must not silently accept invalid scenario controls.
   // A negative/non-finite familyBetaScale previously fell back to 1.0 (full
@@ -881,6 +1119,9 @@ export function simulateIMM(opts: {
   }
   if (!Number.isInteger(trials) || trials <= 0) {
     throw _bad(`trials must be a positive integer, got ${trials}`, { trials });
+  }
+  if (!Number.isInteger(seed) || seed < 0 || seed > 0xffffffff) {
+    throw _bad(`seed must be an unsigned 32-bit integer, got ${seed}`, { seed });
   }
   if (!Array.isArray(crew) || crew.length === 0) {
     throw _bad("crew must be a non-empty array", { crewLength: crew?.length });
@@ -1047,6 +1288,7 @@ export function simulateIMM(opts: {
   }));
 
   const healthCriterionAttainment = scenarioSummary(healthCriterionFlags.map(x => x * 100));
+  const monteCarloError = monteCarloErrorSummary({ tmes, chis, evacs, locls, healthCriterionFlags });
   const outcome: IMMOutcome = {
     tme:   scenarioSummary(tmes),
     chi:   scenarioSummary(chis),
@@ -1057,7 +1299,8 @@ export function simulateIMM(opts: {
     missionSuccess: healthCriterionAttainment,
     perConditionDrivers: drivers,
     convergence: { trialCheckpoints: sigmaCheckpoints, sigmaChi, sigmaPevac },
-    monteCarloError: monteCarloErrorSummary({ tmes, chis, evacs, locls, healthCriterionFlags }),
+    monteCarloError,
+    precisionAssessment: assessMonteCarloPrecision(monteCarloError, precisionTargets),
     chiClamp: {
       count: chiClampCount,
       proportion: chiClampCount / trials,
@@ -1067,4 +1310,36 @@ export function simulateIMM(opts: {
     outcome.diagnostics = { chiSamples: chis };
   }
   return outcome;
+}
+
+export function simulateIMMIndependentSeeds(opts: SimulateIMMIndependentSeedsOptions): MonteCarloIndependentSeedSummary {
+  const { seeds, trialsPerSeed, precisionTargets, ...simulateOpts } = opts;
+  if (!Array.isArray(seeds) || seeds.length === 0) {
+    throw new SelectronError("E_BAD_SCENARIO_CONTROL", "independent-seed replication requires at least one seed", {
+      seeds,
+    });
+  }
+  for (const seed of seeds) {
+    if (!Number.isInteger(seed) || seed < 0 || seed > 0xffffffff) {
+      throw new SelectronError("E_BAD_SCENARIO_CONTROL", `seed must be an unsigned 32-bit integer, got ${seed}`, {
+        seed,
+      });
+    }
+  }
+  const uniqueSeeds = new Set(seeds);
+  if (uniqueSeeds.size !== seeds.length) {
+    throw new SelectronError("E_BAD_SCENARIO_CONTROL", "independent-seed replication requires distinct seeds", {
+      seeds: [...seeds],
+    });
+  }
+
+  const outcomes = seeds.map((seed) =>
+    simulateIMM({
+      ...simulateOpts,
+      trials: trialsPerSeed,
+      seed,
+      precisionTargets,
+    }),
+  );
+  return summarizeIndependentSeedOutcomes(outcomes, seeds, trialsPerSeed, precisionTargets);
 }

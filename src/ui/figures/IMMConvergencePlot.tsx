@@ -46,12 +46,38 @@ function fmtInterval(ci: [number, number]): string {
   return `${fmtPct(ci[0])} -> ${fmtPct(ci[1])}`;
 }
 
+function fmtTrials(n: number): string {
+  return Math.ceil(n).toLocaleString();
+}
+
 function PrecisionPanel({ outcome }: { outcome: IMMOutcome }) {
   const mcse = outcome.monteCarloError;
   if (!mcse) return null;
+  const precision = outcome.precisionAssessment;
+  const replication = precision?.independentSeedReplication;
+  const replicationLabel = replication
+    ? replication.passed === true
+      ? `pass (${replication.observedSeeds}/${replication.requiredSeeds} seeds)`
+      : replication.passed === false
+        ? `needs review (${replication.observedSeeds}/${replication.requiredSeeds} seeds, spread ${fmtPp(replication.maxMeanSpreadPp ?? 0)})`
+        : `not assessed (${replication.observedSeeds}/${replication.requiredSeeds} seeds)`
+    : "not assessed";
   return (
     <div className="panel mt-3 p-3" data-testid="imm-precision-panel">
       <div className="mono text-[10px] uppercase tracking-cap text-ink-3">Estimator precision</div>
+      {precision && (
+        <div className="mt-2 grid grid-cols-1 gap-2 sm:grid-cols-2">
+          <div className="mono text-[10px] text-ink-2">
+            MCSE stopping rule{" "}
+            <span className="tabular-nums text-ink-1">
+              {precision.stoppingRulePassed ? "pass" : `needs T >= ${fmtTrials(precision.requiredTrials)}`}
+            </span>
+          </div>
+          <div className="mono text-[10px] text-ink-2">
+            Independent seeds <span className="tabular-nums text-ink-1">{replicationLabel}</span>
+          </div>
+        </div>
+      )}
       <div className="mt-2 grid grid-cols-1 gap-2 sm:grid-cols-2">
         <div className="mono text-[10px] text-ink-2">
           CHI MCSE <span className="tabular-nums text-ink-1">{fmtPp(mcse.chiMeanMcse)}</span>
@@ -95,7 +121,7 @@ export function IMMConvergencePlot({ outcome, trials, chiStar }: IMMConvergenceP
           block={{
             figureId: "I4",
             oneLine: `Batch σ(CHI) and σ(pEVAC) vs cumulative trials — T=${trials.toLocaleString()} (insufficient for batch diagnostics).`,
-            methods: "Requires T ≥ 1 000 trials for the 1 000-trial rolling-window σ diagnostic. Estimator precision is reported separately by MCSE and Wilson intervals when available.",
+            methods: "Requires T ≥ 1 000 trials for the 1 000-trial rolling-window σ diagnostic. Estimator precision is reported separately by MCSE, Wilson intervals, stopping-rule status, and independent-seed replication status when available.",
             source: "Antonsen et al. (2022) [A22]; Musson & Heaton (2018) [M18].",
             reproducibility: `trials=${trials.toLocaleString()}, chiStar=${chiStar.toFixed(2)}`,
           }}
@@ -203,7 +229,8 @@ export function IMMConvergencePlot({ outcome, trials, chiStar }: IMMConvergenceP
       "simulation (simulate.ts). σ values are in the native 0–100% scale (percentage-point " +
       "absolute SD) and describe batch outcome variability, not estimator precision. The 5 pp " +
       "line is retained as a historical M18/A22-style batch-stability reference only; MCSE, " +
-      "relative MCSE, and Wilson intervals are the displayed estimator-precision diagnostics. " +
+      "relative MCSE, Wilson intervals, stopping-rule status, and independent-seed replication " +
+      "status are the displayed estimator-precision diagnostics. " +
       `χ*=${chiStar.toFixed(2)} (composite health criterion).`,
     source:
       "Musson & Heaton (2018) [M18]; Antonsen et al. (2022) npj Microgravity 8(1) [A22, " +

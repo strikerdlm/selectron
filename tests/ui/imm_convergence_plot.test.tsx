@@ -46,6 +46,30 @@ function makeOutcome(checkpoints: number[], sigmaChi: number[], sigmaPevac: numb
       pLoclRelativeMcse: 0.02,
       healthCriterionRelativeMcse: 0.0005,
     },
+    precisionAssessment: {
+      targets: {
+        tmeRelativeMcseMax: 0.05,
+        chiMcseMaxPp: 0.25,
+        pEvacMcseMaxPp: 0.25,
+        pLoclMcseMaxPp: 0.1,
+        healthCriterionMcseMaxPp: 0.25,
+        binaryWilsonWidthMaxPp: 1,
+        minIndependentSeeds: 3,
+        maxSeedMeanSpreadPp: 0.5,
+      },
+      checks: [],
+      stoppingRulePassed: true,
+      requiredTrials: 100_000,
+      stoppingRule: "fixture",
+      independentSeedReplication: {
+        requiredSeeds: 3,
+        observedSeeds: 1,
+        targetMaxMeanSpreadPp: 0.5,
+        maxMeanSpreadPp: null,
+        passed: null,
+      },
+      passed: false,
+    },
   };
 }
 
@@ -76,6 +100,9 @@ describe("IMMConvergencePlot (I4)", () => {
     );
     const text = container.textContent ?? "";
     expect(text).toContain("Estimator precision");
+    expect(text).toContain("MCSE stopping rule");
+    expect(text).toContain("Independent seeds");
+    expect(text).toContain("not assessed");
     expect(text).toContain("Wilson 95%");
     expect(text).toContain("historical 5 pp batch-SD reference");
   });

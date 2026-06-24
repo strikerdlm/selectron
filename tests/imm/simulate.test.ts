@@ -1,6 +1,6 @@
 // tests/imm/simulate.test.ts
 import { describe, it, expect, vi, afterEach } from "vitest";
-import { runIMMTrial, applyRiskFactorMultiplier, simulateIMM } from "../../src/imm/simulate";
+import { runIMMTrial, applyRiskFactorMultiplier, simulateIMM, simulateIMMIndependentSeeds } from "../../src/imm/simulate";
 import { makeRng } from "../../src/engine/prng";
 import { SelectronError } from "../../src/engine/errors";
 import { IMM_KITS } from "../../src/imm/kits";
@@ -364,6 +364,28 @@ describe("simulateIMM", () => {
     expect(out.chiClamp?.count).toBeGreaterThanOrEqual(0);
     expect(out.chiClamp?.proportion).toBeGreaterThanOrEqual(0);
     expect(out.chiClamp?.proportion).toBeLessThanOrEqual(1);
+    expect(out.precisionAssessment?.checks.some((check) => check.criterion === "wilsonWidth")).toBe(true);
+    expect(out.precisionAssessment?.requiredTrials).toBeGreaterThanOrEqual(2000);
+    expect(out.precisionAssessment?.independentSeedReplication.observedSeeds).toBe(1);
+    expect(out.precisionAssessment?.independentSeedReplication.passed).toBeNull();
+  });
+
+  it("summarizes independent-seed replication without treating one seed as replicated", () => {
+    const summary = simulateIMMIndependentSeeds({
+      crew: oneCrew,
+      mission: oneDayMission,
+      kit: IMM_KITS.none,
+      trialsPerSeed: 100,
+      seeds: [0x101, 0x202, 0x303],
+      precisionTargets: { maxSeedMeanSpreadPp: 100 },
+    });
+
+    expect(summary.seeds).toEqual([0x101, 0x202, 0x303]);
+    expect(summary.trialsPerSeed).toBe(100);
+    expect(summary.assessment.observedSeeds).toBe(3);
+    expect(summary.assessment.requiredSeeds).toBe(3);
+    expect(summary.assessment.passed).toBe(true);
+    expect(summary.assessment.maxMeanSpreadPp).toBeGreaterThanOrEqual(0);
   });
 
   it("reports pEVAC and pLOCL drivers on the same percent scale as headline probabilities", () => {
