@@ -107,7 +107,7 @@ export function Sim({
       {/* TOP — RiskCard + CHI histogram (the headline result) */}
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-12">
         <section className="lg:col-span-5">
-          <RiskCard posterior={latest.posterior} alias={latest.missionId} />
+          <RiskCard scenarioResult={latest.posterior} alias={latest.missionId} />
         </section>
         <section className="lg:col-span-7 panel p-6">
           <RiskHistogram
@@ -142,7 +142,7 @@ export function Sim({
       {mission && (
         <section>
           <IMMCalculationTrace
-            posterior={latest.posterior}
+            scenarioResult={latest.posterior}
             mission={mission}
             conditions={ANALOG_CONDITIONS}
             trials={latest.trials}
@@ -157,7 +157,7 @@ export function Sim({
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-12">
         <section className="lg:col-span-12 panel p-6">
           <ConditionContribution
-            posterior={latest.posterior}
+            scenarioResult={latest.posterior}
             conditions={ANALOG_CONDITIONS}
             trials={latest.trials}
             seed={latest.seed}

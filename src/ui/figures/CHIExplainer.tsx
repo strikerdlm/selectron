@@ -4,13 +4,13 @@
 // expected lost-crew-days metric, then renders a plain-English interpretation
 // of THIS run's specific numbers. No external dependencies — pure presentation.
 
-import type { RiskPosterior } from "@/types/risk";
+import type { RiskScenarioResult } from "@/types/risk";
 import type { GateResult } from "@/types";
 import { assessLxC } from "@/risk/lxc";
 import { LxCMatrix } from "./LxCMatrix";
 
 type Props = {
-  posterior: RiskPosterior;
+  scenarioResult: RiskScenarioResult;
   chiStar: number;
   missionId: string;
   /** Optional gate result. Review flags are shown separately from the
@@ -92,19 +92,19 @@ function pctBucket(p: number): { label: string; tone: string } {
   return { label: "HIGH", tone: "text-warn" };
 }
 
-export function CHIExplainer({ posterior, chiStar, missionId, gate }: Props) {
-  const chi = posterior.chi.mean;
-  const [chiLo, chiHi] = posterior.chi.ci90;
-  const pET = posterior.pEarlyTermination.mean;
-  const [pETLo, pETHi] = posterior.pEarlyTermination.ci90;
-  const lcd = posterior.expectedLostCrewDays.mean;
-  const [lcdLo, lcdHi] = posterior.expectedLostCrewDays.ci90;
+export function CHIExplainer({ scenarioResult, chiStar, missionId, gate }: Props) {
+  const chi = scenarioResult.chi.mean;
+  const [chiLo, chiHi] = scenarioResult.chi.ci90;
+  const pET = scenarioResult.pEarlyTermination.mean;
+  const [pETLo, pETHi] = scenarioResult.pEarlyTermination.ci90;
+  const lcd = scenarioResult.expectedLostCrewDays.mean;
+  const [lcdLo, lcdHi] = scenarioResult.expectedLostCrewDays.ci90;
 
   const severity = severityBucket(chi, chiStar);
   const etBucket = pctBucket(pET);
   // Non-operational LxC appendix mapping driven by the Monte-Carlo output.
   // Gate review flags are not converted into applicant risk postures.
-  const lxc = assessLxC(posterior, gate);
+  const lxc = assessLxC(scenarioResult, gate);
   const lxcTone = LXC_COLOR_TONE[lxc.color];
   const lxcBorder = LXC_COLOR_BORDER[lxc.color];
 

@@ -1,5 +1,5 @@
 import Dexie, { type EntityTable } from "dexie";
-import type { RiskPosterior } from "@/types/risk";
+import type { RiskScenarioResult } from "@/types/risk";
 import type { AccessTier } from "@/types/scenario";
 import type { IMMSession } from "@/imm/types";
 
@@ -53,7 +53,8 @@ export type SimSession = {
   chiStar: number;
   seed: number;
   priorsVersion: string;
-  posterior: RiskPosterior;
+  /** Legacy persisted field name; value is an ordinary scenario result, not a posterior. */
+  posterior: RiskScenarioResult;
   chiSamples: number[];
   qtlSamples: number[];
   notes?: string;

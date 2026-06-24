@@ -113,6 +113,14 @@ describe("active analog workflow guards", () => {
     expect(readRepoFile("src/imm/posterior-predictive.ts")).not.toContain("PosteriorSummary");
     expect(readRepoFile("src/ui/figures/IMMAnalogPosteriorPlot.tsx")).toContain("90% predictive interval");
     expect(readRepoFile("src/ui/figures/IMMAnalogPosteriorPlot.tsx")).not.toContain("90% CI");
+    expect(readRepoFile("src/types/risk.ts")).toContain("RiskScenarioResult");
+    expect(readRepoFile("src/risk/simulate.ts")).toContain("RiskScenarioResultWithDiagnostics");
+    for (const path of ["src/types/risk.ts", "src/risk/simulate.ts", "src/risk/lxc.ts"]) {
+      const source = readRepoFile(path);
+      for (const token of ["RiskPosterior", "PosteriorSummary", "CredibleInterval"]) {
+        expect(source, `${path} must not contain legacy simulation type ${token}`).not.toContain(token);
+      }
+    }
 
     const simulateSource = readRepoFile("src/imm/simulate.ts");
     expect(simulateSource).toContain("operator-selected sensitivity defaults");

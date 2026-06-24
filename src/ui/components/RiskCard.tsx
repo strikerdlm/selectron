@@ -1,15 +1,15 @@
-import type { RiskPosterior } from "@/types/risk";
+import type { RiskScenarioResult } from "@/types/risk";
 
 type Props = {
-  posterior: RiskPosterior;
+  scenarioResult: RiskScenarioResult;
   alias: string;
 };
 
 const pct = (x: number) => (100 * x).toFixed(1) + "%";
 const days = (x: number) => x.toFixed(1) + "d";
 
-export function RiskCard({ posterior, alias }: Props) {
-  const { chi, pEarlyTermination, expectedLostCrewDays, trials } = posterior;
+export function RiskCard({ scenarioResult, alias }: Props) {
+  const { chi, pEarlyTermination, expectedLostCrewDays, trials } = scenarioResult;
   const chiCI90Width = chi.ci90[1] - chi.ci90[0];
 
   // Interval-width gauge (1 - simulation-interval width / 0.30): spread of the simulated CHI

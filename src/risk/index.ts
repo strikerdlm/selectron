@@ -7,4 +7,4 @@ export { lostDays } from "./treatment";
 export { computeCHI, computeQTL, computePEarlyTermination } from "./chi";
 export type { Occurrence } from "./chi";
 export { runMissionTrial, simulateMission } from "./simulate";
-export type { SimulateOptions, TrialResult, RiskPosteriorWithDiagnostics } from "./simulate";
+export type { SimulateOptions, TrialResult, RiskScenarioResultWithDiagnostics } from "./simulate";

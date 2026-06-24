@@ -249,13 +249,6 @@ export type ScenarioSummary = {
  */
 export type PredictiveSummary = ScenarioSummary;
 
-/**
- * @deprecated Use ScenarioSummary for ordinary simulateIMM outputs and
- * PredictiveSummary for posterior-predictive parameter-draw outputs. Retained
- * only for persisted sessions and historical imports.
- */
-export type PosteriorSummary = ScenarioSummary;
-
 export type MonteCarloErrorSummary = {
   trials: number;
   tmeMeanMcse: number;

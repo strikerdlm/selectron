@@ -12,7 +12,7 @@ import type { GateResult } from "@/types";
 afterEach(cleanup);
 
 // Extract banner to a standalone test-fixture component so we can render it
-// without wiring CHIExplainer's full prop set (RiskPosterior, chiStar, etc.).
+// without wiring CHIExplainer's full prop set (RiskScenarioResult, chiStar, etc.).
 function ReviewFlagBanner({ gate }: { gate: GateResult }) {
   if (gate.verdict !== "review-flagged") return null;
   return (

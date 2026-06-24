@@ -8,9 +8,9 @@ import {
   lxcScore,
 } from "@/risk/lxc-definitions";
 import { assessLxC } from "@/risk/lxc";
-import type { RiskPosterior } from "@/types/risk";
+import type { RiskScenarioResult } from "@/types/risk";
 
-function mkPosterior(opts: { chiMean: number; pET: number }): RiskPosterior {
+function mkScenarioResult(opts: { chiMean: number; pET: number }): RiskScenarioResult {
   return {
     chi: { mean: opts.chiMean, ci90: [opts.chiMean - 0.05, opts.chiMean + 0.05], ci95: [opts.chiMean - 0.08, opts.chiMean + 0.08] },
     pEarlyTermination: { mean: opts.pET, ci90: [Math.max(0, opts.pET - 0.02), Math.min(1, opts.pET + 0.02)] },
@@ -77,7 +77,7 @@ describe("Likelihood bucketing — JSC-66705 In-Mission verbatim thresholds", ()
     [1.0,       5],
   ];
   it.each(cases)("P(χ<χ*) = %f → L%i", (pET, expectedL) => {
-    const a = assessLxC(mkPosterior({ chiMean: 0.95, pET }));
+    const a = assessLxC(mkScenarioResult({ chiMean: 0.95, pET }));
     expect(a.likelihood).toBe(expectedL);
   });
 });
@@ -102,14 +102,14 @@ describe("Consequence bucketing — Selectron fraction-lost → JSC-66705 crew-h
     [0.0,  5],
   ];
   it.each(cases)("χ_mean = %f → C%i", (chiMean, expectedC) => {
-    const a = assessLxC(mkPosterior({ chiMean, pET: 0.05 }));
+    const a = assessLxC(mkScenarioResult({ chiMean, pET: 0.05 }));
     expect(a.consequence).toBe(expectedC);
   });
 });
 
-describe("End-to-end posterior → (L, C, score, color)", () => {
+describe("End-to-end scenario result → (L, C, score, color)", () => {
   it("nominal STRONG run (high chi, low pET) lands in green zone", () => {
-    const a = assessLxC(mkPosterior({ chiMean: 0.92, pET: 0.005 }));
+    const a = assessLxC(mkScenarioResult({ chiMean: 0.92, pET: 0.005 }));
     // χ=0.92 → 8% lost → C3; pET=0.5% → L3 → score = 15 → yellow
     // (8% loss is "Significant" already; this is the honest NASA-aligned reading)
     expect(a.consequence).toBe(3);
@@ -119,7 +119,7 @@ describe("End-to-end posterior → (L, C, score, color)", () => {
   });
 
   it("MARGINAL run (chi at floor, elevated pET) is yellow", () => {
-    const a = assessLxC(mkPosterior({ chiMean: 0.72, pET: 0.08 }));
+    const a = assessLxC(mkScenarioResult({ chiMean: 0.72, pET: 0.08 }));
     // 28% lost → C4; pET 8% → L4 → score 22 → red
     expect(a.consequence).toBe(4);
     expect(a.likelihood).toBe(4);
@@ -127,7 +127,7 @@ describe("End-to-end posterior → (L, C, score, color)", () => {
   });
 
   it("DEGRADED run (chi below floor, high pET) is red", () => {
-    const a = assessLxC(mkPosterior({ chiMean: 0.55, pET: 0.40 }));
+    const a = assessLxC(mkScenarioResult({ chiMean: 0.55, pET: 0.40 }));
     // 45% lost → C5; pET 40% → L5 → score 25 → red
     expect(a.consequence).toBe(5);
     expect(a.likelihood).toBe(5);
@@ -136,7 +136,7 @@ describe("End-to-end posterior → (L, C, score, color)", () => {
   });
 
   it("ideal run (chi ≈ 1, pET ≈ 0) is green", () => {
-    const a = assessLxC(mkPosterior({ chiMean: 0.997, pET: 0.00005 }));
+    const a = assessLxC(mkScenarioResult({ chiMean: 0.997, pET: 0.00005 }));
     // 0.3% lost → C1; pET 0.005% → L1 → score 1 → green
     expect(a.consequence).toBe(1);
     expect(a.likelihood).toBe(1);
@@ -145,7 +145,7 @@ describe("End-to-end posterior → (L, C, score, color)", () => {
   });
 
   it("surfaces the raw inputs used (pET and fractionLost) for UI explanation", () => {
-    const a = assessLxC(mkPosterior({ chiMean: 0.80, pET: 0.12 }));
+    const a = assessLxC(mkScenarioResult({ chiMean: 0.80, pET: 0.12 }));
     expect(a.pEarlyTermination).toBeCloseTo(0.12, 6);
     expect(a.fractionLost).toBeCloseTo(0.20, 6);
   });
@@ -154,8 +154,8 @@ describe("End-to-end posterior → (L, C, score, color)", () => {
 import type { GateResult } from "@/types";
 
 describe("assessLxC with gate verdict", () => {
-  it("review-flagged gate reports review flags without overriding CHI/posterior inputs", () => {
-    const post = {
+  it("review-flagged gate reports review flags without overriding CHI/scenario inputs", () => {
+    const scenarioResult = {
       chi: { mean: 0.99, ci90: [0.99, 0.99] as [number, number], ci95: [0.99, 0.99] as [number, number] },
       pEarlyTermination: { mean: 0, ci90: [0, 0] as [number, number] },
       expectedLostCrewDays: { mean: 0, ci90: [0, 0] as [number, number] },
@@ -164,7 +164,7 @@ describe("assessLxC with gate verdict", () => {
       trials: 1000,
     } as any;
     const gate: GateResult = { verdict: "review-flagged", failedGates: ["psych.mmpi2rf_eid"], evaluated: ["psych.mmpi2rf_eid"] };
-    const result = assessLxC(post, gate);
+    const result = assessLxC(scenarioResult, gate);
     expect(result.color).toBe("green");
     expect(result.likelihood).toBe(1);
     expect(result.consequence).toBe(1);

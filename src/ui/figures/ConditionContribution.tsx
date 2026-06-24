@@ -22,7 +22,7 @@ import ReactEChartsCore from "echarts-for-react/lib/core";
 import type { CustomSeriesRenderItemAPI } from "echarts";
 import { echarts } from "./echarts-base";
 import { useFigureTheme } from "./useFigureTheme";
-import type { Condition, ConditionFamily, RiskPosterior } from "@/types/risk";
+import type { Condition, ConditionFamily, RiskScenarioResult } from "@/types/risk";
 import { FigureCaption } from "./FigureCaption";
 import { f3Caption } from "./captions/F3.captions";
 
@@ -36,7 +36,7 @@ const FAMILY_COLOR: Record<ConditionFamily, string> = {
 };
 
 type Props = {
-  posterior: RiskPosterior;
+  scenarioResult: RiskScenarioResult;
   conditions: readonly Condition[];
   trials?: number;
   seed?: number;
@@ -106,7 +106,7 @@ function makeCiWhiskerRenderItem(markerStroke: string) {
 }
 
 export function ConditionContribution({
-  posterior,
+  scenarioResult,
   conditions,
   trials = 25000,
   seed = 0xc0ffee,
@@ -117,7 +117,7 @@ export function ConditionContribution({
   // Build and sort entries descending by mean QTL.
   const entries = conditions
     .map((c) => {
-      const summary = posterior.perConditionQTL[c.id];
+      const summary = scenarioResult.perConditionQTL[c.id];
       return {
         id:     c.id,
         label:  c.label,
@@ -152,7 +152,7 @@ export function ConditionContribution({
   // Compute cumulative left offsets in data-space so interval whiskers land correctly.
   // The interval band for segment i spans [cumulative[i] + ci90[0], cumulative[i] + ci90[1]]
   // where ci90 values are relative to each segment's mean (half-width style).
-  // However, per the types, ci90 are absolute posterior quantile bounds (not relative),
+  // However, per the types, ci90 are absolute simulation quantile bounds (not relative),
   // so we position the band at ci90[0]..ci90[1] mapped into the stacked coordinate:
   // cumOffset is the left edge of segment i = sum of means[0..i-1].
   const ciWhiskerData: Array<[number, number]> = [];

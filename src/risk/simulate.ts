@@ -7,9 +7,9 @@ import type {
   Candidate,
   Condition,
   Criterion,
-  CredibleInterval,
-  PosteriorSummary,
-  RiskPosterior,
+  SimulationInterval,
+  RiskScenarioSummary,
+  RiskScenarioResult,
 } from "@/types";
 
 import { computeCHI, computePEarlyTermination } from "./chi";
@@ -48,7 +48,7 @@ type TrialDiag = {
   teamMemberConcentration: number[][];
 };
 
-export type RiskPosteriorWithDiagnostics = RiskPosterior & {
+export type RiskScenarioResultWithDiagnostics = RiskScenarioResult & {
   diagnostics?: {
     chiSamples: number[];
     qtlSamples: number[];
@@ -336,7 +336,7 @@ function quantile(sortedAsc: readonly number[], q: number): number {
   return sortedAsc[lo] + (pos - lo) * (sortedAsc[hi] - sortedAsc[lo]);
 }
 
-function summarize90(samples: readonly number[]): { mean: number; ci90: CredibleInterval } {
+function summarize90(samples: readonly number[]): { mean: number; ci90: SimulationInterval } {
   const sorted = [...samples].sort((a, b) => a - b);
   let sum = 0;
   for (const x of samples) sum += x;
@@ -348,8 +348,8 @@ function summarize90(samples: readonly number[]): { mean: number; ci90: Credible
 
 function summarize9095(samples: readonly number[]): {
   mean: number;
-  ci90: CredibleInterval;
-  ci95: CredibleInterval;
+  ci90: SimulationInterval;
+  ci95: SimulationInterval;
 } {
   const sorted = [...samples].sort((a, b) => a - b);
   let sum = 0;
@@ -369,7 +369,7 @@ function summarize9095(samples: readonly number[]): {
 function batchMeansCI(
   indicators: readonly number[],
   threshold: number,
-): { mean: number; ci90: CredibleInterval } {
+): { mean: number; ci90: SimulationInterval } {
   const T = indicators.length;
   const mean = computePEarlyTermination(indicators, threshold);
   const batchSize = Math.max(50, Math.floor(T / 100));
@@ -392,7 +392,7 @@ export function simulateMission(
   priors: PriorsJson,
   conditions: readonly Condition[],
   options: SimulateOptions,
-): RiskPosteriorWithDiagnostics {
+): RiskScenarioResultWithDiagnostics {
   validatePriorsJson(priors);
   if (!Number.isInteger(options.trials) || options.trials <= 0) {
     throw new SelectronError(
@@ -435,12 +435,12 @@ export function simulateMission(
   const pET = batchMeansCI(chiSamples, chiStar);
   const lostDaysSummary = summarize90(qtlSamples);
 
-  const perConditionQTL: Record<string, PosteriorSummary> = {};
+  const perConditionQTL: Record<string, RiskScenarioSummary> = {};
   for (const cid of Object.keys(perConditionSamples)) {
     perConditionQTL[cid] = summarize90(perConditionSamples[cid]);
   }
 
-  const posterior: RiskPosteriorWithDiagnostics = {
+  const scenarioResult: RiskScenarioResultWithDiagnostics = {
     chi: { mean: chiSummary.mean, ci90: chiSummary.ci90, ci95: chiSummary.ci95 },
     pEarlyTermination: pET,
     expectedLostCrewDays: lostDaysSummary,
@@ -449,7 +449,7 @@ export function simulateMission(
     trials,
   };
   if (options.diagnostics) {
-    posterior.diagnostics = {
+    scenarioResult.diagnostics = {
       chiSamples,
       qtlSamples,
       ...(diagCollector
@@ -461,5 +461,5 @@ export function simulateMission(
         : {}),
     };
   }
-  return posterior;
+  return scenarioResult;
 }

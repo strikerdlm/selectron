@@ -56,19 +56,19 @@ export type Condition = {
   frailtyCoupled?: boolean;
 };
 
-export type CredibleInterval = readonly [number, number];
+export type SimulationInterval = readonly [number, number];
 
-export type PosteriorSummary = {
+export type RiskScenarioSummary = {
   mean: number;
-  ci90: CredibleInterval;
-  ci95?: CredibleInterval;
+  ci90: SimulationInterval;
+  ci95?: SimulationInterval;
 };
 
-export type RiskPosterior = {
-  chi: { mean: number; ci90: CredibleInterval; ci95: CredibleInterval };
-  pEarlyTermination: { mean: number; ci90: CredibleInterval };
-  expectedLostCrewDays: { mean: number; ci90: CredibleInterval };
-  perConditionQTL: Record<string, PosteriorSummary>;
+export type RiskScenarioResult = {
+  chi: { mean: number; ci90: SimulationInterval; ci95: SimulationInterval };
+  pEarlyTermination: { mean: number; ci90: SimulationInterval };
+  expectedLostCrewDays: { mean: number; ci90: SimulationInterval };
+  perConditionQTL: Record<string, RiskScenarioSummary>;
   ess: number;
   trials: number;
 };

@@ -1,6 +1,6 @@
-// Experimental HSRB-inspired LxC scoring engine for Monte-Carlo posteriors.
+// Experimental HSRB-inspired LxC scoring engine for Monte Carlo scenario results.
 // ─────────────────────────────────────────────────────────────────────
-// Translates a RiskPosterior + χ* threshold into an HSRB-inspired
+// Translates a RiskScenarioResult + χ* threshold into an HSRB-inspired
 // (likelihood, consequence, color) tuple per JSC-66705 Rev A. This is not a
 // NASA board determination.
 //
@@ -11,7 +11,7 @@
 //                 mapping — see lxc-definitions.ts for the bridge).
 //   Color = JSC-66705 §3.2.4 rule (red ≥ 20, yellow 11–19, green ≤ 10).
 
-import type { RiskPosterior } from "@/types/risk";
+import type { RiskScenarioResult } from "@/types/risk";
 import type { GateResult } from "@/types";
 import {
   CONSEQUENCE_BANDS_MISSION_OBJ,
@@ -49,7 +49,7 @@ const EPS = 1e-9;
 function bucketLikelihood(p: number): LikelihoodLevel {
   // Use ≤ on upper bound (+ epsilon for float safety) to match JSC-66705
   // verbatim ("P ≤ 0.01%", etc.). Clamp negatives — shouldn't happen, but
-  // protects against MC posterior float drift.
+  // protects against Monte Carlo float drift.
   const x = Math.max(0, Math.min(1, p));
   for (const band of LIKELIHOOD_BANDS_IN_MISSION) {
     if (x > band.pLowExclusive && x <= band.pHighInclusive + EPS) return band.level;
@@ -66,9 +66,9 @@ function bucketConsequence(fractionLost: number): ConsequenceLevel {
   return 5;
 }
 
-export function assessLxC(posterior: RiskPosterior, gate?: GateResult): LxCAssessment {
-  const pET = posterior.pEarlyTermination.mean;
-  const fractionLost = Math.max(0, 1 - posterior.chi.mean);
+export function assessLxC(scenarioResult: RiskScenarioResult, gate?: GateResult): LxCAssessment {
+  const pET = scenarioResult.pEarlyTermination.mean;
+  const fractionLost = Math.max(0, 1 - scenarioResult.chi.mean);
 
   const L = bucketLikelihood(pET);
   const C = bucketConsequence(fractionLost);

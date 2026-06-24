@@ -19,7 +19,7 @@
 import { useState, type ReactNode } from "react";
 import type { AccessTier, Criterion, ScoreDistribution } from "@/types";
 import { TIER_LABEL } from "@/types";
-import type { RiskPosterior, AnalogMission, Condition } from "@/types/risk";
+import type { RiskScenarioResult, AnalogMission, Condition } from "@/types/risk";
 import { normalizeScore } from "@/engine";
 
 type Citation = { id: string; label: string };
@@ -348,7 +348,7 @@ export function MCDACalculationTrace(props: {
 // ─── IMM mode ───────────────────────────────────────────────────────────────
 
 function immSteps(args: {
-  posterior: RiskPosterior;
+  scenarioResult: RiskScenarioResult;
   mission: AnalogMission;
   conditions: readonly Condition[];
   trials: number;
@@ -356,13 +356,13 @@ function immSteps(args: {
   chiStar: number;
   priorsVersion: string;
 }): TraceStep[] {
-  const { posterior, mission, conditions, trials, chiStar, priorsVersion } = args;
+  const { scenarioResult, mission, conditions, trials, chiStar, priorsVersion } = args;
 
   // Pick the top-contributing condition for a worked example
   const conditionsWithMean = conditions
     .map((c) => ({
       c,
-      mean: posterior.perConditionQTL[c.id]?.mean ?? 0,
+      mean: scenarioResult.perConditionQTL[c.id]?.mean ?? 0,
     }))
     .sort((a, b) => b.mean - a.mean);
   const top = conditionsWithMean[0]?.c;
@@ -475,7 +475,7 @@ function immSteps(args: {
         <span>
           available person-days = {mission.durationDays} × {mission.crewSize} ={" "}
           {availDays.toLocaleString()} · total QTL μ = {fmt(totalQtl, 2)} crew-days · CHI μ ={" "}
-          {fmt(100 * posterior.chi.mean, 1)}%
+          {fmt(100 * scenarioResult.chi.mean, 1)}%
         </span>
       ),
       lay:
@@ -496,10 +496,10 @@ function immSteps(args: {
       ),
       concrete: (
         <span>
-          CHI μ = {fmt(100 * posterior.chi.mean, 1)}% · simulation interval₉₀ = [
-          {fmt(100 * posterior.chi.ci90[0], 1)}%,{" "}
-          {fmt(100 * posterior.chi.ci90[1], 1)}%] · pBelowThreshold ={" "}
-          {fmt(100 * posterior.pEarlyTermination.mean, 1)}%
+          CHI μ = {fmt(100 * scenarioResult.chi.mean, 1)}% · simulation interval₉₀ = [
+          {fmt(100 * scenarioResult.chi.ci90[0], 1)}%,{" "}
+          {fmt(100 * scenarioResult.chi.ci90[1], 1)}%] · pBelowThreshold ={" "}
+          {fmt(100 * scenarioResult.pEarlyTermination.mean, 1)}%
         </span>
       ),
       lay:
@@ -513,7 +513,7 @@ function immSteps(args: {
 }
 
 export function IMMCalculationTrace(props: {
-  posterior: RiskPosterior;
+  scenarioResult: RiskScenarioResult;
   mission: AnalogMission;
   conditions: readonly Condition[];
   trials: number;

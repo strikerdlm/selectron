@@ -8,10 +8,10 @@ export type {
   ConditionFamily,
   ConditionKind,
   CountermeasureSet,
-  CredibleInterval,
+  SimulationInterval,
   MissionType,
-  PosteriorSummary,
-  RiskPosterior,
+  RiskScenarioSummary,
+  RiskScenarioResult,
 } from "./risk";
 export type { AccessTier } from "./scenario";
 export {
