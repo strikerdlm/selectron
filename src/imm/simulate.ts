@@ -739,6 +739,22 @@ function relativeMcse(mcse: number, mean: number): number | null {
   return mean > 0 ? mcse / mean : null;
 }
 
+function wilson95Pct(flags: number[]): [number, number] {
+  const n = flags.length;
+  if (n === 0) return [0, 0];
+  const successes = flags.reduce((a, b) => a + b, 0);
+  const z = 1.959963984540054;
+  const p = successes / n;
+  const z2OverN = (z * z) / n;
+  const denom = 1 + z2OverN;
+  const center = (p + z2OverN / 2) / denom;
+  const halfWidth = (z * Math.sqrt((p * (1 - p) + z2OverN / 4) / n)) / denom;
+  return [
+    successes === 0 ? 0 : Math.max(0, (center - halfWidth) * 100),
+    successes === n ? 100 : Math.min(100, (center + halfWidth) * 100),
+  ];
+}
+
 function monteCarloErrorSummary(args: {
   tmes: number[];
   chis: number[];
@@ -765,6 +781,9 @@ function monteCarloErrorSummary(args: {
     pEvacMcsePct,
     pLoclMcsePct,
     healthCriterionMcsePct,
+    pEvacWilson95Pct: wilson95Pct(evacs),
+    pLoclWilson95Pct: wilson95Pct(locls),
+    healthCriterionWilson95Pct: wilson95Pct(healthCriterionFlags),
     tmeRelativeMcse: relativeMcse(tmeMeanMcse, tmeMean),
     chiRelativeMcse: relativeMcse(chiMeanMcse, chiMean),
     pEvacRelativeMcse: relativeMcse(pEvacMcsePct, pEvacMeanPct),

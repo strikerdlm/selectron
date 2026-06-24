@@ -40,6 +40,15 @@ function fmtMcse(x: number, suffix: string): string {
   if (x < 0.01) return `<0.01 ${suffix}`;
   return `${x.toFixed(2)} ${suffix}`;
 }
+function fmtRelativeMcse(x: number | null | undefined): string | undefined {
+  if (x == null) return undefined;
+  if (x < 0.0001) return "<0.01%";
+  return `${(x * 100).toFixed(2)}%`;
+}
+function fmtPctInterval(ci: [number, number] | undefined): string | undefined {
+  if (!ci) return undefined;
+  return `${fmtPct(ci[0])} -> ${fmtPct(ci[1])}`;
+}
 
 // ── CI₉₅ whisker ─────────────────────────────────────────────────────────────
 // A styled div, NOT ECharts. Renders a thin horizontal bar with a tick at the
@@ -91,9 +100,11 @@ type StatCardProps = {
   fmt: (x: number) => string;
   color: string;
   mcseLabel?: string;
+  relativeMcseLabel?: string;
+  binomialCiLabel?: string;
 };
 
-function StatCard({ label, unit, summary, fmt, color, mcseLabel }: StatCardProps) {
+function StatCard({ label, unit, summary, fmt, color, mcseLabel, relativeMcseLabel, binomialCiLabel }: StatCardProps) {
   return (
     <div className="panel p-5 flex flex-col">
       <div className="flex items-baseline justify-between">
@@ -110,7 +121,12 @@ function StatCard({ label, unit, summary, fmt, color, mcseLabel }: StatCardProps
       </div>
       {mcseLabel && (
         <div className="mono mt-2 text-[10px] uppercase tracking-cap text-ink-3">
-          MCSE {mcseLabel}
+          MCSE {mcseLabel}{relativeMcseLabel ? ` · rel ${relativeMcseLabel}` : ""}
+        </div>
+      )}
+      {binomialCiLabel && (
+        <div className="mono mt-1 text-[10px] uppercase tracking-cap text-ink-3">
+          Wilson 95% {binomialCiLabel}
         </div>
       )}
       <Whisker ci95={summary.ci95} mean={summary.mean} fmt={fmt} color={color} />
@@ -121,7 +137,17 @@ function StatCard({ label, unit, summary, fmt, color, mcseLabel }: StatCardProps
 // ── Composite-health inline row ──────────────────────────────────────────────
 // 5th metric gets a slim full-width row instead
 // of a 5th card — avoids the visual asymmetry of 5 across in a 4-col grid.
-function HealthCriterionRow({ summary, mcseLabel }: { summary: ScenarioSummary; mcseLabel?: string }) {
+function HealthCriterionRow({
+  summary,
+  mcseLabel,
+  relativeMcseLabel,
+  binomialCiLabel,
+}: {
+  summary: ScenarioSummary;
+  mcseLabel?: string;
+  relativeMcseLabel?: string;
+  binomialCiLabel?: string;
+}) {
   const color = "#0072B2"; // Blue (Okabe-Ito); joint health criterion metric.
   return (
     <div className="panel p-4 flex items-center justify-between gap-4">
@@ -146,7 +172,12 @@ function HealthCriterionRow({ summary, mcseLabel }: { summary: ScenarioSummary; 
         </span>
         {mcseLabel && (
           <span className="mono text-[10px] uppercase tracking-cap text-ink-3">
-            MCSE {mcseLabel}
+            MCSE {mcseLabel}{relativeMcseLabel ? ` · rel ${relativeMcseLabel}` : ""}
+          </span>
+        )}
+        {binomialCiLabel && (
+          <span className="mono text-[10px] uppercase tracking-cap text-ink-3">
+            Wilson 95% {binomialCiLabel}
           </span>
         )}
       </div>
@@ -277,8 +308,10 @@ export function IMMHeadlineCard({
       "Hero composite: four stat cards (TME, CHI, pEVAC, pLOCL) plus a composite " +
       "health-criterion row. Each headline number is the Monte Carlo mean " +
       "across T trials; the whisker below shows the 95% simulation " +
-      "interval (CI₉₅) span with a tick at the mean. MCSE values report estimator precision " +
-      "for the displayed means/probabilities, not empirical validation. The health criterion is the joint probability " +
+      "interval (CI₉₅) span with a tick at the mean. MCSE and relative MCSE values " +
+      "report estimator precision for displayed means/probabilities; Wilson 95% " +
+      "intervals report binomial estimator precision for binary probabilities. " +
+      "These diagnostics are not empirical validation. The health criterion is the joint probability " +
       "P(no LOCL ∧ no EVAC ∧ CHI ≥ χ*). The σ(CHI) sparkline at the bottom is the " +
       "convergence glance: a flat trajectory near zero indicates a converged run; " +
       "rising or jagged σ means insufficient trials. See I4 for the full diagnostic.",
@@ -309,6 +342,7 @@ export function IMMHeadlineCard({
           fmt={fmtCount}
           color={COLORS.tme}
           mcseLabel={mcse ? fmtMcse(mcse.tmeMeanMcse, "events") : undefined}
+          relativeMcseLabel={mcse ? fmtRelativeMcse(mcse.tmeRelativeMcse) : undefined}
         />
         <StatCard
           label="CHI"
@@ -317,6 +351,7 @@ export function IMMHeadlineCard({
           fmt={fmtPct}
           color={COLORS.chi}
           mcseLabel={mcse ? fmtMcse(mcse.chiMeanMcse, "pp") : undefined}
+          relativeMcseLabel={mcse ? fmtRelativeMcse(mcse.chiRelativeMcse) : undefined}
         />
         <StatCard
           label="pEVAC"
@@ -325,6 +360,8 @@ export function IMMHeadlineCard({
           fmt={fmtPct}
           color={COLORS.pEvac}
           mcseLabel={mcse ? fmtMcse(mcse.pEvacMcsePct, "pp") : undefined}
+          relativeMcseLabel={mcse ? fmtRelativeMcse(mcse.pEvacRelativeMcse) : undefined}
+          binomialCiLabel={mcse ? fmtPctInterval(mcse.pEvacWilson95Pct) : undefined}
         />
         <StatCard
           label="pLOCL"
@@ -333,6 +370,8 @@ export function IMMHeadlineCard({
           fmt={fmtPct}
           color={COLORS.pLocl}
           mcseLabel={mcse ? fmtMcse(mcse.pLoclMcsePct, "pp") : undefined}
+          relativeMcseLabel={mcse ? fmtRelativeMcse(mcse.pLoclRelativeMcse) : undefined}
+          binomialCiLabel={mcse ? fmtPctInterval(mcse.pLoclWilson95Pct) : undefined}
         />
       </div>
 
@@ -340,6 +379,8 @@ export function IMMHeadlineCard({
         <HealthCriterionRow
           summary={healthCriterion}
           mcseLabel={mcse ? fmtMcse(mcse.healthCriterionMcsePct, "pp") : undefined}
+          relativeMcseLabel={mcse ? fmtRelativeMcse(mcse.healthCriterionRelativeMcse) : undefined}
+          binomialCiLabel={mcse ? fmtPctInterval(mcse.healthCriterionWilson95Pct) : undefined}
         />
       </div>
 

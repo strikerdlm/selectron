@@ -228,6 +228,12 @@ export type MonteCarloErrorSummary = {
   pEvacMcsePct: number;
   pLoclMcsePct: number;
   healthCriterionMcsePct: number;
+  /** Wilson score 95% interval for the binary pEVAC estimator, percent scale. */
+  pEvacWilson95Pct: [number, number];
+  /** Wilson score 95% interval for the binary pLOCL estimator, percent scale. */
+  pLoclWilson95Pct: [number, number];
+  /** Wilson score 95% interval for the binary health-criterion estimator, percent scale. */
+  healthCriterionWilson95Pct: [number, number];
   tmeRelativeMcse: number | null;
   chiRelativeMcse: number | null;
   pEvacRelativeMcse: number | null;

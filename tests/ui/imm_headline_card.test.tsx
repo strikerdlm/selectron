@@ -53,6 +53,9 @@ function makeOutcome(opts?: {
       pEvacMcsePct: 0.02,
       pLoclMcsePct: 0.01,
       healthCriterionMcsePct: 0.04,
+      pEvacWilson95Pct: [5.43, 5.71],
+      pLoclWilson95Pct: [0.39, 0.50],
+      healthCriterionWilson95Pct: [79.75, 80.25],
       tmeRelativeMcse: 0.001,
       chiRelativeMcse: 0.0003,
       pEvacRelativeMcse: 0.003,
@@ -132,6 +135,8 @@ describe("IMMHeadlineCard (I1)", () => {
     );
     const text = container.textContent ?? "";
     expect(text).toContain("MCSE");
+    expect(text).toContain("rel");
+    expect(text).toContain("Wilson 95%");
     expect(text).toContain("CHI clamp");
     expect(text).toContain("3 / 100,000 trials");
   });
