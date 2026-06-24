@@ -1,0 +1,86 @@
+{
+  "journal": "Acta Astronautica",
+  "article_type": "Original research paper",
+  "manuscript_status": "template_not_submission_ready",
+  "title": "A reproducible Bayesian MCDA and NASA-IMM/HSRB risk-mapping pipeline for analog astronaut selection",
+  "selectron_repository": "strikerdlm/selectron",
+  "selectron_branch_at_conversion_start": "iter1-phase0",
+  "selectron_conversion_base_commit": "c6b60eb63e4c7558441af5f46aeb720f90a02280",
+  "selectron_submission_commit": "TO_BE_FILLED_AFTER_SOFTWARE_FREEZE",
+  "manuscripts_repository": "strikerdlm/manuscripts",
+  "manuscripts_submission_commit": "TO_BE_FILLED_AFTER_HANDOFF",
+  "zenodo_doi": "TO_BE_FILLED_AFTER_ARCHIVAL",
+  "source_files": {
+    "acta_manuscript": "paper/acta/manuscript.md",
+    "acta_references": "paper/acta/references.bib or generated numbered reference list",
+    "acta_highlights": "paper/acta/highlights.md",
+    "acta_cover_letter": "paper/acta/cover-letter.md",
+    "engineering_manuscript_source": "paper/manuscript.md",
+    "priors_json": "src/data/imm-priors.json"
+  },
+  "hashes": {
+    "imm_priors_json_sha256": "TO_BE_GENERATED_FROM_FROZEN_COMMIT",
+    "manuscript_md_sha256": "TO_BE_GENERATED_FROM_FROZEN_SOURCE",
+    "references_sha256": "TO_BE_GENERATED_FROM_FINAL_REFERENCES",
+    "figure_directory_sha256_manifest": "TO_BE_GENERATED_AFTER_FIGURE_EXPORT"
+  },
+  "model_claims_locked_at_submission": {
+    "scope": "Earth-based analog isolation missions and LEO/ISS-baseline scenarios only",
+    "not_for_flight": true,
+    "not_clinical_decision_support": true,
+    "not_autonomous_selection": true,
+    "validation_language": "inter-model agreement against public K15 reference, not outcome validation",
+    "stage_a_to_stage_b_coupling_status": "implemented and unit-tested; only claim as validated if exercised in frozen result set"
+  },
+  "priors_provenance_counts": {
+    "total_conditions": "TO_BE_GENERATED_FROM_IMM_PRIORS_JSON",
+    "tierA_nasa": "TO_BE_GENERATED_FROM_IMM_PRIORS_JSON",
+    "tierB_pymc": "TO_BE_GENERATED_FROM_IMM_PRIORS_JSON",
+    "tierB_lit": "TO_BE_GENERATED_FROM_IMM_PRIORS_JSON",
+    "tierC_synth": "TO_BE_GENERATED_FROM_IMM_PRIORS_JSON",
+    "user_custom": "TO_BE_GENERATED_FROM_IMM_PRIORS_JSON"
+  },
+  "verification_commands": {
+    "typecheck": {
+      "command": "npm run typecheck",
+      "status": "TO_BE_RUN_ON_FROZEN_COMMIT",
+      "notes": "Record exact output and any known pre-existing errors."
+    },
+    "unit_tests": {
+      "command": "npm test",
+      "status": "TO_BE_RUN_ON_FROZEN_COMMIT",
+      "notes": "Document any intentionally excluded long-running calibration tests."
+    },
+    "imm_validation": {
+      "command": "npm run validate:imm",
+      "status": "TO_BE_RUN_ON_FROZEN_COMMIT"
+    },
+    "analog_validation": {
+      "command": "npm run validate:imm:analog",
+      "status": "TO_BE_RUN_ON_FROZEN_COMMIT"
+    },
+    "doi_gate": {
+      "command": "TO_BE_FILLED_WITH_FINAL DOI/REFERENCE GATE COMMAND",
+      "status": "TO_BE_RUN_BEFORE_FREEZE"
+    }
+  },
+  "figure_generation": {
+    "command": "TO_BE_FILLED",
+    "seed": "0xc0ffee unless explicitly changed in final manuscript",
+    "trial_counts": {
+      "stage_a": "5000 unless final manuscript changes it",
+      "stage_b_k15": "100000",
+      "cross_mission_comparison": "TO_BE_CONFIRMED"
+    },
+    "artwork_policy": "Separate files; vector PDF/EPS preferred for plots/schematics; online color only unless author requests print color."
+  },
+  "journal_compliance": {
+    "citation_style": "Numbered square-bracket citations, ordered by first appearance",
+    "highlights_required": true,
+    "max_keywords": 6,
+    "author_vitae_required": true,
+    "author_photo_required": true,
+    "competing_interest_docx_required": true,
+    "ai_declaration_required_if_used": true
+  }
+}
