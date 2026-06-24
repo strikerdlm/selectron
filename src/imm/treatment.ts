@@ -3,7 +3,23 @@ import type {
   IMMBetaPert,
   IMMConditionOutcomes,
   IMMPrior,
+  TreatmentModelDisclosure,
 } from "./types";
+
+export const RAF_TREATMENT_MODEL_DISCLOSURE: TreatmentModelDisclosure = {
+  id: "raf-linear-interpolation-v1",
+  label: "RAF screening approximation",
+  status: "screening-approximation",
+  evidenceStatus: "proposal",
+  mechanism: "weighted-resource-scalar-then-parameter-linear-interpolation",
+  appliesTo: "treated-untreated-outcome-parameters",
+  limitations: [
+    "Multiple required resources are reduced to one weighted scalar, so distinct clinical resources can behave as partially substitutable.",
+    "Treated and untreated Beta-PERT parameters are interpolated smoothly; threshold effects, contraindications, treatment delays, provider skill, failure states, and depletion interactions are not represented.",
+    "Use for exploratory scenario screening, not calibrated absolute clinical-risk prediction.",
+  ],
+  requiredUpgrade: "Replace RAF interpolation with condition-specific treatment-state or decision-pathway models before claiming calibrated absolute clinical-risk prediction.",
+};
 
 /**
  * interpolateBetaPertByRAF — linearly interpolates between treated and untreated
@@ -14,6 +30,9 @@ import type {
  *
  * Each component: r * treated + (1 - r) * untreated
  * RAF is clamped to [0, 1].
+ *
+ * Scientific status: this is the v1 RAF screening approximation disclosed in
+ * RAF_TREATMENT_MODEL_DISCLOSURE, not a calibrated clinical treatment pathway.
  */
 export function interpolateBetaPertByRAF(
   treated: IMMBetaPert,

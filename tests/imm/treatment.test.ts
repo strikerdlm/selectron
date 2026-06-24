@@ -1,11 +1,19 @@
 import { describe, it, expect } from "vitest";
-import { interpolateBetaPertByRAF } from "../../src/imm/treatment";
+import { RAF_TREATMENT_MODEL_DISCLOSURE, interpolateBetaPertByRAF } from "../../src/imm/treatment";
 import type { IMMBetaPert } from "../../src/imm/types";
 
 const treated:   IMMBetaPert = { min: 0.1, mode: 0.2, max: 0.4 };
 const untreated: IMMBetaPert = { min: 0.3, mode: 0.6, max: 0.9 };
 
 describe("interpolateBetaPertByRAF", () => {
+  it("exports RAF as a proposal-stage screening approximation, not a calibrated treatment pathway", () => {
+    expect(RAF_TREATMENT_MODEL_DISCLOSURE.status).toBe("screening-approximation");
+    expect(RAF_TREATMENT_MODEL_DISCLOSURE.evidenceStatus).toBe("proposal");
+    expect(RAF_TREATMENT_MODEL_DISCLOSURE.mechanism).toBe("weighted-resource-scalar-then-parameter-linear-interpolation");
+    expect(RAF_TREATMENT_MODEL_DISCLOSURE.limitations.join(" ")).toContain("partially substitutable");
+    expect(RAF_TREATMENT_MODEL_DISCLOSURE.limitations.join(" ")).toContain("threshold effects");
+  });
+
   it("RAF = 1 returns treated params", () => {
     const result = interpolateBetaPertByRAF(treated, untreated, 1);
     expect(result.min).toBeCloseTo(treated.min, 10);

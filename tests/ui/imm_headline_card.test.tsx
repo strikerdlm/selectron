@@ -5,6 +5,7 @@
 import { describe, it, expect, afterEach, vi } from "vitest";
 import { render, cleanup } from "@testing-library/react";
 import { IMMHeadlineCard } from "@/ui/figures/IMMHeadlineCard";
+import { RAF_TREATMENT_MODEL_DISCLOSURE } from "@/imm/treatment";
 import type { IMMOutcome } from "@/imm/types";
 
 afterEach(cleanup);
@@ -63,6 +64,7 @@ function makeOutcome(opts?: {
       healthCriterionRelativeMcse: 0.0005,
     },
     chiClamp: { count: 3, proportion: 0.00003 },
+    treatmentModel: RAF_TREATMENT_MODEL_DISCLOSURE,
   };
 }
 
@@ -139,6 +141,23 @@ describe("IMMHeadlineCard (I1)", () => {
     expect(text).toContain("Wilson 95%");
     expect(text).toContain("CHI clamp");
     expect(text).toContain("3 / 100,000 trials");
+  });
+
+  it("renders the RAF treatment-model qualification", () => {
+    const outcome = makeOutcome();
+    const { container } = render(
+      <IMMHeadlineCard
+        outcome={outcome}
+        trials={100_000}
+        mission={{ id: "iss-6mo", label: "ISS 6-month" }}
+      />,
+    );
+    const text = container.textContent ?? "";
+    expect(text).toContain("Treatment model");
+    expect(text).toContain("RAF screening approximation");
+    expect(text).toContain("proposal-stage screening-approximation");
+    expect(text).toContain("not a treatment-state model");
+    expect(text).toContain("Non-substitutable resources");
   });
 
   it("caption falls back gracefully when mission is omitted", () => {

@@ -78,6 +78,8 @@ occurrence → severity → treatment/resource pathway → CHI/QTL aggregation
 
 It runs 101 evidence-tagged conditions with analog mission profiles, resource kits, and chronological event processing. Outputs support **comparing scenarios** (missions, kits, crew profiles) rather than issuing operational go/no-go verdicts.
 
+The current treatment/resource pathway is a proposal-stage RAF screening approximation: required resources collapse to one scalar and treated/untreated Beta-PERT parameters are linearly interpolated. It does not model non-substitutable components, thresholds, contraindications, treatment delays, provider skill, failure states, or depletion interactions.
+
 ### How the layers connect
 
 - The **Wizard** scores individual candidates (Stage A only).
@@ -259,7 +261,7 @@ Each mission carries structured **I&C profile** metadata (communication delay, w
 
 #### Select resource kit
 
-Choose **None**, **ISS HMS analog**, or **Unlimited** kit. Kit choice affects treatment resource availability and RAF interpolation paths.
+Choose **None**, **ISS HMS analog**, or **Unlimited** kit. Kit choice affects treatment resource availability and RAF interpolation paths; the RAF result is a screening approximation, not a treatment-state model.
 
 #### Simulation controls
 

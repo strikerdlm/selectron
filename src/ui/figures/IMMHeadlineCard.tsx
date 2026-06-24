@@ -291,6 +291,7 @@ export function IMMHeadlineCard({
   const healthCriterion = outcome.healthCriterionAttainment ?? outcome.missionSuccess;
   const mcse = outcome.monteCarloError;
   const chiClamp = outcome.chiClamp;
+  const treatmentModel = outcome.treatmentModel;
   const missionLabel = mission?.label ?? "(mission not specified)";
   const seedHex = `0x${seed.toString(16).toUpperCase()}`;
 
@@ -388,6 +389,18 @@ export function IMMHeadlineCard({
         <span className={`mono text-[10px] tabular-nums ${chiClamp && chiClamp.count > 0 ? "text-warn" : "text-ink-2"}`}>
           {chiClamp
             ? `${chiClamp.count.toLocaleString()} / ${trials.toLocaleString()} trials (${(chiClamp.proportion * 100).toFixed(2)}%)`
+            : "not reported"}
+        </span>
+      </div>
+
+      <div
+        className="panel mt-4 px-3 py-2 flex flex-wrap items-start justify-between gap-3"
+        data-testid="imm-treatment-model-disclosure"
+      >
+        <span className="mono text-[10px] text-ink-3 uppercase tracking-cap">Treatment model</span>
+        <span className="text-right text-[11px] text-ink-2 max-w-[760px]">
+          {treatmentModel
+            ? `${treatmentModel.label} (${treatmentModel.evidenceStatus}-stage ${treatmentModel.status}); scalar RAF interpolation, not a treatment-state model. Non-substitutable resources, thresholds, contraindications, delays, provider skill, failure states, and depletion interactions are not modeled.`
             : "not reported"}
         </span>
       </div>

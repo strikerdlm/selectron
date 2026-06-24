@@ -10,12 +10,13 @@ import numpy as np
 import pytest
 
 from selectron.forward_mc import (
-    sample_gamma_poisson_rate,
-    sample_beta_pert,
-    sample_poisson,
+    TREATMENT_MODEL_DISCLOSURE,
     compute_raf,
     interpolate_beta_pert_by_raf,
     run_trial,
+    sample_beta_pert,
+    sample_gamma_poisson_rate,
+    sample_poisson,
     simulate_imm,
     TrialResult,
 )
@@ -75,6 +76,14 @@ class TestSampleBetaPert:
 
 
 class TestComputeRAF:
+    def test_treatment_model_disclosure_qualifies_raf(self) -> None:
+        assert TREATMENT_MODEL_DISCLOSURE["status"] == "screening-approximation"
+        assert TREATMENT_MODEL_DISCLOSURE["evidence_status"] == "proposal"
+        assert TREATMENT_MODEL_DISCLOSURE["mechanism"] == "weighted-resource-scalar-then-parameter-linear-interpolation"
+        limitations = " ".join(TREATMENT_MODEL_DISCLOSURE["limitations"])
+        assert "partially substitutable" in limitations
+        assert "threshold effects" in limitations
+
     def test_empty_requirements(self) -> None:
         assert compute_raf({}, {"drug-a": 10}) == 1.0
 

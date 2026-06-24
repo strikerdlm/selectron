@@ -364,6 +364,9 @@ describe("simulateIMM", () => {
     expect(out.chiClamp?.count).toBeGreaterThanOrEqual(0);
     expect(out.chiClamp?.proportion).toBeGreaterThanOrEqual(0);
     expect(out.chiClamp?.proportion).toBeLessThanOrEqual(1);
+    expect(out.treatmentModel?.id).toBe("raf-linear-interpolation-v1");
+    expect(out.treatmentModel?.status).toBe("screening-approximation");
+    expect(out.treatmentModel?.evidenceStatus).toBe("proposal");
     expect(out.precisionAssessment?.checks.some((check) => check.criterion === "wilsonWidth")).toBe(true);
     expect(out.precisionAssessment?.requiredTrials).toBeGreaterThanOrEqual(2000);
     expect(out.precisionAssessment?.independentSeedReplication.observedSeeds).toBe(1);

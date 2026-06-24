@@ -36,6 +36,17 @@ export type IMMConditionOutcomes = {
   p_evac: IMMBetaPert; p_locl: IMMBetaPert;
 };
 
+export type TreatmentModelDisclosure = {
+  id: "raf-linear-interpolation-v1";
+  label: string;
+  status: "screening-approximation";
+  evidenceStatus: "proposal";
+  mechanism: "weighted-resource-scalar-then-parameter-linear-interpolation";
+  appliesTo: "treated-untreated-outcome-parameters";
+  limitations: readonly string[];
+  requiredUpgrade: string;
+};
+
 export type IMMSeverityScenarioOutcomes = {
   treated: IMMConditionOutcomes;
   untreated: IMMConditionOutcomes;
@@ -342,6 +353,12 @@ export type IMMOutcome = {
     count: number;
     proportion: number;
   };
+  /**
+   * Scientific qualification for the active treatment/resource pathway model.
+   * simulateIMM populates this field; it is optional only for historical saved
+   * sessions created before model-disclosure provenance was added.
+   */
+  treatmentModel?: TreatmentModelDisclosure;
   /**
    * Raw per-trial CHI samples (percent scale, 0–100).
    * Only populated when `diagnostics: true` is passed to `simulateIMM`.

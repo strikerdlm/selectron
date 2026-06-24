@@ -14,6 +14,21 @@ from numpy.random import Generator
 
 from selectron.k15_reference import CrewMember
 
+TREATMENT_MODEL_DISCLOSURE: dict[str, Any] = {
+    "id": "raf-linear-interpolation-v1",
+    "label": "RAF screening approximation",
+    "status": "screening-approximation",
+    "evidence_status": "proposal",
+    "mechanism": "weighted-resource-scalar-then-parameter-linear-interpolation",
+    "applies_to": "treated-untreated-outcome-parameters",
+    "limitations": [
+        "Multiple required resources are reduced to one weighted scalar, so distinct clinical resources can behave as partially substitutable.",
+        "Treated and untreated Beta-PERT parameters are interpolated smoothly; threshold effects, contraindications, treatment delays, provider skill, failure states, and depletion interactions are not represented.",
+        "Use for exploratory scenario screening, not calibrated absolute clinical-risk prediction.",
+    ],
+    "required_upgrade": "Replace RAF interpolation with condition-specific treatment-state or decision-pathway models before claiming calibrated absolute clinical-risk prediction.",
+}
+
 
 # ── Primitive samplers ──────────────────────────────────────────────────────
 
@@ -85,7 +100,11 @@ def interpolate_beta_pert_by_raf(
     untreated: dict[str, float],
     raf: float,
 ) -> dict[str, float]:
-    """Linearly interpolate between treated and untreated Beta-PERT params."""
+    """Linearly interpolate between treated and untreated Beta-PERT params.
+
+    This is the proposal-stage RAF screening approximation disclosed in
+    TREATMENT_MODEL_DISCLOSURE, not a calibrated clinical treatment pathway.
+    """
     r = max(0.0, min(1.0, raf))
     return {
         "min":  r * treated["min"]  + (1 - r) * untreated["min"],

@@ -83,7 +83,7 @@ import { scaleRelativeScore } from "../engine/normalize-cohort";
 import { sampleGamma } from "../engine/gamma";
 import { sampleSeverity } from "./severity";
 import { sampleBetaPert } from "./outcomes";
-import { interpolateBetaPertByRAF, selectSeverityOutcomes } from "./treatment";
+import { RAF_TREATMENT_MODEL_DISCLOSURE, interpolateBetaPertByRAF, selectSeverityOutcomes } from "./treatment";
 import { computeRAF } from "./kits";
 import { gateAvailable } from "./health-support";
 import { profileIncidenceMultiplier } from "./apply-profile-effects";
@@ -1305,6 +1305,7 @@ export function simulateIMM(opts: SimulateIMMOptions): IMMOutcome {
       count: chiClampCount,
       proportion: chiClampCount / trials,
     },
+    treatmentModel: RAF_TREATMENT_MODEL_DISCLOSURE,
   };
   if (opts.diagnostics) {
     outcome.diagnostics = { chiSamples: chis };
