@@ -12,7 +12,7 @@ export function RiskCard({ posterior, alias }: Props) {
   const { chi, pEarlyTermination, expectedLostCrewDays, trials } = posterior;
   const chiCI90Width = chi.ci90[1] - chi.ci90[0];
 
-  // Interval-width gauge (1 − CI₉₀width/0.30): spread of the simulated CHI
+  // Interval-width gauge (1 - simulation-interval width / 0.30): spread of the simulated CHI
   // distribution, not mission quality.
   const intervalTightness = Math.max(0, Math.min(1, 1 - chiCI90Width / 0.3));
 
@@ -32,14 +32,14 @@ export function RiskCard({ posterior, alias }: Props) {
       <div className="hairline my-5" />
 
       <dl className="mono grid grid-cols-[auto_1fr] gap-y-2 text-xs">
-        <dt className="text-ink-2">CHI CI₉₀</dt>
+        <dt className="text-ink-2">CHI simulation interval₉₀</dt>
         <dd className="text-right tabular-nums text-ink-0">
           <span className="text-signal">{pct(chi.ci90[0])}</span>
           <span className="mx-2 text-ink-3">→</span>
           <span className="text-signal">{pct(chi.ci90[1])}</span>
         </dd>
 
-        <dt className="text-ink-2">CHI CI₉₅</dt>
+        <dt className="text-ink-2">CHI simulation interval₉₅</dt>
         <dd className="text-right tabular-nums text-ink-1">
           {pct(chi.ci95[0])} <span className="text-ink-3">→</span> {pct(chi.ci95[1])}
         </dd>
@@ -47,7 +47,7 @@ export function RiskCard({ posterior, alias }: Props) {
         <dt className="text-ink-2">p(early term.)</dt>
         <dd className="text-right tabular-nums text-ink-0">{pct(pEarlyTermination.mean)}</dd>
 
-        <dt className="text-ink-2">pET CI₉₀</dt>
+        <dt className="text-ink-2">pET simulation interval₉₀</dt>
         <dd className="text-right tabular-nums text-ink-1">
           {pct(pEarlyTermination.ci90[0])} <span className="text-ink-3">→</span> {pct(pEarlyTermination.ci90[1])}
         </dd>
@@ -55,7 +55,7 @@ export function RiskCard({ posterior, alias }: Props) {
         <dt className="text-ink-2">lost crew-days</dt>
         <dd className="text-right tabular-nums text-ink-0">{days(expectedLostCrewDays.mean)}</dd>
 
-        <dt className="text-ink-2">lost CI₉₀</dt>
+        <dt className="text-ink-2">lost simulation interval₉₀</dt>
         <dd className="text-right tabular-nums text-ink-1">
           {days(expectedLostCrewDays.ci90[0])} <span className="text-ink-3">→</span> {days(expectedLostCrewDays.ci90[1])}
         </dd>
@@ -68,7 +68,7 @@ export function RiskCard({ posterior, alias }: Props) {
         <div className="mono mb-1 flex items-center justify-between text-[12px] text-ink-2">
           <span
             className="inline-flex items-center gap-1 cursor-help border-b border-dotted border-ink-3/50"
-            title="Interval tightness — how narrow the 90% simulation interval is (1 − CI₉₀width/0.30). This is distribution spread, not mission quality."
+            title="Interval tightness — how narrow the 90% simulation interval is. This is distribution spread, not mission quality."
           >
             CHI interval tightness
             <span aria-hidden className="text-ink-3">ⓘ</span>

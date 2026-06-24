@@ -6,7 +6,7 @@
 // Design:
 //   - 56-bin histogram of chiSamples.
 //   - Bars: Wong-7 bluish green (#009E73) with a top-to-bottom gradient.
-//   - Overlay: CI₉₀ shaded markArea; dashed μ markLine.
+//   - Overlay: central 90% simulation interval shaded markArea; dashed μ markLine.
 //   - X axis: "CHI" (decimal labels, e.g. "0.91"). Y axis: bin count (labels hidden).
 //   - ARIA enabled, animation: false, grid.containLabel: true — deterministic export.
 //   - Standalone container (no panel chrome) — parent renders the panel.
@@ -36,8 +36,8 @@ const BAR_COLOR_GRADIENT = {
   ],
 };
 
-// CI₉₀ shaded band: very light Wong green fill.
-const CI_AREA_COLOR = "rgba(0, 158, 115, 0.12)";
+// Simulation-interval shaded band: very light Wong green fill.
+const INTERVAL_AREA_COLOR = "rgba(0, 158, 115, 0.12)";
 // Mean line: Wong bluish green, 60% opacity.
 const MEAN_LINE_COLOR = "#009E73";
 
@@ -200,14 +200,14 @@ export function RiskHistogram({
           },
         },
 
-        // CI₉₀ shaded band
+        // Central 90% simulation interval shaded band
         markArea: {
           silent: true,
-          itemStyle: { color: CI_AREA_COLOR },
+          itemStyle: { color: INTERVAL_AREA_COLOR },
           label: { show: false },
           data: [
             [
-              { xAxis: ci90LoLabel, name: "CI₉₀" },
+              { xAxis: ci90LoLabel, name: "simulation interval₉₀" },
               { xAxis: ci90HiLabel },
             ],
           ],

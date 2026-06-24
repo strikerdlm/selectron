@@ -5,8 +5,8 @@
 // Replaces the Iter-3 synthetic-multi-mission PaperF7 (which used the
 // usePaperF7Seed-generated synthetic chi samples) with the IMM Calculator
 // applied across 7 representative Earth-analog + LEO-ISS missions at the
-// operational ISS HMS kit. Each mission row shows CHI mean (with CI₉₅
-// bracket), health-criterion %, and an experimental LxC color chip.
+// operational ISS HMS kit. Each mission row shows CHI mean (with a 95%
+// simulation interval), health-criterion %, and an experimental LxC color chip.
 //
 // Source data: src/data/imm-worked-example.json (computed offline by
 // scripts/extract_imm_worked_example.ts at T = 25 000 trials × 7 missions).
@@ -71,7 +71,7 @@ export function PaperF7IMM() {
             <th className="text-right p-2">Duration (d)</th>
             <th className="text-right p-2">Crew</th>
             <th className="text-right p-2">CHI</th>
-            <th className="text-right p-2">CHI CI₉₅</th>
+            <th className="text-right p-2">CHI simulation interval₉₅</th>
             <th className="text-right p-2">pEVAC %</th>
             <th className="text-right p-2">pLOCL %</th>
             <th className="text-right p-2">Health criterion %</th>

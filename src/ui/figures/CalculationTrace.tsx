@@ -496,7 +496,7 @@ function immSteps(args: {
       ),
       concrete: (
         <span>
-          CHI μ = {fmt(100 * posterior.chi.mean, 1)}% · CI₉₀ = [
+          CHI μ = {fmt(100 * posterior.chi.mean, 1)}% · simulation interval₉₀ = [
           {fmt(100 * posterior.chi.ci90[0], 1)}%,{" "}
           {fmt(100 * posterior.chi.ci90[1], 1)}%] · pBelowThreshold ={" "}
           {fmt(100 * posterior.pEarlyTermination.mean, 1)}%

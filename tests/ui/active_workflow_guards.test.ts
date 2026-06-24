@@ -109,6 +109,28 @@ describe("active analog workflow guards", () => {
     expect(readRepoFile("src/ui/figures/captions/F1.captions.ts")).toContain("Central 90% score interval");
   });
 
+  it("labels ordinary simulation spread as simulation intervals, reserving CI labels for K15 benchmarks", () => {
+    const ordinarySimulationFiles = [
+      "src/ui/components/CompositeCrewPanel.tsx",
+      "src/ui/components/RiskCard.tsx",
+      "src/ui/figures/CalculationTrace.tsx",
+      "src/ui/figures/ConditionContribution.tsx",
+      "src/ui/figures/DashboardSummary.tsx",
+      "src/ui/figures/PaperF7IMM.tsx",
+      "src/ui/figures/RiskHistogram.tsx",
+      "src/ui/figures/captions/F2.captions.ts",
+      "src/ui/figures/captions/F4.captions.ts",
+    ];
+
+    for (const path of ordinarySimulationFiles) {
+      const source = readRepoFile(path);
+      expect(source, `${path} should describe ordinary spread as simulation intervals`).toContain(
+        "simulation interval",
+      );
+      expect(source, `${path} should not use CI labels for ordinary simulation intervals`).not.toContain("CI₉");
+    }
+  });
+
   it("publishes a model card with explicit non-validation boundaries", () => {
     const source = readRepoFile("docs/model_card.md");
 

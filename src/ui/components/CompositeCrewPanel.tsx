@@ -60,7 +60,7 @@ function ResultMetric({
           {mean.toFixed(1)}{unit}
         </span>
         <span className="mono text-[11px] text-ink-3">
-          [{lo.toFixed(1)}, {hi.toFixed(1)}]
+          simulation interval₉₅ [{lo.toFixed(1)}, {hi.toFixed(1)}]
         </span>
       </div>
     </div>
@@ -213,7 +213,7 @@ export function CompositeCrewPanel({
       {simState === "done" && outcome && (
         <div className="border-t border-line pt-4 mt-1 flex flex-col gap-3">
           <h4 className="label text-[12px] text-ink-2 uppercase tracking-cap">
-            IMM Results · CI₉₅
+            IMM Results · simulation interval₉₅
           </h4>
 
           <div className="flex flex-col gap-2">

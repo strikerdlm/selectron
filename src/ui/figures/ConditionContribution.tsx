@@ -9,7 +9,7 @@
 //   - NEW: CI90 uncertainty bands rendered as a custom series — thin vertical
 //     lines at each segment's ci90[0] and ci90[1] positions, computed from
 //     the cumulative left-edge offsets of the stacked bar in data-space.
-//   - Tooltip per segment: label + family + mean QTL + CI₉₀ + share of total.
+//   - Tooltip per segment: label + family + mean QTL + simulation interval₉₀ + share of total.
 //   - Family legend below the bar.
 //   - Top-3 readout list (highest mean QTL with share).
 //   - ARIA enabled, animation: false, useUTC: true, grid.containLabel: true.
@@ -144,13 +144,13 @@ export function ConditionContribution({
         `<span style="color:#9ca3af">condition</span> <span style="color:#f9fafb">${e.label}</span><br/>` +
         `<span style="color:#9ca3af">family</span> <span style="color:${FAMILY_COLOR[e.family]}">${e.family}</span><br/>` +
         `<span style="color:#9ca3af">mean QTL</span> <span style="color:#f9fafb">${days(e.mean)}</span><br/>` +
-        `<span style="color:#9ca3af">CI₉₀</span> <span style="color:#f9fafb">${days(e.ci90[0])} → ${days(e.ci90[1])}</span><br/>` +
+        `<span style="color:#9ca3af">simulation interval₉₀</span> <span style="color:#f9fafb">${days(e.ci90[0])} → ${days(e.ci90[1])}</span><br/>` +
         `<span style="color:#9ca3af">share</span> <span style="color:#f9fafb">${total > 0 ? ((100 * e.mean) / total).toFixed(1) : "0.0"}%</span>`,
     },
   }));
 
-  // Compute cumulative left offsets in data-space so CI whiskers land correctly.
-  // The CI band for segment i spans [cumulative[i] + ci90[0], cumulative[i] + ci90[1]]
+  // Compute cumulative left offsets in data-space so interval whiskers land correctly.
+  // The interval band for segment i spans [cumulative[i] + ci90[0], cumulative[i] + ci90[1]]
   // where ci90 values are relative to each segment's mean (half-width style).
   // However, per the types, ci90 are absolute posterior quantile bounds (not relative),
   // so we position the band at ci90[0]..ci90[1] mapped into the stacked coordinate:
@@ -170,9 +170,9 @@ export function ConditionContribution({
     void segMeanX; // used for clarity
   }
 
-  // CI whisker custom series — one data point per segment.
+  // Simulation-interval whisker custom series — one data point per segment.
   const whiskerSeries = {
-    name:        "CI₉₀",
+    name:        "simulation interval₉₀",
     type:        "custom" as const,
     renderItem:  makeCiWhiskerRenderItem(tokens.markerStroke),
     data:        ciWhiskerData,
