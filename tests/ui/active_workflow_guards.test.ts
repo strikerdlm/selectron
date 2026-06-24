@@ -142,6 +142,28 @@ describe("active analog workflow guards", () => {
     expect(readRepoFile("docs/Manual.md")).toContain("docs/model_card.md");
   });
 
+  it("keeps the legacy paper package retired instead of presenting stale submission artifacts", () => {
+    const retiredPaperFiles = [
+      "paper/manuscript.md",
+      "paper/manuscript_pjambp.md",
+      "paper/supplementary/S-Methods-1-vv-dossier.md",
+      "paper/supplementary/S-Methods-2-nasa-mc-audit.md",
+    ];
+
+    expect(readRepoFile("paper/RETIREMENT_NOTICE.md")).toContain("Do not submit, cite, rebuild, or upload");
+    expect(readRepoFile("paper/Makefile")).toContain("The paper/ submission package is retired");
+
+    for (const path of retiredPaperFiles) {
+      const source = readRepoFile(path);
+      expect(source, `${path} must be marked retired`).toContain("status: \"retired\"");
+      expect(source, `${path} must block submission use`).toMatch(/must not be\s+submitted|Do not use this file/);
+    }
+
+    expect(readRepoFile("paper/supplementary/S-Methods-1-vv-dossier.md")).not.toContain("Factor 2 — Validation");
+    expect(readRepoFile("paper/supplementary/S-Methods-1-vv-dossier.md")).not.toContain("credible interval");
+    expect(readRepoFile("paper/supplementary/S-Methods-2-nasa-mc-audit.md")).not.toContain("simulateMission");
+  });
+
   it("keeps the slow validation workflow archiving release-verification artifacts", () => {
     const workflow = readRepoFile(".github/workflows/nightly.yml");
 
