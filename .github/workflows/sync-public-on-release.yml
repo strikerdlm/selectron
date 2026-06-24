@@ -1,5 +1,5 @@
-# Sync application code to the public selectron repo on release tags.
-# Manuscript / submission assets stay in selectron_private only.
+# Sync application code to the public selectron repo when private master moves
+# or a release tag is pushed. Manuscript / submission assets stay private only.
 #
 # Auth: deploy key SELECTRON_PUBLIC_DEPLOY_KEY (write access on strikerdlm/selectron).
 # Bootstrapped automatically; no PAT required from the maintainer.
@@ -8,6 +8,8 @@ name: Sync public selectron
 
 on:
   push:
+    branches:
+      - master
     tags:
       - "v*"
       - "0.*"

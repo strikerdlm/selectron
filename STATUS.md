@@ -36,15 +36,16 @@ Manuscript sources, journal submission packages, and peer-review working files a
 
 ## Sync from private source
 
-Application changes are developed in `selectron_private`, then published here:
+Application changes are developed **only** in `selectron_private`, then published here automatically on every push to private `master`:
 
 ```bash
-# Local (maintainer machine):
-npm run sync:public   # in selectron_private, then commit/push here
-
-# CI (on tag push to selectron_private):
-# sync-public-on-release.yml pushes public master automatically
+# in selectron_private (optional local preview):
+npm run sync:public
+git push origin master
+# CI: sync-public-on-release.yml pushes this repo's master directly
 ```
+
+Do not commit application changes directly to this public repository.
 
 The sync copies all application paths and replaces `README.md`, `STATUS.md`, `CLAUDE.md`, and `CHANGELOG.md` with public templates. It deletes `paper/` and manuscript-only docs if present.
 
