@@ -1,6 +1,6 @@
-import { readFileSync, writeFileSync } from "node:fs";
+import { existsSync, readdirSync, readFileSync, statSync, writeFileSync } from "node:fs";
 import { createHash } from "node:crypto";
-import { dirname, resolve } from "node:path";
+import { basename, dirname, extname, relative, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { PROFILE_EFFECTS } from "../src/imm/profile-effects";
 
@@ -24,10 +24,10 @@ export type EvidenceStatus = {
 const REPO_ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const LEDGER_PATH = "research/evidence_extracted/evidence_ledger.csv";
 const PRIORS_PATH = "src/data/imm-priors.json";
+const SOURCE_CATALOG_DIRS = ["research/evidence", "research/imm_sources"];
 
 const REQUIRED_ACCEPTED_FIELDS = [
   "parameter_path",
-  "study_doi",
   "study_slug",
   "endpoint_definition",
   "numerator",
@@ -62,13 +62,97 @@ type EvidenceLedgerRow = {
   [key: string]: string | number | undefined;
 };
 
-const SOURCE_DOI_BY_SLUG: Record<string, string | null> = {
-  M18_myers_2018_imm_validation: null,
-  S20_walton_kerstman_2020_iss_quantification: "10.3357/AMHP.5432.2020",
+type SourceCatalogEntry = {
+  path: string;
+  title?: string;
+  doi: string | null;
 };
 
 function normalizeDoi(value: string): string {
-  return value.trim().toLowerCase();
+  return value
+    .trim()
+    .replace(/^https?:\/\/(?:dx\.)?doi\.org\//i, "")
+    .toLowerCase();
+}
+
+function stripYamlScalar(value: string): string {
+  const trimmed = value.trim();
+  if (
+    (trimmed.startsWith("\"") && trimmed.endsWith("\"")) ||
+    (trimmed.startsWith("'") && trimmed.endsWith("'"))
+  ) {
+    return trimmed.slice(1, -1).trim();
+  }
+  return trimmed;
+}
+
+function optionalDoi(value: unknown): string | null {
+  if (typeof value !== "string") return null;
+  const scalar = stripYamlScalar(value);
+  if (
+    scalar.length === 0 ||
+    scalar === "—" ||
+    scalar === "-" ||
+    /^null$/i.test(scalar) ||
+    /^none$/i.test(scalar)
+  ) {
+    return null;
+  }
+  return normalizeDoi(scalar);
+}
+
+function parseFrontmatter(text: string): Record<string, string> {
+  if (!text.startsWith("---")) return {};
+  const end = text.indexOf("\n---", 3);
+  if (end < 0) return {};
+  const frontmatter = text.slice(3, end);
+  const parsed: Record<string, string> = {};
+  for (const line of frontmatter.split(/\r?\n/)) {
+    const match = /^([A-Za-z0-9_-]+):\s*(.*)$/.exec(line);
+    if (!match) continue;
+    parsed[match[1]] = stripYamlScalar(match[2]);
+  }
+  return parsed;
+}
+
+function markdownFiles(root: string, relativeDir: string): string[] {
+  const base = resolve(root, relativeDir);
+  if (!existsSync(base)) return [];
+  const out: string[] = [];
+  const visit = (dir: string) => {
+    for (const entry of readdirSync(dir)) {
+      const abs = resolve(dir, entry);
+      const stat = statSync(abs);
+      if (stat.isDirectory()) {
+        visit(abs);
+      } else if (stat.isFile() && extname(abs) === ".md") {
+        out.push(relative(root, abs).replace(/\\/g, "/"));
+      }
+    }
+  };
+  visit(base);
+  return out;
+}
+
+function sourceCatalog(root: string): Map<string, SourceCatalogEntry> {
+  const catalog = new Map<string, SourceCatalogEntry>();
+  for (const dir of SOURCE_CATALOG_DIRS) {
+    for (const path of markdownFiles(root, dir)) {
+      const frontmatter = parseFrontmatter(readFileSync(resolve(root, path), "utf8"));
+      if (Object.keys(frontmatter).length === 0) continue;
+      const entry: SourceCatalogEntry = {
+        path,
+        title: frontmatter.title,
+        doi: optionalDoi(frontmatter.doi),
+      };
+      const slug = basename(path, ".md");
+      const relativeSlug = path.replace(/\.md$/, "");
+      catalog.set(slug, entry);
+      catalog.set(relativeSlug, entry);
+      if (frontmatter.ref_id) catalog.set(frontmatter.ref_id, entry);
+    }
+  }
+  return catalog;
 }
 
 function parseCsvRecords(text: string): CsvRecord[] {
@@ -221,6 +305,7 @@ function malformedAcceptedRowIds(
   headerColumnCount: number,
   activePaths: ReadonlySet<string>,
   priors: unknown,
+  sources: ReadonlyMap<string, SourceCatalogEntry>,
 ): string[] {
   const malformed: string[] = [];
   rows.forEach((row) => {
@@ -259,17 +344,31 @@ function malformedAcceptedRowIds(
       reasons.push("parameter_path is not active");
     }
 
+    const conditionPathMatch =
+      typeof row.parameter_path === "string" ? /^conditions\.([^.]+)\./.exec(row.parameter_path) : null;
+    if (conditionPathMatch) {
+      const activeConditionId = conditionPathMatch[1];
+      if (!row.condition_id) reasons.push("missing condition_id");
+      if (!row.mapped_prior_id) {
+        reasons.push("missing mapped_prior_id");
+      } else if (row.mapped_prior_id !== activeConditionId) {
+        reasons.push(`mapped_prior_id ${row.mapped_prior_id} does not match parameter_path condition ${activeConditionId}`);
+      }
+    }
+
     const studySlug = row.study_slug;
-    const studyDoi = row.study_doi ?? "";
-    if (studySlug && studySlug in SOURCE_DOI_BY_SLUG) {
-      const expectedDoi = SOURCE_DOI_BY_SLUG[studySlug];
-      if (expectedDoi === null && row.study_doi) {
-        reasons.push(`study_slug ${studySlug} has no DOI; found ${row.study_doi}`);
-      } else if (
-        expectedDoi !== null &&
-        normalizeDoi(studyDoi) !== normalizeDoi(expectedDoi)
-      ) {
-        reasons.push(`study_doi ${studyDoi} does not match ${studySlug} (${expectedDoi})`);
+    if (studySlug) {
+      const source = sources.get(studySlug);
+      if (!source) {
+        reasons.push(`study_slug ${studySlug} does not resolve to source markdown`);
+      } else {
+        const studyDoi = optionalDoi(row.study_doi);
+        if (source.doi === null && studyDoi !== null) {
+          reasons.push(`study_slug ${studySlug} has no DOI in ${source.path}; found ${row.study_doi}`);
+        } else if (source.doi !== null && studyDoi !== source.doi) {
+          const title = source.title ? `; title: ${source.title}` : "";
+          reasons.push(`study_doi ${row.study_doi ?? ""} does not match ${studySlug} (${source.doi}${title})`);
+        }
       }
     }
 
@@ -314,7 +413,13 @@ export function buildEvidenceStatus(root = REPO_ROOT): EvidenceStatus {
   const parameterPaths = activeParameterPaths(priors, root === REPO_ROOT);
   const activePathSet = new Set(parameterPaths);
   const acceptedRows = ledgerRows.filter((row) => row.status === "accepted");
-  const malformedRows = malformedAcceptedRowIds(ledgerRows, headerColumnCount, activePathSet, priors);
+  const malformedRows = malformedAcceptedRowIds(
+    ledgerRows,
+    headerColumnCount,
+    activePathSet,
+    priors,
+    sourceCatalog(root),
+  );
   const malformedRowIndexes = new Set(
     malformedRows.flatMap((message) => {
       const match = /^row (\d+):/.exec(message);

@@ -4,6 +4,94 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { buildEvidenceStatus } from "../../scripts/evidence_status";
 
+const LEDGER_HEADER = [
+  "status",
+  "parameter_path",
+  "condition_id",
+  "mapped_prior_id",
+  "mission_type",
+  "study_doi",
+  "study_slug",
+  "endpoint_definition",
+  "numerator",
+  "denominator",
+  "person_days",
+  "events",
+  "exposure_time",
+  "repeated_measure_structure",
+  "extraction_quote",
+  "extractor",
+  "verifier",
+  "risk_of_bias",
+  "transportability",
+  "transformation",
+  "uncertainty_distribution",
+  "model_version",
+  "acceptance_version",
+  "prior_value_hash",
+  "notes",
+];
+
+function writeSourceFixture(root: string, slug = "fixture-source", doi = "10.0000/fixture"): void {
+  mkdirSync(join(root, "research/evidence"), { recursive: true });
+  writeFileSync(
+    join(root, `research/evidence/${slug}.md`),
+    `---\ntitle: "Fixture source"\ndoi: ${doi}\n---\n\n# Fixture source\n`,
+  );
+}
+
+function writeSingleParameterFixture(root: string, rowOverrides: Record<string, string> = {}): void {
+  mkdirSync(join(root, "research/evidence_extracted"), { recursive: true });
+  mkdirSync(join(root, "src/data"), { recursive: true });
+  writeSourceFixture(root);
+  writeFileSync(
+    join(root, "src/data/imm-priors.json"),
+    JSON.stringify({
+      schema_version: 1,
+      calibration_target: "fixture",
+      conditions: {
+        fixture: {
+          source_ref: "accepted fixture",
+          incidence: { distribution: "Fixed", lambda_fixed: 0.1 },
+        },
+      },
+      global_calibration: {},
+    }),
+  );
+  const row: Record<string, string> = {
+    status: "accepted",
+    parameter_path: "conditions.fixture.incidence.lambda_fixed",
+    condition_id: "fixture",
+    mapped_prior_id: "fixture",
+    mission_type: "fixture",
+    study_doi: "10.0000/fixture",
+    study_slug: "fixture-source",
+    endpoint_definition: "fixture endpoint",
+    numerator: "1",
+    denominator: "10",
+    person_days: "10",
+    events: "1",
+    exposure_time: "fixture exposure",
+    repeated_measure_structure: "independent",
+    extraction_quote: "fixture quote",
+    extractor: "extractor-a",
+    verifier: "verifier-b",
+    risk_of_bias: "low",
+    transportability: "direct",
+    transformation: "none",
+    uncertainty_distribution: "fixed",
+    model_version: "fixture-v1",
+    acceptance_version: "accepted-v1",
+    prior_value_hash: "14be4b45f18e0d8c",
+    notes: "",
+    ...rowOverrides,
+  };
+  writeFileSync(
+    join(root, "research/evidence_extracted/evidence_ledger.csv"),
+    [LEDGER_HEADER, LEDGER_HEADER.map((field) => row[field] ?? "")].map((values) => values.join(",")).join("\n"),
+  );
+}
+
 describe("evidence status gate", () => {
   it("reports pilot adjudication in progress when partial accepted ledger rows exist", () => {
     const status = buildEvidenceStatus();
@@ -24,6 +112,7 @@ describe("evidence status gate", () => {
     const root = mkdtempSync(join(tmpdir(), "selectron-evidence-"));
     mkdirSync(join(root, "research/evidence_extracted"), { recursive: true });
     mkdirSync(join(root, "src/data"), { recursive: true });
+    writeSourceFixture(root);
 
     writeFileSync(
       join(root, "src/data/imm-priors.json"),
@@ -58,33 +147,6 @@ describe("evidence status gate", () => {
       "conditions.fixture.risk_factor_multipliers.sex-male",
       "conditions.fixture.required_resources.bandage-small",
       "global_calibration.tierA_multiplier",
-    ];
-    const header = [
-      "status",
-      "parameter_path",
-      "condition_id",
-      "mapped_prior_id",
-      "mission_type",
-      "study_doi",
-      "study_slug",
-      "endpoint_definition",
-      "numerator",
-      "denominator",
-      "person_days",
-      "events",
-      "exposure_time",
-      "repeated_measure_structure",
-      "extraction_quote",
-      "extractor",
-      "verifier",
-      "risk_of_bias",
-      "transportability",
-      "transformation",
-      "uncertainty_distribution",
-      "model_version",
-      "acceptance_version",
-      "prior_value_hash",
-      "notes",
     ];
     const hashes: Record<string, string> = {
       "conditions.fixture.incidence.lambda_fixed": "14be4b45f18e0d8c",
@@ -129,7 +191,7 @@ describe("evidence status gate", () => {
     ]);
     writeFileSync(
       join(root, "research/evidence_extracted/evidence_ledger.csv"),
-      [header, ...rows].map((row) => row.join(",")).join("\n"),
+      [LEDGER_HEADER, ...rows].map((row) => row.join(",")).join("\n"),
     );
 
     const status = buildEvidenceStatus(root);
@@ -137,5 +199,35 @@ describe("evidence status gate", () => {
     expect(status.activeParameterCount).toBe(parameterPaths.length);
     expect(status.uncoveredParameterCount).toBe(0);
     expect(status.malformedAcceptedRows).toEqual([]);
+  });
+
+  it("rejects accepted rows whose DOI does not match the resolved source slug", () => {
+    const root = mkdtempSync(join(tmpdir(), "selectron-evidence-"));
+    writeSingleParameterFixture(root, { study_doi: "10.0000/wrong" });
+
+    const status = buildEvidenceStatus(root);
+    expect(status.releasePriorsAdjudicated).toBe(false);
+    expect(status.acceptedCoveredParameterCount).toBe(0);
+    expect(status.malformedAcceptedRows.join("\n")).toMatch(/study_doi 10\.0000\/wrong does not match fixture-source/);
+  });
+
+  it("rejects accepted rows whose source slug cannot be traced to source markdown", () => {
+    const root = mkdtempSync(join(tmpdir(), "selectron-evidence-"));
+    writeSingleParameterFixture(root, { study_slug: "missing-source" });
+
+    const status = buildEvidenceStatus(root);
+    expect(status.releasePriorsAdjudicated).toBe(false);
+    expect(status.acceptedCoveredParameterCount).toBe(0);
+    expect(status.malformedAcceptedRows.join("\n")).toMatch(/study_slug missing-source does not resolve/);
+  });
+
+  it("rejects accepted condition rows whose mapped prior id does not match the parameter path", () => {
+    const root = mkdtempSync(join(tmpdir(), "selectron-evidence-"));
+    writeSingleParameterFixture(root, { mapped_prior_id: "different-condition" });
+
+    const status = buildEvidenceStatus(root);
+    expect(status.releasePriorsAdjudicated).toBe(false);
+    expect(status.acceptedCoveredParameterCount).toBe(0);
+    expect(status.malformedAcceptedRows.join("\n")).toMatch(/mapped_prior_id different-condition does not match/);
   });
 });

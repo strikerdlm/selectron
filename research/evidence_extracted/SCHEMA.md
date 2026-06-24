@@ -65,14 +65,21 @@ accepted-ledger-derived. The gate is intentionally conservative:
 - Every active numeric prior parameter path must be covered by one accepted
   `evidence_ledger.csv` row.
 - Accepted rows must include extractor, independent verifier, endpoint
-  definition, risk-of-bias, transportability, uncertainty distribution,
-  acceptance version, and prior-value hash.
+  definition, numerator/events, a usable denominator/person-time/exposure field,
+  repeated-measure structure, extraction quote, risk-of-bias, transportability,
+  uncertainty distribution, acceptance version, and prior-value hash.
+- Accepted `study_slug` values must resolve to source markdown in
+  `research/evidence/` or `research/imm_sources/`, and any DOI in the ledger
+  must match that source file's frontmatter.
+- Condition-level accepted rows must map back to the same active prior id named
+  in `parameter_path`.
 - `proposalRefCount` must be `0`.
 - `releasePriorsAdjudicated` must be `true` before release priors are described
   as adjudicated analog evidence.
 
-The current status is `releasePriorsAdjudicated=false` because the accepted
-ledger is empty and proposal-stage source references remain in `imm-priors.json`.
+The current status is `releasePriorsAdjudicated=false` because the nominally
+accepted pilot rows are malformed and proposal-stage source references remain
+in `imm-priors.json`.
 
 ## Notes on values
 
