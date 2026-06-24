@@ -1,13 +1,13 @@
 import { describe, it, expect } from "vitest";
 import { scaleRelativeScore, zScoreAgainstScale } from "../../src/engine/normalize-cohort";
 
-// F10: this is a scale-relative score, NOT a population z-score. No normative
-// mean/SD is supplied; the operational scale endpoints are treated as ±2 SD.
+// F10: this is a bounded scale-relative coordinate, NOT a population z-score.
+// No normative mean or standard deviation is supplied.
 describe("scaleRelativeScore", () => {
   it("midpoint → 0", () => {
     expect(scaleRelativeScore(50, { min: 0, max: 100 })).toBe(0);
   });
-  it("max → +2 (operational range = ±2 SD)", () => {
+  it("max → +2", () => {
     expect(scaleRelativeScore(100, { min: 0, max: 100 })).toBe(2);
   });
   it("min → -2", () => {

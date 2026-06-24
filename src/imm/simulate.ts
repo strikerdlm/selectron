@@ -47,7 +47,7 @@ export function isTerrestrialAnalog(kind: IMMMissionKind): boolean {
   return TERRESTRIAL_MISSION_KINDS.has(kind);
 }
 
-import type { IMMCrewMember, IMMMission, IMMKitScenario, IMMPrior, IMMConditionFamily, IMMCondition, IMMMissionKind, IMMProcessType, VulnerabilityCouplingMode } from "./types";
+import type { IMMCrewMember, IMMMission, IMMKitScenario, IMMPrior, IMMConditionFamily, IMMCondition, IMMMissionKind, IMMProcessType, VulnerabilityCouplingMode, ProfileEffectMode } from "./types";
 import { IMM_CONDITIONS } from "./conditions";
 import { loadIMMPriors } from "./priors";
 import { applyProportionalHazardMultiplier, samplePoisson, sampleLognormal, sampleScaledBetaBernoulli, samplePoissonProcess } from "./incidence";
@@ -59,12 +59,13 @@ import { sampleBetaPert } from "./outcomes";
 import { interpolateBetaPertByRAF, selectSeverityOutcomes } from "./treatment";
 import { computeRAF } from "./kits";
 import { gateAvailable } from "./health-support";
+import { profileIncidenceMultiplier } from "./apply-profile-effects";
 import type { Criterion } from "../types";
 
 /**
- * Family-specific β coefficients for Stage A z-scored vulnerability multiplier.
+ * Family-specific β coefficients for Stage A scale-relative vulnerability multiplier.
  * Negative β: HIGH-quality candidate (z>0 on higherIsBetter criteria) → exp(β·z) < 1 → λ↓.
- * Magnitudes calibrated so a ±2 SD spread produces a 2–4× incidence multiplier spread.
+ * Magnitudes calibrated so a -2..+2 coordinate spread produces a 2–4× incidence multiplier spread.
  * Same values as SYNTHETIC_PRIORS in src/data/synthetic-iter3.ts — these are the
  * operator-supplied scenario defaults, not accepted-ledger calibrated coefficients.
  */
@@ -178,16 +179,16 @@ export type IMMTrialOpts = {
    */
   kindMultipliers?: Record<string, number>;
   vulnerabilityCouplingMode?: VulnerabilityCouplingMode;
+  profileEffectMode?: ProfileEffectMode;
 };
 
 /**
- * IC-5: Compute Stage A z-scored vulnerability multiplier for a condition.
+ * IC-5: Compute Stage A scale-relative vulnerability multiplier for a condition.
  *
  * For each criterion referenced in vulnerabilityCriteria:
  *   1. Look up the criterion in criteriaIndex to get scale + higherIsBetter.
  *   2. Scale-relative score: scaleRelativeScore(raw, scale). This is NOT a
- *      population z-score — it treats the operational scale endpoints as
- *      ±2 SD (no normative mean/SD supplied).
+ *      population z-score. The declared scale endpoints map to -2 and +2.
  *   3. Apply sign convention: higherIsBetter ? z : -z
  *      (HIGH raw on higherIsBetter=true → z>0; with β<0 → exp<1 → λ↓).
  *   4. Look up the operator-supplied scenario β from FAMILY_BETA (default -0.2).
@@ -222,6 +223,7 @@ export function applyStageAVulnerabilityMultiplier(
     if (raw === undefined || !Number.isFinite(raw)) continue;
     const c = criteriaIndex.get(cid);
     if (!c) continue;
+    if (raw < c.scale.min || raw > c.scale.max) continue;
     const zRaw = scaleRelativeScore(raw, c.scale);
     const zSigned = c.higherIsBetter ? zRaw : -zRaw;
     beta[cid] = familyBeta;
@@ -330,7 +332,7 @@ export function applyRiskFactorMultiplier(baseLambda: number, member: IMMCrewMem
  * The count must be scaled by mission duration before Poisson sampling:
  *   1. Draw λ_per_day from the prior's hierarchical distribution.
  *   2. Apply per-person risk-factor multipliers to λ_per_day.
- *   3. Apply Stage A z-scored vulnerability multiplier only in scenario mode.
+ *   3. Apply Stage A scale-relative vulnerability multiplier only in scenario mode.
  *   4. Sample Poisson(λ_modulated × durationDays).
  *
  * Beta-Bernoulli and Fixed distributions retain their existing semantics and are
@@ -485,7 +487,12 @@ export function runIMMTrial(
       // guard the lookup with a typeof check for forward-compat).
       const rawKindMult = opts.kindMultipliers?.[cond.id];
       const kindMult = (typeof rawKindMult === "number" && Number.isFinite(rawKindMult)) ? rawKindMult : 1.0;
-      const effectiveMult = tierMult * kindMult;
+      const profileMult = profileIncidenceMultiplier(
+        mission,
+        cond.family,
+        opts.profileEffectMode ?? "adjudicated",
+      );
+      const effectiveMult = tierMult * kindMult * profileMult;
 
       let count = 0;
       if (cond.processType === "general-Poisson") {
@@ -698,7 +705,7 @@ export function simulateIMM(opts: {
    */
   chiStar?: number;
   /**
-   * Optional criteria catalog for Stage A z-scored vulnerability multipliers.
+   * Optional criteria catalog for Stage A scale-relative vulnerability multipliers.
    * Ignored unless vulnerabilityCouplingMode === "scenario".
    */
   criteria?: readonly Criterion[];
@@ -729,6 +736,13 @@ export function simulateIMM(opts: {
    * kind without an entry (e.g. leo-iss), the engine falls through to 1.0.
    */
   kindMultipliers?: Record<string, number>;
+  /**
+   * Profile-field effect mode. "adjudicated" applies accepted registry effects
+   * only; "exploratory" also applies proposal estimates such as the current
+   * communication-delay sensitivity coefficient; "off" applies no profile
+   * effects. Default is "adjudicated".
+   */
+  profileEffectMode?: ProfileEffectMode;
 }): IMMOutcome {
   const { crew, mission, kit, trials, seed } = opts;
   const chiStar = opts.chiStar ?? 0.7;
@@ -740,6 +754,9 @@ export function simulateIMM(opts: {
   // never NaN or negative; multipliers/scales must be finite and non-negative.
   const _bad = (msg: string, details?: Record<string, unknown>) =>
     new SelectronError("E_BAD_SCENARIO_CONTROL", msg, details);
+  const criteriaIndex: ReadonlyMap<string, Criterion> = opts.criteria
+    ? new Map(opts.criteria.map(c => [c.id, c]))
+    : new Map();
   if (!Number.isInteger(trials) || trials <= 0) {
     throw _bad(`trials must be a positive integer, got ${trials}`, { trials });
   }
@@ -756,6 +773,32 @@ export function simulateIMM(opts: {
     const s = opts.familyBetaScale;
     if (!Number.isFinite(s) || s < 0) {
       throw _bad(`familyBetaScale must be a finite non-negative number, got ${s}`, { familyBetaScale: s });
+    }
+  }
+  if (opts.criteria) {
+    for (const member of crew) {
+      for (const [criterionId, raw] of Object.entries(member.stageAScores ?? {})) {
+        const criterion = criteriaIndex.get(criterionId);
+        if (!criterion) {
+          throw _bad(`stageAScores[${member.id}.${criterionId}] has no matching criterion`, {
+            memberId: member.id,
+            criterionId,
+          });
+        }
+        if (!Number.isFinite(raw)) {
+          throw _bad(`stageAScores[${member.id}.${criterionId}] must be finite, got ${raw}`, {
+            memberId: member.id,
+            criterionId,
+            value: raw,
+          });
+        }
+        if (raw < criterion.scale.min || raw > criterion.scale.max) {
+          throw _bad(
+            `stageAScores[${member.id}.${criterionId}] must be within [${criterion.scale.min}, ${criterion.scale.max}], got ${raw}`,
+            { memberId: member.id, criterionId, value: raw },
+          );
+        }
+      }
     }
   }
   for (const [k, q] of Object.entries(kit.resources ?? {})) {
@@ -782,10 +825,7 @@ export function simulateIMM(opts: {
   // entry is safe (leo-iss / analog-isolation etc. all get the 1.0 baseline).
   const kindMultAuto = globalCal.kind_multipliers?.[mission.kind] ?? {};
   const effectiveKindMults = opts.kindMultipliers ?? kindMultAuto;
-  // IC-5: build criteria index once, pass to each trial.
-  const criteriaIndex: ReadonlyMap<string, Criterion> = opts.criteria
-    ? new Map(opts.criteria.map(c => [c.id, c]))
-    : new Map();
+  // IC-5: criteria index was built once during public-boundary validation.
   const chiStarPct = chiStar * 100;
   const rng = makeRng(seed);
   const L_hours = mission.durationDays * 24;
@@ -812,6 +852,7 @@ export function simulateIMM(opts: {
       // Empty object / missing keys → 1.0 fallthrough in runIMMTrial.
       kindMultipliers: effectiveKindMults,
       vulnerabilityCouplingMode: opts.vulnerabilityCouplingMode ?? "off",
+      profileEffectMode: opts.profileEffectMode ?? "adjudicated",
       familyBetaScale: opts.familyBetaScale,
       criteriaIndex,
       conditionFilter: opts.conditionFilter,

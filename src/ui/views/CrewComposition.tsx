@@ -9,7 +9,7 @@
 // Commit 5: polish + a11y.
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import type { IMMCrewMember, CrewCompositeMethod, IMMOutcome, VulnerabilityCouplingMode } from "../../imm/types";
+import type { IMMCrewMember, CrewCompositeMethod, IMMOutcome, VulnerabilityCouplingMode, ProfileEffectMode } from "../../imm/types";
 import { ACTIVE_CRITERION_CATALOG } from "../../data/demo-criteria";
 import { ACTIVE_MISSIONS } from "../../data/imm-missions";
 import type { IMMMission } from "../../imm/types";
@@ -31,10 +31,19 @@ import { loadIMMPriors } from "../../imm/priors";
 import {
   EVIDENCE_COVERAGE_STATEMENT,
   EVIDENCE_STATUS_SNAPSHOT,
+  PROFILE_MAPPING_VERSION,
+  activeProfileEffectsForMode,
+  classifySavedOutcomeStatus,
   computeKindMultiplierHash,
+  computeProfileEffectsHash,
   computePriorsHash,
 } from "../../imm/provenance";
-import { SELECTRON_VERSION } from "../../version";
+import {
+  DESCRIPTIVE_ONLY_FIELDS,
+  ISOLATION_CONFINEMENT_EXPOSURE_MODELED,
+  PROFILE_EFFECTS,
+} from "../../imm/profile-effects";
+import { SELECTRON_SOURCE_COMMIT, SELECTRON_VERSION } from "../../version";
 import { KindMultipliersTable } from "../components/KindMultipliersTable";
 import { notify } from "../components/Toast";
 import { createIMMSession, recentIMMSessionsFor } from "../../db/repository";
@@ -191,6 +200,7 @@ interface CrewState {
   chiStar: number;
   couplingMode: VulnerabilityCouplingMode;
   familyBetaScale: number;
+  profileEffectMode: ProfileEffectMode;
 }
 
 const INITIAL_STATE: CrewState = {
@@ -203,6 +213,7 @@ const INITIAL_STATE: CrewState = {
   chiStar: 0.7,
   couplingMode: "off",
   familyBetaScale: 1.0,
+  profileEffectMode: "adjudicated",
 };
 
 // ─── localStorage autosave (Diego 2026-05-29) ────────────────────────────────
@@ -226,6 +237,7 @@ function persistCrewState(s: CrewState): void {
         chiStar: s.chiStar,
         couplingMode: s.couplingMode,
         familyBetaScale: s.familyBetaScale,
+        profileEffectMode: s.profileEffectMode,
       }),
     );
   } catch {
@@ -247,6 +259,7 @@ function loadPersistedCrewState(): CrewState | null {
       chiStar: number;
       couplingMode: VulnerabilityCouplingMode;
       familyBetaScale: number;
+      profileEffectMode: ProfileEffectMode;
     }>;
     if (!Array.isArray(p.members) || !p.mission) return null;
     const kit =
@@ -263,6 +276,7 @@ function loadPersistedCrewState(): CrewState | null {
       chiStar: p.chiStar ?? INITIAL_STATE.chiStar,
       couplingMode: p.couplingMode ?? INITIAL_STATE.couplingMode,
       familyBetaScale: p.familyBetaScale ?? INITIAL_STATE.familyBetaScale,
+      profileEffectMode: p.profileEffectMode ?? INITIAL_STATE.profileEffectMode,
     };
   } catch {
     return null;
@@ -409,13 +423,14 @@ export function CrewComposition() {
         trials: 5000, seed: state.seed, chiStar: state.chiStar, criteria: ACTIVE_CRITERIA,
         vulnerabilityCouplingMode: state.couplingMode,
         familyBetaScale: state.familyBetaScale,
+        profileEffectMode: state.profileEffectMode,
       });
     }, 400);
     return () => {
       clearTimeout(handle);
       if (previewWorkerRef.current) { previewWorkerRef.current.terminate(); previewWorkerRef.current = null; }
     };
-  }, [state.members, state.mission, state.kit, state.seed, state.chiStar, state.couplingMode, state.familyBetaScale]);
+  }, [state.members, state.mission, state.kit, state.seed, state.chiStar, state.couplingMode, state.familyBetaScale, state.profileEffectMode]);
 
   // ── I6 (2026-06-04): analog prior-uncertainty predictive effect ───────────
   // Fetch per-condition λ draws from the Python calibration API, then
@@ -494,6 +509,7 @@ export function CrewComposition() {
               kindMultipliers,
               vulnerabilityCouplingMode: state.couplingMode,
               familyBetaScale: state.familyBetaScale,
+              profileEffectMode: state.profileEffectMode,
             },
           });
         })
@@ -510,7 +526,7 @@ export function CrewComposition() {
       if (ppAbortRef.current) { ppAbortRef.current.abort(); ppAbortRef.current = null; }
       if (ppWorkerRef.current) { ppWorkerRef.current.terminate(); ppWorkerRef.current = null; }
     };
-  }, [state.members, state.mission, state.kit, state.seed, state.couplingMode, state.familyBetaScale, kindMultipliers]);
+  }, [state.members, state.mission, state.kit, state.seed, state.couplingMode, state.familyBetaScale, state.profileEffectMode, kindMultipliers]);
 
   function toggleMember(id: string) {
     setExpandedIds((prev) => {
@@ -642,8 +658,9 @@ export function CrewComposition() {
       criteria: ACTIVE_CRITERIA,
       vulnerabilityCouplingMode: state.couplingMode,
       familyBetaScale: state.familyBetaScale,
+      profileEffectMode: state.profileEffectMode,
     });
-  }, [simState, state.members, state.mission, state.kit, state.trials, state.seed, state.chiStar, state.couplingMode, state.familyBetaScale]);
+  }, [simState, state.members, state.mission, state.kit, state.trials, state.seed, state.chiStar, state.couplingMode, state.familyBetaScale, state.profileEffectMode]);
 
   // ── worker cleanup on unmount ───────────────────────────────────────────
   useEffect(() => {
@@ -688,9 +705,9 @@ export function CrewComposition() {
         className="sr-only"
       >
         Crew composite: {Math.round(composite.compositeScore * 100)}%,{" "}
-        {gateResult.crewVerdict === "qualified" ? "no review flags" : "review required"}.
+        {gateResult.crewVerdict === "qualified" ? "no demo-threshold flags" : "demo-threshold review flag present"}.
         {gateResult.disqualifiedMemberIds.length > 0
-          ? ` Review flags: ${gateResult.disqualifiedMemberIds.join(", ")}.`
+          ? ` Demo-threshold review flags: ${gateResult.disqualifiedMemberIds.join(", ")}.`
           : ""}
       </div>
 
@@ -775,7 +792,7 @@ export function CrewComposition() {
                   </span>
                   {gateResult.crewVerdict === "disqualified" && (
                     <span className="mono text-xs text-red-300">
-                      gate review required: {gateResult.disqualifiedMemberIds.join(", ")}
+                      demo-threshold review flag present: {gateResult.disqualifiedMemberIds.join(", ")}
                     </span>
                   )}
                   <span className="mono text-[11px] text-ink-3">
@@ -842,6 +859,27 @@ export function CrewComposition() {
                   );
                 })}
               </select>
+              <details className="mono text-[11px] text-ink-3 mt-0.5" data-testid="profile-effects-disclosure">
+                <summary className="cursor-pointer hover:text-ink-1">
+                  profile field effects: {PROFILE_EFFECTS.filter((e) => e.evidenceStatus !== "unsupported").length} modeled · {DESCRIPTIVE_ONLY_FIELDS.length} descriptive-only
+                  {ISOLATION_CONFINEMENT_EXPOSURE_MODELED ? " · I&C pilot active" : ""}
+                </summary>
+                <p className="leading-relaxed mt-1 text-ink-2">
+                  Duration, mission kind, EVA schedule, kit, and{" "}
+                  <span className="text-ink-1">comms delay → behavioral/psychiatric incidence</span>{" "}
+                  (pilot) drive the simulator. Remaining profile fields are{" "}
+                  <span className="text-warn">descriptive only; no modeled effect</span>{" "}
+                  (registry v{PROFILE_MAPPING_VERSION}).
+                </p>
+                <ul className="list-disc pl-4 mt-1 space-y-0.5">
+                  {DESCRIPTIVE_ONLY_FIELDS.map((e) => (
+                    <li key={e.profilePath}>
+                      <span className="text-ink-1">{e.profilePath}</span>{" "}
+                      <span className="text-ink-3">→ {e.target} ({e.model}) · descriptive only</span>
+                    </li>
+                  ))}
+                </ul>
+              </details>
               {/* 2026-06-04 mission-kind context badge. A `<button>` toggling a
                   `<details>` so the user can expand to read the multiplier
                   explanation + the per-condition table below the outcome area.
@@ -1034,6 +1072,38 @@ export function CrewComposition() {
                   </p>
                 </div>
               )}
+
+              <div className="flex items-center justify-between gap-3 border border-line/60 rounded px-3 py-2">
+                <div className="flex flex-col">
+                  <label htmlFor="profile-effect-mode" className="mono text-[12px] text-ink-2">
+                    Profile effects
+                  </label>
+                  <span className="mono text-[10px] text-ink-3">
+                    {state.profileEffectMode === "exploratory"
+                      ? "proposal sensitivity enabled"
+                      : state.profileEffectMode === "off"
+                        ? "zero-effect control"
+                        : "accepted effects only"}
+                  </span>
+                </div>
+                <select
+                  id="profile-effect-mode"
+                  className="mono text-[11px] border border-line/60 bg-transparent text-ink-1 px-2 py-1"
+                  value={state.profileEffectMode}
+                  onChange={(e) => {
+                    setState((s) => ({
+                      ...s,
+                      profileEffectMode: e.target.value as ProfileEffectMode,
+                    }));
+                    setOutcome(undefined);
+                    setSimState("idle");
+                  }}
+                >
+                  <option value="adjudicated">adjudicated</option>
+                  <option value="off">off</option>
+                  <option value="exploratory">exploratory</option>
+                </select>
+              </div>
 
               <div className="flex flex-col gap-1">
                 <label className="mono text-[12px] text-ink-3">
@@ -1340,9 +1410,10 @@ export function CrewComposition() {
               // reload. Each save creates a NEW session row — outcome-bearing
               // sessions are immutable; editing assumptions and re-saving
               // produces a derived session with a new id.
-              const [priorsHash, kindMultiplierHash] = await Promise.all([
+              const [priorsHash, kindMultiplierHash, profileEffectsHash] = await Promise.all([
                 computePriorsHash(),
                 computeKindMultiplierHash(),
+                computeProfileEffectsHash(),
               ]);
               const id = await createIMMSession({
                 candidateId: null,
@@ -1358,14 +1429,19 @@ export function CrewComposition() {
                 outcomes: outcome ?? null,
                 couplingMode: state.couplingMode,
                 familyBetaScale: state.familyBetaScale,
+                profileEffectMode: state.profileEffectMode,
                 chiStar: state.chiStar,
                 aggregator: state.aggregator,
                 criterionCatalogId: ACTIVE_CRITERION_CATALOG.id,
                 criterionCatalogVersion: ACTIVE_CRITERION_CATALOG.version,
+                profileMappingVersion: PROFILE_MAPPING_VERSION,
                 priorsHash,
                 kindMultiplierHash,
+                profileEffectsHash,
+                activeProfileEffects: activeProfileEffectsForMode(state.profileEffectMode),
                 evidenceStatusSnapshot: EVIDENCE_STATUS_SNAPSHOT,
                 softwareVersion: SELECTRON_VERSION,
+                sourceCommit: SELECTRON_SOURCE_COMMIT,
                 validation: {
                   vsK15Table1: {
                     delta_tme: 0, delta_chi: 0, delta_pEvac: 0, delta_pLocl: 0,
@@ -1397,7 +1473,7 @@ export function CrewComposition() {
           aria-label="Load recent IMM session"
           className="mono text-xs border border-line/40 bg-transparent text-ink-1 px-2 py-1"
           value=""
-          onChange={(e) => {
+          onChange={async (e) => {
             const sid = e.target.value;
             if (!sid) return;
             const s = recentSessions.find((r) => r.id === sid);
@@ -1414,14 +1490,26 @@ export function CrewComposition() {
               // generated its outcome (not the current working-state controls).
               couplingMode: s.couplingMode ?? cur.couplingMode,
               familyBetaScale: s.familyBetaScale ?? cur.familyBetaScale,
+              profileEffectMode: s.profileEffectMode ?? cur.profileEffectMode,
               chiStar: s.chiStar ?? cur.chiStar,
               aggregator: s.aggregator ?? cur.aggregator,
             }));
-            // A config-only session has no outcome — clear any stale result so
-            // the user re-runs the loaded setup.
-            setOutcome(s.outcomes ?? undefined);
+            // A config-only or stale session has no current-engine outcome.
+            // Clear any prior result so the user re-runs the loaded setup.
+            let loadStatus: Awaited<ReturnType<typeof classifySavedOutcomeStatus>> | null = null;
+            if (s.outcomes) {
+              loadStatus = await classifySavedOutcomeStatus(s);
+            }
+            setOutcome(s.outcomes && loadStatus === "current" ? s.outcomes : undefined);
             setSimState("idle");
-            notify(s.outcomes ? `session loaded` : `config loaded — press run`, "info");
+            notify(
+              s.outcomes
+                ? (loadStatus === "current"
+                    ? "session loaded"
+                    : `session loaded as config — saved outcome is ${loadStatus}`)
+                : "config loaded — press run",
+              "info",
+            );
             e.target.value = "";
           }}
         >
@@ -1442,12 +1530,14 @@ export function CrewComposition() {
             // F3/F4: export the full assumption set + evidence provenance so the
             // exported JSON is self-describing and cannot be confused with a
             // calibrated estimate.
-            const [priorsHash, kindMultiplierHash] = await Promise.all([
+            const [priorsHash, kindMultiplierHash, profileEffectsHash] = await Promise.all([
               computePriorsHash(),
               computeKindMultiplierHash(),
+              computeProfileEffectsHash(),
             ]);
             const payload = {
               softwareVersion: SELECTRON_VERSION,
+              sourceCommit: SELECTRON_SOURCE_COMMIT,
               exportedAt: new Date().toISOString(),
               mission: { ...state.mission, crewSize: state.members.length, totalEVAs },
               kit: state.kit.scenarioId,
@@ -1457,6 +1547,7 @@ export function CrewComposition() {
               // F3: operative scenario controls
               couplingMode: state.couplingMode,
               familyBetaScale: state.familyBetaScale,
+              profileEffectMode: state.profileEffectMode,
               chiStar: state.chiStar,
               aggregator: state.aggregator,
               // F3: catalog + prior/multiplier provenance
@@ -1464,8 +1555,11 @@ export function CrewComposition() {
                 id: ACTIVE_CRITERION_CATALOG.id,
                 version: ACTIVE_CRITERION_CATALOG.version,
               },
+              profileMappingVersion: PROFILE_MAPPING_VERSION,
               priorsHash,
               kindMultiplierHash,
+              profileEffectsHash,
+              activeProfileEffects: activeProfileEffectsForMode(state.profileEffectMode),
               // F4: operative evidence coverage + disclaimer
               evidenceStatus: EVIDENCE_STATUS_SNAPSHOT,
               coverageStatement: EVIDENCE_COVERAGE_STATEMENT,

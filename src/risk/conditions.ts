@@ -345,7 +345,7 @@ export const ANALOG_CONDITIONS: readonly Condition[] = [
     label: "Sustained cognitive performance decrement (>1 week)",
     family: "performance",
     kind: "rate",
-    vulnerabilityCriteria: ["cognitive.nasa_cognition_battery", "cognitive.pvt_b_rt_ms"],
+    vulnerabilityCriteria: ["cognitive.nasa_cognition_battery"],
     citations: [
       "10.1371/journal.pone.0093298", // Basner 2014 — 1/6 Mars500 crew sustained PVT/cognitive decline
       "10.3389/fnhum.2026.1720237", // Glos 2026 — 4-month isolation cognitive trajectory

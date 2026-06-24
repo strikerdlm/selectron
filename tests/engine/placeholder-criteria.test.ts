@@ -3,20 +3,19 @@ import { ACTIVE_CRITERION_CATALOG, DEMO_CRITERIA } from "@/data/demo-criteria";
 import { ACCESS_TIERS } from "@/types";
 
 describe("DEMO_CRITERIA", () => {
-  it("has 12 demo entries and is explicitly non-ratified", () => {
-    expect(DEMO_CRITERIA.length).toBe(12);
+  it("has 11 demo entries and is explicitly non-ratified", () => {
+    expect(DEMO_CRITERIA.length).toBe(11);
     expect(ACTIVE_CRITERION_CATALOG.status).toBe("demo");
     expect(ACTIVE_CRITERION_CATALOG.intendedUse).toContain("not a ratified eligibility or selection instrument");
   });
 
-  // F10: the PVT-B / NASA Cognition construct overlap is documented as a
-  // known limitation on the catalog (author to resolve by dropping one).
-  it("documents the PVT-B double-weighting as a known catalog limitation", () => {
+  // F10 resolved: standalone PVT-B removed; vigilance only via NASA Cognition composite.
+  it("documents single-path vigilance scoring (no PVT double-weighting)", () => {
     expect(ACTIVE_CRITERION_CATALOG.knownLimitations).toBeDefined();
-    expect(ACTIVE_CRITERION_CATALOG.knownLimitations!.length).toBeGreaterThan(0);
+    expect(DEMO_CRITERIA.some((c) => c.id === "cognitive.pvt_b_rt_ms")).toBe(false);
     const joined = ACTIVE_CRITERION_CATALOG.knownLimitations!.join(" ");
-    expect(joined).toContain("double-weighted");
-    expect(joined).toMatch(/pvt.?b/i);
+    expect(joined).toMatch(/NASA Cognition/i);
+    expect(joined).not.toContain("double-weighted");
   });
 
   it("each has unique id, sane scale, and at least one citation", () => {

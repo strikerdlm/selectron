@@ -15,7 +15,6 @@ const HETERO: Candidate = {
     "professional.technical_competence": 3,
     "behavioral.teamwork": 4,
     "cognitive.nasa_cognition_battery": 2.0,
-    "cognitive.pvt_b_rt_ms": 220,
     "physical.sot5_equilibrium": 85,
     "psych.resilience_cdrisc": 90,
     "psych.emotional_intelligence": 1.5,

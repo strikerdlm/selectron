@@ -87,9 +87,9 @@ function sampleFromPosterior(rng: Rng, samples: readonly number[]): number {
   return samples[idx];
 }
 
-// Build z-vector for a crew member by looking up the criteria the condition
-// flags as vulnerability drivers. Z-scores each raw score against the
-// criterion's operational scale (scale [min,max] = ±2 SD range, 4 SDs total).
+// Build a scale-relative vector for a crew member by looking up the criteria
+// the condition flags as vulnerability drivers. This is not a population
+// z-score: scale min maps to -2, midpoint to 0, and max to +2.
 //
 // Sign convention: HIGH-quality candidate → SMALL λ multiplier.
 // β is negative in SYNTHETIC_PRIORS (G6). So we need β·z < 0 for high-quality,

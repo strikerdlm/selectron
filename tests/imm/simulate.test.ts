@@ -403,7 +403,7 @@ describe("General-Poisson duration scaling", () => {
   });
 });
 
-// ── IC-5: Stage A z-scored vulnerability multiplier ──────────────────────────
+// ── IC-5: Stage A scale-relative vulnerability multiplier ───────────────────
 import { applyStageAVulnerabilityMultiplier } from "../../src/imm/simulate";
 import type { IMMConditionFamily } from "../../src/imm/types";
 import type { Criterion } from "../../src/types";
@@ -947,5 +947,38 @@ describe("F9: simulateIMM fail-closed input validation", () => {
     expect(() => simulateIMM({ ...base, kindMultipliers: { "uti": Infinity } })).toThrowError(SelectronError);
     expect(() => simulateIMM({ ...base, tierBMultiplier: -0.5 })).toThrowError(SelectronError);
     expect(() => simulateIMM({ ...base, tierBMultiplier: NaN })).toThrowError(SelectronError);
+  });
+
+  it("rejects out-of-range, unknown, and non-finite Stage-A scores when criteria are supplied", () => {
+    const criterion = {
+      id: "psych.score_a",
+      family: "psychological",
+      label: "Score A",
+      description: "",
+      instrument: "test",
+      scale: { min: 0, max: 100 },
+      higherIsBetter: true,
+      citations: [],
+      minimumTier: "minimum",
+    } satisfies Criterion;
+    const scoredCrew: IMMCrewMember[] = [{
+      ...oneCrew[0],
+      stageAScores: { "psych.score_a": 101 },
+    }];
+    expect(() => simulateIMM({ ...base, crew: scoredCrew, criteria: [criterion] })).toThrowError(SelectronError);
+    expect(() =>
+      simulateIMM({
+        ...base,
+        crew: [{ ...oneCrew[0], stageAScores: { "psych.unknown": 50 } }],
+        criteria: [criterion],
+      }),
+    ).toThrowError(SelectronError);
+    expect(() =>
+      simulateIMM({
+        ...base,
+        crew: [{ ...oneCrew[0], stageAScores: { "psych.score_a": NaN } }],
+        criteria: [criterion],
+      }),
+    ).toThrowError(SelectronError);
   });
 });

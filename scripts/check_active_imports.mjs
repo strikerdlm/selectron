@@ -50,8 +50,11 @@ function walk(dir, out = []) {
   return out;
 }
 
-// Capture both static `from "x"` and dynamic `import("x")` specifiers.
-const IMPORT_RE = /(?:\bfrom\s*|import\s*\(\s*)["']([^"']+)["']/g;
+// Capture static `from "x"`, side-effect `import "x"`, and literal dynamic
+// `import("x")` specifiers. Computed dynamic imports are intentionally outside
+// this lightweight guard; use the TypeScript compiler API or a dependency-graph
+// tool before treating this as an exhaustive architectural boundary.
+const IMPORT_RE = /(?:\bfrom\s*|\bimport\s+|import\s*\(\s*)["']([^"']+)["']/g;
 
 function resolveSpecifier(specifier, importer) {
   if (specifier.startsWith("@/")) {

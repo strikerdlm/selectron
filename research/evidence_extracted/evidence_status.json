@@ -1,8 +1,8 @@
 {
   "ledgerPath": "research/evidence_extracted/evidence_ledger.csv",
   "priorsPath": "src/data/imm-priors.json",
-  "acceptedCount": 0,
-  "proposalCount": 0,
+  "acceptedCount": 4,
+  "proposalCount": 1,
   "proposalRefCount": 7,
   "proposalRefConditionIds": [
     "ankle-sprain-strain",
@@ -13,9 +13,9 @@
     "nephrolithiasis",
     "urinary-tract-infection"
   ],
-  "activeParameterCount": 4846,
+  "activeParameterCount": 4849,
   "acceptedCoveredParameterCount": 0,
-  "uncoveredParameterCount": 4846,
+  "uncoveredParameterCount": 4849,
   "uncoveredParameterPaths": [
     "conditions.abdominal-injury.incidence.alpha",
     "conditions.abdominal-injury.incidence.beta",
@@ -4862,9 +4862,17 @@
     "global_calibration.kind_multipliers.antarctic-station.visual-impairment-and-intracranial-pressure-viip-space-adaptation",
     "global_calibration.tierA_multiplier",
     "global_calibration.tierB_multiplier",
-    "global_calibration.tierC_multiplier"
+    "global_calibration.tierC_multiplier",
+    "profile_effects.mission.durationDays.incidence.estimate",
+    "profile_effects.mission.evaSchedule.incidence.estimate",
+    "profile_effects.profile.communication.delaySec.incidence.estimate"
   ],
-  "malformedAcceptedRows": [],
+  "malformedAcceptedRows": [
+    "row 2: column count 23 != 25; missing prior_value_hash; study_doi 10.3357/ASEM.3612.2013 does not match S20_walton_kerstman_2020_iss_quantification (10.3357/AMHP.5432.2020)",
+    "row 3: column count 23 != 25; missing prior_value_hash; study_doi 10.3357/ASEM.3612.2013 does not match S20_walton_kerstman_2020_iss_quantification (10.3357/AMHP.5432.2020)",
+    "row 4: column count 23 != 25; missing prior_value_hash; study_slug M18_myers_2018_imm_validation has no DOI; found 10.3357/amhp.4343.2015",
+    "row 5: column count 23 != 25; missing prior_value_hash; study_slug M18_myers_2018_imm_validation has no DOI; found 10.3357/amhp.4343.2015"
+  ],
   "releasePriorsAdjudicated": false,
   "status": "unadjudicated",
   "message": "No complete adjudicated analog evidence release is available; active prior parameters remain uncovered or proposal-stage references remain exploratory."

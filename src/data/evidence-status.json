@@ -1,8 +1,8 @@
 {
   "status": "unadjudicated",
   "releasePriorsAdjudicated": false,
-  "acceptedCount": 0,
-  "proposalCount": 0,
+  "acceptedCount": 4,
+  "proposalCount": 1,
   "proposalRefCount": 7,
   "proposalRefConditionIds": [
     "ankle-sprain-strain",
@@ -13,10 +13,10 @@
     "nephrolithiasis",
     "urinary-tract-infection"
   ],
-  "activeParameterCount": 4846,
+  "activeParameterCount": 4849,
   "acceptedCoveredParameterCount": 0,
-  "uncoveredParameterCount": 4846,
-  "malformedAcceptedRowCount": 0,
+  "uncoveredParameterCount": 4849,
+  "malformedAcceptedRowCount": 4,
   "message": "No complete adjudicated analog evidence release is available; active prior parameters remain uncovered or proposal-stage references remain exploratory.",
-  "generatedAt": "2026-06-23T16:55:34.707Z"
+  "generatedAt": "2026-06-24T00:33:11.051Z"
 }

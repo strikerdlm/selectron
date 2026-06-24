@@ -145,8 +145,9 @@ export const DEMO_CRITERIA: readonly Criterion[] = [
     label: "Cognitive throughput (NASA Cognition Battery)",
     description:
       "Composite z-score across 10 subtests (PVT-B, DSST, AM, F2B, ERT, MRT, BART, VOLT, LOT, MPT) " +
-      "captured on the same instrument NASA flies on the ISS. Predicts technical-task performance " +
-      "under sleep restriction; d ≥ 0.65 under known stressor.",
+      "captured on the same instrument NASA flies on the ISS. Vigilance is represented only via the " +
+      "embedded PVT-B subtest (no separate PVT criterion in this demo catalog). Predicts technical-task " +
+      "performance under sleep restriction; d ≥ 0.65 under known stressor.",
     instrument: "NASA Cognition Test Battery — composite z-score (Basner et al. 2015)",
     // Operational range of the composite z relative to astronaut-cohort norms ≈ [-3, +3]
     scale: { min: -3, max: 3 },
@@ -173,45 +174,6 @@ export const DEMO_CRITERIA: readonly Criterion[] = [
       elite: {
         instrument: "NASA Cognition Battery (Basner et al. 2015; Joggle Research / Pulsar Informatics; institutional subscription)",
         citations: ["10.3357/amhp.4343.2015", "10.3389/fphys.2024.1451269"],
-      },
-    },
-  },
-  {
-    // scope-expansion-3 follow-up (2026-05-19): renamed from cognitive.pvt_b_lapses
-    // to cognitive.pvt_b_rt_ms — Diego pointed out he has the NASA PVT iOS app
-    // (free), and the iOS app's headline output is mean reaction time in ms (not
-    // lapse count). Mean RT is also the more interpretable + comparable metric
-    // across populations. The lapse count is still tracked internally by the
-    // app but the primary score we record in Selectron is mean RT (ms).
-    id: "cognitive.pvt_b_rt_ms",
-    family: "cognitive",
-    label: "Vigilance — PVT-B reaction time",
-    description:
-      "Mean reaction time (in milliseconds) on the 3-minute Psychomotor Vigilance Test Brief — " +
-      "the ISS standard for detecting dangerous slowing before EVAs. Operational range for adults: " +
-      "200–500 ms; <250 ms = elite vigilance, 250–300 ms = typical, >350 ms = sleep-restriction " +
-      "impairment, >500 ms = a 'lapse' (Dinges et al. 1991 criterion). Lower RT means better " +
-      "sustained-attention performance.",
-    instrument: "PVT-B 3-min, mean RT in ms (Basner 2011; NASA PVT iOS app at par.iagc.com)",
-    // Scale: 200 ms (elite floor) to 500 ms (lapse threshold).
-    scale: { min: 200, max: 500 },
-    higherIsBetter: false, // shorter RT = higher Selectron z
-    citations: ["10.1093/sleep/34.5.581"],
-    minimumTier: "minimum", // 8-of-12 DIY-feasible core
-    tierInstruments: {
-      minimum: {
-        instrument: "NASA PVT (iOS app, FREE) — distributed by NASA Behavioral Health & Performance lab; same engine as the ISS PVT-B reaction-self-test. Records mean RT, fastest 10%, slowest 10%, and lapses (RT > 500 ms).",
-        citations: ["10.1093/sleep/34.5.581"],
-        notes: "Diego confirms NASA PVT iOS app is accessible at no cost — preferred Tier-1 PVT instrument. PEBL PVT module is a cross-platform fallback if iOS is unavailable.",
-      },
-      medium: {
-        instrument: "NASA PVT (iOS app, free) or commercial Pulsar Informatics PVT-B (Windows/tablet; ~USD 200–500/yr).",
-        citations: ["10.1093/sleep/34.5.581"],
-        notes: "At Tier 2 the same NASA PVT app is still defensible; the commercial Pulsar version is a richer-norms alternative when a research license is in budget.",
-      },
-      elite: {
-        instrument: "PVT-B embedded within the NASA Cognition Battery (same Joggle platform; avoids double-counting the subtest).",
-        citations: ["10.1093/sleep/34.5.581"],
       },
     },
   },
@@ -397,14 +359,11 @@ export const DEMO_CRITERION_CATALOG: CriterionCatalog = {
   intendedUse:
     "Research demonstration of uncertain-weight MCDA scoring only; not a ratified eligibility or selection instrument.",
   knownLimitations: [
-    // F10: the NASA Cognition Battery composite (cognitive.nasa_cognition_battery)
-    // explicitly includes a PVT-B subtest, and PVT-B is also scored as a
-    // separate criterion (cognitive.pvt_b_rt_ms). Under the equal-weight
-    // Dirichlet(1,…,1) prior, vigilance is therefore double-weighted relative
-    // to other domains. This is a known construct overlap awaiting author
-    // resolution (drop PVT-B from the composite, or drop the standalone PVT-B
-    // criterion); it does not affect the demo-only status of the catalog.
-    "Vigilance is double-weighted: the NASA Cognition composite includes PVT-B, which is also scored as a standalone criterion (cognitive.pvt_b_rt_ms). Equal Dirichlet(1,…,1) weights therefore over-represent vigilance relative to other domains. Awaiting author resolution.",
+    // F10 resolved (2026-06-23): standalone PVT-B removed from the demo catalog;
+    // vigilance is represented only via the PVT-B subtest inside the NASA Cognition
+    // composite, matching the Tier-3 instrument note and avoiding double-weighting
+    // under equal Dirichlet(1,…,1) MCDA weights.
+    "Vigilance is scored only through the NASA Cognition Battery composite (PVT-B subtest). A separate PVT-B criterion is not included in this demo catalog to avoid construct double-counting.",
   ],
   criteria: DEMO_CRITERIA,
 };

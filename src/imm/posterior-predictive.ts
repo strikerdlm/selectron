@@ -39,6 +39,7 @@ import type {
   PosteriorPredictiveOutcome,
   PosteriorSummary,
   VulnerabilityCouplingMode,
+  ProfileEffectMode,
 } from "./types";
 import { simulateIMM } from "./simulate";
 import { loadIMMPriors } from "./priors";
@@ -63,6 +64,7 @@ export type PosteriorPredictiveOpts = {
   tierCMultiplier?: number;
   vulnerabilityCouplingMode?: VulnerabilityCouplingMode;
   familyBetaScale?: number;
+  profileEffectMode?: ProfileEffectMode;
 };
 
 /**
@@ -208,6 +210,7 @@ export function posteriorPredictiveSimulateIMM(
       tierCMultiplier: opts.tierCMultiplier,
       vulnerabilityCouplingMode: opts.vulnerabilityCouplingMode ?? "off",
       familyBetaScale: opts.familyBetaScale,
+      profileEffectMode: opts.profileEffectMode ?? "adjudicated",
     });
 
     pEvacByDraw.push(out.pEvac.mean);

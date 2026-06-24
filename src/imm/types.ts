@@ -338,18 +338,32 @@ export type IMMSession = {
    * backward compatibility with pre-existing Dexie rows.
    */
   familyBetaScale?: number;
+  profileEffectMode?: ProfileEffectMode;
   chiStar?: number;
   aggregator?: CrewCompositeMethod;
   criterionCatalogId?: string;
   criterionCatalogVersion?: string;
+  profileMappingVersion?: string;
   /** SHA-256 over the canonical JSON of the loaded prior set at save time. */
   priorsHash?: string;
   /** SHA-256 over the active kind_multipliers block at save time. */
   kindMultiplierHash?: string;
+  /** SHA-256 over PROFILE_EFFECTS at save time. */
+  profileEffectsHash?: string;
+  /** Active profile-effect estimates under the saved profileEffectMode. */
+  activeProfileEffects?: Array<{
+    profilePath: string;
+    estimate: number;
+    evidenceStatus: import("./profile-effects").ProfileEffectEvidenceStatus;
+  }>;
   /** Frozen evidence-ledger status snapshot (F4) — the operative coverage. */
   evidenceStatusSnapshot?: import("./provenance").EvidenceStatusSnapshot;
   /** Selectron software version at save time (src/version.ts). */
   softwareVersion?: string;
+  /** Source/build commit at save time. */
+  sourceCommit?: string;
+  /** Current-state comparison assigned on load, not persisted by older rows. */
+  loadStatus?: import("./provenance").SavedOutcomeStatus;
   validation: {
     vsK15Table1: {
       delta_tme: number; delta_chi: number;
@@ -361,3 +375,4 @@ export type IMMSession = {
 };
 
 export type VulnerabilityCouplingMode = "off" | "scenario";
+export type ProfileEffectMode = import("./profile-effects").ProfileEffectMode;

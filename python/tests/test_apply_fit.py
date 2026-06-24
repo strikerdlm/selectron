@@ -71,8 +71,9 @@ def test_main_dry_run_does_not_merge(tmp_path: Path):
     mock_report.n_failed = 0
     mock_report.n_skipped = 0
 
-    with patch("apply_fit.fit_all_tier_b", return_value=mock_report) as mock_fit, \
-         patch("apply_fit.merge_fitted_priors") as mock_merge, \
+    with patch("selectron.fitter.fit_all_tier_b", return_value=mock_report) as mock_fit, \
+         patch("selectron.writer.merge_fitted_priors") as mock_merge, \
+         patch("apply_fit.accepted_evidence_count", return_value=1), \
          patch("sys.argv", ["apply_fit.py", "--dry-run"]):
         apply_fit.main()
 
@@ -92,8 +93,8 @@ def test_main_allow_proposals_uses_exploratory_source(tmp_path: Path):
     mock_report.n_failed = 0
     mock_report.n_skipped = 0
 
-    with patch("apply_fit.fit_all_tier_b", return_value=mock_report) as mock_fit, \
-         patch("apply_fit.merge_fitted_priors"), \
+    with patch("selectron.fitter.fit_all_tier_b", return_value=mock_report) as mock_fit, \
+         patch("selectron.writer.merge_fitted_priors"), \
          patch("sys.argv", ["apply_fit.py", "--dry-run", "--allow-proposals"]):
         apply_fit.main()
 
@@ -113,9 +114,10 @@ def test_main_failed_conditions_write_diagnostics(tmp_path: Path):
     mock_report.n_failed = 1
     mock_report.n_skipped = 0
 
-    with patch("apply_fit.fit_all_tier_b", return_value=mock_report), \
-         patch("apply_fit.merge_fitted_priors"), \
+    with patch("selectron.fitter.fit_all_tier_b", return_value=mock_report), \
+         patch("selectron.writer.merge_fitted_priors"), \
          patch("apply_fit.write_diagnostics") as mock_write_diag, \
+         patch("apply_fit.accepted_evidence_count", return_value=1), \
          patch("sys.argv", ["apply_fit.py"]):
         apply_fit.main()
 

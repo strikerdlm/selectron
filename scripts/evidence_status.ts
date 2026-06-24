@@ -1,6 +1,8 @@
 import { readFileSync, writeFileSync } from "node:fs";
+import { createHash } from "node:crypto";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
+import { PROFILE_EFFECTS } from "../src/imm/profile-effects";
 
 export type EvidenceStatus = {
   ledgerPath: string;
@@ -25,8 +27,10 @@ const PRIORS_PATH = "src/data/imm-priors.json";
 
 const REQUIRED_ACCEPTED_FIELDS = [
   "parameter_path",
+  "study_doi",
   "study_slug",
   "endpoint_definition",
+  "extraction_quote",
   "extractor",
   "verifier",
   "risk_of_bias",
@@ -37,11 +41,40 @@ const REQUIRED_ACCEPTED_FIELDS = [
   "prior_value_hash",
 ];
 
-function parseCsvRecords(text: string): string[][] {
-  const rows: string[][] = [];
+type CsvRecord = {
+  physicalRow: number;
+  values: string[];
+};
+
+type EvidenceLedgerRow = {
+  index: number;
+  rawColumnCount: number;
+  status?: string;
+  parameter_path?: string;
+  study_doi?: string;
+  study_slug?: string;
+  extractor?: string;
+  verifier?: string;
+  prior_value_hash?: string;
+  [key: string]: string | number | undefined;
+};
+
+const SOURCE_DOI_BY_SLUG: Record<string, string | null> = {
+  M18_myers_2018_imm_validation: null,
+  S20_walton_kerstman_2020_iss_quantification: "10.3357/AMHP.5432.2020",
+};
+
+function normalizeDoi(value: string): string {
+  return value.trim().toLowerCase();
+}
+
+function parseCsvRecords(text: string): CsvRecord[] {
+  const rows: CsvRecord[] = [];
   let row: string[] = [];
   let field = "";
   let inQuotes = false;
+  let physicalRow = 1;
+  let recordStartRow = 1;
 
   for (let i = 0; i < text.length; i++) {
     const ch = text[i];
@@ -66,26 +99,38 @@ function parseCsvRecords(text: string): string[][] {
     if ((ch === "\n" || ch === "\r") && !inQuotes) {
       if (ch === "\r" && next === "\n") i++;
       row.push(field);
-      if (row.some((value) => value.trim().length > 0)) rows.push(row);
+      if (row.some((value) => value.trim().length > 0)) {
+        rows.push({ physicalRow: recordStartRow, values: row });
+      }
       row = [];
       field = "";
+      physicalRow++;
+      recordStartRow = physicalRow;
       continue;
     }
 
+    if ((ch === "\n" || ch === "\r") && inQuotes) {
+      physicalRow++;
+    }
     field += ch;
   }
 
   row.push(field);
-  if (row.some((value) => value.trim().length > 0)) rows.push(row);
+  if (row.some((value) => value.trim().length > 0)) {
+    rows.push({ physicalRow: recordStartRow, values: row });
+  }
   return rows;
 }
 
-function parseCsvRows(text: string): Record<string, string>[] {
+function parseCsvRows(text: string): EvidenceLedgerRow[] {
   const records = parseCsvRecords(text);
   if (records.length <= 1) return [];
-  const headers = records[0].map((h) => h.trim());
-  return records.slice(1).map((values) => {
-    const row: Record<string, string> = {};
+  const headers = records[0].values.map((h) => h.trim());
+  return records.slice(1).map(({ physicalRow, values }) => {
+    const row: EvidenceLedgerRow = {
+      index: physicalRow,
+      rawColumnCount: values.length,
+    };
     headers.forEach((header, index) => {
       row[header] = (values[index] ?? "").trim();
     });
@@ -104,10 +149,18 @@ function walkNumericParameters(value: unknown, prefix: string, out: string[]): v
   }
 }
 
+function profileEffectParameterPaths(): string[] {
+  return PROFILE_EFFECTS.flatMap((effect) =>
+    typeof effect.estimate === "number" && Number.isFinite(effect.estimate)
+      ? [`profile_effects.${effect.profilePath}.${effect.target}.estimate`]
+      : [],
+  );
+}
+
 function activeParameterPaths(priors: {
   conditions?: Record<string, unknown>;
   global_calibration?: Record<string, unknown>;
-}): string[] {
+}, includeProfileEffects: boolean): string[] {
   const paths: string[] = [];
   for (const [conditionId, rawPrior] of Object.entries(priors.conditions ?? {})) {
     const prior = rawPrior as Record<string, unknown>;
@@ -133,16 +186,80 @@ function activeParameterPaths(priors: {
     }
   }
 
+  if (includeProfileEffects) {
+    paths.push(...profileEffectParameterPaths());
+  }
+
   return Array.from(new Set(paths)).sort();
 }
 
-function malformedAcceptedRowIds(rows: Record<string, string>[]): string[] {
+function valueAtPath(root: unknown, path: string): unknown {
+  let cur: unknown = root;
+  for (const part of path.split(".")) {
+    if (!cur || typeof cur !== "object" || Array.isArray(cur)) return undefined;
+    cur = (cur as Record<string, unknown>)[part];
+  }
+  return cur;
+}
+
+function priorValueHash(value: number): string {
+  return createHash("sha256").update(String(value)).digest("hex").slice(0, 16);
+}
+
+function malformedAcceptedRowIds(
+  rows: EvidenceLedgerRow[],
+  headerColumnCount: number,
+  activePaths: ReadonlySet<string>,
+  priors: unknown,
+): string[] {
   const malformed: string[] = [];
-  rows.forEach((row, index) => {
+  rows.forEach((row) => {
     if (row.status !== "accepted") return;
+    const reasons: string[] = [];
+
+    if (row.rawColumnCount !== headerColumnCount) {
+      reasons.push(`column count ${row.rawColumnCount} != ${headerColumnCount}`);
+    }
+
     const missing = REQUIRED_ACCEPTED_FIELDS.filter((field) => !row[field]);
-    if (missing.length > 0) {
-      malformed.push(`row ${index + 2}: missing ${missing.join("|")}`);
+    if (missing.length > 0) reasons.push(`missing ${missing.join("|")}`);
+
+    if (row.extractor && row.verifier && row.extractor === row.verifier) {
+      reasons.push("extractor and verifier are not independent");
+    }
+
+    if (row.parameter_path && !activePaths.has(row.parameter_path)) {
+      reasons.push("parameter_path is not active");
+    }
+
+    const studySlug = row.study_slug;
+    const studyDoi = row.study_doi ?? "";
+    if (studySlug && studySlug in SOURCE_DOI_BY_SLUG) {
+      const expectedDoi = SOURCE_DOI_BY_SLUG[studySlug];
+      if (expectedDoi === null && row.study_doi) {
+        reasons.push(`study_slug ${studySlug} has no DOI; found ${row.study_doi}`);
+      } else if (
+        expectedDoi !== null &&
+        normalizeDoi(studyDoi) !== normalizeDoi(expectedDoi)
+      ) {
+        reasons.push(`study_doi ${studyDoi} does not match ${studySlug} (${expectedDoi})`);
+      }
+    }
+
+    if (row.parameter_path && row.prior_value_hash) {
+      const value = valueAtPath(priors, row.parameter_path);
+      if (typeof value !== "number" || !Number.isFinite(value)) {
+        reasons.push("prior_value_hash cannot be checked because active parameter value is not finite numeric");
+      } else {
+        const expectedHash = priorValueHash(value);
+        if (row.prior_value_hash !== expectedHash) {
+          reasons.push(`prior_value_hash ${row.prior_value_hash} != active ${expectedHash}`);
+        }
+      }
+    }
+
+    if (reasons.length > 0) {
+      malformed.push(`row ${row.index}: ${reasons.join("; ")}`);
     }
   });
   return malformed;
@@ -151,7 +268,10 @@ function malformedAcceptedRowIds(rows: Record<string, string>[]): string[] {
 export function buildEvidenceStatus(root = REPO_ROOT): EvidenceStatus {
   const ledgerPath = resolve(root, LEDGER_PATH);
   const priorsPath = resolve(root, PRIORS_PATH);
-  const ledgerRows = parseCsvRows(readFileSync(ledgerPath, "utf8"));
+  const ledgerText = readFileSync(ledgerPath, "utf8");
+  const ledgerRecords = parseCsvRecords(ledgerText);
+  const headerColumnCount = ledgerRecords[0]?.values.length ?? 0;
+  const ledgerRows = parseCsvRows(ledgerText);
   const acceptedCount = ledgerRows.filter((row) => row.status === "accepted").length;
   const proposalCount = ledgerRows.filter((row) => row.status === "proposal").length;
 
@@ -164,11 +284,19 @@ export function buildEvidenceStatus(root = REPO_ROOT): EvidenceStatus {
     .map(([conditionId]) => conditionId)
     .sort();
 
-  const parameterPaths = activeParameterPaths(priors);
+  const parameterPaths = activeParameterPaths(priors, root === REPO_ROOT);
+  const activePathSet = new Set(parameterPaths);
   const acceptedRows = ledgerRows.filter((row) => row.status === "accepted");
-  const malformedRows = malformedAcceptedRowIds(ledgerRows);
+  const malformedRows = malformedAcceptedRowIds(ledgerRows, headerColumnCount, activePathSet, priors);
+  const malformedRowIndexes = new Set(
+    malformedRows.flatMap((message) => {
+      const match = /^row (\d+):/.exec(message);
+      return match ? [Number(match[1])] : [];
+    }),
+  );
+  const validAcceptedRows = acceptedRows.filter((row) => !malformedRowIndexes.has(row.index));
   const acceptedParameterPaths = new Set(
-    acceptedRows
+    validAcceptedRows
       .map((row) => row.parameter_path)
       .filter((path): path is string => typeof path === "string" && path.length > 0),
   );

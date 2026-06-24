@@ -74,6 +74,7 @@ function EvidenceStatusSection() {
     { label: "accepted rows", value: fmtInt(evidenceStatus.acceptedCount) },
     { label: "proposal refs", value: fmtInt(evidenceStatus.proposalRefCount) },
     { label: "covered params", value: `${fmtInt(evidenceStatus.acceptedCoveredParameterCount)} / ${fmtInt(evidenceStatus.activeParameterCount)}` },
+    { label: "malformed accepted rows", value: fmtInt(evidenceStatus.malformedAcceptedRowCount) },
     { label: "coverage", value: `${coveragePct.toFixed(1)}%` },
   ];
 
@@ -91,7 +92,7 @@ function EvidenceStatusSection() {
       <p className="text-sm text-ink-2 mt-3 max-w-4xl">
         {evidenceStatus.message}
       </p>
-      <div className="grid grid-cols-2 lg:grid-cols-4 border-y border-line/60 divide-x divide-line/60 mt-4">
+      <div className="grid grid-cols-2 lg:grid-cols-5 border-y border-line/60 divide-x divide-line/60 mt-4">
         {stats.map((s) => (
           <div key={s.label} className="px-3 py-3">
             <div className="mono text-[12px] text-ink-0">{s.value}</div>

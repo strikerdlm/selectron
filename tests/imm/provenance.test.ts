@@ -12,7 +12,12 @@ import {
   sha256Hex,
   computePriorsHash,
   computeKindMultiplierHash,
+  computeProfileEffectsHash,
+  activeProfileEffectsForMode,
+  classifySavedOutcomeStatus,
+  PROFILE_MAPPING_VERSION,
 } from "../../src/imm/provenance";
+import { SELECTRON_SOURCE_COMMIT, SELECTRON_VERSION } from "../../src/version";
 
 describe("provenance — SHA-256 helpers (F3)", () => {
   it("sha256Hex is deterministic and matches the known digest of 'abc'", async () => {
@@ -50,19 +55,79 @@ describe("provenance — SHA-256 helpers (F3)", () => {
     const k = await computeKindMultiplierHash();
     expect(p).not.toBe(k);
   });
+
+  it("computeProfileEffectsHash is stable and active effects depend on mode", async () => {
+    const a = await computeProfileEffectsHash();
+    const b = await computeProfileEffectsHash();
+    expect(a).toBe(b);
+    expect(a).toMatch(/^[0-9a-f]{64}$/);
+
+    expect(activeProfileEffectsForMode("off")).toEqual([]);
+    expect(activeProfileEffectsForMode("adjudicated").some((e) => e.evidenceStatus === "proposal")).toBe(false);
+    expect(activeProfileEffectsForMode("exploratory").some((e) => e.profilePath === "profile.communication.delaySec")).toBe(true);
+  });
+
+  it("classifies saved outcome freshness against current hashes", async () => {
+    const [priorsHash, kindMultiplierHash, profileEffectsHash] = await Promise.all([
+      computePriorsHash(),
+      computeKindMultiplierHash(),
+      computeProfileEffectsHash(),
+    ]);
+    await expect(
+      classifySavedOutcomeStatus({
+        priorsHash,
+        kindMultiplierHash,
+        profileMappingVersion: PROFILE_MAPPING_VERSION,
+        profileEffectsHash,
+        softwareVersion: SELECTRON_VERSION,
+        sourceCommit: SELECTRON_SOURCE_COMMIT,
+      }),
+    ).resolves.toBe("current");
+    await expect(
+      classifySavedOutcomeStatus({
+        priorsHash: "old",
+        kindMultiplierHash,
+        profileMappingVersion: PROFILE_MAPPING_VERSION,
+        profileEffectsHash,
+        softwareVersion: SELECTRON_VERSION,
+        sourceCommit: SELECTRON_SOURCE_COMMIT,
+      }),
+    ).resolves.toBe("stale-priors");
+    await expect(
+      classifySavedOutcomeStatus({
+        priorsHash,
+        kindMultiplierHash,
+        profileMappingVersion: "old",
+        profileEffectsHash,
+        softwareVersion: SELECTRON_VERSION,
+        sourceCommit: SELECTRON_SOURCE_COMMIT,
+      }),
+    ).resolves.toBe("stale-profile-effects");
+    await expect(
+      classifySavedOutcomeStatus({
+        priorsHash,
+        kindMultiplierHash,
+        profileMappingVersion: PROFILE_MAPPING_VERSION,
+        profileEffectsHash,
+        softwareVersion: "old",
+        sourceCommit: SELECTRON_SOURCE_COMMIT,
+      }),
+    ).resolves.toBe("stale-software");
+  });
 });
 
 describe("provenance — evidence coverage statement (F4)", () => {
-  it("EVIDENCE_STATUS_SNAPSHOT reports the operative 0 / 4,846 coverage", () => {
-    expect(EVIDENCE_STATUS_SNAPSHOT.acceptedCount).toBe(0);
+  it("EVIDENCE_STATUS_SNAPSHOT reports zero valid accepted coverage (0 / 4,849)", () => {
+    expect(EVIDENCE_STATUS_SNAPSHOT.acceptedCount).toBe(4);
     expect(EVIDENCE_STATUS_SNAPSHOT.acceptedCoveredParameterCount).toBe(0);
-    expect(EVIDENCE_STATUS_SNAPSHOT.activeParameterCount).toBe(4846);
+    expect(EVIDENCE_STATUS_SNAPSHOT.activeParameterCount).toBe(4849);
+    expect(EVIDENCE_STATUS_SNAPSHOT.malformedAcceptedRowCount).toBe(4);
     expect(EVIDENCE_STATUS_SNAPSHOT.releasePriorsAdjudicated).toBe(false);
     expect(EVIDENCE_STATUS_SNAPSHOT.status).toBe("unadjudicated");
   });
 
   it("EVIDENCE_COVERAGE_STATEMENT states the coverage fact and the variability disclaimer", () => {
-    expect(EVIDENCE_COVERAGE_STATEMENT).toContain("0 / 4846");
+    expect(EVIDENCE_COVERAGE_STATEMENT).toContain("0 / 4849");
     expect(EVIDENCE_COVERAGE_STATEMENT).toContain("unadjudicated");
     expect(EVIDENCE_COVERAGE_STATEMENT).toContain("Monte Carlo");
     expect(EVIDENCE_COVERAGE_STATEMENT.toLowerCase()).toContain("not establish empirical calibration");

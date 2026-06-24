@@ -14,6 +14,14 @@
 
 import evidenceStatusJson from "@/data/evidence-status.json";
 import { loadIMMPriors } from "./priors";
+import {
+  PROFILE_EFFECTS,
+  PROFILE_MAPPING_VERSION,
+  type ProfileEffectEvidenceStatus,
+  type ProfileEffectMode,
+} from "./profile-effects";
+import type { IMMSession } from "./types";
+import { SELECTRON_SOURCE_COMMIT, SELECTRON_VERSION } from "../version";
 
 /** Shape of the committed frontend evidence-status snapshot. */
 export type EvidenceStatusSnapshot = {
@@ -44,6 +52,27 @@ export const EVIDENCE_COVERAGE_STATEMENT =
   `${EVIDENCE_STATUS_SNAPSHOT.activeParameterCount} parameter paths. ` +
   `Monte Carlo intervals describe simulated mission variability and do not ` +
   `establish empirical calibration.`;
+
+export type ActiveProfileEffectSnapshot = {
+  profilePath: string;
+  estimate: number;
+  evidenceStatus: ProfileEffectEvidenceStatus;
+};
+
+export type SavedOutcomeStatus =
+  | "current"
+  | "stale-priors"
+  | "stale-profile-effects"
+  | "stale-software";
+
+function profileEffectApplies(
+  evidenceStatus: ProfileEffectEvidenceStatus,
+  mode: ProfileEffectMode,
+): boolean {
+  if (mode === "off") return false;
+  if (mode === "exploratory") return evidenceStatus !== "unsupported";
+  return evidenceStatus === "accepted";
+}
 
 /**
  * SHA-256 hex digest of a UTF-8 string via WebCrypto SubtleCrypto. Falls back
@@ -81,3 +110,71 @@ export async function computeKindMultiplierHash(): Promise<string> {
   const block = priors.global_calibration?.kind_multipliers ?? {};
   return sha256Hex(JSON.stringify(block));
 }
+
+/** Stable SHA-256 over the complete PROFILE_EFFECTS registry. */
+export async function computeProfileEffectsHash(): Promise<string> {
+  return sha256Hex(JSON.stringify(PROFILE_EFFECTS));
+}
+
+/** Active numeric effects under a specific operator profile-effect mode. */
+export function activeProfileEffectsForMode(
+  mode: ProfileEffectMode = "adjudicated",
+): ActiveProfileEffectSnapshot[] {
+  return PROFILE_EFFECTS
+    .filter((effect) =>
+      typeof effect.estimate === "number" &&
+      Number.isFinite(effect.estimate) &&
+      profileEffectApplies(effect.evidenceStatus, mode),
+    )
+    .map((effect) => ({
+      profilePath: effect.profilePath,
+      estimate: effect.estimate as number,
+      evidenceStatus: effect.evidenceStatus,
+    }));
+}
+
+/**
+ * Compare a saved session's assumptions against the currently loaded engine.
+ * Missing legacy provenance is stale by design: old rows are still loadable,
+ * but their saved outcomes are not presented as current-engine results.
+ */
+export async function classifySavedOutcomeStatus(
+  session: Pick<
+    IMMSession,
+    | "priorsHash"
+    | "kindMultiplierHash"
+    | "profileMappingVersion"
+    | "profileEffectsHash"
+    | "softwareVersion"
+    | "sourceCommit"
+  >,
+): Promise<SavedOutcomeStatus> {
+  const [currentPriorsHash, currentKindMultiplierHash, currentProfileEffectsHash] =
+    await Promise.all([
+      computePriorsHash(),
+      computeKindMultiplierHash(),
+      computeProfileEffectsHash(),
+    ]);
+
+  if (
+    session.softwareVersion !== SELECTRON_VERSION ||
+    session.sourceCommit !== SELECTRON_SOURCE_COMMIT
+  ) {
+    return "stale-software";
+  }
+  if (
+    session.profileMappingVersion !== PROFILE_MAPPING_VERSION ||
+    session.profileEffectsHash !== currentProfileEffectsHash
+  ) {
+    return "stale-profile-effects";
+  }
+  if (
+    session.priorsHash !== currentPriorsHash ||
+    session.kindMultiplierHash !== currentKindMultiplierHash
+  ) {
+    return "stale-priors";
+  }
+  return "current";
+}
+
+export { PROFILE_MAPPING_VERSION };

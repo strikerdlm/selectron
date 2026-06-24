@@ -148,11 +148,13 @@ def load_evidence_proposals(
 def load_accepted_evidence(
     ledger_path: Path | None = None,
 ) -> list[dict[str, Any]]:
-    """Load accepted, independently adjudicated evidence rows.
+    """Load accepted, independently adjudicated evidence rows for PyMC fitting.
 
     Proposal CSVs are intentionally excluded from this release-scientific path.
-    Rows enter fitting only when status == accepted and the extraction has both
-    extractor and verifier fields populated.
+    Rows enter fitting only when status == accepted, extractor and verifier are
+    populated, and person_days/events are present (count extracts). Accepted
+    parameter-path rows without incidence counts are tracked by the TS evidence
+    gate but skipped here.
     """
     p = ledger_path or _ACCEPTED_LEDGER
     if not p.exists():
@@ -167,6 +169,12 @@ def load_accepted_evidence(
             if not row.get("extractor") or not row.get("verifier"):
                 continue
 
+            person_days_raw = (row.get("person_days") or "").strip()
+            events_raw = (row.get("events") or "").strip()
+            if not person_days_raw or not events_raw:
+                # Parameter-path adjudication without count extract — not fit input.
+                continue
+
             def _parse_int(val: str) -> int:
                 return int(val.removeprefix("EST:").strip())
 
@@ -175,8 +183,8 @@ def load_accepted_evidence(
                 {
                     "condition_id": condition_id,
                     "mapped_prior_id": row.get("mapped_prior_id") or map_proposal_id(condition_id),
-                    "person_days": _parse_int(row["person_days"]),
-                    "events": _parse_int(row["events"]),
+                    "person_days": _parse_int(person_days_raw),
+                    "events": _parse_int(events_raw),
                     "study_slug": row["study_slug"],
                     "study_doi": row.get("study_doi", ""),
                     "mission_type": row.get("mission_type", ""),

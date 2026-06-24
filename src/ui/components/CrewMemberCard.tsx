@@ -47,11 +47,9 @@ export function CrewMemberCard({
 }: CrewMemberCardProps) {
   const pct = Math.round(compositeScore * 100);
   const qualified = gateVerdict === "qualified";
+  const flagLabel = qualified ? "no demo-threshold flags" : "demo-threshold review flag present";
 
-  const scoreColor =
-    pct >= 70 ? "var(--go)" :
-    pct >= 45 ? "var(--signal)" :
-    "var(--warn)";
+  const scoreColor = "var(--ink-1)";
 
   const editable = typeof onMemberChange === "function";
   const patch = (p: Partial<IMMCrewMember>) => onMemberChange?.(member.id, p);
@@ -81,15 +79,15 @@ export function CrewMemberCard({
           className="flex-1 min-w-0 flex items-center justify-between gap-4 text-left py-0.5"
           onClick={onToggle}
           aria-expanded={expanded}
-          aria-label={`${member.id} — ${qualified ? "no review flags" : "review required"}, composite ${pct}%`}
+          aria-label={`${member.id} — ${flagLabel}, composite ${pct}%`}
         >
           {/* Left cluster */}
           <div className="flex items-center gap-3 min-w-0">
             {/* Gate verdict dot */}
             <span
               className="shrink-0 w-2.5 h-2.5 rounded-full"
-              style={{ background: qualified ? "var(--go)" : "var(--warn)" }}
-              title={qualified ? "no review flags" : `review flags: ${failedGates.join(", ")}`}
+              style={{ background: qualified ? "var(--ink-3)" : "var(--warn)" }}
+              title={qualified ? "no demo-threshold flags" : `demo-threshold review flags: ${failedGates.join(", ")}`}
             />
             {/* Member ID */}
             <span className="mono text-[15px] text-ink-0 truncate">{member.id}</span>

@@ -15,14 +15,15 @@
     "guard:active-imports": "node scripts/check_active_imports.mjs",
     "e2e": "playwright test",
     "verify:fast": "npm run typecheck && npm run guard:active-imports && npm run evidence:check && npm run test:fast",
-    "verify:paper": "npm run typecheck && npm run guard:active-imports && npm run evidence:check && npx vitest run tests/imm/conditions.test.ts && npm run build",
     "verify:e2e": "playwright test",
     "calibrate:imm": "tsx scripts/calibrate_imm_priors.ts",
     "validate:imm": "tsx scripts/validate_imm.ts",
     "validate:imm:analog": "vitest run tests/imm/analog_45d_unscreened_crew.test.ts tests/imm/analog_90d_crew_archetypes.test.ts tests/imm/posterior_predictive.test.ts",
     "evidence:status": "tsx scripts/evidence_status.ts",
     "evidence:check": "tsx scripts/evidence_status.ts --check",
-    "evidence:require-adjudicated": "tsx scripts/evidence_status.ts --require-adjudicated"
+    "evidence:require-adjudicated": "tsx scripts/evidence_status.ts --require-adjudicated",
+    "sync:public": "node scripts/sync-to-public.mjs",
+    "verify:release": "npm run typecheck && npm run guard:active-imports && npm run evidence:check && npx vitest run tests/imm/conditions.test.ts && npm run build"
   },
   "dependencies": {
     "dexie": "^4.4.2",

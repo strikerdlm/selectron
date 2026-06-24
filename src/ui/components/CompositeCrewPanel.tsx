@@ -95,6 +95,9 @@ export function CompositeCrewPanel({
 }: CompositeCrewPanelProps) {
   const pct = Math.round(compositeScore * 100);
   const qualified = crewVerdict === "qualified";
+  const thresholdFlagLabel = qualified
+    ? "no demo-threshold flags"
+    : "demo-threshold review flag present";
 
   return (
     <div className="panel flex flex-col gap-5">
@@ -105,12 +108,12 @@ export function CompositeCrewPanel({
         <span
           className="mono text-[12px] uppercase tracking-cap px-2 py-0.5 rounded-full border"
           style={{
-            color: qualified ? "var(--go)" : "var(--warn)",
-            borderColor: qualified ? "var(--go)" : "var(--warn)",
-            background: qualified ? "rgba(86,214,160,0.08)" : "rgba(255,107,94,0.08)",
+            color: qualified ? "var(--ink-2)" : "var(--warn)",
+            borderColor: qualified ? "var(--line)" : "var(--warn)",
+            background: qualified ? "transparent" : "rgba(255,107,94,0.08)",
           }}
         >
-          {qualified ? "no review flags" : "review required"}
+          {thresholdFlagLabel}
         </span>
       </div>
 
@@ -164,7 +167,7 @@ export function CompositeCrewPanel({
       {disqualifiedMemberIds.length > 0 && (
         <div className="flex flex-col gap-1">
           <span className="label text-[12px] uppercase tracking-cap" style={{ color: "var(--warn)" }}>
-            Review flags
+            Demo-threshold review flags
           </span>
           {disqualifiedMemberIds.map((id) => (
             <div

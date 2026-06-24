@@ -5,15 +5,18 @@ import { join } from "node:path";
 import { buildEvidenceStatus } from "../../scripts/evidence_status";
 
 describe("evidence status gate", () => {
-  it("reports current release priors as unadjudicated when accepted ledger rows are absent", () => {
+  it("reports pilot adjudication in progress when partial accepted ledger rows exist", () => {
     const status = buildEvidenceStatus();
 
-    expect(status.acceptedCount).toBe(0);
+    expect(status.acceptedCount).toBe(4);
+    expect(status.proposalCount).toBe(1);
     expect(status.releasePriorsAdjudicated).toBe(false);
     expect(status.status).toBe("unadjudicated");
     expect(status.proposalRefCount).toBeGreaterThan(0);
     expect(status.activeParameterCount).toBeGreaterThan(0);
+    expect(status.acceptedCoveredParameterCount).toBe(0);
     expect(status.uncoveredParameterCount).toBe(status.activeParameterCount);
+    expect(status.malformedAcceptedRows).toHaveLength(4);
     expect(status.message).toContain("No complete adjudicated analog evidence release");
   });
 
@@ -83,6 +86,20 @@ describe("evidence status gate", () => {
       "prior_value_hash",
       "notes",
     ];
+    const hashes: Record<string, string> = {
+      "conditions.fixture.incidence.lambda_fixed": "14be4b45f18e0d8c",
+      "conditions.fixture.severity.worst_case_prob_alpha": "6b86b273ff34fce1",
+      "conditions.fixture.severity.worst_case_prob_beta": "19581e27de7ced00",
+      "conditions.fixture.treated.fi_cp1.min": "5feceb66ffc86f38",
+      "conditions.fixture.treated.fi_cp1.mode": "5feceb66ffc86f38",
+      "conditions.fixture.treated.fi_cp1.max": "5feceb66ffc86f38",
+      "conditions.fixture.untreated.fi_cp1.min": "14be4b45f18e0d8c",
+      "conditions.fixture.untreated.fi_cp1.mode": "44896b09365746b5",
+      "conditions.fixture.untreated.fi_cp1.max": "221764976efe0413",
+      "conditions.fixture.risk_factor_multipliers.sex-male": "77ac319bfe1979e2",
+      "conditions.fixture.required_resources.bandage-small": "6b86b273ff34fce1",
+      "global_calibration.tierA_multiplier": "6b86b273ff34fce1",
+    };
     const rows = parameterPaths.map((path) => [
       "accepted",
       path,
@@ -107,7 +124,7 @@ describe("evidence status gate", () => {
       "fixed",
       "fixture-v1",
       "accepted-v1",
-      "sha256-fixture",
+      hashes[path],
       "",
     ]);
     writeFileSync(

@@ -35,10 +35,9 @@ describe("defaultScores — archetype fraction monotonicity (F5)", () => {
     }
   });
 
-  it("PVT-B RT: higher fraction yields lower (better) raw reaction time", () => {
-    const low = defaultScores({ default: 0.2 })["cognitive.pvt_b_rt_ms"];
-    const high = defaultScores({ default: 0.9 })["cognitive.pvt_b_rt_ms"];
-    // lower-is-better: the stronger archetype (0.9) must produce the smaller RT.
+  it("BDI-II: higher fraction yields lower (better) raw depression score", () => {
+    const low = defaultScores({ default: 0.2 })["psych.bdi2_baseline"];
+    const high = defaultScores({ default: 0.9 })["psych.bdi2_baseline"];
     expect(low).toBeGreaterThan(high);
   });
 
