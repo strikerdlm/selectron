@@ -40,6 +40,7 @@ const REQUIRED_ACCEPTED_FIELDS = [
   "transportability",
   "holdout_design",
   "calibration_metrics",
+  "transformation",
   "uncertainty_distribution",
   "model_version",
   "acceptance_version",
@@ -302,6 +303,14 @@ function numericLedgerField(row: EvidenceLedgerRow, field: string): number | nul
   return Number.isFinite(value) ? value : null;
 }
 
+function isNonNegativeInteger(value: number | null): value is number {
+  return value !== null && value >= 0 && Number.isInteger(value);
+}
+
+function isPositiveInteger(value: number | null): value is number {
+  return value !== null && value > 0 && Number.isInteger(value);
+}
+
 function malformedAcceptedRowIds(
   rows: EvidenceLedgerRow[],
   headerColumnCount: number,
@@ -322,17 +331,20 @@ function malformedAcceptedRowIds(
     if (missing.length > 0) reasons.push(`missing ${missing.join("|")}`);
 
     const numerator = numericLedgerField(row, "numerator");
-    if (numerator === null || numerator < 0) reasons.push("numerator is not finite non-negative");
+    if (!isNonNegativeInteger(numerator)) reasons.push("numerator is not a finite non-negative integer");
 
     const events = numericLedgerField(row, "events");
-    if (events === null || events < 0) reasons.push("events is not finite non-negative");
+    if (!isNonNegativeInteger(events)) reasons.push("events is not a finite non-negative integer");
 
     const denominator = numericLedgerField(row, "denominator");
     const personDays = numericLedgerField(row, "person_days");
     const exposureTime = numericLedgerField(row, "exposure_time");
+    if (personDays !== null && !isPositiveInteger(personDays)) {
+      reasons.push("person_days is not a finite positive integer");
+    }
     if (
       (denominator === null || denominator <= 0) &&
-      (personDays === null || personDays <= 0) &&
+      !isPositiveInteger(personDays) &&
       (exposureTime === null || exposureTime <= 0)
     ) {
       reasons.push("missing finite positive denominator/person_days/exposure_time");

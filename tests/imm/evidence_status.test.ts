@@ -246,4 +246,26 @@ describe("evidence status gate", () => {
     expect(status.acceptedCoveredParameterCount).toBe(0);
     expect(status.malformedAcceptedRows.join("\n")).toMatch(/missing holdout_design\|calibration_metrics/);
   });
+
+  it("rejects accepted rows with fractional event-count fields", () => {
+    const root = mkdtempSync(join(tmpdir(), "selectron-evidence-"));
+    writeSingleParameterFixture(root, { events: "1.5", numerator: "1.5" });
+
+    const status = buildEvidenceStatus(root);
+    expect(status.releasePriorsAdjudicated).toBe(false);
+    expect(status.acceptedCoveredParameterCount).toBe(0);
+    expect(status.malformedAcceptedRows.join("\n")).toMatch(/events is not a finite non-negative integer/);
+    expect(status.malformedAcceptedRows.join("\n")).toMatch(/numerator is not a finite non-negative integer/);
+  });
+
+  it("rejects accepted rows with fractional person-day exposure", () => {
+    const root = mkdtempSync(join(tmpdir(), "selectron-evidence-"));
+    writeSingleParameterFixture(root, { denominator: "", person_days: "10.5", exposure_time: "" });
+
+    const status = buildEvidenceStatus(root);
+    expect(status.releasePriorsAdjudicated).toBe(false);
+    expect(status.acceptedCoveredParameterCount).toBe(0);
+    expect(status.malformedAcceptedRows.join("\n")).toMatch(/person_days is not a finite positive integer/);
+    expect(status.malformedAcceptedRows.join("\n")).toMatch(/missing finite positive denominator\/person_days\/exposure_time/);
+  });
 });

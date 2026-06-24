@@ -87,6 +87,7 @@ describe("active analog workflow guards", () => {
     expect(readRepoFile("src/ui/figures/CalculationTrace.tsx")).toContain("accepted evidence ledger does not currently calibrate");
     expect(readRepoFile("src/ui/views/calibration/ConditionsPanel.tsx")).toContain("NASA-publication-attributed Selectron prior");
     expect(readRepoFile("src/ui/views/calibration/BatchFitPanel.tsx")).toContain("Evidence ledger not release-ready");
+    expect(readRepoFile("src/ui/views/calibration/BatchFitPanel.tsx")).toContain("malformed accepted rows");
     expect(readRepoFile("src/ui/views/CrewComposition.tsx")).toContain("data/demo-criteria");
     expect(readRepoFile("src/ui/App.tsx")).toContain("SELECTRON_VERSION");
     // F3: session save records the operative scenario controls, not just

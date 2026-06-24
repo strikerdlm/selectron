@@ -72,6 +72,9 @@ export function BatchFitPanel() {
             <p className="text-sm text-ink-2">
               Fitting uses accepted rows only and skips uncovered conditions unless they are run through proposal tooling outside this UI.
             </p>
+            <p className="mono mt-2 text-[12px] uppercase tracking-cap text-warn">
+              accepted coverage {evidenceStatus.acceptedCoveredParameterCount.toLocaleString()} / {evidenceStatus.activeParameterCount.toLocaleString()} · malformed accepted rows {evidenceStatus.malformedAcceptedRowCount.toLocaleString()} · proposal refs {evidenceStatus.proposalRefCount.toLocaleString()}
+            </p>
           </div>
         )}
 
