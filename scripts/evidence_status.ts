@@ -30,6 +30,9 @@ const REQUIRED_ACCEPTED_FIELDS = [
   "study_doi",
   "study_slug",
   "endpoint_definition",
+  "numerator",
+  "events",
+  "repeated_measure_structure",
   "extraction_quote",
   "extractor",
   "verifier",
@@ -206,6 +209,13 @@ function priorValueHash(value: number): string {
   return createHash("sha256").update(String(value)).digest("hex").slice(0, 16);
 }
 
+function numericLedgerField(row: EvidenceLedgerRow, field: string): number | null {
+  const raw = row[field];
+  if (typeof raw !== "string" || raw.trim() === "") return null;
+  const value = Number(raw);
+  return Number.isFinite(value) ? value : null;
+}
+
 function malformedAcceptedRowIds(
   rows: EvidenceLedgerRow[],
   headerColumnCount: number,
@@ -223,6 +233,23 @@ function malformedAcceptedRowIds(
 
     const missing = REQUIRED_ACCEPTED_FIELDS.filter((field) => !row[field]);
     if (missing.length > 0) reasons.push(`missing ${missing.join("|")}`);
+
+    const numerator = numericLedgerField(row, "numerator");
+    if (numerator === null || numerator < 0) reasons.push("numerator is not finite non-negative");
+
+    const events = numericLedgerField(row, "events");
+    if (events === null || events < 0) reasons.push("events is not finite non-negative");
+
+    const denominator = numericLedgerField(row, "denominator");
+    const personDays = numericLedgerField(row, "person_days");
+    const exposureTime = numericLedgerField(row, "exposure_time");
+    if (
+      (denominator === null || denominator <= 0) &&
+      (personDays === null || personDays <= 0) &&
+      (exposureTime === null || exposureTime <= 0)
+    ) {
+      reasons.push("missing finite positive denominator/person_days/exposure_time");
+    }
 
     if (row.extractor && row.verifier && row.extractor === row.verifier) {
       reasons.push("extractor and verifier are not independent");

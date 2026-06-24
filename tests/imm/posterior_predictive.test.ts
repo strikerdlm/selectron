@@ -2,8 +2,8 @@
 //
 // Tests for posteriorPredictiveSimulateIMM — the predictive Monte Carlo wrapper
 // around simulateIMM. The wrapper threads per-condition λ draws into the engine
-// as per-draw composite kind-multipliers (moment-matched
-// to λ_d / E[λ]) with ZERO engine changes, so the K15 invariance canary holds.
+// as direct incidenceRateOverrides while keeping mission kindMultipliers as
+// independent context multipliers.
 //
 // TDD: these were written before posterior-predictive.ts existed (module-not-found
 // first, then green).
@@ -217,12 +217,11 @@ describe("posteriorPredictiveSimulateIMM", () => {
 //
 // Because every per-condition draw set here is constructed so that E[draws] = m
 // (the prior point mean) EXACTLY — a symmetric ±40% perturbation set whose length
-// (8) divides nDraws (64) — the moment-matching composite multiplier λ_d / E[λ]
-// has unit mean by construction. The predictive GRAND mean over draws
-// should therefore agree with the point-prior simulateIMM mean up to (a) a small
-// positive Jensen gap — pEvac is a nonlinear, saturating function of cumulative
-// TME, and within each draw λ is re-sampled scaled, so E[f(λ)] ≠ f(E[λ]) — and
-// (b) Monte-Carlo noise at these sample sizes.
+// (8) divides nDraws (64) — the predictive GRAND mean over draws should agree
+// with the point-prior simulateIMM mean up to nonlinear Jensen effects and
+// Monte-Carlo noise at these sample sizes. Unlike the older multiplier
+// workaround, each λ draw is held fixed at the incidence sampling site for that
+// predictive draw.
 //
 // MEASURED on the K15 reference config (iss-6mo / issHMS / file crew fixture /
 // seed 0xc0ffee), nDraws=64, trialsPerDraw=500, point trials=16000, all 99

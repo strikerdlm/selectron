@@ -5,32 +5,25 @@
 // per draw and summarizes each metric as a predictive distribution.
 //
 // ── How parameter draws are threaded into the engine ─────────────────────────
-// simulateIMM already accepts `kindMultipliers?: Record<string, number>` — a
-// per-condition multiplier applied at the λ-sampling site, where an explicit
-// override REPLACES the auto-loaded per-kind map and any missing condition key
-// falls through to 1.0. We exploit this: for each posterior draw d we build a
-// per-draw composite multiplier map and pass it as `kindMultipliers`, so the
-// engine (and therefore the K15 invariance canary) stays byte-identical.
+// simulateIMM accepts two orthogonal controls:
+//   1. `kindMultipliers`, the mission-context multiplier map; and
+//   2. `incidenceRateOverrides`, direct λ draws injected at the rate-sampling site.
 //
-// For draw d, condition cid with parameter draw λ_d and prior point mean E[λ]:
+// For each posterior draw d, this wrapper passes:
 //
-//     composite[cid] = (base[cid] ?? 1) * (λ_d / E[λ])
+//     incidenceRateOverrides[cid] = λ_d
 //
-// where `base` is the explicit kindMultipliers (if given) else the mission
-// kind's map from imm-priors.json. Because the engine samples λ with prior mean
-// E[λ], multiplying by λ_d / E[λ] moment-matches the engine's per-draw mean to
-// λ_d while preserving the prior's relative dispersion — the same
-// moment-matching approximation class blessed in the plan (fine for mean and
-// shape propagation).
+// and leaves `kindMultipliers` as the explicit or auto-loaded mission-context
+// map. The base Gamma/Lognormal/Fixed prior is not sampled again for overridden
+// conditions, so the draw cleanly represents fitted parameter uncertainty plus
+// ordinary event-count variation under that fixed draw.
 //
 // ── What the resulting interval is (and is not) ───────────────────────────────
 // Each λ_d is drawn from the condition's stored Gamma/Lognormal prior fit.
 // Because E[λ_d] = E[λ], the grand mean over draws stays unbiased versus the
-// point-prior pipeline; the spread of per-draw metric means is a moment-matched
-// predictive interval. It is NOT a clean epistemic/aleatory
-// decomposition — within a draw λ is not held fixed (the engine re-samples it
-// each trial, scaled), so the within-draw variance still mixes parameter and
-// sampling uncertainty. Label it accordingly; do not over-claim.
+// point-prior pipeline; the spread of per-draw metric means is a conditional
+// posterior-predictive interval for the fitted incidence-rate draws. It still
+// does not validate the underlying evidence base or analog transportability.
 
 import type {
   IMMCrewMember,
@@ -43,6 +36,7 @@ import type {
 } from "./types";
 import { simulateIMM } from "./simulate";
 import { loadIMMPriors } from "./priors";
+import { IMM_CONDITIONS } from "./conditions";
 
 export type PosteriorPredictiveOpts = {
   crew: IMMCrewMember[];
@@ -95,37 +89,6 @@ function summarize(values: number[]): PosteriorSummary {
 }
 
 /**
- * Prior point mean E[λ] for a condition, or null when there is no usable point
- * mean (Beta-Bernoulli, missing condition, or a non-finite / non-positive mean).
- * A null means the condition is skipped for the composite-multiplier rescale.
- */
-function priorPointMean(conditionId: string): number | null {
-  const cond = loadIMMPriors().conditions[conditionId];
-  if (!cond) return null;
-  const inc = cond.incidence;
-  let m: number;
-  switch (inc.distribution) {
-    case "Gamma-Poisson":
-      if (inc.alpha === undefined || inc.beta === undefined) return null;
-      m = inc.alpha / inc.beta;
-      break;
-    case "Lognormal-Poisson":
-      if (inc.mu_log_lambda === undefined || inc.sigma_log_lambda === undefined) return null;
-      m = Math.exp(inc.mu_log_lambda + (inc.sigma_log_lambda * inc.sigma_log_lambda) / 2);
-      break;
-    case "Fixed":
-      if (inc.lambda_fixed === undefined) return null;
-      m = inc.lambda_fixed;
-      break;
-    // Beta-Bernoulli has no Poisson-rate point mean to rescale against.
-    default:
-      return null;
-  }
-  if (!Number.isFinite(m) || m <= 0) return null;
-  return m;
-}
-
-/**
  * Run a predictive Monte Carlo over fitted per-condition λ draws.
  * Pure over the seeded engine — determinism comes from `seed` only (no
  * Date.now / Math.random). Each draw gets a decorrelated sub-seed.
@@ -134,6 +97,8 @@ export function posteriorPredictiveSimulateIMM(
   opts: PosteriorPredictiveOpts,
 ): PosteriorPredictiveOutcome {
   const { crew, mission, kit, posterior, nDraws, trialsPerDraw, seed } = opts;
+  const priors = loadIMMPriors();
+  const conditionById = new Map(IMM_CONDITIONS.map(c => [c.id, c]));
 
   if (nDraws <= 0) {
     throw new Error(`posteriorPredictiveSimulateIMM: nDraws must be > 0 (got ${nDraws})`);
@@ -155,13 +120,24 @@ export function posteriorPredictiveSimulateIMM(
         `Posterior draws for "${cid}" must be non-negative finite numbers`,
       );
     }
+    const condition = conditionById.get(cid);
+    const prior = priors.conditions[cid];
+    if (!condition || !prior) {
+      throw new Error(`Posterior draws for "${cid}" have no matching active condition/prior`);
+    }
+    if (
+      prior.incidence.distribution === "Beta-Bernoulli" ||
+      !["general-Poisson", "space-adaptation-once", "EVA-coupled", "SA-VIIP-late"].includes(condition.processType)
+    ) {
+      throw new Error(`Posterior draws for "${cid}" require a rate-compatible incidence prior`);
+    }
   }
 
   // Resolve the base kind-multiplier map once (explicit override wins, else the
   // mission kind's map from imm-priors.json, else empty → 1.0 everywhere).
   const base: Record<string, number> =
     opts.kindMultipliers ??
-    loadIMMPriors().global_calibration.kind_multipliers?.[mission.kind] ??
+    priors.global_calibration.kind_multipliers?.[mission.kind] ??
     {};
 
   // Build cleanBase once: strip documentation sentinel keys (e.g. `_doc_`) and
@@ -173,12 +149,6 @@ export function posteriorPredictiveSimulateIMM(
     cleanBase[k] = v;
   }
 
-  // Cache prior point means for the conditions present in the posterior.
-  const pointMeans = new Map<string, number | null>();
-  for (const cid of Object.keys(posterior)) {
-    pointMeans.set(cid, priorPointMean(cid));
-  }
-
   const pEvacByDraw: number[] = [];
   const pLoclByDraw: number[] = [];
   const chiByDraw: number[] = [];
@@ -186,13 +156,9 @@ export function posteriorPredictiveSimulateIMM(
   const tmeByCond: Record<string, number[]> = {};
 
   for (let d = 0; d < nDraws; d++) {
-    // Build the per-draw composite multiplier map from the pre-filtered cleanBase.
-    const composite: Record<string, number> = { ...cleanBase };
+    const incidenceRateOverrides: Record<string, number> = {};
     for (const [cid, lams] of Object.entries(posterior)) {
-      const m = pointMeans.get(cid);
-      if (m == null) continue; // Beta-Bernoulli / missing / degenerate → skip.
-      const baseMult = base[cid] ?? 1.0;
-      composite[cid] = baseMult * (lams[d] / m);
+      incidenceRateOverrides[cid] = lams[d];
     }
 
     // Decorrelated sub-seed per draw (Knuth multiplicative hash), uint32.
@@ -204,7 +170,8 @@ export function posteriorPredictiveSimulateIMM(
       kit,
       trials: trialsPerDraw,
       seed: drawSeed,
-      kindMultipliers: composite,
+      kindMultipliers: cleanBase,
+      incidenceRateOverrides,
       tierAMultiplier: opts.tierAMultiplier,
       tierBMultiplier: opts.tierBMultiplier,
       tierCMultiplier: opts.tierCMultiplier,

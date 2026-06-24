@@ -17,4 +17,11 @@ describe("normalizeScore", () => {
   it("throws SelectronError on out-of-range score", () => {
     expect(() => normalizeScore(75, { min: 20, max: 70 }, true)).toThrow(SelectronError);
   });
+
+  it("throws SelectronError on non-finite scores or invalid scales", () => {
+    expect(() => normalizeScore(NaN, { min: 20, max: 70 }, true)).toThrow(SelectronError);
+    expect(() => normalizeScore(45, { min: 70, max: 70 }, true)).toThrow(SelectronError);
+    expect(() => normalizeScore(45, { min: 70, max: 20 }, true)).toThrow(SelectronError);
+    expect(() => normalizeScore(45, { min: 20, max: Infinity }, true)).toThrow(SelectronError);
+  });
 });

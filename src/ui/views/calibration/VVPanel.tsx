@@ -100,6 +100,11 @@ function EvidenceStatusSection() {
           </div>
         ))}
       </div>
+      {evidenceStatus.malformedAcceptedRowCount > 0 && (
+        <p className="text-sm text-warn mt-3">
+          {fmtInt(evidenceStatus.malformedAcceptedRowCount)} accepted ledger rows are malformed and do not count toward accepted parameter coverage.
+        </p>
+      )}
       {evidenceStatus.proposalRefConditionIds.length > 0 && (
         <p className="mono text-[12px] text-ink-3 mt-3">
           proposal-only conditions: {evidenceStatus.proposalRefConditionIds.join(", ")}

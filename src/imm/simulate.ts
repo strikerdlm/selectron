@@ -1,7 +1,7 @@
 // src/imm/simulate.ts
 import { makeRng } from "../engine/prng";
 import { SelectronError } from "../engine/errors";
-import type { IMMOutcome, PosteriorSummary } from "./types";
+import type { IMMOutcome, MonteCarloErrorSummary, PosteriorSummary } from "./types";
 // Rng inlined — prng.ts does not export this type (matches incidence.ts convention)
 type Rng = () => number;
 
@@ -32,6 +32,13 @@ const SPACE_ONLY_PROCESS_TYPES = new Set<IMMProcessType>([
   "EVA-coupled",           // pressurised-suit EVA operations
   "SPE-coupled",           // solar particle events (blocked by atmosphere)
   "SA-VIIP-late",          // long-duration microgravity VIIP
+]);
+
+const RATE_OVERRIDE_PROCESS_TYPES = new Set<IMMProcessType>([
+  "general-Poisson",
+  "space-adaptation-once",
+  "EVA-coupled",
+  "SA-VIIP-late",
 ]);
 
 // General-Poisson conditions that are specific to ISS/ECLSS infrastructure
@@ -178,6 +185,14 @@ export type IMMTrialOpts = {
    * the caller does not thread an explicit map. Tests can override directly.
    */
   kindMultipliers?: Record<string, number>;
+  /**
+   * Per-condition posterior/direct incidence-rate overrides for non-Beta
+   * incidence paths. Values use the prior's native λ unit and are applied
+   * before tier, kind, profile, risk-factor, and optional Stage-A scenario
+   * multipliers. Used by posterior-predictive runs to avoid drawing a fitted
+   * posterior λ and then re-drawing the base prior.
+   */
+  incidenceRateOverrides?: Record<string, number>;
   vulnerabilityCouplingMode?: VulnerabilityCouplingMode;
   profileEffectMode?: ProfileEffectMode;
 };
@@ -220,10 +235,9 @@ export function applyStageAVulnerabilityMultiplier(
 
   for (const cid of vulnerabilityCriteria) {
     const raw = member.stageAScores[cid];
-    if (raw === undefined || !Number.isFinite(raw)) continue;
+    if (raw === undefined) continue;
     const c = criteriaIndex.get(cid);
     if (!c) continue;
-    if (raw < c.scale.min || raw > c.scale.max) continue;
     const zRaw = scaleRelativeScore(raw, c.scale);
     const zSigned = c.higherIsBetter ? zRaw : -zRaw;
     beta[cid] = familyBeta;
@@ -350,10 +364,11 @@ function sampleGeneralPoissonCount(
   criteriaIndex: ReadonlyMap<string, Criterion>,
   tierMult: number = 1.0,
   familyBetaScale = 1.0,
+  incidenceRateOverride?: number,
 ): number {
   const inc = prior.incidence;
   if (inc.distribution === "Lognormal-Poisson") {
-    const lambdaPerDay = sampleLognormal(rng, inc.mu_log_lambda!, inc.sigma_log_lambda!);
+    const lambdaPerDay = incidenceRateOverride ?? sampleLognormal(rng, inc.mu_log_lambda!, inc.sigma_log_lambda!);
     const rfmLambda = applyRiskFactorMultiplier(lambdaPerDay, member, prior);
     const modLambda = applyStageAVulnerabilityMultiplier(rfmLambda, member, family, vulnerabilityCriteria, criteriaIndex, familyBetaScale);
     // rev3-b-followup: tierMult applied at the λ-sampling site → Poisson(λ · tierMult)
@@ -362,7 +377,7 @@ function sampleGeneralPoissonCount(
     return samplePoisson(rng, modLambda * durationDays * tierMult);
   }
   if (inc.distribution === "Gamma-Poisson") {
-    const lambdaPerDay = sampleGamma(inc.alpha!, rng) / inc.beta!;
+    const lambdaPerDay = incidenceRateOverride ?? (sampleGamma(inc.alpha!, rng) / inc.beta!);
     const rfmLambda = applyRiskFactorMultiplier(lambdaPerDay, member, prior);
     const modLambda = applyStageAVulnerabilityMultiplier(rfmLambda, member, family, vulnerabilityCriteria, criteriaIndex, familyBetaScale);
     return samplePoisson(rng, modLambda * durationDays * tierMult);
@@ -384,6 +399,7 @@ function sampleSingleOccurrenceWithMultiplier(
   prior: IMMPrior,
   multiplier: number,
   exposureUnits: number,
+  incidenceRateOverride?: number,
 ): 0 | 1 {
   if (!Number.isFinite(multiplier) || multiplier <= 0 || exposureUnits <= 0) return 0;
 
@@ -392,7 +408,7 @@ function sampleSingleOccurrenceWithMultiplier(
     return sampleScaledBetaBernoulli(rng, inc.alpha!, inc.beta!, multiplier);
   }
 
-  const rate = Math.max(0, sampleRateFromPrior(rng, prior));
+  const rate = Math.max(0, incidenceRateOverride ?? sampleRateFromPrior(rng, prior));
   const baseP = 1 - Math.exp(-rate * exposureUnits);
   const scaledP = applyProportionalHazardMultiplier(baseP, multiplier);
   return rng() < scaledP ? 1 : 0;
@@ -493,6 +509,13 @@ export function runIMMTrial(
         opts.profileEffectMode ?? "adjudicated",
       );
       const effectiveMult = tierMult * kindMult * profileMult;
+      const rawRateOverride = opts.incidenceRateOverrides?.[cond.id];
+      if (rawRateOverride !== undefined && (!Number.isFinite(rawRateOverride) || rawRateOverride < 0)) {
+        throw new SelectronError("E_BAD_SCENARIO_CONTROL", `incidenceRateOverrides[${cond.id}] must be finite and non-negative, got ${rawRateOverride}`, {
+          key: cond.id,
+          value: rawRateOverride,
+        });
+      }
 
       let count = 0;
       if (cond.processType === "general-Poisson") {
@@ -501,20 +524,31 @@ export function runIMMTrial(
           // Scenario mode: apply Stage A vulnerability multiplier on top of RFM.
           // rev3-b-followup: tierMult applied to λ directly (variance-preserving).
           // 2026-06-04: kindMult threaded into effectiveMult.
-          const baseLambdaPerDay = prior.incidence.lambda_fixed!;
+          const baseLambdaPerDay = rawRateOverride ?? prior.incidence.lambda_fixed!;
           const rfmLambdaPerDay = applyRiskFactorMultiplier(baseLambdaPerDay, member, prior);
           const modLambdaPerDay = applyStageAVulnerabilityMultiplier(rfmLambdaPerDay, member, cond.family, cond.vulnerabilityCriteria, criteriaIndex, familyBetaScale);
           count = samplePoisson(rng, modLambdaPerDay * mission.durationDays * effectiveMult);
         } else {
           // Gamma-Poisson / Lognormal-Poisson: draw λ/day from hierarchical prior, apply RFM,
           // optional scenario Stage A multiplier, then scale by mission duration before Poisson sampling.
-          count = sampleGeneralPoissonCount(rng, prior, member, mission.durationDays, cond.family, cond.vulnerabilityCriteria, criteriaIndex, effectiveMult, familyBetaScale);
+          count = sampleGeneralPoissonCount(
+            rng,
+            prior,
+            member,
+            mission.durationDays,
+            cond.family,
+            cond.vulnerabilityCriteria,
+            criteriaIndex,
+            effectiveMult,
+            familyBetaScale,
+            rawRateOverride,
+          );
         }
       } else if (cond.processType === "space-adaptation-once") {
         // T24: once-per-mission cap — skip if this crew member already had this condition.
         if (processedSAOnce[cIdx].has(cond.id)) {
           count = 0;
-        } else if (sampleSingleOccurrenceWithMultiplier(rng, prior, effectiveMult, mission.durationDays)) {
+        } else if (sampleSingleOccurrenceWithMultiplier(rng, prior, effectiveMult, mission.durationDays, rawRateOverride)) {
           processedSAOnce[cIdx].add(cond.id);
           count = 1;
         }
@@ -523,7 +557,7 @@ export function runIMMTrial(
         // probability through proportional-hazard scaling so values >1 elevate
         // risk instead of being silently capped by a second Bernoulli gate.
         for (let e = 0; e < member.EVA_count; e++) {
-          if (sampleSingleOccurrenceWithMultiplier(rng, prior, effectiveMult, 1)) count++;
+          if (sampleSingleOccurrenceWithMultiplier(rng, prior, effectiveMult, 1, rawRateOverride)) count++;
         }
       } else if (cond.processType === "SPE-coupled") {
         // T23: Per-SPE-event Bernoulli via ARS prior (Beta-Bernoulli per event).
@@ -546,7 +580,7 @@ export function runIMMTrial(
       } else if (cond.processType === "SA-VIIP-late") {
         // Single late-mission occurrence path under the same probability
         // scaling as other Bernoulli-style processes.
-        if (sampleSingleOccurrenceWithMultiplier(rng, prior, effectiveMult, mission.durationDays)) count = 1;
+        if (sampleSingleOccurrenceWithMultiplier(rng, prior, effectiveMult, mission.durationDays, rawRateOverride)) count = 1;
       }
 
       // rev3-b-followup (2026-05-22): the post-count stochastic-rounding block that
@@ -688,6 +722,57 @@ function posteriorSummary(values: number[]): PosteriorSummary {
   };
 }
 
+function meanOf(values: number[]): number {
+  if (values.length === 0) return 0;
+  return values.reduce((a, b) => a + b, 0) / values.length;
+}
+
+function sampleMcse(values: number[]): number {
+  const n = values.length;
+  if (n === 0) return 0;
+  const mean = meanOf(values);
+  const variance = values.reduce((a, b) => a + (b - mean) ** 2, 0) / n;
+  return Math.sqrt(variance) / Math.sqrt(n);
+}
+
+function relativeMcse(mcse: number, mean: number): number | null {
+  return mean > 0 ? mcse / mean : null;
+}
+
+function monteCarloErrorSummary(args: {
+  tmes: number[];
+  chis: number[];
+  evacs: number[];
+  locls: number[];
+  healthCriterionFlags: number[];
+}): MonteCarloErrorSummary {
+  const { tmes, chis, evacs, locls, healthCriterionFlags } = args;
+  const tmeMean = meanOf(tmes);
+  const chiMean = meanOf(chis);
+  const pEvacMeanPct = meanOf(evacs) * 100;
+  const pLoclMeanPct = meanOf(locls) * 100;
+  const healthMeanPct = meanOf(healthCriterionFlags) * 100;
+  const tmeMeanMcse = sampleMcse(tmes);
+  const chiMeanMcse = sampleMcse(chis);
+  const pEvacMcsePct = sampleMcse(evacs.map(x => x * 100));
+  const pLoclMcsePct = sampleMcse(locls.map(x => x * 100));
+  const healthCriterionMcsePct = sampleMcse(healthCriterionFlags.map(x => x * 100));
+
+  return {
+    trials: tmes.length,
+    tmeMeanMcse,
+    chiMeanMcse,
+    pEvacMcsePct,
+    pLoclMcsePct,
+    healthCriterionMcsePct,
+    tmeRelativeMcse: relativeMcse(tmeMeanMcse, tmeMean),
+    chiRelativeMcse: relativeMcse(chiMeanMcse, chiMean),
+    pEvacRelativeMcse: relativeMcse(pEvacMcsePct, pEvacMeanPct),
+    pLoclRelativeMcse: relativeMcse(pLoclMcsePct, pLoclMeanPct),
+    healthCriterionRelativeMcse: relativeMcse(healthCriterionMcsePct, healthMeanPct),
+  };
+}
+
 export function simulateIMM(opts: {
   crew: IMMCrewMember[];
   mission: IMMMission;
@@ -737,6 +822,12 @@ export function simulateIMM(opts: {
    */
   kindMultipliers?: Record<string, number>;
   /**
+   * Direct per-condition incidence-rate overrides (λ per person-day) for
+   * non-Beta incidence paths. Used by posterior-predictive simulations to
+   * inject one fitted posterior draw without re-sampling the base prior.
+   */
+  incidenceRateOverrides?: Record<string, number>;
+  /**
    * Profile-field effect mode. "adjudicated" applies accepted registry effects
    * only; "exploratory" also applies proposal estimates such as the current
    * communication-delay sensitivity coefficient; "off" applies no profile
@@ -757,6 +848,18 @@ export function simulateIMM(opts: {
   const criteriaIndex: ReadonlyMap<string, Criterion> = opts.criteria
     ? new Map(opts.criteria.map(c => [c.id, c]))
     : new Map();
+  for (const criterion of opts.criteria ?? []) {
+    if (
+      !Number.isFinite(criterion.scale.min) ||
+      !Number.isFinite(criterion.scale.max) ||
+      criterion.scale.max <= criterion.scale.min
+    ) {
+      throw _bad(
+        `criterion ${criterion.id} scale must have finite min < max, got [${criterion.scale.min}, ${criterion.scale.max}]`,
+        { criterionId: criterion.id, scale: criterion.scale },
+      );
+    }
+  }
   if (!Number.isInteger(trials) || trials <= 0) {
     throw _bad(`trials must be a positive integer, got ${trials}`, { trials });
   }
@@ -812,13 +915,35 @@ export function simulateIMM(opts: {
       throw _bad(`kindMultipliers[${k}] must be finite and non-negative, got ${m}`, { key: k, value: m });
     }
   }
+  const priors = loadIMMPriors();
+  const conditionById = new Map(IMM_CONDITIONS.map(c => [c.id, c]));
+  for (const [k, lambdaPerDay] of Object.entries(opts.incidenceRateOverrides ?? {})) {
+    if (!Number.isFinite(lambdaPerDay) || lambdaPerDay < 0) {
+      throw _bad(`incidenceRateOverrides[${k}] must be finite and non-negative, got ${lambdaPerDay}`, {
+        key: k,
+        value: lambdaPerDay,
+      });
+    }
+    const condition = conditionById.get(k);
+    const prior = priors.conditions[k];
+    if (!condition || !prior) {
+      throw _bad(`incidenceRateOverrides[${k}] has no matching active condition/prior`, { key: k });
+    }
+    if (prior.incidence.distribution === "Beta-Bernoulli" || !RATE_OVERRIDE_PROCESS_TYPES.has(condition.processType)) {
+      throw _bad(`incidenceRateOverrides[${k}] is only supported for rate priors`, {
+        key: k,
+        processType: condition.processType,
+        distribution: prior.incidence.distribution,
+      });
+    }
+  }
   for (const [name, m] of [["tierAMultiplier", opts.tierAMultiplier], ["tierBMultiplier", opts.tierBMultiplier], ["tierCMultiplier", opts.tierCMultiplier]] as const) {
     if (m !== undefined && (!Number.isFinite(m) || m < 0)) {
       throw _bad(`${name} must be finite and non-negative, got ${m}`, { name, value: m });
     }
   }
   // priors-rev3-b: read global_calibration defaults for tier multipliers.
-  const globalCal = loadIMMPriors().global_calibration;
+  const globalCal = priors.global_calibration;
   // 2026-06-04: kind_multipliers auto-load. Caller's explicit override wins;
   // otherwise look up the per-kind map from JSON. Any (kind, condition) pair
   // not in the map falls through to 1.0 in the engine, so absence of a kind
@@ -839,6 +964,7 @@ export function simulateIMM(opts: {
   const perConditionCountsSum: Record<string, number> = {};
   const perConditionEvacSum: Record<string, number> = {};
   const perConditionLoclSum: Record<string, number> = {};
+  let chiClampCount = 0;
 
   for (let t = 1; t <= trials; t++) {
     const r = runIMMTrial(rng, crew, mission, kit, {
@@ -851,6 +977,7 @@ export function simulateIMM(opts: {
       // 2026-06-04: thread the resolved per-(kind, condition) multiplier map.
       // Empty object / missing keys → 1.0 fallthrough in runIMMTrial.
       kindMultipliers: effectiveKindMults,
+      incidenceRateOverrides: opts.incidenceRateOverrides,
       vulnerabilityCouplingMode: opts.vulnerabilityCouplingMode ?? "off",
       profileEffectMode: opts.profileEffectMode ?? "adjudicated",
       familyBetaScale: opts.familyBetaScale,
@@ -859,7 +986,9 @@ export function simulateIMM(opts: {
     });
     tmes.push(r.tme);
     // CHI clamped at [0, 100] — QTL can exceed denom under pathological priors (v1 analogue of risk/simulate.ts §3.5 guard).
-    const chiForTrial = Math.max(0, Math.min(100, 100 * (1 - r.qtl / denom)));
+    const rawChiForTrial = 100 * (1 - r.qtl / denom);
+    const chiForTrial = Math.max(0, Math.min(100, rawChiForTrial));
+    if (chiForTrial !== rawChiForTrial) chiClampCount++;
     chis.push(chiForTrial);
     evacs.push(r.evac);
     locls.push(r.locl);
@@ -909,6 +1038,11 @@ export function simulateIMM(opts: {
     missionSuccess: healthCriterionAttainment,
     perConditionDrivers: drivers,
     convergence: { trialCheckpoints: sigmaCheckpoints, sigmaChi, sigmaPevac },
+    monteCarloError: monteCarloErrorSummary({ tmes, chis, evacs, locls, healthCriterionFlags }),
+    chiClamp: {
+      count: chiClampCount,
+      proportion: chiClampCount / trials,
+    },
   };
   if (opts.diagnostics) {
     outcome.diagnostics = { chiSamples: chis };

@@ -29,26 +29,6 @@ function normalizedScoreVector(candidate: Candidate, criteria: readonly Criterio
   return z;
 }
 
-function autocorrelation1(samples: Float64Array, mean: number): number {
-  const n = samples.length;
-  let num = 0;
-  let den = 0;
-  for (let i = 0; i < n - 1; i++) {
-    num += (samples[i] - mean) * (samples[i + 1] - mean);
-  }
-  for (let i = 0; i < n; i++) {
-    den += (samples[i] - mean) ** 2;
-  }
-  return den > 0 ? num / den : 0;
-}
-
-function effectiveSampleSize(samples: Float64Array, mean: number): number {
-  const rho1 = autocorrelation1(samples, mean);
-  // ESS ≈ N * (1 - rho1) / (1 + rho1); independent samples → rho1 ≈ 0 → ESS ≈ N
-  const ratio = Math.max(0, (1 - rho1) / (1 + rho1));
-  return samples.length * ratio;
-}
-
 function quantile(sortedAsc: Float64Array, q: number): number {
   const n = sortedAsc.length;
   const idx = q * (n - 1);
@@ -61,14 +41,25 @@ function quantile(sortedAsc: Float64Array, q: number): number {
 
 export function scoreCandidate(input: ScoreInput): Posterior {
   const { candidate, criteria, alpha, iterations, seed } = input;
+  if (!Number.isInteger(iterations) || iterations <= 0) {
+    throw new SelectronError("E_BAD_ITERATIONS", `iterations must be a positive integer, got ${iterations}`, {
+      iterations,
+    });
+  }
   if (alpha.length !== criteria.length) {
     throw new SelectronError("E_BAD_WEIGHT", "alpha length must equal criteria length", {
       alpha: alpha.length,
       criteria: criteria.length,
     });
   }
-  for (const a of alpha) {
-    if (a <= 0) throw new SelectronError("E_BAD_WEIGHT", "all alpha entries must be > 0");
+  for (let i = 0; i < alpha.length; i++) {
+    const a = alpha[i];
+    if (!Number.isFinite(a) || a <= 0) {
+      throw new SelectronError("E_BAD_WEIGHT", `alpha[${i}] must be finite and > 0`, {
+        index: i,
+        value: a,
+      });
+    }
   }
 
   const z = normalizedScoreVector(candidate, criteria);
@@ -88,7 +79,7 @@ export function scoreCandidate(input: ScoreInput): Posterior {
   const sorted = new Float64Array(samples).sort();
   return {
     samples,
-    ess: effectiveSampleSize(samples, mean),
+    ess: samples.length,
     mean,
     ci90: [quantile(sorted, 0.05), quantile(sorted, 0.95)] as const,
     ci95: [quantile(sorted, 0.025), quantile(sorted, 0.975)] as const,

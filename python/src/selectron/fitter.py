@@ -50,6 +50,27 @@ def base_prior_for(incidence: dict[str, Any]) -> tuple[float, float]:
     )
 
 
+def gamma_poisson_conjugate_posterior(
+    alpha_0: float,
+    beta_0: float,
+    observations: list[dict[str, int]],
+) -> tuple[float, float, float, float]:
+    """Analytic Gamma-Poisson posterior used as the fitter oracle.
+
+    With λ ~ Gamma(alpha_0, beta_0) and y_j ~ Poisson(λ T_j), the posterior is
+    Gamma(alpha_0 + Σevents, beta_0 + Σperson_days). This is the authoritative
+    returned fit for the current single-rate model; NUTS is retained only as a
+    diagnostic canary until hierarchical source models are introduced.
+    """
+    total_events = sum(int(o["events"]) for o in observations)
+    total_person_days = sum(int(o["person_days"]) for o in observations)
+    posterior_alpha = float(alpha_0 + total_events)
+    posterior_beta = float(beta_0 + total_person_days)
+    posterior_mean = posterior_alpha / posterior_beta
+    posterior_sd = float(np.sqrt(posterior_alpha) / posterior_beta)
+    return posterior_alpha, posterior_beta, posterior_mean, posterior_sd
+
+
 @dataclass
 class FitResult:
     """Result of a single-condition PyMC Gamma-Poisson fit."""
@@ -130,7 +151,6 @@ def fit_gamma_poisson(
             )
 
     summary = az.summary(idata, var_names=["lambda"])
-    lambda_samples = idata.posterior["lambda"].values.flatten()
 
     r_hat = float(summary["r_hat"].iloc[0])
     ess_bulk = float(summary["ess_bulk"].iloc[0])
@@ -141,21 +161,18 @@ def fit_gamma_poisson(
     else:
         divergences = 0
 
-    post_mean = float(lambda_samples.mean())
-    post_var = float(lambda_samples.var())
-    if post_var > 0:
-        post_alpha = post_mean ** 2 / post_var
-        post_beta = post_mean / post_var
-    else:
-        post_alpha = alpha_0
-        post_beta = beta_0
+    post_alpha, post_beta, post_mean, post_sd = gamma_poisson_conjugate_posterior(
+        alpha_0,
+        beta_0,
+        observations,
+    )
 
     result = FitResult(
         condition_id=condition_id,
         posterior_alpha=post_alpha,
         posterior_beta=post_beta,
         posterior_lambda_mean=post_mean,
-        posterior_lambda_sd=float(lambda_samples.std()),
+        posterior_lambda_sd=post_sd,
         r_hat=r_hat,
         ess_bulk=ess_bulk,
         ess_tail=ess_tail,

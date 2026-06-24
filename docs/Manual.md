@@ -246,7 +246,7 @@ This is the **primary scientific workflow** for analog mission scenario analysis
 2. Use the **Mission** dropdown — default catalog includes terrestrial analog campaigns (7 d → 520 d) and Antarctic winter (365 d).
 3. ISS missions appear under developer/benchmark entries, not as the default analog workflow.
 
-Each mission carries structured **I&C profile** metadata (communication delay, workload, resupply, evacuation time, etc.). The pilot **comms-delay profile effect** scales behavioral/psychiatric incidence when delay > 0 (accepted evidence row; see Profile effects disclosure panel).
+Each mission carries structured **I&C profile** metadata (communication delay, workload, resupply, evacuation time, etc.). The pilot **comms-delay profile effect** is proposal-stage only: default scientific/adjudicated runs do not apply it, and operators must explicitly select exploratory profile effects before the current behavioral/psychiatric incidence sensitivity coefficient is used.
 
 #### Set crew size and members
 
@@ -307,8 +307,8 @@ Scroll to **Condition drivers** (I3 chart):
 
 The **Mission profile → modeled effects** panel lists:
 
-- **Accepted** effects currently wired (duration exposure, EVA schedule, comms delay pilot)
-- **Proposal** effects documented but not yet driving simulation
+- **Accepted** mechanical effects currently wired (duration exposure and EVA schedule)
+- **Proposal** effects documented for explicit exploratory mode, including the communications-delay pilot coefficient
 - **Unsupported** I&C fields stored descriptively only
 
 ### 7.6 Save, load, export session
@@ -321,7 +321,7 @@ Toolbar appears once an outcome exists (config-only save available earlier):
 | **Load** | Restores mission, crew, coupling mode, β scale, χ*, aggregator, seed |
 | **Export JSON** | Downloads session + assumptions + evidence snapshot |
 
-Exported JSON includes: `couplingMode`, `familyBetaScale`, `chiStar`, `aggregator`, `priorsHash`, `kindMultiplierHash`, `evidenceStatusSnapshot`, `softwareVersion`.
+Exported JSON includes: `couplingMode`, `familyBetaScale`, `profileEffectMode`, `chiStar`, `aggregator`, `profileMappingVersion`, `priorsHash`, `kindMultiplierHash`, `profileEffectsHash`, `activeProfileEffects`, `evidenceStatusSnapshot`, `softwareVersion`, and `sourceCommit`.
 
 ### 7.7 Optional: posterior predictive sweep (Python API)
 
@@ -426,7 +426,7 @@ npm run evidence:require-adjudicated # release gate (fails until full coverage)
 
 4. Python release fitting (`python -m selectron` / `scripts/apply_fit.py`) reads **accepted count extracts** for PyMC; parameter-path acceptance rows are tracked by the TS gate separately.
 
-**Current pilot state (v0.6):** 4 accepted ledger rows (batch-1 adjudication in progress); release remains **unadjudicated** until all 4,849 active parameter paths have accepted coverage.
+**Current pilot state (v0.6):** 4 nominal accepted ledger rows exist, but all 4 are malformed and quarantined from accepted coverage; valid accepted coverage is 0/4,849 active parameter paths. Release remains **unadjudicated** until every active parameter path has accepted, independently verified coverage.
 
 ### Do not claim
 

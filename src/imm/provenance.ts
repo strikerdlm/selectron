@@ -8,7 +8,7 @@
 // block, the software version, and a snapshot of the evidence-ledger status.
 //
 // The evidence snapshot also feeds F4: outcome cards and exports state the
-// operative fact that accepted parameter coverage is currently 0/4,846 and
+// operative fact that accepted parameter coverage is currently 0/4,849 and
 // that Monte Carlo intervals describe simulated variability, not empirical
 // calibration.
 

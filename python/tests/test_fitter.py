@@ -15,6 +15,7 @@ from selectron.fitter import (
     fit_all_tier_b,
     BatchFitReport,
     base_prior_for,
+    gamma_poisson_conjugate_posterior,
     BASE_PRIOR_ALPHA,
     BASE_PRIOR_BETA,
 )
@@ -130,10 +131,24 @@ class TestFitGammaPoisson:
         sum_events = sum(o["events"] for o in observations)
         sum_pdays = sum(o["person_days"] for o in observations)
         conjugate_mean = (alpha_0 + sum_events) / (beta_0 + sum_pdays)
+        conjugate_sd = np.sqrt(alpha_0 + sum_events) / (beta_0 + sum_pdays)
 
-        assert abs(result.posterior_alpha - (alpha_0 + sum_events)) / (alpha_0 + sum_events) < 0.10
-        assert abs(result.posterior_beta - (beta_0 + sum_pdays)) / (beta_0 + sum_pdays) < 0.10
-        assert abs(result.posterior_lambda_mean - conjugate_mean) / conjugate_mean < 0.05
+        assert result.posterior_alpha == pytest.approx(alpha_0 + sum_events)
+        assert result.posterior_beta == pytest.approx(beta_0 + sum_pdays)
+        assert result.posterior_lambda_mean == pytest.approx(conjugate_mean)
+        assert result.posterior_lambda_sd == pytest.approx(conjugate_sd)
+
+    def test_conjugate_posterior_oracle(self) -> None:
+        observations = [
+            {"person_days": 100, "events": 2},
+            {"person_days": 50, "events": 1},
+        ]
+        alpha, beta, mean, sd = gamma_poisson_conjugate_posterior(2.0, 10.0, observations)
+
+        assert alpha == pytest.approx(5.0)
+        assert beta == pytest.approx(160.0)
+        assert mean == pytest.approx(5.0 / 160.0)
+        assert sd == pytest.approx(np.sqrt(5.0) / 160.0)
 
     @pytest.mark.slow
     def test_multi_study_converges(self) -> None:

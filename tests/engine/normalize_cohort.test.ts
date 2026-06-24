@@ -1,5 +1,6 @@
 import { describe, it, expect } from "vitest";
 import { scaleRelativeScore, zScoreAgainstScale } from "../../src/engine/normalize-cohort";
+import { SelectronError } from "../../src/engine/errors";
 
 // F10: this is a bounded scale-relative coordinate, NOT a population z-score.
 // No normative mean or standard deviation is supplied.
@@ -16,15 +17,20 @@ describe("scaleRelativeScore", () => {
   it("works for non-zero-anchored scales", () => {
     expect(scaleRelativeScore(60, { min: 20, max: 70 })).toBeCloseTo(1.2, 5);
   });
-  it("degenerate range → 0", () => {
-    expect(scaleRelativeScore(5, { min: 5, max: 5 })).toBe(0);
+  it("rejects non-finite values, degenerate scales, and out-of-range raw scores", () => {
+    expect(() => scaleRelativeScore(NaN, { min: 0, max: 100 })).toThrow(SelectronError);
+    expect(() => scaleRelativeScore(5, { min: 5, max: 5 })).toThrow(SelectronError);
+    expect(() => scaleRelativeScore(5, { min: 10, max: 5 })).toThrow(SelectronError);
+    expect(() => scaleRelativeScore(101, { min: 0, max: 100 })).toThrow(SelectronError);
   });
 });
 
-// Backward-compat alias used by archived src/risk paths.
-describe("zScoreAgainstScale (backward-compat alias for scaleRelativeScore)", () => {
-  it("aliases scaleRelativeScore", () => {
+// Backward-compat helper used by archived src/risk paths.
+describe("zScoreAgainstScale (archived permissive compatibility helper)", () => {
+  it("matches scaleRelativeScore inside range but preserves archived extrapolation", () => {
     expect(zScoreAgainstScale(0, { min: 0, max: 100 })).toBe(scaleRelativeScore(0, { min: 0, max: 100 }));
     expect(zScoreAgainstScale(100, { min: 0, max: 100 })).toBe(2);
+    expect(zScoreAgainstScale(0.5, { min: 20, max: 70 })).toBeLessThan(-2);
+    expect(zScoreAgainstScale(5, { min: 5, max: 5 })).toBe(0);
   });
 });

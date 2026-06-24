@@ -1,6 +1,7 @@
 import { describe, it, expect } from "vitest";
 import { sampleDirichlet, dirichletMean, dirichletVariance } from "@/engine/dirichlet";
 import { makeRng } from "@/engine/prng";
+import { SelectronError } from "@/engine/errors";
 
 describe("sampleDirichlet", () => {
   it("returns a simplex (non-negative, sums to 1 within 1e-9)", () => {
@@ -30,5 +31,15 @@ describe("sampleDirichlet", () => {
       expect(mean[k]).toBeCloseTo(expectedMean[k], 2);
       expect(variance[k]).toBeCloseTo(expectedVariance[k], 2);
     }
+  });
+
+  it("rejects empty, non-finite, and non-positive alpha vectors", () => {
+    const rng = makeRng(3);
+    expect(() => sampleDirichlet([], rng)).toThrow(SelectronError);
+    expect(() => sampleDirichlet([1, NaN], rng)).toThrow(SelectronError);
+    expect(() => sampleDirichlet([1, Infinity], rng)).toThrow(SelectronError);
+    expect(() => sampleDirichlet([1, 0], rng)).toThrow(SelectronError);
+    expect(() => dirichletMean([1, -1])).toThrow(SelectronError);
+    expect(() => dirichletVariance([1, NaN])).toThrow(SelectronError);
   });
 });

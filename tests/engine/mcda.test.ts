@@ -2,6 +2,7 @@ import { describe, it, expect } from "vitest";
 import { scoreCandidate, closedFormMoments } from "@/engine/mcda";
 import { PLACEHOLDER_CRITERIA } from "@/data/placeholder-criteria";
 import type { Candidate } from "@/types";
+import { SelectronError } from "@/engine/errors";
 
 // Demo candidate — must carry a score for EVERY criterion in PLACEHOLDER_CRITERIA
 // (Iter-1 placeholders + Diego 2026-05-19 scope expansion = 12 criteria) or
@@ -36,7 +37,7 @@ describe("scoreCandidate", () => {
       seed: 42,
     });
     expect(post.samples.length).toBe(5000);
-    expect(post.ess).toBeGreaterThan(0);
+    expect(post.ess).toBe(5000);
     expect(post.mean).toBeGreaterThan(0);
     expect(post.mean).toBeLessThan(1);
     expect(post.ci90[0]).toBeLessThan(post.ci90[1]);
@@ -80,5 +81,19 @@ describe("scoreCandidate", () => {
     const b = scoreCandidate(args);
     expect(a.mean).toBe(b.mean);
     expect(a.samples[0]).toBe(b.samples[0]);
+  });
+
+  it("rejects invalid iteration counts and non-finite alpha values", () => {
+    const args = {
+      candidate: demo,
+      criteria: PLACEHOLDER_CRITERIA,
+      alpha: ALPHA,
+      seed: 99,
+    };
+    expect(() => scoreCandidate({ ...args, iterations: 0 })).toThrow(SelectronError);
+    expect(() => scoreCandidate({ ...args, iterations: 10.5 })).toThrow(SelectronError);
+    expect(() => scoreCandidate({ ...args, iterations: 10, alpha: [1, NaN, ...ALPHA.slice(2)] })).toThrow(
+      SelectronError,
+    );
   });
 });

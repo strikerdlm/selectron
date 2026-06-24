@@ -345,6 +345,12 @@ describe("simulateIMM", () => {
     expect(out.pEvac.mean).toBeLessThanOrEqual(100);
     expect(out.pLocl.mean).toBeGreaterThanOrEqual(0);
     expect(out.pLocl.mean).toBeLessThanOrEqual(100);
+    expect(out.monteCarloError?.trials).toBe(2000);
+    expect(out.monteCarloError?.chiMeanMcse).toBeGreaterThanOrEqual(0);
+    expect(out.monteCarloError?.pEvacMcsePct).toBeGreaterThanOrEqual(0);
+    expect(out.chiClamp?.count).toBeGreaterThanOrEqual(0);
+    expect(out.chiClamp?.proportion).toBeGreaterThanOrEqual(0);
+    expect(out.chiClamp?.proportion).toBeLessThanOrEqual(1);
   });
   it("deterministic on the same seed", () => {
     const a = simulateIMM({ crew: oneCrew, mission: oneDayMission, kit: IMM_KITS.issHMS, trials: 1000, seed: 12345 });
@@ -400,6 +406,33 @@ describe("General-Poisson duration scaling", () => {
     // Allow ±25% tolerance (Monte Carlo noise at N=10k).
     expect(empiricalMean).toBeGreaterThan(1.8 * 0.75); // > 1.35
     expect(empiricalMean).toBeLessThan(1.8 * 1.25);    // < 2.25
+  });
+
+  it("incidenceRateOverrides inject a direct rate at the sampling site", () => {
+    const conditionOnly = (c: import("../../src/imm/types").IMMCondition) => c.id === "acute-sinusitis";
+    const suppressed = simulateIMM({
+      crew: oneCrew,
+      mission: oneDayMission,
+      kit: IMM_KITS.none,
+      trials: 1000,
+      seed: 0xc0ffee,
+      conditionFilter: conditionOnly,
+      kindMultipliers: {},
+      incidenceRateOverrides: { "acute-sinusitis": 0 },
+    });
+    const elevated = simulateIMM({
+      crew: oneCrew,
+      mission: oneDayMission,
+      kit: IMM_KITS.none,
+      trials: 1000,
+      seed: 0xc0ffee,
+      conditionFilter: conditionOnly,
+      kindMultipliers: {},
+      incidenceRateOverrides: { "acute-sinusitis": 1 },
+    });
+
+    expect(suppressed.tme.mean).toBe(0);
+    expect(elevated.tme.mean).toBeGreaterThan(0.5);
   });
 });
 
@@ -515,6 +548,24 @@ describe("applyStageAVulnerabilityMultiplier (IC-5)", () => {
     };
     const result = applyStageAVulnerabilityMultiplier(2.0, member, "psychiatric" as IMMConditionFamily, ["psych.score_a"], criteriaIndex);
     expect(result).toBeCloseTo(2.0, 5);
+  });
+
+  it("throws on malformed Stage-A scores instead of extrapolating vulnerability effects", () => {
+    const member: IMMCrewMember = {
+      id: "m", sex: "male", contacts: false, crowns: false,
+      CAC_positive: false, abdominal_surgery_history: false,
+      EVA_eligible: false, EVA_count: 0,
+      stageAScores: { "psych.score_a": 101 },
+    };
+    expect(() =>
+      applyStageAVulnerabilityMultiplier(
+        1.0,
+        member,
+        "psychiatric" as IMMConditionFamily,
+        ["psych.score_a"],
+        criteriaIndex,
+      ),
+    ).toThrow(SelectronError);
   });
 
   it("simulateIMM accepts criteria param and runs without throwing", () => {
@@ -947,6 +998,15 @@ describe("F9: simulateIMM fail-closed input validation", () => {
     expect(() => simulateIMM({ ...base, kindMultipliers: { "uti": Infinity } })).toThrowError(SelectronError);
     expect(() => simulateIMM({ ...base, tierBMultiplier: -0.5 })).toThrowError(SelectronError);
     expect(() => simulateIMM({ ...base, tierBMultiplier: NaN })).toThrowError(SelectronError);
+  });
+
+  it("rejects invalid or unsupported incidenceRateOverrides", () => {
+    expect(() => simulateIMM({ ...base, incidenceRateOverrides: { "acute-sinusitis": -1 } })).toThrowError(SelectronError);
+    expect(() => simulateIMM({ ...base, incidenceRateOverrides: { "acute-sinusitis": Infinity } })).toThrowError(SelectronError);
+    expect(() => simulateIMM({ ...base, incidenceRateOverrides: { "not-a-condition": 1 } })).toThrowError(SelectronError);
+    expect(() =>
+      simulateIMM({ ...base, incidenceRateOverrides: { "acute-radiation-syndrome": 1 } }),
+    ).toThrowError(SelectronError);
   });
 
   it("rejects out-of-range, unknown, and non-finite Stage-A scores when criteria are supplied", () => {

@@ -1,6 +1,7 @@
 export type SelectronErrorCode =
   | "E_BAD_SCORE"
   | "E_BAD_WEIGHT"
+  | "E_BAD_ITERATIONS"
   | "E_NO_CRITERIA"
   | "E_NO_CANDIDATES"
   | "E_SAMPLER_DIVERGED"

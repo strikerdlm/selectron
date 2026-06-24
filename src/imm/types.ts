@@ -214,6 +214,20 @@ export type PosteriorSummary = {
   mean: number; ci90: [number, number]; ci95: [number, number]; sd: number;
 };
 
+export type MonteCarloErrorSummary = {
+  trials: number;
+  tmeMeanMcse: number;
+  chiMeanMcse: number;
+  pEvacMcsePct: number;
+  pLoclMcsePct: number;
+  healthCriterionMcsePct: number;
+  tmeRelativeMcse: number | null;
+  chiRelativeMcse: number | null;
+  pEvacRelativeMcse: number | null;
+  pLoclRelativeMcse: number | null;
+  healthCriterionRelativeMcse: number | null;
+};
+
 export type IMMOutcome = {
   tme: PosteriorSummary;
   chi: PosteriorSummary;
@@ -237,6 +251,11 @@ export type IMMOutcome = {
   convergence: {
     trialCheckpoints: number[];
     sigmaChi: number[]; sigmaPevac: number[];
+  };
+  monteCarloError?: MonteCarloErrorSummary;
+  chiClamp?: {
+    count: number;
+    proportion: number;
   };
   /**
    * Raw per-trial CHI samples (percent scale, 0–100).
