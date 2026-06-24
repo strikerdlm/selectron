@@ -67,11 +67,22 @@ jobs:
         with:
           ssh-private-key: ${{ secrets.SELECTRON_PUBLIC_DEPLOY_KEY }}
 
-      - name: Checkout public selectron
+      - name: Verify deploy key can reach public repo
         run: |
           set -euo pipefail
           mkdir -p ~/.ssh
           ssh-keyscan -t ed25519 github.com >> ~/.ssh/known_hosts
+          if ! git ls-remote "git@github.com:${PUBLIC_REPO}.git" HEAD >/dev/null 2>&1; then
+            echo "::error::SELECTRON_PUBLIC_DEPLOY_KEY cannot authenticate to ${PUBLIC_REPO}."
+            echo "The private-repo secret and public-repo deploy key are out of sync."
+            echo "Fix once from an admin machine: node scripts/bootstrap-public-sync-auth.mjs"
+            exit 1
+          fi
+          echo "Deploy key verified for ${PUBLIC_REPO}."
+
+      - name: Checkout public selectron
+        run: |
+          set -euo pipefail
           git clone --branch master --single-branch "git@github.com:${PUBLIC_REPO}.git" "${PUBLIC_DIR}"
 
       - name: Sync application tree (exclude manuscripts)
