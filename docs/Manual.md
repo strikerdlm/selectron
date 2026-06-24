@@ -366,7 +366,7 @@ Requires optional Python FastAPI service (`uvicorn api.main:app --reload`).
 ### 8.3 V&V panel (K15 regression)
 
 1. Open **Calibration → V&V**.
-2. Click **Run K15 validation** — compares simulator outputs to published NASA IMM reference metrics.
+2. Click **Run K15 Benchmark** — compares simulator outputs to published NASA IMM reference metrics. This is an inter-model regression benchmark, not external analog-outcome validation.
 3. Read **two independent badges** per metric:
    - **Within CI95** (green) — scientific agreement signal
    - **Regression envelope** (amber) — internal regression stable · K15 divergent
@@ -441,6 +441,8 @@ npm run evidence:require-adjudicated # release gate (fails until full coverage)
 - "Evidence-based calibrated analog incidence" while `releasePriorsAdjudicated=false`
 - "NASA-standard applicant verdict" from any UI surface
 - "Validated crew selection" from Stage A MCDA intervals alone
+
+For the current prediction boundary, see the model card: [`docs/model_card.md`](model_card.md).
 
 ---
 

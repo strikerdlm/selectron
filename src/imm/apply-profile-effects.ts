@@ -4,9 +4,10 @@ import { PROFILE_EFFECTS, type ProfileEffectMode } from "./profile-effects";
 const BEHAVIORAL_PSYCH_FAMILIES = new Set<IMMConditionFamily>(["behavioral", "psychiatric"]);
 
 /**
- * Incidence multiplier from accepted profile effects. Today only comms delay
- * (log-hazard on behavioral/psychiatric λ) is wired; other registry entries
- * remain descriptive or are handled elsewhere (duration, EVA, kit).
+ * Incidence multiplier from the profile-effect registry. In adjudicated mode
+ * this function only applies accepted effects; proposal effects such as the
+ * current communications-delay sensitivity coefficient require explicit
+ * exploratory mode.
  */
 export function profileIncidenceMultiplier(
   mission: IMMMission,

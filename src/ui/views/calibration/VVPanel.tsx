@@ -196,7 +196,7 @@ function ValidationSection() {
               : "border-signal text-signal hover:bg-signal/10"
           }`}
         >
-          {running ? "Running…" : "▶ Run Validation"}
+          {running ? "Running…" : "▶ Run K15 Benchmark"}
         </button>
         {running && (
           <span className="flex items-center gap-2">

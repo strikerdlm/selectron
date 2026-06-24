@@ -59,6 +59,7 @@ describe("active analog workflow guards", () => {
       "src/ui/wizard/StepReview.tsx",
       "src/ui/views/calibration/BatchFitPanel.tsx",
       "src/ui/views/calibration/ConditionsPanel.tsx",
+      "src/ui/views/calibration/VVPanel.tsx",
     ];
     const forbidden = [
       "NASA-standard",
@@ -73,6 +74,7 @@ describe("active analog workflow guards", () => {
       "Cox-style coefficient elicited from the literature",
       "authoritative operational values",
       "release priors are adjudicated",
+      "Run Validation",
     ];
 
     for (const path of checkedFiles) {
@@ -97,6 +99,18 @@ describe("active analog workflow guards", () => {
     // F4: every outcome surface carries the operative coverage fact.
     expect(readRepoFile("src/ui/views/CrewComposition.tsx")).toContain("EVIDENCE_COVERAGE_STATEMENT");
     expect(readRepoFile("src/ui/views/CrewComposition.tsx")).toContain("accepted coverage");
+    expect(readRepoFile("src/ui/views/calibration/VVPanel.tsx")).toContain("Run K15 Benchmark");
+  });
+
+  it("publishes a model card with explicit non-validation boundaries", () => {
+    const source = readRepoFile("docs/model_card.md");
+
+    expect(source).toContain("No population, mission type, mission duration range, or analog facility family is currently validated");
+    expect(source).toContain("valid accepted active-parameter coverage: 0/4,849");
+    expect(source).toContain("Unacceptable Extrapolations");
+    expect(source).toContain("not an empirically calibrated analog-risk predictor");
+    expect(readRepoFile("README.md")).toContain("docs/model_card.md");
+    expect(readRepoFile("docs/Manual.md")).toContain("docs/model_card.md");
   });
 
   it("keeps the slow validation workflow archiving release-verification artifacts", () => {

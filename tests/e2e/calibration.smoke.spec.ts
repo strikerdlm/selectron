@@ -68,11 +68,12 @@ test.describe("Calibration view — Python API integration", () => {
     await expect(page.locator("button:has-text('Run Fit')")).toBeEnabled();
   });
 
-  test("V&V tab shows validation and sensitivity panels", async ({ page }) => {
+  test("V&V tab shows reference-model regression and sensitivity panels", async ({ page }) => {
     await page.click("button:has-text('V&V')");
     await expect(page.locator("h3:has-text('Evidence Ledger Status')")).toBeVisible();
     await expect(page.locator("text=unadjudicated")).toBeVisible();
     await expect(page.locator("h3:has-text('K15 Reference-Model Regression')")).toBeVisible();
+    await expect(page.locator("button:has-text('Run K15 Benchmark')")).toBeVisible();
     await expect(page.locator("h3:has-text('Sensitivity Analysis')")).toBeVisible();
   });
 
