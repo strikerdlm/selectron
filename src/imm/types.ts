@@ -210,9 +210,16 @@ export type IMMKitScenario = {
   capabilities?: { telemedicine: Telemedicine; provider: CareProvider };
 };
 
-export type PosteriorSummary = {
+export type ScenarioSummary = {
   mean: number; ci90: [number, number]; ci95: [number, number]; sd: number;
 };
+
+/**
+ * @deprecated Use ScenarioSummary for ordinary simulateIMM outputs. Retained
+ * for persisted sessions, historical tests, and true posterior-predictive
+ * parameter-draw summaries.
+ */
+export type PosteriorSummary = ScenarioSummary;
 
 export type MonteCarloErrorSummary = {
   trials: number;
@@ -229,21 +236,21 @@ export type MonteCarloErrorSummary = {
 };
 
 export type IMMOutcome = {
-  tme: PosteriorSummary;
-  chi: PosteriorSummary;
-  pEvac: PosteriorSummary;
-  pLocl: PosteriorSummary;
+  tme: ScenarioSummary;
+  chi: ScenarioSummary;
+  pEvac: ScenarioSummary;
+  pLocl: ScenarioSummary;
   /**
    * Probability of meeting the specified composite health criterion (×100,
    * percent scale, same as pEvac/pLocl). A trial meets the criterion when:
    * EVAC=0 AND LOCL=0 AND CHI >= chiStar×100.
    */
-  healthCriterionAttainment?: PosteriorSummary;
+  healthCriterionAttainment?: ScenarioSummary;
   /**
    * Legacy alias retained for persisted sessions and historical tests. New UI
    * should use healthCriterionAttainment terminology.
    */
-  missionSuccess: PosteriorSummary;
+  missionSuccess: ScenarioSummary;
   perConditionDrivers: {
     conditionId: string;
     pEvacContrib: number; pLoclContrib: number; tmeContrib: number;
@@ -270,7 +277,7 @@ export type IMMOutcome = {
 /**
  * Output of `posteriorPredictiveSimulateIMM`. Each summary is a predictive
  * distribution over the metric (one value per parameter draw, not per trial).
- * Reuses IMMOutcome's PosteriorSummary per metric so the UI renders point + interval
+ * Reuses the same summary shape per metric so the UI renders point + interval
  * estimates without extra aggregation.
  */
 export type PosteriorPredictiveOutcome = {

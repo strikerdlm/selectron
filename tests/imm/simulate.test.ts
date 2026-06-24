@@ -336,7 +336,7 @@ describe("T25: per-event Bernoulli end-state", () => {
 // (simulateIMM and IMM_MISSIONS already imported at the top of this file.)
 
 describe("simulateIMM", () => {
-  it("T=2000 returns IMMOutcome with all 4 PosteriorSummary shapes", () => {
+  it("T=2000 returns IMMOutcome with all 4 ScenarioSummary shapes", () => {
     const out = simulateIMM({ crew: oneCrew, mission: oneDayMission, kit: IMM_KITS.issHMS, trials: 2000, seed: 0xc0ffee });
     expect(out.tme.mean).toBeGreaterThanOrEqual(0);
     expect(out.chi.mean).toBeGreaterThanOrEqual(0);
@@ -592,7 +592,7 @@ describe("applyStageAVulnerabilityMultiplier (IC-5)", () => {
 
 // ── IC-4: missionSuccess MSP tracking ────────────────────────────────────────
 describe("simulateIMM missionSuccess (IC-4)", () => {
-  it("missionSuccess is a valid PosteriorSummary in [0, 100] percent scale", () => {
+  it("missionSuccess is a valid ScenarioSummary in [0, 100] percent scale", () => {
     const out = simulateIMM({ crew: oneCrew, mission: oneDayMission, kit: IMM_KITS.issHMS, trials: 2000, seed: 0xface });
     expect(out.missionSuccess.mean).toBeGreaterThanOrEqual(0);
     expect(out.missionSuccess.mean).toBeLessThanOrEqual(100);

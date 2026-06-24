@@ -36,14 +36,14 @@ import type {
   IMMKitScenario,
   IMMMission,
   IMMOutcome,
-  PosteriorSummary,
+  ScenarioSummary,
 } from "@/imm/types";
 import { ACTIVE_MISSIONS } from "@/data/imm-missions";
 import { IMM_KITS } from "@/imm/kits";
 
 // ── fixtures ──────────────────────────────────────────────────────────────
 
-function fakeSummary(mean: number): PosteriorSummary {
+function fakeSummary(mean: number): ScenarioSummary {
   return {
     mean,
     sd: Math.max(0.01, mean * 0.05),

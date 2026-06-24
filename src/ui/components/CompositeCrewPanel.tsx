@@ -2,7 +2,7 @@
 // Displays crew-level composite score + gate verdict + aggregator method selector.
 // CC-4: Run Simulation button + IMMOutcome results panel.
 
-import type { CrewCompositeMethod, IMMOutcome, PosteriorSummary } from "../../imm/types";
+import type { CrewCompositeMethod, IMMOutcome, ScenarioSummary } from "../../imm/types";
 
 interface CompositeCrewPanelProps {
   compositeScore: number;          // [0, 1]
@@ -28,7 +28,7 @@ const METHOD_LABELS: Record<CrewCompositeMethod, string> = {
 /** Single IMM outcome metric display row.
  *
  * F11: outcome metrics are rendered in a NEUTRAL color. Stage A is demo-only
- * and outcome priors are unadjudicated (0 / 4,846 accepted parameter paths),
+ * and outcome priors are unadjudicated (0 / 4,849 accepted parameter paths),
  * so favorable/intermediate/warning color bands would falsely imply
  * validated decision thresholds. `goodIsHigh` is retained only to mark the
  * direction-of-good in the accessible label; policy thresholds, if ever
@@ -42,7 +42,7 @@ function ResultMetric({
   goodIsHigh = false,
 }: {
   label: string;
-  summary: PosteriorSummary;
+  summary: ScenarioSummary;
   unit?: string;
   goodIsHigh?: boolean;
 }) {

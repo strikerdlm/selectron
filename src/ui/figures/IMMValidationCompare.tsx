@@ -14,7 +14,7 @@ import ReactEChartsCore from "echarts-for-react/lib/core";
 import { echarts } from "./echarts-base";
 import { useFigureTheme } from "./useFigureTheme";
 import { FigureCaption } from "./FigureCaption";
-import type { IMMOutcome, PosteriorSummary } from "../../imm/types";
+import type { IMMOutcome, ScenarioSummary } from "../../imm/types";
 
 // K15 Table 1 issHMS reference — inlined to avoid importing the fs-using calibration module.
 // Source: src/imm/calibration.ts K15_TABLE1_REF.issHMS (ISS 6-month / 6-crew / 100 000 trials)
@@ -42,11 +42,11 @@ export type IMMValidationCompareProps = {
 type MetricRow = {
   label: string;
   unit: string;
-  summary: PosteriorSummary;
+  summary: ScenarioSummary;
   refMean: number;
 };
 
-function withinCI95(summary: PosteriorSummary, refMean: number): boolean {
+function withinCI95(summary: ScenarioSummary, refMean: number): boolean {
   return refMean >= summary.ci95[0] && refMean <= summary.ci95[1];
 }
 

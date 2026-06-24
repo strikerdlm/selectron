@@ -16,7 +16,7 @@ import ReactEChartsCore from "echarts-for-react/lib/core";
 import { echarts } from "./echarts-base";
 import { useFigureTheme } from "./useFigureTheme";
 import { FigureCaption } from "./FigureCaption";
-import type { IMMOutcome, PosteriorSummary } from "../../imm/types";
+import type { IMMOutcome, ScenarioSummary } from "../../imm/types";
 import { FIGURE_GENERATION_COMMIT } from "../../version";
 
 // Okabe-Ito palette assignments per metric (match I2 IMMPosteriorHist exactly)
@@ -35,6 +35,10 @@ function fmtCount(x: number): string {
 }
 function fmtPct(x: number): string {
   return `${x.toFixed(1)}%`;
+}
+function fmtMcse(x: number, suffix: string): string {
+  if (x < 0.01) return `<0.01 ${suffix}`;
+  return `${x.toFixed(2)} ${suffix}`;
 }
 
 // ── CI₉₅ whisker ─────────────────────────────────────────────────────────────
@@ -83,12 +87,13 @@ function Whisker({ ci95, mean, fmt, color }: WhiskerProps) {
 type StatCardProps = {
   label: string;
   unit: string;
-  summary: PosteriorSummary;
+  summary: ScenarioSummary;
   fmt: (x: number) => string;
   color: string;
+  mcseLabel?: string;
 };
 
-function StatCard({ label, unit, summary, fmt, color }: StatCardProps) {
+function StatCard({ label, unit, summary, fmt, color, mcseLabel }: StatCardProps) {
   return (
     <div className="panel p-5 flex flex-col">
       <div className="flex items-baseline justify-between">
@@ -103,6 +108,11 @@ function StatCard({ label, unit, summary, fmt, color }: StatCardProps) {
           {fmt(summary.mean)}
         </span>
       </div>
+      {mcseLabel && (
+        <div className="mono mt-2 text-[10px] uppercase tracking-cap text-ink-3">
+          MCSE {mcseLabel}
+        </div>
+      )}
       <Whisker ci95={summary.ci95} mean={summary.mean} fmt={fmt} color={color} />
     </div>
   );
@@ -111,7 +121,7 @@ function StatCard({ label, unit, summary, fmt, color }: StatCardProps) {
 // ── Composite-health inline row ──────────────────────────────────────────────
 // 5th metric gets a slim full-width row instead
 // of a 5th card — avoids the visual asymmetry of 5 across in a 4-col grid.
-function HealthCriterionRow({ summary }: { summary: PosteriorSummary }) {
+function HealthCriterionRow({ summary, mcseLabel }: { summary: ScenarioSummary; mcseLabel?: string }) {
   const color = "#0072B2"; // Blue (Okabe-Ito); joint health criterion metric.
   return (
     <div className="panel p-4 flex items-center justify-between gap-4">
@@ -134,6 +144,11 @@ function HealthCriterionRow({ summary }: { summary: PosteriorSummary }) {
             {fmtPct(summary.ci95[0])} <span className="text-ink-3">→</span> {fmtPct(summary.ci95[1])}
           </span>
         </span>
+        {mcseLabel && (
+          <span className="mono text-[10px] uppercase tracking-cap text-ink-3">
+            MCSE {mcseLabel}
+          </span>
+        )}
       </div>
     </div>
   );
@@ -244,6 +259,8 @@ export function IMMHeadlineCard({
 }: IMMHeadlineCardProps) {
   const { tme, chi, pEvac, pLocl, convergence } = outcome;
   const healthCriterion = outcome.healthCriterionAttainment ?? outcome.missionSuccess;
+  const mcse = outcome.monteCarloError;
+  const chiClamp = outcome.chiClamp;
   const missionLabel = mission?.label ?? "(mission not specified)";
   const seedHex = `0x${seed.toString(16).toUpperCase()}`;
 
@@ -260,7 +277,8 @@ export function IMMHeadlineCard({
       "Hero composite: four stat cards (TME, CHI, pEVAC, pLOCL) plus a composite " +
       "health-criterion row. Each headline number is the Monte Carlo mean " +
       "across T trials; the whisker below shows the 95% simulation " +
-      "interval (CI₉₅) span with a tick at the mean. The health criterion is the joint probability " +
+      "interval (CI₉₅) span with a tick at the mean. MCSE values report estimator precision " +
+      "for the displayed means/probabilities, not empirical validation. The health criterion is the joint probability " +
       "P(no LOCL ∧ no EVAC ∧ CHI ≥ χ*). The σ(CHI) sparkline at the bottom is the " +
       "convergence glance: a flat trajectory near zero indicates a converged run; " +
       "rising or jagged σ means insufficient trials. See I4 for the full diagnostic.",
@@ -284,14 +302,54 @@ export function IMMHeadlineCard({
   return (
     <div data-testid="imm-headline-card">
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <StatCard label="TME"   unit="events" summary={tme}   fmt={fmtCount} color={COLORS.tme}   />
-        <StatCard label="CHI"   unit="%"      summary={chi}   fmt={fmtPct}   color={COLORS.chi}   />
-        <StatCard label="pEVAC" unit="%"      summary={pEvac} fmt={fmtPct}   color={COLORS.pEvac} />
-        <StatCard label="pLOCL" unit="%"      summary={pLocl} fmt={fmtPct}   color={COLORS.pLocl} />
+        <StatCard
+          label="TME"
+          unit="events"
+          summary={tme}
+          fmt={fmtCount}
+          color={COLORS.tme}
+          mcseLabel={mcse ? fmtMcse(mcse.tmeMeanMcse, "events") : undefined}
+        />
+        <StatCard
+          label="CHI"
+          unit="%"
+          summary={chi}
+          fmt={fmtPct}
+          color={COLORS.chi}
+          mcseLabel={mcse ? fmtMcse(mcse.chiMeanMcse, "pp") : undefined}
+        />
+        <StatCard
+          label="pEVAC"
+          unit="%"
+          summary={pEvac}
+          fmt={fmtPct}
+          color={COLORS.pEvac}
+          mcseLabel={mcse ? fmtMcse(mcse.pEvacMcsePct, "pp") : undefined}
+        />
+        <StatCard
+          label="pLOCL"
+          unit="%"
+          summary={pLocl}
+          fmt={fmtPct}
+          color={COLORS.pLocl}
+          mcseLabel={mcse ? fmtMcse(mcse.pLoclMcsePct, "pp") : undefined}
+        />
       </div>
 
       <div className="mt-4">
-        <HealthCriterionRow summary={healthCriterion} />
+        <HealthCriterionRow
+          summary={healthCriterion}
+          mcseLabel={mcse ? fmtMcse(mcse.healthCriterionMcsePct, "pp") : undefined}
+        />
+      </div>
+
+      <div className={`panel mt-4 px-3 py-2 flex flex-wrap items-center justify-between gap-3 ${chiClamp && chiClamp.count > 0 ? "border-warn/40 bg-warn/5" : ""}`}>
+        <span className="mono text-[10px] text-ink-3 uppercase tracking-cap">CHI clamp</span>
+        <span className={`mono text-[10px] tabular-nums ${chiClamp && chiClamp.count > 0 ? "text-warn" : "text-ink-2"}`}>
+          {chiClamp
+            ? `${chiClamp.count.toLocaleString()} / ${trials.toLocaleString()} trials (${(chiClamp.proportion * 100).toFixed(2)}%)`
+            : "not reported"}
+        </span>
       </div>
 
       <div className="mt-4">

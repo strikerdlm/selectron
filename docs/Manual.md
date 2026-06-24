@@ -287,8 +287,9 @@ Failed gates are **review flags**; the sim can still run unless you choose to ex
 1. Click **Run simulation** (or wait for the debounced **preview** at T=5,000).
 2. A Web Worker runs Monte Carlo off the main thread (~10–120 s depending on T and hardware).
 3. On completion, the **Outcome** panel shows:
-   - TME, CHI, pEVAC, pLOCL (with uncertainty intervals)
+   - TME, CHI, pEVAC, pLOCL (with simulation intervals and MCSE)
    - Composite crew health criterion attainment
+   - CHI clamp count/proportion
    - Expected duty hours lost
    - Evidence coverage statement (`accepted: N / M params · unadjudicated`)
    - Mission evidence grade
@@ -470,8 +471,11 @@ npm run evidence:require-adjudicated # release gate (fails until full coverage)
 | **QTL** | Quality time lost (duty hours) |
 | **Composite attainment** | P(no LOCL ∧ no EVAC ∧ CHI > χ*) |
 | **MCDA interval** | Percentile band of Stage A score under weight uncertainty |
+| **Simulation interval** | Percentile band of simulated mission-to-mission variability under current assumptions; not a confidence interval for real analog outcomes |
+| **MCSE** | Monte Carlo standard error of the displayed mean/probability estimate; small MCSE means the simulation estimate is numerically stable, not empirically validated |
+| **CHI clamp** | Count/proportion of trials where raw CHI was clipped to the 0–100 display scale |
 | **Kind multiplier** | Per-(mission-kind, condition) incidence scaler from prior catalog |
-| **Profile multiplier** | Accepted I&C profile effect (e.g., comms delay) |
+| **Profile multiplier** | Registry-controlled I&C profile effect; communications delay is proposal-stage and applies only in exploratory mode |
 | **Vulnerability multiplier** | exp(β·z) on λ from Stage A z-scores (scenario mode only) |
 
 ---

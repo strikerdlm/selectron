@@ -5,6 +5,7 @@ import type {
   IMMCrewMember,
   IMMOutcome,
   PosteriorSummary,
+  ScenarioSummary,
   CrewCompositeMethod,
   CrewComposite,
   CrewGateResult,
@@ -46,10 +47,11 @@ describe("IMM composite-crew types", () => {
     expect(noScores.stageAScores).toBeUndefined();
   });
 
-  it("IMMOutcome includes missionSuccess PosteriorSummary", () => {
-    const ps: PosteriorSummary = { mean: 72, ci90: [60, 85], ci95: [55, 90], sd: 8 };
+  it("IMMOutcome includes missionSuccess ScenarioSummary", () => {
+    const ps: ScenarioSummary = { mean: 72, ci90: [60, 85], ci95: [55, 90], sd: 8 };
+    const compat: PosteriorSummary = ps;
     const outcome: IMMOutcome = {
-      tme: ps, chi: ps, pEvac: ps, pLocl: ps,
+      tme: compat, chi: ps, pEvac: ps, pLocl: ps,
       missionSuccess: { mean: 45, ci90: [30, 60], ci95: [25, 65], sd: 12 },
       perConditionDrivers: [],
       convergence: { trialCheckpoints: [], sigmaChi: [], sigmaPevac: [] },

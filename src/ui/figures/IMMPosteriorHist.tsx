@@ -1,7 +1,7 @@
 // I2 IMMPosteriorHist — 4-panel small-multiples for IMM Monte Carlo summaries.
 //
 // Renders parametric Gaussian PDF curves (not histograms of raw samples) for
-// TME, CHI, pEVAC, and pLOCL based on PosteriorSummary (mean + sd).
+// TME, CHI, pEVAC, and pLOCL based on ScenarioSummary (mean + sd).
 // Rationale: IMMOutcome carries only summary statistics, not per-trial arrays.
 // By CLT the T-trial means converge to Gaussian; the parametric approximation
 // is stated explicitly in the caption.
@@ -14,7 +14,7 @@ import ReactEChartsCore from "echarts-for-react/lib/core";
 import { echarts } from "./echarts-base";
 import { useFigureTheme } from "./useFigureTheme";
 import { FigureCaption } from "./FigureCaption";
-import type { IMMOutcome, PosteriorSummary } from "../../imm/types";
+import type { IMMOutcome, ScenarioSummary } from "../../imm/types";
 import { FIGURE_GENERATION_COMMIT } from "../../version";
 
 // Okabe-Ito palette assignments per metric
@@ -68,7 +68,7 @@ function closestLabel(xs: string[], target: number): string {
 
 // Build a single panel option for one metric
 function panelOption(
-  summary: PosteriorSummary,
+  summary: ScenarioSummary,
   label: string,
   unit: string,
   color: string,
@@ -205,8 +205,8 @@ export function IMMPosteriorHist({
     oneLine: `Monte Carlo summary distributions for TME / CHI / pEVAC / pLOCL after T=${trials.toLocaleString()} IMM trials on ${mission.label}.`,
     methods:
       "Parametric Gaussian approximation: each panel renders the normal PDF N(μ, σ²) derived " +
-      "from the PosteriorSummary (mean ± sd). Per CLT the T-trial means are approximately " +
-      "Gaussian; this approximation is faithful for T ≥ 10 000. CI₉₀ shaded; Monte Carlo mean " +
+      "from the ScenarioSummary (mean ± sd). Per CLT the T-trial means are approximately " +
+      "Gaussian; this approximation is faithful for T ≥ 10 000. Simulation interval₉₀ shaded; Monte Carlo mean " +
       "overlaid as dashed line. When sd = 0 (degenerate/deterministic outcome) a vertical " +
       "spike is shown with σ = 1e-6 regularisation. Per-trial samples are not stored in " +
       "IMMOutcome — use the raw trial arrays from simulateIMM if kernel density is required.",

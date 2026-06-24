@@ -55,7 +55,7 @@ import type {
   IMMCrewMember,
   IMMOutcome,
   PosteriorPredictiveOutcome,
-  PosteriorSummary,
+  ScenarioSummary,
 } from "@/imm/types";
 import type { PosteriorDrawsResponse } from "@/api/calibration";
 import { PLACEHOLDER_CRITERIA } from "@/data/placeholder-criteria";
@@ -64,7 +64,7 @@ const PERSIST_KEY = "selectron:crew-state:v1";
 
 // ── fixtures ────────────────────────────────────────────────────────────────
 
-function summary(mean: number): PosteriorSummary {
+function summary(mean: number): ScenarioSummary {
   return {
     mean,
     sd: Math.max(0.01, mean * 0.05),

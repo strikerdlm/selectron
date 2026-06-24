@@ -5,9 +5,9 @@
 
 import { describe, it, expect } from "vitest";
 import { assessIMMLxC } from "../../src/imm/lxc";
-import type { IMMOutcome, CrewGateResult, PosteriorSummary } from "../../src/imm/types";
+import type { IMMOutcome, CrewGateResult, ScenarioSummary } from "../../src/imm/types";
 
-function summary(mean: number, sd = 1): PosteriorSummary {
+function summary(mean: number, sd = 1): ScenarioSummary {
   return {
     mean, sd,
     ci90: [mean - 1.645 * sd, mean + 1.645 * sd],

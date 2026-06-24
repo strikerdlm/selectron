@@ -46,6 +46,20 @@ function makeOutcome(opts?: {
       sigmaChi:         opts?.sigmaChi    ?? [8.2, 6.1, 5.4, 4.9, 4.7],
       sigmaPevac:       opts?.sigmaPevac  ?? [3.1, 2.8, 2.4, 2.2, 2.1],
     },
+    monteCarloError: {
+      trials: 100_000,
+      tmeMeanMcse: 0.12,
+      chiMeanMcse: 0.03,
+      pEvacMcsePct: 0.02,
+      pLoclMcsePct: 0.01,
+      healthCriterionMcsePct: 0.04,
+      tmeRelativeMcse: 0.001,
+      chiRelativeMcse: 0.0003,
+      pEvacRelativeMcse: 0.003,
+      pLoclRelativeMcse: 0.02,
+      healthCriterionRelativeMcse: 0.0005,
+    },
+    chiClamp: { count: 3, proportion: 0.00003 },
   };
 }
 
@@ -105,6 +119,21 @@ describe("IMMHeadlineCard (I1)", () => {
       />,
     );
     expect(container.textContent).toContain("Mars 18-month");
+  });
+
+  it("renders Monte Carlo standard error and CHI clamp diagnostics", () => {
+    const outcome = makeOutcome();
+    const { container } = render(
+      <IMMHeadlineCard
+        outcome={outcome}
+        trials={100_000}
+        mission={{ id: "iss-6mo", label: "ISS 6-month" }}
+      />,
+    );
+    const text = container.textContent ?? "";
+    expect(text).toContain("MCSE");
+    expect(text).toContain("CHI clamp");
+    expect(text).toContain("3 / 100,000 trials");
   });
 
   it("caption falls back gracefully when mission is omitted", () => {

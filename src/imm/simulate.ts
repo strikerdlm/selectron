@@ -1,7 +1,7 @@
 // src/imm/simulate.ts
 import { makeRng } from "../engine/prng";
 import { SelectronError } from "../engine/errors";
-import type { IMMOutcome, MonteCarloErrorSummary, PosteriorSummary } from "./types";
+import type { IMMOutcome, MonteCarloErrorSummary, ScenarioSummary } from "./types";
 // Rng inlined — prng.ts does not export this type (matches incidence.ts convention)
 type Rng = () => number;
 
@@ -705,9 +705,9 @@ export function runIMMTrial(
   };
 }
 
-// ── Task 29: posteriorSummary + simulateIMM ───────────────────────────────────
+// ── Task 29: scenarioSummary + simulateIMM ───────────────────────────────────
 
-function posteriorSummary(values: number[]): PosteriorSummary {
+function scenarioSummary(values: number[]): ScenarioSummary {
   const n = values.length;
   if (n === 0) return { mean: 0, ci90: [0, 0], ci95: [0, 0], sd: 0 };
   const sorted = [...values].sort((a, b) => a - b);
@@ -1027,12 +1027,12 @@ export function simulateIMM(opts: {
     tmeContrib:   (perConditionCountsSum[c.id] ?? 0) / trials,
   }));
 
-  const healthCriterionAttainment = posteriorSummary(healthCriterionFlags.map(x => x * 100));
+  const healthCriterionAttainment = scenarioSummary(healthCriterionFlags.map(x => x * 100));
   const outcome: IMMOutcome = {
-    tme:   posteriorSummary(tmes),
-    chi:   posteriorSummary(chis),
-    pEvac: posteriorSummary(evacs.map(x => x * 100)),
-    pLocl: posteriorSummary(locls.map(x => x * 100)),
+    tme:   scenarioSummary(tmes),
+    chi:   scenarioSummary(chis),
+    pEvac: scenarioSummary(evacs.map(x => x * 100)),
+    pLocl: scenarioSummary(locls.map(x => x * 100)),
     healthCriterionAttainment,
     // Legacy alias for persisted sessions and existing scripts/tests.
     missionSuccess: healthCriterionAttainment,
