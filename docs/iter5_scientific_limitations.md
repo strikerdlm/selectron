@@ -1,22 +1,24 @@
 # Selectron — Scientific Limitations of the Current IMM Calibration
 
 **Created:** 2026-05-22 (post priors-rev3-b)
-**Last updated:** 2026-06-14 — manuscript-freeze cleanup; provenance 34+66+1; zero tier-C synthetic priors; K15 TME + unlimited CHI inter-model agreement retained
+**Last updated:** 2026-06-24 — v0.6 audit containment; HSRB verdict and validation claims retired; accepted-evidence coverage clarified as 0/4,849
 **Status:** Living document — update on every priors revision or engine extension
 **Companion docs:** [`iter5_priors_rev3_strategy.md`](iter5_priors_rev3_strategy.md), [`iter3_vv_dossier.md`](iter3_vv_dossier.md) §5, [`future_features.md`](future_features.md)
 
-> **NOT-FOR-FLIGHT — analog scope only.** Selectron v1 is a research tool + methodology demonstrator scoped to **Earth-based analog isolation missions** (MDRS, HI-SEAS, Mars-500, Antarctic winter-over) and **LEO / ISS-baseline scenarios** (ISS 6 mo K15 reference, S20 DRMs). It is **NOT** a Mars-mission tool, **NOT** an Artemis-mission tool, **NOT** a flight-medical-kit sizing tool, and **NOT** a substitute for individual crew-member fitness-to-fly assessment. Mars and Artemis are catalogued in [`future_features.md`](future_features.md) with their structural prerequisites; do not enable them in `ACTIVE_MISSIONS` until those prerequisites land. The limitations below apply to the *in-scope* analog + LEO use case and are real and material.
+> **NOT-FOR-FLIGHT — analog scope only.** Selectron v1 is a research tool + methodology demonstrator scoped to **Earth-based analog isolation missions** (MDRS, HI-SEAS, Mars-500, Antarctic winter-over) and **LEO / ISS-baseline scenarios** (ISS 6 mo K15 reference, S20 DRMs). It is **NOT** a Mars-mission tool, **NOT** an Artemis-mission tool, **NOT** a flight-medical-kit sizing tool, **NOT** a medical-clearance or crew-selection instrument, and **NOT** a NASA HSRB verdict engine. Mars and Artemis are catalogued in [`future_features.md`](future_features.md) with their structural prerequisites; do not enable them in `ACTIVE_MISSIONS` until those prerequisites land. The limitations below apply to the *in-scope* analog + LEO use case and are real and material.
+
+> **v0.6 evidence boundary.** Source-attribution provenance in `imm-priors.json` is not the same as accepted evidence adjudication. The evidence ledger currently contains four nominal `accepted` rows, all malformed, yielding **0/4,849 valid accepted active-parameter coverage** and `releasePriorsAdjudicated = false`. K15 agreement is inter-model verification against a public NASA model output, not external validation against observed analog clinical outcomes.
 
 ---
 
-## 1 · What is mathematically rigorous
+## 1 · What is mechanically verified
 
-The following are verified against primary sources and have closed-form-moment unit tests:
+The following are mechanically verified or unit-tested. They do not establish empirical prediction, crew-selection validity, or operational acceptance:
 
-- **Stage A Bayesian MCDA** (`src/engine/`) — Dirichlet weights, Marsaglia–Tsang Gamma sampler, Mulberry32 PRNG, score normalization. Closed-form mean / variance match Monte Carlo within 2 % / 5 % at 50k samples.
+- **Stage A uncertain-weight MCDA** (`src/engine/`) — Dirichlet weights, Marsaglia–Tsang Gamma sampler, Mulberry32 PRNG, score normalization, finite-alpha validation, finite raw-score/range validation, positive integer iteration validation, and IID draw-count reporting. Closed-form mean / variance match Monte Carlo within 2 % / 5 % at 50k samples. These are induced score distributions, not suitability posteriors.
 - **IMM engine math** (`src/imm/`) — Lognormal-Poisson, Gamma-Poisson, Beta-Bernoulli incidence samplers; Beta-Pert outcomes (mean = (a+4m+b)/6); concurrent FI formula `1 − Π(1 − f_i)` per K15 §II.A.9 verbatim; sequential-phase QTL accumulator (cp1 + cp2 + cp3) per K15 §II.A.9; per-event Bernoulli end-state sampling per spec; T=100 000 canonical trial count per M18 / A22.
-- **Convergence diagnostic** — σ(CHI) and σ(pEVAC) recorded at every 1 000-trial checkpoint per the M18 / A22 5 % rule.
-- **NASA HSRB LxC verdict** — per JSC-66705 Rev A Fig. 4 verbatim; explicit "disqualified" overrides set L=5, C=5.
+- **Monte Carlo precision diagnostics** — MCSE, relative MCSE, Wilson 95 % intervals for rare binary probabilities, CHI clamp count/proportion, and independent-seed replication status are reported for current IMM scenario outputs. Legacy σ checkpoint arrays remain compatibility diagnostics and are not presented as empirical convergence proof.
+- **HSRB-inspired developer adapter** — LxC translation remains available only for historical/developer comparison. The active analog workflow does not present NASA-equivalent HSRB verdicts, select/reject decisions, or L5/C5 override semantics.
 - **Tier multipliers** — applied at each distribution-specific sampling site (λ-site for Poisson; per-Bernoulli for SA-once and EVA-coupled). Variance-correct by construction (Poisson closed under rate scaling; Bernoulli(p)×Bernoulli(mult) = Bernoulli(p·mult)). Commit `ce97dda`.
 
 These do not absolve the priors of the issues below.
@@ -25,18 +27,20 @@ These do not absolve the priors of the issues below.
 
 ## 2 · What the priors are
 
-`src/data/imm-priors.json` carries the 100-condition K15 reference catalog plus one source-cited analog behavioral extension (`interpersonal-conflict`), with three provenance tiers:
+`src/data/imm-priors.json` carries the 100-condition K15 reference catalog plus one source-cited analog behavioral extension (`interpersonal-conflict`), with source-attribution provenance tags:
 
 | Tier | Count | Source character |
 |------|-------|------------------|
-| `tierA-nasa` | **34** | Directly attributed to a NASA-published IMM source (K15, M18, G12, TM21, S20, A22). Per-condition incidence numbers were elicited from these papers when explicit; otherwise from clinical-SME judgment guided by the paper. ISS-specific conditions (CO2 headache, VIIP, EVA-DCS) and conditions with corroborated but insufficient analog denominators remain here. Full list in `STATUS.md`. |
-| `tierB-pymc` | **66** | PyMC NUTS Gamma-Poisson posteriors fitted against primary-source terrestrial/analog epidemiology (analog missions, Antarctic, submarine, military, spaceflight). Provenance chain: evidence CSV → `fit_gamma_poisson()` → R-hat/ESS/divergence gate → `merge_fitted_priors()` → imm-priors.json. Includes rev3-f severity tuning (32/32 persistent-impairment K15 conditions). |
+| `tierA-nasa` | **34** | Attributed to a NASA-published IMM source (K15, M18, G12, TM21, S20, A22). Per-condition incidence numbers remain Selectron elicitation when the public source does not publish the internal NASA value. |
+| `tierB-pymc` | **66** | Historical tag for Gamma-Poisson fitted or source-transcribed terrestrial/analog epidemiology. Current calibration code uses the analytic Gamma-Poisson posterior as the oracle where event and exposure data exist; source heterogeneity and transportability remain unmodeled. |
 | `tierB-lit` | **1** | Source-cited analog behavioral extension (`interpersonal-conflict`) retained as literature-anchored rather than PyMC-fitted because it is not represented in the proposal CSV evidence table. |
 | `tierC-synth` | 0 | Fully eliminated (2026-05-26). Final 2 conditions: acute-radiation-syndrome (literature-validated, Beta-Bernoulli retained) + smoke-inhalation (PyMC NUTS fit, Guibaud 2022). |
 
 The K15 Appendix lists the 100 conditions with their incidence-source category and distribution family but **does NOT publish per-condition numerical incidence rates**. Those live in NASA's internal iMED SQL database which is not externally accessible.
 
-**Consequence:** for tier-A and (especially) tier-B conditions, the specific numerical λ / Beta-Pert parameters are *our elicitation*, not NASA's. They are reviewable but not independently verified against in-flight observation per-condition.
+**Consequence:** for tier-A and (especially) tier-B conditions, the specific numerical λ / Beta-Pert parameters are Selectron priors, not NASA's internal database values. They are reviewable but not independently verified against in-flight observation per condition.
+
+**Evidence-ledger status:** the machine-readable accepted-evidence ledger is not release-ready. All four nominal accepted rows are malformed and excluded from accepted coverage. The valid accepted active-parameter coverage is **0/4,849**, and the current coverage denominator includes profile-effect parameters as well as `imm-priors.json` numeric parameters.
 
 ---
 
@@ -83,11 +87,11 @@ The 'none' (no medical kit) scenario produces values that diverge from K15:
 
 1. **Operationally implausible.** No real Earth-analog or LEO mission has ever launched with zero medical resources.
 2. **K15 'none' is model-construct, not observed data.** NASA's iMED produces 'none' values by setting all resources to zero and running its internal untreated-outcome priors, which are not publicly published.
-3. **Operational scenarios reproduce well.** issHMS and unlimited both reproduce K15 within CI₉₅ on CHI.
+3. **Operational scenarios have benchmark anchors.** issHMS and unlimited are retained for inter-model comparison, but the current K15 benchmark result is reported as 4/12 interval overlaps rather than a general validation pass.
 4. **Closing the gap would over-correct operational scenarios.** Blanket inflation of `untreated.fi_cp1/cp2` / `untreated.p_evac` would propagate through the RAF-interpolated path on issHMS and break the CI₉₅ fit.
 5. **Per-condition `untreated.p_evac` anchored to Pattarini 2016.** Antarctic MEDEVAC rate (0.036/py) is the operational anchor.
 
-**Empirical confirmation (2026-05-26).** The closed-form rescale predicted in `iter5_priors_rev3_strategy.md` §3.3 was implemented (`scripts/rescale_outcome_parameters.ts`) and validated. Results: untreated `p_evac` scaled by 8.42× and treated `p_evac` by 3.16× brings 'none' pEVAC to 63.90 % (target 66.90 %) and unlimited pEVAC to 4.86 % (target 4.93 %) — excellent fit. However, the same rescale drives issHMS pEVAC to 53.39 % (target 5.57 %) via RAF-interpolated fall-through coupling, confirming prediction #4 exactly. The priors were reverted; the script is preserved for sensitivity analysis but is not merged into production priors.
+**Sensitivity confirmation (2026-05-26).** The closed-form rescale predicted in `iter5_priors_rev3_strategy.md` §3.3 was implemented (`scripts/rescale_outcome_parameters.ts`) and checked as a sensitivity run. Results: untreated `p_evac` scaled by 8.42× and treated `p_evac` by 3.16× brings 'none' pEVAC to 63.90 % (target 66.90 %) and unlimited pEVAC to 4.86 % (target 4.93 %) — strong fit to that model-output target. However, the same rescale drives issHMS pEVAC to 53.39 % (target 5.57 %) via RAF-interpolated fall-through coupling, confirming prediction #4 exactly. The priors were reverted; the script is preserved for sensitivity analysis but is not merged into production priors.
 
 Selectron's 'none' scenario should be interpreted as a sensitivity-analysis lower bound, not a calibrated prediction.
 
@@ -107,9 +111,9 @@ These are out-of-scope **by design** as of 2026-05-22. The catalogued AMM/SMM Ma
 
 ---
 
-## 5 · Validation status
+## 5 · Verification and validation status
 
-**IMM-86** — K15 Table 1 reproduction gate. **K15 all-3-scenario validation (T=100k, seed 0xc0ffee, current 34+66+1 provenance):**
+**IMM-86** — K15 Table 1 benchmark. **K15 all-3-scenario inter-model comparison (T=100k, seed 0xc0ffee, current source-attributed priors):**
 
 | Scenario | TME | ref | Δ | CHI | pEVAC | pLOCL |
 |---|---|---|---|---|---|---|
@@ -117,28 +121,28 @@ These are out-of-scope **by design** as of 2026-05-22. The catalogued AMM/SMM Ma
 | issHMS | **98.1** | 106.00 | -7.9 (known) | 82.8 | 9.65% | 0.23% |
 | unlimited | **98.8** | 106.00 | -7.2 (known) | 95.3 | 1.78% | 0.18% |
 
-All TME within K15 CI₉₅ ✓. CHI/pEVAC/pLOCL divergences are documented pre-existing limitations (§3.5). Written as a formal vitest gate at `tests/imm/validation_k15.test.ts` (13 tests, 3 scenarios × 4 metrics + 1 inventory). Documented-divergent metrics use wider brackets with `tracking` fields pointing at open backlog items. 37/37 simulate tests pass. Commit `04543d9`.
+K15 is a public model-output benchmark, not an observed analog-outcome dataset. Current scientific agreement is intentionally reported as **4/12 interval overlaps**, with **8/12 documented divergences**. Regression brackets protect against software drift; they do not convert model-output agreement into empirical validation. Written as a formal vitest benchmark at `tests/imm/validation_k15.test.ts`.
 
-**IMM-87** — TM21 AMM/SMM ±20 % gate. **Not written.** Mars missions are out of scope (§4); this gate is deferred until the structural engine prerequisites in [`future_features.md`](future_features.md) are implemented.
+**IMM-87** — TM21 AMM/SMM ±20 % benchmark. **Not written.** Mars missions are out of scope (§4); this benchmark is deferred until the structural engine prerequisites in [`future_features.md`](future_features.md) are implemented.
 
 **NASA-STD-7009 / 7009A** — full standard PDF still not in corpus. W14 (Task 27) is a 1-page poster, not the full document. Resolution path: NTRS direct download or institutional library proxy.
 
 **New diagnostics (2026-05-24 math-hardening):**
 
 - **K-S marginal Dirichlet fit** (`tests/engine/dirichlet_ks.test.ts`): 3 marginal Beta fits at T=5000 pass K-S at α=0.05 (D < 0.019); 1 rejection of misspecified Beta(10,10). More discriminating than the lag-1 ESS diagnostic for the IID Gamma-normalization sampler.
-- **Gelman-Rubin R̂** (`tests/imm/rhat_convergence.test.ts`): 4 independent chains (seeds 0xc0ffee / 0xdeadbeef / 0x12345678 / 0xfeedface) × T=25k on issHMS. R̂(CHI) ≤ 1.01. Each chain individually satisfies the M18 σ<5% stability rule. Supplements the within-chain σ<5% with between-chain convergence proof.
-- **α₀ robustness panel** (`tests/engine/alpha0_robustness.test.ts`): Stage A posterior at α₀ ∈ {1, 10, 100} with heterogeneous candidate. CI₉₀ width monotonically decreasing (0.50 → 0.21 → 0.07). Closed-form mean matches MC within 2% at all three concentrations.
-- **Leave-calibrated-out sensitivity** (`tests/imm/validation_k15_loo.test.ts`): K15 reproduction with evidence-based conditions only (tier-A + source-cited tier-B). TME drops from ~100 → ~42; CHI rises from ~90% → ~97%. Demonstrates honest degradation when calibration-circular conditions are removed. (Test fixture reflects a pre-2026-05-25 provenance snapshot; current manuscript-freeze provenance is 34 tierA-nasa + 66 tierB-pymc + 1 tierB-lit.)
+- **Gelman-Rubin R̂** (`tests/imm/rhat_convergence.test.ts`): 4 independent chains (seeds 0xc0ffee / 0xdeadbeef / 0x12345678 / 0xfeedface) × T=25k on issHMS. R̂(CHI) ≤ 1.01. This is numerical stability evidence, not external validation.
+- **α₀ robustness panel** (`tests/engine/alpha0_robustness.test.ts`): Stage A score distribution at α₀ ∈ {1, 10, 100} with heterogeneous candidate. Central interval width monotonically decreases (0.50 → 0.21 → 0.07). Closed-form mean matches MC within 2% at all three concentrations.
+- **Leave-calibrated-out sensitivity** (`tests/imm/validation_k15_loo.test.ts`): K15 reproduction with source-attributed conditions only (tier-A + source-cited tier-B). TME drops from ~100 → ~42; CHI rises from ~90% → ~97%. Demonstrates honest degradation when calibration-circular conditions are removed. This is a sensitivity test, not a validation study. (Test fixture reflects a pre-2026-05-25 provenance snapshot; current provenance tags are 34 tierA-nasa + 66 tierB-pymc + 1 tierB-lit.)
 
 ---
 
 ## 6 · What Selectron IS appropriate for (v1 scope)
 
-- **Earth-based analog-mission planning** — assessing relative crew composition risk for MDRS / HI-SEAS / Mars-500 / SIRIUS / Antarctic winter-over / AMADEE / D-MARS / CHAPEA scenarios where the priors are closer to in-flight or terrestrial-analog observation
-- **LEO / ISS-baseline scenarios** — ISS 6 mo K15 reference; S20 DRM1/DRM2; analog-mission planners using ISS as the comparator
-- **Selection-criteria sensitivity analysis** — testing how different MCDA weight elicitations change ranking under the same posterior
-- **Methodology/software-validation paper** — the V&V approach (NASA-STD-7009A factors 1-3 explicit), Bayesian MCDA, K15 inter-model agreement, and HSRB mapping are the publishable contribution; the priors are evidence-based but not flight-validated
-- **Educational tool** — teaching the IMM Monte Carlo workflow, Bayesian MCDA, NASA HSRB LxC
+- **Conditional scenario analysis** — comparing how explicit mission duration, crew composition, medical-kit, profile-effect mode, and prior-multiplier assumptions affect outputs under the same engine.
+- **LEO / ISS-baseline software benchmarks** — ISS 6 mo K15 reference and S20 DRM scenarios as inter-model verification anchors, not analog validation.
+- **Selection-criteria sensitivity analysis** — testing how different uncertain-weight MCDA assumptions change candidate score distributions. No real select/reject, clearance, or validated ranking use is supported.
+- **Verification-first methods/software manuscript** — transparent separation of uncertain-weight MCDA, IMM-style scenario simulation, evidence accounting, and model-management controls. It must report 0/4,849 valid accepted coverage, 4/12 K15 interval overlap, and no external analog-outcome validation.
+- **Educational tool** — teaching uncertain-weight MCDA, IMM-style Monte Carlo, evidence provenance, and model-credibility boundaries.
 
 ## 7 · What Selectron is NOT appropriate for
 
@@ -146,6 +150,8 @@ All TME within K15 CI₉₅ ✓. CHI/pEVAC/pLOCL divergences are documented pre-
 - **Artemis (lunar) mission planning** — out of scope by design as of 2026-05-22. See [`future_features.md`](future_features.md) §1 for the structural prerequisites.
 - **Flight medical kit sizing** (any destination) — use NASA's actual iMED + IMM workflow with NASA-internal priors
 - **Individual crew-member fitness-to-fly decisions** — the gate-then-modulate architecture is illustrative; clinical disposition requires the full NASA Class I/II/III qualification process and individual medical workup
+- **Analog-astronaut selection or rejection** — the Stage-A catalog is demonstration-only and lacks ratified criteria, elicited decision-maker weights, rank acceptability, construct validation, criterion validity, and fairness assessment.
+- **NASA-equivalent HSRB verdicts** — HSRB-inspired adapters are developer comparisons only and are not board-equivalent operational risk postures.
 - **Insurance / actuarial actual-loss prediction** — calibration is not against observed in-flight losses
 
 ---
@@ -168,7 +174,7 @@ Every time:
 
 - a new priors revision lands — add or update a §3 subsection with the calibration and its residuals
 - the engine gains a new model (comms delay, cumulative dose, Mars EVA) — update §4
-- a validation gate is written — update §5
+- an inter-model verification benchmark or external-validation study is written — update §5 and distinguish those categories explicitly
 - a per-condition source audit is done — list which tier-B conditions were verified and against what source
 
 Diego reviews this doc before publishing any results derived from Selectron.

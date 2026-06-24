@@ -148,6 +148,31 @@ describe("active analog workflow guards", () => {
     expect(readRepoFile("docs/Manual.md")).toContain("docs/model_card.md");
   });
 
+  it("keeps the active scientific limitations document aligned with v0.6 claim boundaries", () => {
+    const source = readRepoFile("docs/iter5_scientific_limitations.md");
+
+    expect(source).toContain("0/4,849 valid accepted active-parameter coverage");
+    expect(source).toContain("releasePriorsAdjudicated = false");
+    expect(source).toContain("inter-model verification");
+    expect(source).toContain("4/12 interval overlaps");
+    expect(source).toContain("not external validation");
+    expect(source).toContain("Verification-first methods/software manuscript");
+
+    for (const forbidden of [
+      "Stage A Bayesian MCDA",
+      "K15 all-3-scenario validation",
+      "NASA HSRB LxC verdict",
+      "Methodology/software-validation paper",
+      "HSRB mapping are the publishable contribution",
+      "same posterior",
+      "evidence-based conditions only",
+    ]) {
+      expect(source, `docs/iter5_scientific_limitations.md must not contain ${forbidden}`).not.toContain(
+        forbidden,
+      );
+    }
+  });
+
   it("keeps the legacy paper package retired instead of presenting stale submission artifacts", () => {
     const retiredPaperFiles = [
       "paper/manuscript.md",
