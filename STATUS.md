@@ -39,9 +39,11 @@ Manuscript sources, journal submission packages, and peer-review working files a
 Application changes are developed in `selectron_private`, then published here:
 
 ```bash
-# In selectron_private:
-node scripts/sync-to-public.mjs /path/to/Selectron
-cd /path/to/Selectron && git status && git commit && git push origin master
+# Local (maintainer machine):
+npm run sync:public   # in selectron_private, then commit/push here
+
+# CI (on tag push to selectron_private):
+# sync-public-on-release.yml pushes public master automatically
 ```
 
 The sync copies all application paths and replaces `README.md`, `STATUS.md`, `CLAUDE.md`, and `CHANGELOG.md` with public templates. It deletes `paper/` and manuscript-only docs if present.

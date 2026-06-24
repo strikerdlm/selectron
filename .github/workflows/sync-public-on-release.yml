@@ -1,0 +1,99 @@
+# Sync application code to the public selectron repo on release tags.
+# Manuscript / submission assets stay in selectron_private only.
+#
+# Auth: deploy key SELECTRON_PUBLIC_DEPLOY_KEY (write access on strikerdlm/selectron).
+# Bootstrapped automatically; no PAT required from the maintainer.
+
+name: Sync public selectron
+
+on:
+  push:
+    tags:
+      - "v*"
+      - "0.*"
+  release:
+    types: [published]
+  workflow_dispatch:
+    inputs:
+      tag_label:
+        description: "Label for the commit message (defaults to short SHA)"
+        required: false
+        type: string
+
+env:
+  PUBLIC_REPO: strikerdlm/selectron
+  PUBLIC_DIR: selectron-public
+
+jobs:
+  sync-and-push:
+    name: sync to public master
+    runs-on: ubuntu-latest
+    steps:
+      - name: Resolve sync label
+        id: meta
+        run: |
+          set -euo pipefail
+          if [ "${{ github.event_name }}" = "release" ]; then
+            label="${{ github.event.release.tag_name }}"
+          elif [ "${{ github.ref_type }}" = "tag" ]; then
+            label="${{ github.ref_name }}"
+          elif [ -n "${{ inputs.tag_label }}" ]; then
+            label="${{ inputs.tag_label }}"
+          else
+            label="manual-${GITHUB_SHA:0:7}"
+          fi
+          echo "label=$label" >> "$GITHUB_OUTPUT"
+
+      - name: Require deploy key secret
+        run: |
+          if [ -z "${{ secrets.SELECTRON_PUBLIC_DEPLOY_KEY }}" ]; then
+            echo "::error::Missing SELECTRON_PUBLIC_DEPLOY_KEY on selectron_private."
+            echo "Run: node scripts/bootstrap-public-sync-auth.mjs (once) from a machine with gh admin access."
+            exit 1
+          fi
+
+      - name: Checkout selectron_private
+        uses: actions/checkout@v4
+        with:
+          path: private
+          fetch-depth: 0
+
+      - name: Load SSH deploy key
+        uses: webfactory/ssh-agent@v0.9.0
+        with:
+          ssh-private-key: ${{ secrets.SELECTRON_PUBLIC_DEPLOY_KEY }}
+
+      - name: Checkout public selectron
+        run: |
+          set -euo pipefail
+          mkdir -p ~/.ssh
+          ssh-keyscan -t ed25519 github.com >> ~/.ssh/known_hosts
+          git clone "git@github.com:${PUBLIC_REPO}.git" "${PUBLIC_DIR}"
+          git -C "${PUBLIC_DIR}" checkout master
+          git -C "${PUBLIC_DIR}" pull --ff-only origin master
+
+      - name: Sync application tree (exclude manuscripts)
+        run: node scripts/sync-to-public.mjs "${{ github.workspace }}/${{ env.PUBLIC_DIR }}"
+        working-directory: private
+
+      - name: Push to public master
+        env:
+          LABEL: ${{ steps.meta.outputs.label }}
+        working-directory: ${{ env.PUBLIC_DIR }}
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          git add -A
+          if git diff --staged --quiet; then
+            echo "Public repo already matches selectron_private at ${LABEL}; nothing to push."
+            exit 0
+          fi
+
+          git commit -m "sync: align with selectron_private ${LABEL}" \
+            -m "Automated one-way sync from selectron_private (${GITHUB_SHA})." \
+            -m "Manuscript and journal-submission assets are excluded by design."
+
+          git push origin master
+          echo "Pushed sync for ${LABEL} to ${PUBLIC_REPO} master."
