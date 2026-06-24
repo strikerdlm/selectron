@@ -1,13 +1,12 @@
 // scripts/check_active_imports.mjs
 //
-// F7: dependency-graph architecture gate. The prior guard checked direct
-// import STRINGS with regexes, which misses transitive imports, alias
-// resolutions (@/risk re-exported through a barrel), and dynamic imports
-// assembled indirectly. This version parses every static and dynamic import,
-// resolves each specifier to a real file (alias @/ -> src/, relative paths,
-// .ts/.tsx/index extensions), builds the module dependency graph, and fails
-// when any non-allowed ("active") source file transitively reaches an
-// archived src/risk module.
+// F7: dependency-graph architecture gate. This guard parses TypeScript source
+// with the compiler API, resolves static imports, side-effect imports, literal
+// dynamic imports, export-from declarations, import-equals require forms, and
+// import("./type") references. It then builds a transitive module graph and
+// fails when any non-allowed ("active") source file reaches an archived
+// src/risk module. Computed dynamic imports in active source files fail closed
+// because the target cannot be resolved statically.
 //
 // Allowed compatibility surfaces (which may import src/risk, and through which
 // risk may be reached without flagging a dependent): the archived src/risk
@@ -15,28 +14,33 @@
 // harness under src/ui/testing.
 
 import { readdirSync, readFileSync, statSync, existsSync } from "node:fs";
+import { fileURLToPath } from "node:url";
 import { join, relative, resolve, dirname, normalize } from "node:path";
+import ts from "typescript";
 
-const ROOT = process.cwd();
-const SRC = join(ROOT, "src");
+const DEFAULT_ROOT = process.cwd();
 
 // Named compatibility surfaces: these files/dirs MAY import src/risk and are
 // the ONLY sanctioned route from active code into the archive.
-const ALLOWED_FILES = new Set([
+const DEFAULT_ALLOWED_FILES = [
   "src/data/synthetic-iter3.ts",
   "src/ui/figures/CHIExplainer.tsx",
   "src/ui/figures/MissionComparison.tsx",
   "src/ui/views/Sim.tsx",
-]);
-const ALLOWED_DIRS = [
+];
+const DEFAULT_ALLOWED_DIRS = [
   "src/risk/",   // the archive itself
   "src/ui/testing/", // dev-only figure harness
 ];
 
-function isAllowedRel(rel) {
+function normalizeRel(path) {
+  return path.replaceAll("\\", "/");
+}
+
+function isAllowedRel(rel, allowedFiles, allowedDirs) {
   return (
-    ALLOWED_FILES.has(rel) ||
-    ALLOWED_DIRS.some((d) => rel.startsWith(d))
+    allowedFiles.has(rel) ||
+    allowedDirs.some((d) => rel.startsWith(d))
   );
 }
 
@@ -50,15 +54,65 @@ function walk(dir, out = []) {
   return out;
 }
 
-// Capture static `from "x"`, side-effect `import "x"`, and literal dynamic
-// `import("x")` specifiers. Computed dynamic imports are intentionally outside
-// this lightweight guard; use the TypeScript compiler API or a dependency-graph
-// tool before treating this as an exhaustive architectural boundary.
-const IMPORT_RE = /(?:\bfrom\s*|\bimport\s+|import\s*\(\s*)["']([^"']+)["']/g;
+function isStringLiteralLike(node) {
+  return ts.isStringLiteral(node) || ts.isNoSubstitutionTemplateLiteral(node);
+}
 
-function resolveSpecifier(specifier, importer) {
+function lineAndColumn(sourceFile, node) {
+  const pos = sourceFile.getLineAndCharacterOfPosition(node.getStart(sourceFile));
+  return { line: pos.line + 1, column: pos.character + 1 };
+}
+
+export function collectImportSpecifiers(source, fileName = "source.ts") {
+  const sourceFile = ts.createSourceFile(
+    fileName,
+    source,
+    ts.ScriptTarget.Latest,
+    true,
+    fileName.endsWith(".tsx") ? ts.ScriptKind.TSX : ts.ScriptKind.TS,
+  );
+  const specifiers = [];
+  const computedDynamicImports = [];
+
+  function addSpecifier(node) {
+    if (node && isStringLiteralLike(node)) specifiers.push(node.text);
+  }
+
+  function visit(node) {
+    if (ts.isImportDeclaration(node) || ts.isExportDeclaration(node)) {
+      addSpecifier(node.moduleSpecifier);
+    } else if (ts.isImportEqualsDeclaration(node)) {
+      const ref = node.moduleReference;
+      if (ts.isExternalModuleReference(ref)) addSpecifier(ref.expression);
+    } else if (ts.isCallExpression(node)) {
+      if (node.expression.kind === ts.SyntaxKind.ImportKeyword) {
+        const arg = node.arguments[0];
+        if (arg && isStringLiteralLike(arg)) {
+          specifiers.push(arg.text);
+        } else {
+          computedDynamicImports.push(lineAndColumn(sourceFile, node));
+        }
+      } else if (
+        ts.isIdentifier(node.expression) &&
+        node.expression.text === "require" &&
+        node.arguments.length > 0
+      ) {
+        addSpecifier(node.arguments[0]);
+      }
+    } else if (ts.isImportTypeNode(node)) {
+      const arg = node.argument;
+      if (ts.isLiteralTypeNode(arg)) addSpecifier(arg.literal);
+    }
+    ts.forEachChild(node, visit);
+  }
+
+  visit(sourceFile);
+  return { specifiers, computedDynamicImports };
+}
+
+function resolveSpecifier(specifier, importer, srcRoot) {
   if (specifier.startsWith("@/")) {
-    return resolve(SRC, specifier.slice(2));
+    return resolve(srcRoot, specifier.slice(2));
   }
   if (specifier.startsWith(".")) {
     return resolve(dirname(importer), specifier);
@@ -74,70 +128,98 @@ function resolveToSource(absNoExt) {
   return null;
 }
 
-const files = walk(SRC);
-const relOf = (p) => relative(ROOT, p).replaceAll("\\", "/");
-
-// Adjacency: file -> set of resolved source files it imports.
-const graph = new Map();
-for (const file of files) {
-  const source = readFileSync(file, "utf8");
-  const deps = new Set();
-  for (const m of source.matchAll(IMPORT_RE)) {
-    const spec = m[1];
-    const base = resolveSpecifier(spec, file);
-    if (!base) continue;
-    // Try resolving with and without a trailing extension handling.
-    const resolved = resolveToSource(base) ?? (existsSync(base) ? base : null);
-    if (resolved && existsSync(resolved)) deps.add(resolved);
-  }
-  graph.set(file, deps);
+function isRiskRel(rel) {
+  return rel.startsWith("src/risk/");
 }
 
-function isRisk(p) {
-  return relOf(p).startsWith("src/risk/");
-}
+export function analyzeActiveImports(options = {}) {
+  const root = options.root ?? DEFAULT_ROOT;
+  const srcRoot = options.srcRoot ?? join(root, "src");
+  const allowedFiles = new Set(options.allowedFiles ?? DEFAULT_ALLOWED_FILES);
+  const allowedDirs = options.allowedDirs ?? DEFAULT_ALLOWED_DIRS;
+  const relOf = (p) => normalizeRel(relative(root, p));
+  const files = walk(srcRoot);
 
-// For each active file, BFS its import graph and detect any reachable
-// src/risk file that is NOT reached solely through allowed compatibility.
-function reachableRisk(start) {
-  const seen = new Set([start]);
-  const stack = [start];
-  const hits = [];
-  while (stack.length) {
-    const cur = stack.pop();
-    for (const dep of graph.get(cur) ?? []) {
-      if (seen.has(dep)) continue;
-      seen.add(dep);
-      const drel = relOf(dep);
-      if (isRisk(drel)) {
-        hits.push(dep);
-        continue; // reached a risk file — record, don't expand into the archive
-      }
-      if (isAllowedRel(drel)) continue; // compat shield: risk behind this is sanctioned
-      stack.push(dep);
+  // Adjacency: file -> set of resolved source files it imports.
+  const graph = new Map();
+  const computedDynamicImports = [];
+  for (const file of files) {
+    const source = readFileSync(file, "utf8");
+    const { specifiers, computedDynamicImports: computed } = collectImportSpecifiers(source, file);
+    const deps = new Set();
+    for (const spec of specifiers) {
+      const base = resolveSpecifier(spec, file, srcRoot);
+      if (!base) continue;
+      const resolved = resolveToSource(base) ?? (existsSync(base) ? base : null);
+      if (resolved && existsSync(resolved)) deps.add(resolved);
+    }
+    graph.set(file, deps);
+    const rel = relOf(file);
+    if (!isAllowedRel(rel, allowedFiles, allowedDirs)) {
+      for (const hit of computed) computedDynamicImports.push({ file: rel, ...hit });
     }
   }
-  return hits;
-}
 
-const violations = [];
-for (const file of files) {
-  const rel = relOf(file);
-  if (isAllowedRel(rel)) continue; // compatibility surface may import risk
-  const hits = reachableRisk(file);
-  if (hits.length > 0) {
-    violations.push({ file: rel, risk: hits.map(relOf) });
+  function reachableRisk(start) {
+    const seen = new Set([start]);
+    const stack = [start];
+    const hits = [];
+    while (stack.length) {
+      const cur = stack.pop();
+      for (const dep of graph.get(cur) ?? []) {
+        if (seen.has(dep)) continue;
+        seen.add(dep);
+        const drel = relOf(dep);
+        if (isRiskRel(drel)) {
+          hits.push(dep);
+          continue; // reached a risk file — record, don't expand into the archive
+        }
+        if (isAllowedRel(drel, allowedFiles, allowedDirs)) continue; // compat shield
+        stack.push(dep);
+      }
+    }
+    return hits;
   }
-}
 
-if (violations.length > 0) {
-  console.error(
-    "Active source files must not transitively import archived src/risk modules:",
-  );
-  for (const v of violations) {
-    console.error(`- ${v.file}  ->  ${v.risk.join(", ")}`);
+  const violations = [];
+  for (const file of files) {
+    const rel = relOf(file);
+    if (isAllowedRel(rel, allowedFiles, allowedDirs)) continue;
+    const hits = reachableRisk(file);
+    if (hits.length > 0) {
+      violations.push({ file: rel, risk: hits.map(relOf) });
+    }
   }
-  process.exit(1);
+
+  return { violations, computedDynamicImports };
 }
 
-console.log("Active import guard passed (transitive dependency-graph check).");
+function main() {
+  const { violations, computedDynamicImports } = analyzeActiveImports();
+
+  if (violations.length > 0 || computedDynamicImports.length > 0) {
+    if (violations.length > 0) {
+      console.error(
+        "Active source files must not transitively import archived src/risk modules:",
+      );
+      for (const v of violations) {
+        console.error(`- ${v.file}  ->  ${v.risk.join(", ")}`);
+      }
+    }
+    if (computedDynamicImports.length > 0) {
+      console.error(
+        "Active source files must not use computed dynamic imports; targets cannot be resolved by the architecture guard:",
+      );
+      for (const v of computedDynamicImports) {
+        console.error(`- ${v.file}:${v.line}:${v.column}`);
+      }
+    }
+    process.exit(1);
+  }
+
+  console.log("Active import guard passed (TypeScript AST transitive dependency-graph check).");
+}
+
+if (process.argv[1] && normalize(fileURLToPath(import.meta.url)) === normalize(process.argv[1])) {
+  main();
+}
