@@ -29,8 +29,8 @@ import type {
   IMMCrewMember,
   IMMKitScenario,
   IMMMission,
+  PredictiveSummary,
   PosteriorPredictiveOutcome,
-  PosteriorSummary,
   VulnerabilityCouplingMode,
   ProfileEffectMode,
 } from "./types";
@@ -62,7 +62,7 @@ export type PosteriorPredictiveOpts = {
 };
 
 /**
- * Summarize a sample of per-draw metric values into a PosteriorSummary.
+ * Summarize a sample of per-draw metric values into a PredictiveSummary.
  * Percentiles use a sorted copy with floor indices clamped to [0, n-1].
  * n === 0 → all zeros. `sd` is the population standard deviation.
  *
@@ -72,7 +72,7 @@ export type PosteriorPredictiveOpts = {
  * Small-n note: with nearest-rank floor indices, ci90/ci95 degenerate toward the
  * min–max range below ~21/~41 draws respectively; intended operating point is nDraws ≥ 64.
  */
-function summarize(values: number[]): PosteriorSummary {
+function summarize(values: number[]): PredictiveSummary {
   const n = values.length;
   if (n === 0) return { mean: 0, ci90: [0, 0], ci95: [0, 0], sd: 0 };
   const sorted = [...values].sort((a, b) => a - b);
@@ -197,7 +197,7 @@ export function posteriorPredictiveSimulateIMM(
   // draws would bias means upward. In practice simulateIMM emits every condition
   // every draw, but we pad to nDraws defensively so the summary is unbiased
   // regardless of the engine's driver coverage.
-  const perConditionTmeContribPost: Record<string, PosteriorSummary> = {};
+  const perConditionTmeContribPost: Record<string, PredictiveSummary> = {};
   for (const [cid, vals] of Object.entries(tmeByCond)) {
     while (vals.length < nDraws) vals.push(0);
     perConditionTmeContribPost[cid] = summarize(vals);

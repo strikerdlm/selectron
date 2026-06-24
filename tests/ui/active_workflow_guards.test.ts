@@ -109,6 +109,10 @@ describe("active analog workflow guards", () => {
     expect(readRepoFile("src/ui/components/ScoreCard.tsx")).toContain("interval₉₀");
     expect(readRepoFile("src/ui/components/ScoreCard.tsx")).not.toContain("CI₉₀");
     expect(readRepoFile("src/ui/figures/captions/F1.captions.ts")).toContain("Central 90% score interval");
+    expect(readRepoFile("src/imm/posterior-predictive.ts")).toContain("PredictiveSummary");
+    expect(readRepoFile("src/imm/posterior-predictive.ts")).not.toContain("PosteriorSummary");
+    expect(readRepoFile("src/ui/figures/IMMAnalogPosteriorPlot.tsx")).toContain("90% predictive interval");
+    expect(readRepoFile("src/ui/figures/IMMAnalogPosteriorPlot.tsx")).not.toContain("90% CI");
   });
 
   it("labels ordinary simulation spread as simulation intervals, reserving CI labels for K15 benchmarks", () => {

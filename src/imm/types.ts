@@ -243,9 +243,16 @@ export type ScenarioSummary = {
 };
 
 /**
- * @deprecated Use ScenarioSummary for ordinary simulateIMM outputs. Retained
- * for persisted sessions, historical tests, and true posterior-predictive
- * parameter-draw summaries.
+ * Summary of a true posterior-predictive parameter-draw distribution. This
+ * intentionally uses a separate name from ordinary `ScenarioSummary` outputs
+ * so non-posterior IMM runs do not inherit posterior terminology.
+ */
+export type PredictiveSummary = ScenarioSummary;
+
+/**
+ * @deprecated Use ScenarioSummary for ordinary simulateIMM outputs and
+ * PredictiveSummary for posterior-predictive parameter-draw outputs. Retained
+ * only for persisted sessions and historical imports.
  */
 export type PosteriorSummary = ScenarioSummary;
 
@@ -415,13 +422,13 @@ export type IMMOutcome = {
  */
 export type PosteriorPredictiveOutcome = {
   /** Predictive distribution of pEVAC (% scale, 0..100) over the N draws. */
-  pEvacPost: PosteriorSummary;
+  pEvacPost: PredictiveSummary;
   /** Predictive distribution of pLOCL (% scale, 0..100). */
-  pLoclPost: PosteriorSummary;
+  pLoclPost: PredictiveSummary;
   /** Predictive distribution of CHI (% scale, 0..100). */
-  chiPost: PosteriorSummary;
+  chiPost: PredictiveSummary;
   /** Per-condition predictive expected TME contribution (per-draw mean tmeContrib, events per trial). */
-  perConditionTmeContribPost: Record<string, PosteriorSummary>;
+  perConditionTmeContribPost: Record<string, PredictiveSummary>;
   /** Number of parameter draws used. */
   nDraws: number;
   /** Monte Carlo trials run per parameter draw. */

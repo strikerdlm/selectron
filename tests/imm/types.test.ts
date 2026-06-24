@@ -2,7 +2,7 @@
 import { describe, it, expect } from "vitest";
 import type {
   IMMCondition, IMMCrewMember, IMMMission, IMMKitScenario,
-  IMMBetaPert, IMMPrior, IMMOutcome, PosteriorSummary, ScenarioSummary, IMMSession
+  IMMBetaPert, IMMPrior, IMMOutcome, PredictiveSummary, ScenarioSummary, IMMSession
 } from "../../src/imm/types";
 
 // Compile-time shape checks — ensures all exported types are structurally valid.
@@ -11,10 +11,10 @@ declare const _m: IMMMission;
 declare const _k: IMMKitScenario;
 declare const _p: IMMPrior;
 declare const _o: IMMOutcome;
-declare const _ps: PosteriorSummary;
+declare const _pred: PredictiveSummary;
 declare const _ss: ScenarioSummary;
 declare const _s: IMMSession;
-export type { _m as _mission, _k as _kit, _p as _prior, _o as _outcome, _ps as _posteriorSummary, _ss as _scenarioSummary, _s as _session };
+export type { _m as _mission, _k as _kit, _p as _prior, _o as _outcome, _pred as _predictiveSummary, _ss as _scenarioSummary, _s as _session };
 
 describe("IMM types", () => {
   it("IMMCondition shape", () => {

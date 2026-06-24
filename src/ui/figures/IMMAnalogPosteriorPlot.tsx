@@ -20,7 +20,7 @@ import { useFigureTheme } from "./useFigureTheme";
 import { FigureCaption } from "./FigureCaption";
 import type { CaptionBlock } from "./FigureCaption";
 import type { PosteriorDrawsResponse } from "../../api/calibration";
-import type { PosteriorPredictiveOutcome, PosteriorSummary } from "../../imm/types";
+import type { PosteriorPredictiveOutcome, PredictiveSummary } from "../../imm/types";
 
 // Okabe-Ito palette — colorblind-safe
 const COLORS = {
@@ -72,7 +72,7 @@ function buildLambdaHistogram(
 type MetricCardProps = {
   testId: string;
   label: string;
-  summary: PosteriorSummary;
+  summary: PredictiveSummary;
   color: string;
   unit?: string;
 };
@@ -90,7 +90,7 @@ function MetricCard({ testId, label, summary, color, unit = "%" }: MetricCardPro
         {mean.toFixed(1)}<span className="text-xs font-normal text-ink-2 ml-0.5">{unit}</span>
       </p>
       <p className="text-[10px] mono text-ink-3">
-        90% CI [{ci90[0].toFixed(1)}, {ci90[1].toFixed(1)}]{unit}
+        90% predictive interval [{ci90[0].toFixed(1)}, {ci90[1].toFixed(1)}]{unit}
         {"  "}σ={sd.toFixed(2)}
       </p>
     </div>
@@ -272,7 +272,7 @@ export function IMMAnalogPosteriorPlot({ draws, outcome, kind, trialsPerDraw }: 
             <tr className="border-b border-line/40 text-ink-3">
               <th className="text-left py-1 pr-3 font-normal">Condition</th>
               <th className="text-right py-1 pr-3 font-normal">Mean</th>
-              <th className="text-right py-1 pr-3 font-normal">90% CI</th>
+              <th className="text-right py-1 pr-3 font-normal">90% pred. interval</th>
               <th className="text-right py-1 font-normal">σ</th>
             </tr>
           </thead>

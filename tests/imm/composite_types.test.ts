@@ -4,7 +4,6 @@ import { describe, it, expect } from "vitest";
 import type {
   IMMCrewMember,
   IMMOutcome,
-  PosteriorSummary,
   ScenarioSummary,
   CrewCompositeMethod,
   CrewComposite,
@@ -48,10 +47,9 @@ describe("IMM composite-crew types", () => {
   });
 
   it("IMMOutcome includes missionSuccess ScenarioSummary", () => {
-    const ps: ScenarioSummary = { mean: 72, ci90: [60, 85], ci95: [55, 90], sd: 8 };
-    const compat: PosteriorSummary = ps;
+    const scenarioSummary: ScenarioSummary = { mean: 72, ci90: [60, 85], ci95: [55, 90], sd: 8 };
     const outcome: IMMOutcome = {
-      tme: compat, chi: ps, pEvac: ps, pLocl: ps,
+      tme: scenarioSummary, chi: scenarioSummary, pEvac: scenarioSummary, pLocl: scenarioSummary,
       missionSuccess: { mean: 45, ci90: [30, 60], ci95: [25, 65], sd: 12 },
       perConditionDrivers: [],
       convergence: { trialCheckpoints: [], sigmaChi: [], sigmaPevac: [] },

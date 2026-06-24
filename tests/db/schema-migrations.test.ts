@@ -2,7 +2,7 @@ import { afterEach, beforeEach, describe, expect, test } from "vitest";
 import "fake-indexeddb/auto";
 import { db, SCHEMA_VERSION } from "@/db/schema";
 import type { DbCandidate } from "@/db/schema";
-import type { IMMSession, PosteriorSummary } from "@/imm/types";
+import type { IMMSession, ScenarioSummary } from "@/imm/types";
 
 describe("schema migrations", () => {
   test("v1 schema opens cleanly", async () => {
@@ -18,7 +18,7 @@ describe("schema migrations", () => {
   });
 });
 
-const emptyPosterior = (): PosteriorSummary => ({
+const emptyScenarioSummary = (): ScenarioSummary => ({
   mean: 0,
   ci90: [0, 0],
   ci95: [0, 0],
@@ -62,11 +62,11 @@ function buildSession(id: string): IMMSession {
     vulnerabilityMode: "boolean-flags",
     engine: "monte-carlo",
     outcomes: {
-      tme: emptyPosterior(),
-      chi: emptyPosterior(),
-      pEvac: emptyPosterior(),
-      pLocl: emptyPosterior(),
-      missionSuccess: emptyPosterior(),
+      tme: emptyScenarioSummary(),
+      chi: emptyScenarioSummary(),
+      pEvac: emptyScenarioSummary(),
+      pLocl: emptyScenarioSummary(),
+      missionSuccess: emptyScenarioSummary(),
       perConditionDrivers: [],
       convergence: { trialCheckpoints: [], sigmaChi: [], sigmaPevac: [] },
     },

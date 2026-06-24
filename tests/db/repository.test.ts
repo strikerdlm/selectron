@@ -28,7 +28,7 @@ import type {
   IMMMission,
   IMMOutcome,
   IMMSession,
-  PosteriorSummary,
+  ScenarioSummary,
 } from "@/imm/types";
 
 beforeEach(async () => {
@@ -268,7 +268,7 @@ describe("simSessions", () => {
 // IMMSession CRUD (IMM-38, v3 schema)
 // ───────────────────────────────────────────────────────────────────────────
 
-function fakePosteriorSummary(mean: number): PosteriorSummary {
+function fakeScenarioSummary(mean: number): ScenarioSummary {
   return {
     mean,
     ci90: [mean * 0.9, mean * 1.1],
@@ -312,11 +312,11 @@ function fakeKit(): IMMKitScenario {
 
 function fakeOutcome(): IMMOutcome {
   return {
-    tme: fakePosteriorSummary(3.2),
-    chi: fakePosteriorSummary(0.92),
-    pEvac: fakePosteriorSummary(2.4),
-    pLocl: fakePosteriorSummary(0.31),
-    missionSuccess: fakePosteriorSummary(96.1),
+    tme: fakeScenarioSummary(3.2),
+    chi: fakeScenarioSummary(0.92),
+    pEvac: fakeScenarioSummary(2.4),
+    pLocl: fakeScenarioSummary(0.31),
+    missionSuccess: fakeScenarioSummary(96.1),
     perConditionDrivers: [
       { conditionId: "renal.stone", pEvacContrib: 0.42, pLoclContrib: 0.05, tmeContrib: 0.18 },
     ],
