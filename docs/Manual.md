@@ -27,7 +27,7 @@
 
 ## 1. Scope and safety
 
-Selectron is a **research prototype** for space-analog crew-selection and mission-scenario analysis. It is **not**:
+Selectron is a **research prototype** for space-analog candidate-score sensitivity analysis and crew-composition mission scenarios. It is **not**:
 
 - A flight-certification or medical-clearance system
 - A validated analog crew-selection instrument

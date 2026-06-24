@@ -148,6 +148,44 @@ describe("active analog workflow guards", () => {
     expect(readRepoFile("docs/Manual.md")).toContain("docs/model_card.md");
   });
 
+  it("keeps top-level docs and citation metadata scoped to scenario analysis", () => {
+    const readme = readRepoFile("README.md");
+    const citation = readRepoFile("CITATION.cff");
+    const manual = readRepoFile("docs/Manual.md");
+    const future = readRepoFile("docs/future_features.md");
+    const status = readRepoFile("STATUS.md");
+
+    expect(readme).toContain("space-analog crew-composition scenario analysis");
+    expect(readme).toContain("uncertain-weight MCDA candidate scoring");
+    expect(citation).toContain("space-analog crew-composition scenario analysis");
+    expect(manual).toContain("candidate-score sensitivity analysis and crew-composition mission scenarios");
+    expect(future).toContain("inter-model verification benchmarks");
+    expect(future).toContain("Future benchmark/external-validation requirement");
+    expect(status).toContain("four nominal `accepted` rows, all malformed");
+    expect(status).toContain("0/4,849");
+
+    for (const forbidden of [
+      "crew-selection research",
+      "selection scoring",
+      "space-analog crew-selection and mission-scenario analysis",
+      "The validation gates (K15 Table 1 reproduction) are defined",
+      "Validation gate to add",
+      "K15 calibration partially within CI₉₅",
+      "0 / 4,846",
+      "zero accepted rows",
+    ]) {
+      for (const [path, source] of [
+        ["README.md", readme],
+        ["CITATION.cff", citation],
+        ["docs/Manual.md", manual],
+        ["docs/future_features.md", future],
+        ["STATUS.md", status],
+      ] as const) {
+        expect(source, `${path} must not contain ${forbidden}`).not.toContain(forbidden);
+      }
+    }
+  });
+
   it("keeps the active scientific limitations document aligned with v0.6 claim boundaries", () => {
     const source = readRepoFile("docs/iter5_scientific_limitations.md");
 

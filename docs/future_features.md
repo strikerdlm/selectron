@@ -12,7 +12,7 @@ Selectron v1 is scoped to **Earth-based analog isolation missions** (MDRS, HI-SE
 
 - The K15 / S20 priors have direct in-flight / Earth-analog backing
 - The IMM engine math (Lognormal-Poisson, Beta-Pert, concurrent FI) is appropriate as designed
-- The validation gates (K15 Table 1 reproduction) are defined
+- The inter-model verification benchmarks (K15 Table 1 reproduction) are defined
 
 Everything below extends Selectron beyond that scope. **Do not enable any feature in this roadmap without first implementing its listed structural prerequisites.** The temptation to "just turn it on" is exactly how aerospace medical models start producing plausibly-shaped but quantitatively wrong outputs for missions they were never calibrated to.
 
@@ -42,7 +42,7 @@ Tag in `src/data/imm-missions.ts`: `kind: "lunar-artemis-future"`. Currently fil
 4. **Partial-gravity bone & cardiovascular deconditioning.** 1/6 g over 6.5 days surface (Artemis III) is bounded; the existing space-adaptation prior set (back-pain-space-adaptation, headache-space-adaptation, etc.) is approximately right for short lunar surface stays. Re-elicit for longer Gateway-assembly Artemis missions.
 5. **Lunar-medical-kit prior**. Different from ISS HMS — Artemis has tighter mass/volume constraints; some ISS HMS items unavailable. Add `IMM_KITS.artemis` to `src/imm/kits.ts` once NASA's actual Artemis medical kit manifest is publicly documented.
 
-**Validation gate to add as `IMM-87-lunar`:** Artemis-III aggregate pLOCL within band X% (TBD when reference numbers are published). Currently no published NASA Artemis IMM aggregate exists; the gate is provisional.
+**Future benchmark/external-validation requirement to add as `IMM-87-lunar`:** Artemis-III aggregate pLOCL within band X% (TBD when reference numbers are published), plus explicit classification of whether the reference is a model-output benchmark or observed outcome data. Currently no published NASA Artemis IMM aggregate exists; this requirement is provisional.
 
 **When to implement:** after rev3-c (the K15 'none' pEVAC fit) closes and the engine extension for comms-delay is small enough that the bulk of the work is in priors elicitation, not engine architecture.
 
@@ -66,11 +66,11 @@ Tag in `src/data/imm-missions.ts`: `kind: "lunar-artemis-future"`. Currently fil
 5. **Resupply / no-resupply dimension.** ISS has Progress/Dragon/Cygnus resupply ~3–4×/year. Mars missions have NONE. Engine extension: per-resource consumption tracking already exists (kit.resources); add a no-resupply constraint that hard-fails treatments when kit runs out (currently it silently falls through to untreated). Mars 426d / 4-crew on a fixed kit may run out of critical resources before mission end.
 6. **Compound-failure modes.** Simultaneous medical + life-support degradation, food/water shortages, planetary launch-window dependencies on crew capability — not modelled. Likely out of scope for v2; may need v3 architectural revisit.
 
-**Validation gate to add as `IMM-87-mars`:** TM21 AMM/SMM pEVAC + pLOCL within published spec bands (AMM pEVAC 25–40%, pLOCL 5–12%; SMM pEVAC 40–65%, pLOCL 15–30%). Per the 2026-05-22 diagnostic (`exports/2026-05-22_tm21_gap_diagnostic.txt`), current model misses pLOCL by 12–30×. Validation will fail until prereqs 1–5 above are implemented.
+**Future benchmark/external-validation requirement to add as `IMM-87-mars`:** TM21 AMM/SMM pEVAC + pLOCL within published spec bands (AMM pEVAC 25–40%, pLOCL 5–12%; SMM pEVAC 40–65%, pLOCL 15–30%), plus explicit classification of whether each reference is a model-output benchmark or observed outcome data. Per the 2026-05-22 diagnostic (`exports/2026-05-22_tm21_gap_diagnostic.txt`), current model misses pLOCL by 12–30×. Any future Mars validation or benchmark will fail until prerequisites 1–5 above are implemented.
 
 **When to implement:** after Artemis is shipped AND a dedicated 3–6 month effort to elicit Mars-specific priors (with literature review of Hodkinson, Antonsen, Cucinotta, NASA Bioastronautics Roadmap sources). This is a separate Iter-N initiative, not a follow-up to rev3-c.
 
-**Hard truth:** rev3-b's "K15 calibration partially within CI₉₅" claim does not extend to Mars. Anyone pasting the model into a Mars-planning context without these prereqs is mis-using it.
+**Hard truth:** K15 inter-model agreement does not extend to Mars. Anyone pasting the model into a Mars-planning context without these prerequisites is misusing it.
 
 ---
 

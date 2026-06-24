@@ -1,5 +1,5 @@
 cff-version: 1.2.0
-title: "Selectron: uncertain-weight MCDA and analog mission simulation prototype for space-analog crew-selection research"
+title: "Selectron: uncertain-weight MCDA and analog mission simulation prototype for space-analog crew-composition scenario analysis"
 message: "If you use Selectron in academic work, please cite this software as below, plus the underlying NASA Integrated Medical Model papers listed in `references`."
 type: software
 authors:
@@ -18,7 +18,7 @@ version: "0.6.0-rebaseline.0"
 # only when the rebaseline source freeze is tagged and the Zenodo archive
 # is updated to that exact version.
 keywords:
-  - "space-analog crew selection"
+  - "space-analog crew composition"
   - "uncertain-weight MCDA"
   - "analog mission simulation"
   - "scenario analysis"
