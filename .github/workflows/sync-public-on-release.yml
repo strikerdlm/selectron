@@ -47,8 +47,10 @@ jobs:
           echo "label=$label" >> "$GITHUB_OUTPUT"
 
       - name: Require deploy key secret
+        env:
+          SELECTRON_PUBLIC_DEPLOY_KEY: ${{ secrets.SELECTRON_PUBLIC_DEPLOY_KEY }}
         run: |
-          if [ -z "${{ secrets.SELECTRON_PUBLIC_DEPLOY_KEY }}" ]; then
+          if [ -z "${SELECTRON_PUBLIC_DEPLOY_KEY}" ]; then
             echo "::error::Missing SELECTRON_PUBLIC_DEPLOY_KEY on selectron_private."
             echo "Run: node scripts/bootstrap-public-sync-auth.mjs (once) from a machine with gh admin access."
             exit 1
@@ -70,9 +72,7 @@ jobs:
           set -euo pipefail
           mkdir -p ~/.ssh
           ssh-keyscan -t ed25519 github.com >> ~/.ssh/known_hosts
-          git clone "git@github.com:${PUBLIC_REPO}.git" "${PUBLIC_DIR}"
-          git -C "${PUBLIC_DIR}" checkout master
-          git -C "${PUBLIC_DIR}" pull --ff-only origin master
+          git clone --branch master --single-branch "git@github.com:${PUBLIC_REPO}.git" "${PUBLIC_DIR}"
 
       - name: Sync application tree (exclude manuscripts)
         run: node scripts/sync-to-public.mjs "${{ github.workspace }}/${{ env.PUBLIC_DIR }}"

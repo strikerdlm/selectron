@@ -55,24 +55,39 @@ function ensureKeyPair() {
   };
 }
 
-function deployKeyPresent(publicKey) {
-  const keys = ghJson([`repos/${PUBLIC_REPO}/keys`]);
-  return keys.some(
-    (k) => k.title === KEY_TITLE || k.key.trim() === publicKey.trim(),
-  );
+function listDeployKeys() {
+  return ghJson([`repos/${PUBLIC_REPO}/keys`]);
 }
 
-function addDeployKey(publicKey) {
-  if (deployKeyPresent(publicKey)) {
-    console.log(`Deploy key "${KEY_TITLE}" already on ${PUBLIC_REPO}`);
+function findDeployKeyByTitle(keys) {
+  return keys.find((k) => k.title === KEY_TITLE) ?? null;
+}
+
+function removeDeployKey(keyId) {
+  run("gh", ["api", `repos/${PUBLIC_REPO}/keys/${keyId}`, "-X", "DELETE"]);
+  console.log(`Removed stale deploy key ${keyId} from ${PUBLIC_REPO}`);
+}
+
+function ensureDeployKey(publicKey) {
+  const keys = listDeployKeys();
+  const normalized = publicKey.trim();
+  const exact = keys.find((k) => k.key.trim() === normalized);
+  if (exact) {
+    console.log(`Deploy key already matches ${PUBLIC_REPO} (id ${exact.id})`);
     return;
   }
+
+  const stale = findDeployKeyByTitle(keys);
+  if (stale) {
+    removeDeployKey(stale.id);
+  }
+
   ghJson([
     `repos/${PUBLIC_REPO}/keys`,
     "-f",
     `title=${KEY_TITLE}`,
     "-f",
-    `key=${publicKey.trim()}`,
+    `key=${normalized}`,
     "-F",
     "read_only=false",
   ]);
@@ -97,7 +112,7 @@ function main() {
   }
 
   const { privateKey, publicKey } = ensureKeyPair();
-  addDeployKey(publicKey);
+  ensureDeployKey(publicKey);
   setPrivateSecret(privateKey);
   writeGitignoreNote();
 
