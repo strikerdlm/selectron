@@ -1,94 +1,15 @@
 {
-  "lock_status": "archive_doi_populated_pending_rendered_package_rebuild",
-  "created_date": "2026-06-14",
-  "journal_target": "Acta Astronautica",
-  "selectron_version": "0.5.6",
-  "selectron_commit_sha_at_lock_creation": "c4fff1e127a3064614518356cb555f68fdb2a10e",
-  "manuscript_repo_commit_sha": "not_applicable_manuscript_source_lives_in_selectron_repo",
-  "zenodo_doi": "10.5281/zenodo.20693257",
-  "zenodo_url": "https://doi.org/10.5281/zenodo.20693257",
-  "figure_generation_commit_sha": "538e16ccff94",
-  "rendered_package_status": {
-    "paper/submission/manuscript.docx": "stale_after_2026-06-14_source_revision",
-    "paper/submission/cover-letter.docx": "stale_after_2026-06-14_target_change",
-    "required_next_step": "rebuild rendered files after final journal target and figure-generation commit are frozen"
-  },
-  "source_files": {
-    "paper/manuscript.md": {
-      "sha256": "c0012550d116eed30adea1c6838aac6bcc80d2f6b0bb00e00a403e8f6b48a65f"
-    },
-    "paper/references.bib": {
-      "sha256": "e68b67ea3a29954c3a57232f7c1f9e79b0b0cc76affae625577d900c6bca1f7d"
-    },
-    "paper/cover-letter.md": {
-      "sha256": "ed84debb6aefff2a48d733953641c2068e6d6fefa9549ffddd8edef5a8827ae2"
-    },
-    "paper/submission/highlights.md": {
-      "sha256": "79cf79d811b78742a593a2c73fc8c6069dc382d7ef64bfc81a43265d9011954d"
-    },
-    "src/data/imm-priors.json": {
-      "sha256": "e5989341ef5c5dba29eefe57999b4e3843dbbe3bb60964f9c5236bde9341267b",
-      "condition_count": 101,
-      "catalog_scope": "100 K15 medical conditions plus one source-cited analog behavioral extension",
-      "provenance_counts": {
-        "tierA-nasa": 34,
-        "tierB-pymc": 66,
-        "tierB-lit": 1,
-        "tierC-synth": 0
-      }
-    }
-  },
-  "figure_hashes": {
-    "paper/figures/F1_pipeline.png": "83486201971b66b3ac5f7bcd0bb8be3b3a9564a0ecdc97c2f93f814bca0b70b1",
-    "paper/figures/F2_criterion_tiers.png": "77de692affb75d3d2e3dd1fc741d444bd5c82c4143d907b067bc9fc50d21bb45",
-    "paper/figures/F3.png": "824f9a7a3a695b8eed20df85128005b21618266bf714e61a2537d81e5195128e",
-    "paper/figures/F4.png": "99020e4e4902e9dc17dcde7b091f9fd3c04d41c94d3242b2b33eb62ddcf57b6a",
-    "paper/figures/F5_convergence.png": "a8e6cde386ba4da59c1cdbd9cfac83de9d9514f2edf79492c97535e2826d9958",
-    "paper/figures/F6.png": "5ffbde724b650574c17ce259830d933bd93a3ed0e51003aa9bda55f1a1ec1d6d",
-    "paper/figures/F7.png": "145ff5721274d620f2a7533d1c0b07bed18cd0ce3568e592c011885c6b434443",
-    "paper/figures/S1_ess_table.png": "471c738fec9893e100a0b8ce50dd3e7e93ed9e0f000daa6c99ac67e2456bba00"
-  },
-  "verification_commands": [
-    {
-      "command": "npm run typecheck",
-      "status": "passed_2026-06-14"
-    },
-    {
-      "command": "npx vitest run tests/imm/priors.test.ts tests/imm/conditions.test.ts tests/data/citations.test.ts",
-      "status": "passed_2026-06-14_29_tests"
-    },
-    {
-      "command": "npm run validate:imm",
-      "status": "passed_2026-06-14"
-    },
-    {
-      "command": "npm run validate:imm:analog",
-      "status": "passed_2026-06-14_25_tests"
-    },
-    {
-      "command": "npm run build",
-      "status": "passed_2026-06-14_vite_warnings_only"
-    },
-    {
-      "command": "python -m pytest -m \"not slow\"",
-      "status": "last_passed_2026-06-11_not_rerun_current_revision"
-    }
-  ],
-  "journal_guide_verification": {
-    "status": "verified_2026-06-14_against_sciencedirect_guide_for_authors",
-    "url": "https://www.sciencedirect.com/journal/acta-astronautica/publish/guide-for-authors",
-    "observations": [
-      "journal supports open access",
-      "scope includes basic, engineering, life and social space sciences and space technology",
-      "submission proceeds online through Acta Astronautica Editorial Manager"
-    ],
-    "required_next_step": "recheck the selected journal guide immediately before portal upload"
-  },
-  "safety_statements": {
-    "synthetic_data_only": true,
-    "human_subjects_data_used": false,
-    "clinical_decision_support": false,
-    "flight_certification_tool": false,
-    "mars_or_artemis_claims": false
-  }
+  "lock_status": "retired",
+  "retired_date": "2026-06-24",
+  "reason": "The private paper package was retired after scientific audit. Its rendered figures, submission figures, and worked-example payloads were removed because they encoded obsolete posterior, HSRB, convergence, evidence-coverage, and operational-verdict claims.",
+  "current_use": "Do not submit, cite, rebuild, upload, or treat artifacts from paper/ as current Selectron evidence.",
+  "active_manuscript_location": "strikerdlm/manuscripts/selectron/acta",
+  "active_claim_boundary": "verification-first software/methods manuscript; conditional scenario analysis only; no empirical analog-outcome validation, crew-selection validation, medical clearance, or NASA-equivalent HSRB verdicts",
+  "rendered_artifacts_status": "none active in this retired package",
+  "figure_hashes": {},
+  "verification_commands": [],
+  "replacement_notes": [
+    "Use the active methods manuscript package and synchronize it to an exact Selectron commit before any submission.",
+    "Regenerate figures only from audit-safe specifications using score-sensitivity, simulation-interval, MCSE, evidence-coverage, and non-operational review-language boundaries."
+  ]
 }

@@ -122,7 +122,6 @@ describe("active analog workflow guards", () => {
       "src/ui/figures/CalculationTrace.tsx",
       "src/ui/figures/ConditionContribution.tsx",
       "src/ui/figures/DashboardSummary.tsx",
-      "src/ui/figures/PaperF7IMM.tsx",
       "src/ui/figures/RiskHistogram.tsx",
       "src/ui/figures/captions/F2.captions.ts",
       "src/ui/figures/captions/F4.captions.ts",
@@ -221,6 +220,8 @@ describe("active analog workflow guards", () => {
 
     expect(readRepoFile("paper/RETIREMENT_NOTICE.md")).toContain("Do not submit, cite, rebuild, or upload");
     expect(readRepoFile("paper/Makefile")).toContain("The paper/ submission package is retired");
+    expect(readRepoFile("src/ui/testing/TestFigureHost.tsx")).toContain("RETIRED_PAPER_FIGURE_IDS");
+    expect(readRepoFile("src/ui/testing/TestFigureHost.tsx")).toContain("Retired paper figure");
 
     for (const path of retiredPaperFiles) {
       const source = readRepoFile(path);
