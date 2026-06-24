@@ -98,4 +98,17 @@ describe("active analog workflow guards", () => {
     expect(readRepoFile("src/ui/views/CrewComposition.tsx")).toContain("EVIDENCE_COVERAGE_STATEMENT");
     expect(readRepoFile("src/ui/views/CrewComposition.tsx")).toContain("accepted coverage");
   });
+
+  it("keeps the slow validation workflow archiving release-verification artifacts", () => {
+    const workflow = readRepoFile(".github/workflows/nightly.yml");
+
+    expect(workflow).toContain("npm run test:slow");
+    expect(workflow).toContain("npm run validate:imm:analog");
+    expect(workflow).toContain("npm run validate:imm");
+    expect(workflow).toContain("npm run verify:e2e");
+    expect(workflow).toContain("python -m pytest");
+    expect(workflow).toContain("python -m selectron --dry-run");
+    expect(workflow).toContain("verification-artifacts/run-metadata.env");
+    expect(workflow).toContain("actions/upload-artifact@v4");
+  });
 });

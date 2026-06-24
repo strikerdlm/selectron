@@ -23,23 +23,56 @@ jobs:
       - name: Install Node dependencies
         run: npm ci
 
+      - name: Capture run metadata
+        shell: bash
+        run: |
+          mkdir -p verification-artifacts
+          package_version="$(node -p "require('./package.json').version")"
+          {
+            echo "workflow=${GITHUB_WORKFLOW}"
+            echo "run_id=${GITHUB_RUN_ID}"
+            echo "run_attempt=${GITHUB_RUN_ATTEMPT}"
+            echo "event=${GITHUB_EVENT_NAME}"
+            echo "ref=${GITHUB_REF}"
+            echo "sha=${GITHUB_SHA}"
+            echo "repository=${GITHUB_REPOSITORY}"
+            echo "node=$(node --version)"
+            echo "npm=$(npm --version)"
+            echo "package_version=${package_version}"
+            echo "generated_at_utc=$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+          } > verification-artifacts/run-metadata.env
+          cp package-lock.json verification-artifacts/package-lock.snapshot.json
+          npm run evidence:status > verification-artifacts/evidence-status.json
+
       - name: Slow stochastic Vitest suite
         # F6: the slow stochastic suites relegated out of the required CI lane
         # (calibration idempotency, K15 reproduction, leave-calibrated-out
         # sensitivity, R-hat convergence).
-        run: npm run test:slow
+        shell: bash
+        run: |
+          set -o pipefail
+          npm run test:slow 2>&1 | tee verification-artifacts/test-slow.log
 
       - name: Analog IMM validation
-        run: npm run validate:imm:analog
+        shell: bash
+        run: |
+          set -o pipefail
+          npm run validate:imm:analog 2>&1 | tee verification-artifacts/validate-imm-analog.log
 
       - name: K15 IMM benchmark
-        run: npm run validate:imm
+        shell: bash
+        run: |
+          set -o pipefail
+          npm run validate:imm 2>&1 | tee verification-artifacts/validate-imm-k15.log
 
       - name: Install Playwright Chromium
         run: npx playwright install --with-deps chromium
 
       - name: Full browser suite
-        run: npm run verify:e2e
+        shell: bash
+        run: |
+          set -o pipefail
+          npm run verify:e2e 2>&1 | tee verification-artifacts/verify-e2e.log
 
       - name: Setup Python
         uses: actions/setup-python@v5
@@ -52,4 +85,23 @@ jobs:
 
       - name: Full Python suite
         working-directory: python
-        run: python -m pytest
+        shell: bash
+        run: |
+          set -o pipefail
+          python -m pytest 2>&1 | tee ../verification-artifacts/python-pytest.log
+
+      - name: Python calibration dry run
+        working-directory: python
+        shell: bash
+        run: |
+          set -o pipefail
+          python -m selectron --dry-run --draws 100 --chains 1 --output-dir ../verification-artifacts/python-calibration-dry-run 2>&1 | tee ../verification-artifacts/python-calibration-dry-run.log
+
+      - name: Upload nightly verification archive
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: nightly-verification-${{ github.sha }}-${{ github.run_attempt }}
+          path: verification-artifacts
+          if-no-files-found: error
+          retention-days: 90
