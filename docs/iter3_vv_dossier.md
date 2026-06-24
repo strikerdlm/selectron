@@ -1,8 +1,10 @@
-# Iter-3 V&V Dossier — NASA-STD-7009 Eight Credibility Factors
+# Archived Iter-3 V&V Dossier — NASA-STD-7009 Eight Credibility Factors
 
-**Status:** living document. Last revised 2026-06-05 (Phase 3F closure; Phase 3A in-flight, Phase 3B blocked on Diego's T37 curation).
+**Status:** archived historical dossier. Last revised 2026-06-05 before the v0.6 audit containment work.
 
-**Mandate:** Iter-3 spec §9 [W14, M18] requires the model to be assessed against the eight NASA-STD-7009a credibility factors. This dossier holds the per-factor evidence and identifies remaining gaps. Re-read on every Iter-3 sign-off step.
+> **Superseded by v0.6.** This document records historical Iter-3 verification planning and contains retired terminology such as posterior score, credible interval, validation gate, HSRB mapping, and synthetic-prior status. Do not use it as the current Selectron claim boundary, manuscript evidence, evidence-coverage source, or operational validation record. Current boundaries are in `README.md`, `docs/model_card.md`, `docs/iter5_scientific_limitations.md`, and `docs/v0.6_rebaseline.md`.
+
+**Historical mandate:** Iter-3 spec §9 [W14, M18] required the model to be assessed against the eight NASA-STD-7009a credibility factors. This dossier preserved the per-factor plan and the gaps known at the time.
 
 **Canonical eight-factor list** (verbatim from [M18, math_anchors]):
 

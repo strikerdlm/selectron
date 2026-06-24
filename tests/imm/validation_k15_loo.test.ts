@@ -3,11 +3,11 @@
 // peer-review-2 §4.5 — Leave-calibrated-out (LOO) sensitivity analysis.
 //
 // Demonstrates how K15 reproduction degrades when calibration-target-circular
-// conditions are removed, leaving only the 41 tier-A-nasa (directly NASA-
-// attributed) plus the 3 rev3-c source-cited tier-B conditions that received
-// per-condition Earth-analog calibration (depression, respiratory-infection,
-// skin-rash). Tier-B blanket-multiplier conditions (37 of 41 tier-B) and all
-// 18 tier-C back-fit conditions are excluded.
+// conditions are removed, leaving only source-attributed tier-A conditions plus
+// the rev3-c source-cited tier-B conditions that received historical
+// per-condition Earth-analog fitting (depression, respiratory-infection,
+// skin-rash). Historically fitted tier-B conditions and former tier-C back-fit
+// conditions are excluded.
 //
 // Expected:
 //   - TME drops (fewer active conditions → fewer Poisson draws → fewer events)
@@ -70,7 +70,7 @@ describe("Leave-calibrated-out K15 sensitivity", () => {
       .map((c) => c.id)
   );
 
-  it("includes 30–39 evidence-based conditions (34 tier-A after pass 4 + up to 5 source-cited tier-B)", () => {
+  it("includes 30–39 source-attributed conditions (34 tier-A after pass 4 + up to 5 source-cited tier-B)", () => {
     expect(evidenceBasedIds.size).toBeGreaterThanOrEqual(30);
     expect(evidenceBasedIds.size).toBeLessThanOrEqual(39);
   });

@@ -39,7 +39,7 @@ references:
       name: "ICES-2015-123, 45th International Conference on Environmental Systems"
       city: "Bellevue"
       country: "US"
-    notes: "K15 — Selectron's foundational IMM architecture and Table 1 validation target"
+    notes: "K15 — Selectron's foundational IMM architecture and Table 1 inter-model reference benchmark"
   - type: article
     authors:
       - family-names: "Myers"

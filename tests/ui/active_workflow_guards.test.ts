@@ -168,25 +168,33 @@ describe("active analog workflow guards", () => {
     const manual = readRepoFile("docs/Manual.md");
     const future = readRepoFile("docs/future_features.md");
     const status = readRepoFile("STATUS.md");
+    const iter3VvDossier = readRepoFile("docs/iter3_vv_dossier.md");
+    const iter3MonteCarloAudit = readRepoFile("docs/iter3_nasa_monte_carlo_audit.md");
 
     expect(readme).toContain("space-analog crew-composition scenario analysis");
     expect(readme).toContain("uncertain-weight MCDA candidate scoring");
     expect(citation).toContain("space-analog crew-composition scenario analysis");
+    expect(citation).toContain("Table 1 inter-model reference benchmark");
     expect(manual).toContain("candidate-score sensitivity analysis and crew-composition mission scenarios");
     expect(future).toContain("inter-model verification benchmarks");
     expect(future).toContain("Future benchmark/external-validation requirement");
     expect(status).toContain("four nominal `accepted` rows, all malformed");
     expect(status).toContain("0/4,849");
+    expect(iter3VvDossier).toContain("archived historical dossier");
+    expect(iter3VvDossier).toContain("Superseded by v0.6");
+    expect(iter3MonteCarloAudit).toContain("Superseded by v0.6");
 
     for (const forbidden of [
       "crew-selection research",
       "selection scoring",
       "space-analog crew-selection and mission-scenario analysis",
+      "Table 1 validation target",
       "The validation gates (K15 Table 1 reproduction) are defined",
       "Validation gate to add",
       "K15 calibration partially within CI₉₅",
       "0 / 4,846",
       "zero accepted rows",
+      "**Status:** living document",
     ]) {
       for (const [path, source] of [
         ["README.md", readme],
@@ -194,6 +202,8 @@ describe("active analog workflow guards", () => {
         ["docs/Manual.md", manual],
         ["docs/future_features.md", future],
         ["STATUS.md", status],
+        ["docs/iter3_vv_dossier.md", iter3VvDossier],
+        ["docs/iter3_nasa_monte_carlo_audit.md", iter3MonteCarloAudit],
       ] as const) {
         expect(source, `${path} must not contain ${forbidden}`).not.toContain(forbidden);
       }

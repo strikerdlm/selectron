@@ -1,7 +1,7 @@
 // tests/e2e/crew_composition.smoke.spec.ts
 //
 // Manual UI smoke test for the CrewComposition view — verifies the IMM Phase 2
-// UI batch (IMM-46 K15 validation badge + IMM-49 preset crews + IMM-50 session
+// UI batch (IMM-46 K15 benchmark badge + IMM-49 preset crews + IMM-50 session
 // save/load/export) renders end-to-end against the real Vite dev server and a
 // real browser. Complements the RTL unit tests in tests/ui/ by exercising the
 // integration paths (browser navigation, ECharts rendering, Web Worker
@@ -57,7 +57,7 @@ test.describe("CrewComposition smoke", () => {
     await expect(page.getByRole("button", { name: /Export current IMM session as JSON/i })).toBeVisible();
   });
 
-  test("K15 validation badge only renders for K15 reference scenario", async ({ page }) => {
+  test("K15 benchmark badge only renders for K15 reference scenario", async ({ page }) => {
     await page.goto("/");
     await page.getByRole("button", { name: /^Crew$/i }).click();
     await expect(page.getByRole("heading", { name: /^Crew Composition$/i })).toBeVisible();

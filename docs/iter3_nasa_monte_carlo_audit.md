@@ -2,7 +2,9 @@
 
 **Date:** 2026-05-19
 **Trigger:** Diego — "verify the methods for the monte carlo simulations on the nasa literature evidence folder, make sure how many simulations do they run to get the correct calculation."
-**Scope:** confirm Selectron's `simulateMission` trial count + convergence handling matches the verbatim NASA IMM literature in `research/imm_sources/`.
+**Scope:** historical audit of the retired Iter-3 `simulateMission` path and the then-planned IMM alignment.
+
+> **Superseded by v0.6.** This historical audit predates the active IMM scenario engine, MCSE/rare-event precision diagnostics, K15 4/12 inter-model agreement framing, and evidence-coverage controls. It is not the current convergence, validation, or manuscript-readiness source. Use `docs/iter5_scientific_limitations.md`, `docs/model_card.md`, `README.md`, and current tests for the active claim boundary.
 
 ---
 
