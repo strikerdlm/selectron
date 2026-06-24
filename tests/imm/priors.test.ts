@@ -131,6 +131,28 @@ describe("IMM priors", () => {
     expect(() => validatePriorsJson(badDuration)).toThrow(/acute-sinusitis.*treated\.dt_cp1_hours\.min/);
   });
 
+  it("rejects unknown schema fields instead of silently ignoring prior typos", () => {
+    const extraTopLevel = priorsFixture();
+    extraTopLevel.unreviewed_metadata = {};
+    expect(() => validatePriorsJson(extraTopLevel)).toThrow(/priors\.unreviewed_metadata.*runtime prior schema/);
+
+    const extraGlobal = priorsFixture();
+    extraGlobal.global_calibration.unreviewed_multiplier = 1;
+    expect(() => validatePriorsJson(extraGlobal)).toThrow(/global_calibration\.unreviewed_multiplier.*runtime prior schema/);
+
+    const extraPrior = priorsFixture();
+    extraPrior.conditions["acute-sinusitis"].unreviewed_field = 1;
+    expect(() => validatePriorsJson(extraPrior)).toThrow(/acute-sinusitis\.unreviewed_field.*runtime prior schema/);
+
+    const extraIncidence = priorsFixture();
+    extraIncidence.conditions["acute-sinusitis"].incidence.lamda_fixed = 0.1;
+    expect(() => validatePriorsJson(extraIncidence)).toThrow(/acute-sinusitis.*incidence\.lamda_fixed.*runtime prior schema/);
+
+    const extraPert = priorsFixture();
+    extraPert.conditions["acute-sinusitis"].treated.p_evac.units = "probability";
+    expect(() => validatePriorsJson(extraPert)).toThrow(/acute-sinusitis.*treated\.p_evac\.units.*runtime prior schema/);
+  });
+
   it("rejects unknown prior ids and undocumented kind-multiplier sensitivity keys", () => {
     const unknownPrior = priorsFixture();
     unknownPrior.conditions["not-a-real-condition"] = {

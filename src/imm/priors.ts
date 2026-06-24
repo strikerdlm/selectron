@@ -105,6 +105,60 @@ const RATE_COMPATIBLE_DISTRIBUTIONS = new Set([
   "Gamma-Poisson",
   "Fixed",
 ]);
+const PRIORS_FILE_KEYS = new Set([
+  "schema_version",
+  "calibration_target",
+  "conditions",
+  "global_calibration",
+]);
+const PRIOR_KEYS = new Set([
+  "conditionId",
+  "provenance",
+  "source_ref",
+  "incidence",
+  "severity",
+  "outcomeScenarios",
+  "treated",
+  "untreated",
+  "risk_factor_multipliers",
+  "required_resources",
+]);
+const INCIDENCE_KEYS = new Set([
+  "distribution",
+  "mu_log_lambda",
+  "sigma_log_lambda",
+  "alpha",
+  "beta",
+  "lambda_fixed",
+  "lambda_unit",
+]);
+const SEVERITY_KEYS = new Set([
+  "worst_case_prob_alpha",
+  "worst_case_prob_beta",
+]);
+const OUTCOME_KEYS = new Set([
+  "fi_cp1",
+  "dt_cp1_hours",
+  "fi_cp2",
+  "dt_cp2_hours",
+  "fi_cp3",
+  "p_evac",
+  "p_locl",
+]);
+const BETA_PERT_KEYS = new Set(["min", "mode", "max"]);
+const OUTCOME_SCENARIOS_KEYS = new Set(["best", "worst"]);
+const SCENARIO_OUTCOME_KEYS = new Set(["treated", "untreated", "evidenceStatus"]);
+const GLOBAL_CALIBRATION_KEYS = new Set([
+  "tierC_multiplier_iss_hms",
+  "tierC_multiplier_iss_none",
+  "tierC_multiplier_iss_unlimited",
+  "tierA_multiplier",
+  "tierB_multiplier",
+  "tierC_multiplier",
+  "fit_against",
+  "fit_residuals_within_CI95",
+  "kind_multipliers",
+]);
 
 function fail(message: string): never {
   throw new Error(`E_BAD_PRIORS: ${message}`);
@@ -117,6 +171,14 @@ function isRecord(value: unknown): value is Record<string, unknown> {
 function requireRecord(value: unknown, path: string): Record<string, unknown> {
   if (!isRecord(value)) fail(`${path} must be an object`);
   return value;
+}
+
+function rejectUnknownKeys(value: Record<string, unknown>, allowed: ReadonlySet<string>, path: string): void {
+  for (const key of Object.keys(value)) {
+    if (!allowed.has(key)) {
+      fail(`${path}.${key} is not part of the runtime prior schema`);
+    }
+  }
 }
 
 function requireNonEmptyString(value: unknown, path: string): string {
@@ -148,6 +210,7 @@ function requireFiniteNumber(
 
 function validateBetaPert(value: unknown, path: string, bounds: { min: number; max?: number }): IMMBetaPert {
   const pert = requireRecord(value, path);
+  rejectUnknownKeys(pert, BETA_PERT_KEYS, path);
   const min = requireFiniteNumber(pert.min, `${path}.min`, { min: bounds.min, max: bounds.max });
   const mode = requireFiniteNumber(pert.mode, `${path}.mode`, { min: bounds.min, max: bounds.max });
   const max = requireFiniteNumber(pert.max, `${path}.max`, { min: bounds.min, max: bounds.max });
@@ -159,6 +222,7 @@ function validateBetaPert(value: unknown, path: string, bounds: { min: number; m
 
 function validateOutcomes(value: unknown, path: string): IMMConditionOutcomes {
   const outcomes = requireRecord(value, path);
+  rejectUnknownKeys(outcomes, OUTCOME_KEYS, path);
   return {
     fi_cp1: validateBetaPert(outcomes.fi_cp1, `${path}.fi_cp1`, { min: 0, max: 1 }),
     dt_cp1_hours: validateBetaPert(outcomes.dt_cp1_hours, `${path}.dt_cp1_hours`, { min: 0 }),
@@ -172,6 +236,7 @@ function validateOutcomes(value: unknown, path: string): IMMConditionOutcomes {
 
 function validatePrior(id: string, value: unknown): void {
   const prior = requireRecord(value, `conditions.${id}`);
+  rejectUnknownKeys(prior, PRIOR_KEYS, `conditions.${id}`);
   if (!CONDITION_IDS.has(id)) fail(`conditions.${id} is not in IMM_CONDITIONS`);
   const condition = IMM_CONDITIONS.find((c) => c.id === id);
   if (!condition) fail(`conditions.${id} is not in IMM_CONDITIONS`);
@@ -183,6 +248,7 @@ function validatePrior(id: string, value: unknown): void {
   requireNonEmptyString(prior.source_ref, `conditions.${id}.source_ref`);
 
   const incidence = requireRecord(prior.incidence, `conditions.${id}.incidence`);
+  rejectUnknownKeys(incidence, INCIDENCE_KEYS, `conditions.${id}.incidence`);
   const distribution = requireNonEmptyString(incidence.distribution, `conditions.${id}.incidence.distribution`);
   if (!ALLOWED_DISTRIBUTIONS.has(distribution)) {
     fail(`conditions.${id}.incidence.distribution is unsupported: ${distribution}`);
@@ -214,6 +280,7 @@ function validatePrior(id: string, value: unknown): void {
   }
 
   const severity = requireRecord(prior.severity, `conditions.${id}.severity`);
+  rejectUnknownKeys(severity, SEVERITY_KEYS, `conditions.${id}.severity`);
   requireFiniteNumber(severity.worst_case_prob_alpha, `conditions.${id}.severity.worst_case_prob_alpha`, { exclusiveMin: 0 });
   requireFiniteNumber(severity.worst_case_prob_beta, `conditions.${id}.severity.worst_case_prob_beta`, { exclusiveMin: 0 });
 
@@ -221,8 +288,10 @@ function validatePrior(id: string, value: unknown): void {
   validateOutcomes(prior.untreated, `conditions.${id}.untreated`);
   if (prior.outcomeScenarios !== undefined) {
     const scenarios = requireRecord(prior.outcomeScenarios, `conditions.${id}.outcomeScenarios`);
+    rejectUnknownKeys(scenarios, OUTCOME_SCENARIOS_KEYS, `conditions.${id}.outcomeScenarios`);
     for (const scenarioName of ["best", "worst"] as const) {
       const scenario = requireRecord(scenarios[scenarioName], `conditions.${id}.outcomeScenarios.${scenarioName}`);
+      rejectUnknownKeys(scenario, SCENARIO_OUTCOME_KEYS, `conditions.${id}.outcomeScenarios.${scenarioName}`);
       validateOutcomes(scenario.treated, `conditions.${id}.outcomeScenarios.${scenarioName}.treated`);
       validateOutcomes(scenario.untreated, `conditions.${id}.outcomeScenarios.${scenarioName}.untreated`);
       if (
@@ -252,6 +321,7 @@ function validatePrior(id: string, value: unknown): void {
 export function validatePriorsJson(obj: unknown): asserts obj is IMMPriorsFile {
   if (!obj || typeof obj !== "object") throw new Error("E_BAD_PRIORS: not an object");
   const p = obj as Record<string, unknown>;
+  rejectUnknownKeys(p, PRIORS_FILE_KEYS, "priors");
   if (p.schema_version !== 1) throw new Error("E_BAD_PRIORS: schema_version must be 1");
   if (!p.conditions || typeof p.conditions !== "object") {
     throw new Error("E_BAD_PRIORS: conditions must be an object");
@@ -266,6 +336,7 @@ export function validatePriorsJson(obj: unknown): asserts obj is IMMPriorsFile {
     }
   }
   const gc = requireRecord((p as { global_calibration?: Record<string, unknown> }).global_calibration, "global_calibration");
+  rejectUnknownKeys(gc, GLOBAL_CALIBRATION_KEYS, "global_calibration");
   for (const key of [
     "tierC_multiplier_iss_hms",
     "tierC_multiplier_iss_none",
