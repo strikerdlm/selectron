@@ -27,6 +27,8 @@ export function EvidenceForm({
   const instrumentLabel = tierInst?.instrument ?? criterion.instrument;
   const transform = tierInst?.scaleTransform;
   const tierNotes = tierInst?.notes;
+  const scoreUse = tierInst?.scoreUse ?? (transform?.multiplier ? "linear-crosswalk" : "canonical");
+  const scoreable = scoreUse === "canonical" || scoreUse === "linear-crosswalk";
 
   // Slider semantics — when a tier-specific scaleTransform.multiplier exists,
   // the underlying instrument has a different native range than the
@@ -35,8 +37,8 @@ export function EvidenceForm({
   // we multiply on write and divide on read so the persisted rawValue is
   // always in canonical [scale.min, scale.max].
   const multiplier = transform?.multiplier ?? 1;
-  const nativeMin = criterion.scale.min / multiplier;
-  const nativeMax = criterion.scale.max / multiplier;
+  const nativeMin = tierInst?.nativeScale?.min ?? criterion.scale.min / multiplier;
+  const nativeMax = tierInst?.nativeScale?.max ?? criterion.scale.max / multiplier;
   const nativeMidpoint = (nativeMin + nativeMax) / 2;
   const stepSize = (nativeMax - nativeMin) / 100;
 
@@ -103,10 +105,25 @@ export function EvidenceForm({
             ⚠ scale transform · {transform.note}
           </p>
         )}
+        {!scoreable && (
+          <p className="mono text-[12px] text-warn leading-relaxed mb-2">
+            not scoreable in MCDA at this tier · {scoreUse === "triage-only"
+              ? "triage-only instrument, no canonical crosswalk"
+              : "construct equivalence not established"}
+          </p>
+        )}
+        {tierInst?.reviewThreshold && (
+          <p className="mono text-[12px] text-ink-3 leading-relaxed mb-2">
+            tier review rule · {tierInst.reviewThreshold.operator === "fail-if-above" ? "flag above" : "flag below"}{" "}
+            {tierInst.reviewThreshold.value}
+            {tierInst.reviewThreshold.note ? ` · ${tierInst.reviewThreshold.note}` : ""}
+          </p>
+        )}
         {tierNotes && (
           <p className="mono text-[12px] text-ink-2 leading-relaxed mb-2">{tierNotes}</p>
         )}
       </div>
+      {scoreable ? (
       <div>
         <label className="label">
           raw value
@@ -149,6 +166,15 @@ export function EvidenceForm({
           )}
         </p>
       </div>
+      ) : (
+        <div className="rounded-md border border-warn/30 bg-warn/5 px-3 py-2">
+          <p className="mono text-[12px] text-ink-2 leading-relaxed">
+            This instrument is recorded for audit context only. Selectron will not create a
+            canonical MCDA score from it until a validated tier-specific crosswalk and gate
+            rule are supplied.
+          </p>
+        </div>
+      )}
 
       <div className="grid grid-cols-2 gap-3">
         <div>

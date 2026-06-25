@@ -185,30 +185,25 @@ export function IMMAnalogPosteriorPlot({ draws, outcome, kind, trialsPerDraw }: 
   // Caption
   const captionBlock: CaptionBlock = {
     figureId: "I6",
-    oneLine: `Prior-uncertainty predictive summary for kind "${kind}": ${trialsPerDraw.toLocaleString()} Monte Carlo trials × ${outcome.nDraws} parameter draws.`,
+    oneLine: `Incidence-parameter uncertainty sensitivity for kind "${kind}": ${trialsPerDraw.toLocaleString()} Monte Carlo trials × ${outcome.nDraws} parameter draws.`,
     methods:
-      "The Python /posterior/draws endpoint serves Gamma-Poisson or Lognormal-Poisson parameter draws already stored in the fitted priors for each condition. " +
-      "For each draw the frontend runs trialsPerDraw Monte Carlo trials via composite " +
-      "kind-multipliers (moment-matched: per-draw mean scaled to the draw, prior dispersion " +
-      "preserved). The spread of per-draw metric means constitutes a moment-matched " +
-      "predictive interval — this is NOT a clean epistemic/aleatory decomposition " +
-      "but rather a propagation of prior uncertainty through the simulation. " +
+      "The Python /posterior/draws endpoint serves Gamma-Poisson or Lognormal-Poisson incidence-rate draws stored in the fitted priors for each condition. " +
+      "For each draw the frontend runs trialsPerDraw Monte Carlo trials by injecting direct incidence-rate overrides at the engine's rate-sampling site. " +
+      "The interval is over per-draw conditional metric means, not the full mission-outcome distribution and not an empirical calibration interval. " +
+      "Per-condition draws are sampled independently and do not include cross-condition posterior covariance, severity uncertainty, treatment uncertainty, or accepted evidence coverage. " +
       "Per-condition histograms show the raw λ samples from the parameter draws (events/person-day). " +
       "The TME contribution table reports the distribution of the per-draw mean expected TME " +
       "contribution per condition (events/trial), sorted by mean descending.",
     source:
       "Antonsen et al. (2022) npj Microgravity 8(1) [doi:10.1038/s41526-022-00193-9]; " +
       "Keenan et al. (2015) ICES-2015-123 [K15]. " +
-      "Fitted Selectron prior draws, Selectron Calibration API.",
+      "Stored Selectron incidence-prior draws, Selectron Calibration API. Accepted evidence coverage: 0/4,849.",
     reproducibility: `kind=${kind}, nDraws=${outcome.nDraws}, trialsPerDraw=${trialsPerDraw}, seed=${draws.seed}`,
     interpretation:
-      "This figure shows how uncertain the model is about each astronaut crew's medical risk " +
-      "for a given mission type. The three metric cards (pEVAC, pLOCL, CHI) show the most " +
-      "likely outcome and the range of plausible values (90% interval). The small histograms " +
-      "show how the per-condition incidence rates (λ) vary across stored parameter draws — " +
-      "wider histograms mean more uncertainty about that condition's true rate. The table " +
-      "ranks conditions by their expected contribution to total medical events. Conditions " +
-      "with higher means are the biggest drivers of mission risk for this kind of mission.",
+      "This figure shows how conditional scenario outputs change when unadjudicated incidence-rate parameters are varied. " +
+      "The three metric cards report mean conditional scenario outputs and 90% intervals over parameter-draw means. " +
+      "The small histograms show how per-condition incidence rates (λ) vary across stored parameter draws. " +
+      "The table ranks conditions by their conditional expected contribution to total medical events under these assumptions.",
   };
 
   return (
@@ -243,7 +238,7 @@ export function IMMAnalogPosteriorPlot({ draws, outcome, kind, trialsPerDraw }: 
         {histDraws.length === 0 ? (
           <p className="text-[11px] italic text-ink-3">
             No per-condition draws available for kind "{kind}" — this is expected for
-            mission kinds without a kind_multipliers block in the calibrated priors.
+            mission kinds without stored incidence-parameter draws.
           </p>
         ) : (
           <div
@@ -272,7 +267,7 @@ export function IMMAnalogPosteriorPlot({ draws, outcome, kind, trialsPerDraw }: 
             <tr className="border-b border-line/40 text-ink-3">
               <th className="text-left py-1 pr-3 font-normal">Condition</th>
               <th className="text-right py-1 pr-3 font-normal">Mean</th>
-              <th className="text-right py-1 pr-3 font-normal">90% pred. interval</th>
+          <th className="text-right py-1 pr-3 font-normal">90% sensitivity interval</th>
               <th className="text-right py-1 font-normal">σ</th>
             </tr>
           </thead>

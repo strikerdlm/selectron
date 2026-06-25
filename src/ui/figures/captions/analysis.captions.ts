@@ -17,7 +17,7 @@ export const analysisCaptions = {
   bubble: ({ n, excluded, missionDays }: { n: number; excluded: number; missionDays: number }): CaptionBlock => ({
     figureId: "A2",
     oneLine: `${n} IMM conditions by incidence, severity, body system, and mission contribution.`,
-    methods: `x = incidence (events/1000 person-years, log) from the calibrated priors; y = worst-case severity probability α/(α+β); color = body-system group; bubble area ∝ expected ${missionDays}-day mission contribution (expected events × cumulative treated impairment). ${excluded} per-event (Beta-Bernoulli, per-EVA/SPE) conditions are excluded from the rate axis.`,
+    methods: `x = incidence (events/1000 person-years, log) from the stored unadjudicated priors; y = worst-case severity probability α/(α+β); color = body-system group; bubble area ∝ expected ${missionDays}-day mission contribution (expected events × cumulative treated impairment). ${excluded} per-event (Beta-Bernoulli, per-EVA/SPE) conditions are excluded from the rate axis.`,
     source: "src/data/imm-priors.json (34 tierA-nasa + 66 tierB-pymc) joined with src/imm/conditions.ts.",
     reproducibility: "Pure function of the committed priors + condition catalog.",
   }),

@@ -19,6 +19,7 @@ afterEach(cleanup);
 // (including the higherIsBetter branch for reversed-scale criteria).
 function makeMember(id: string, fraction: number): IMMCrewMember {
   const scores = defaultScores({ default: fraction });
+  scores["psych.bdi2_baseline"] = 8;
   return {
     id,
     sex: "male",
@@ -74,6 +75,16 @@ describe("evaluateCrewGates — demo-threshold flags", () => {
     const result = evaluateCrewGates(crew, PLACEHOLDER_CRITERIA);
     expect(result.crewVerdict).toBe("review-flagged");
     expect(result.flaggedMemberIds).toContain("C");
+    expect(result.flaggedMemberIds).not.toContain("A");
+  });
+
+  it("crew member with BDI-II score >= 20 is surfaced as a review flag", () => {
+    const member = makeMember("BDI", 0.7);
+    member.stageAScores = { ...member.stageAScores, "psych.bdi2_baseline": 30 };
+    const crew = [makeMember("A", 0.7), member];
+    const result = evaluateCrewGates(crew, PLACEHOLDER_CRITERIA);
+    expect(result.crewVerdict).toBe("review-flagged");
+    expect(result.flaggedMemberIds).toContain("BDI");
     expect(result.flaggedMemberIds).not.toContain("A");
   });
 

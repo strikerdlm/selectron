@@ -15,7 +15,7 @@
 
 import { loadIMMPriors } from "../../imm/priors";
 import { IMM_CONDITIONS } from "../../imm/conditions";
-import type { IMMMissionKind } from "../../imm/types";
+import type { IMMMissionKind, KindMultiplierMode } from "../../imm/types";
 
 type Confidence = "HIGH" | "MED" | "LOW";
 
@@ -68,7 +68,13 @@ const CONDITION_LOOKUP: Record<string, string> = (() => {
   return out;
 })();
 
-export function KindMultipliersTable({ kind }: { kind: IMMMissionKind }) {
+export function KindMultipliersTable({
+  kind,
+  mode = "adjudicated",
+}: {
+  kind: IMMMissionKind;
+  mode?: KindMultiplierMode;
+}) {
   // Read the per-kind map defensively. The JSON validator guarantees the
   // shape, but the auto-generated `kind_multipliers` block could be
   // missing for legacy/future kinds.
@@ -105,6 +111,9 @@ export function KindMultipliersTable({ kind }: { kind: IMMMissionKind }) {
 
   return (
     <div data-testid="kind-multipliers-table">
+      <p className="mono text-[11px] text-ink-3 mb-2">
+        proposal-stage context multipliers · {mode === "exploratory" ? "active in this run" : "not active unless exploratory/custom mode is selected"}
+      </p>
       <table className="w-full mono text-[12px] border-collapse">
         <thead>
           <tr className="text-ink-3 text-left">

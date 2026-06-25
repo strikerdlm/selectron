@@ -3,11 +3,11 @@
 // Tier 1 = low-resource analog program; Tier 2 = mid-budget research centre;
 // Tier 3 = agency-grade/specialist instrumentation.
 //
-// Tier now changes instrument fidelity, not the construct set. A Minimum-tier
-// candidate and an Elite-tier candidate should still be scored on the same
-// constructs unless a criterion truly lacks a tier instrument. This avoids the
-// old behavior where adding a higher-tier instrument changed every active
-// Dirichlet mean weight from 1/K to a different 1/K solely because K changed.
+// Tier changes which instruments can produce a comparable canonical score.
+// Criteria whose lower-tier substitutes do not have an accepted/proposal
+// crosswalk are unavailable at that tier instead of being forced onto the
+// canonical scale. This makes the active MCDA dimension explicit and avoids
+// treating DASS-21, TEIQue-SF, or FMT values as MMPI/MSCEIT/SOT scores.
 //
 // See research/2026-05-19_test_battery_tiers.md for the per-criterion × per-
 // tier instrument table.
@@ -39,22 +39,24 @@ export const TIER_ORDINAL: Record<AccessTier, number> = {
 };
 
 export function isCriterionAvailableAtTier(
-  _minimumTier: AccessTier | undefined,
-  _currentTier: AccessTier,
+  minimumTier: AccessTier | undefined,
+  currentTier: AccessTier,
 ): boolean {
-  return true;
+  return TIER_ORDINAL[currentTier] >= TIER_ORDINAL[minimumTier ?? "minimum"];
 }
 
 export const TIER_LONG_DESCRIPTION: Record<AccessTier, string> = {
   minimum:
     "Free, open-source, or paper-based instruments on commodity hardware. IPIP-NEO-120, PEBL, " +
-    "Cooper 12-min run, mCTSIB obstacle course, CD-RISC-10, TEIQue-SF, DASS-21 (triage only), PHQ-9. " +
+    "Cooper 12-min run, CD-RISC-10, PHQ-9, and other scoreable demo instruments. " +
+    "mCTSIB/FMT, TEIQue-SF, and DASS-21 are documented as non-comparable or triage-only rather than " +
+    "converted to SOT-5, MSCEIT, or MMPI-2-RF scores. " +
     "DASS-21 positive screens must be referred to a licensed mental-health professional — DASS-21 " +
     "is not a Selectron psychiatric disposition boundary.",
   medium:
     "Adds commercial computerized tools + clinical-psychology consultation. NEO-FFI, CogScreen-AE, " +
-    "submaximal cycle ergometer, Wii Balance Board sway, CD-RISC-25, EQ-i 2.0, MMPI-2-RF (licensed " +
-    "psychologist), BDI-II. Same construct coverage as Tier 1 with higher fidelity.",
+    "submaximal cycle ergometer, Wii Balance Board sway, CD-RISC-25, MMPI-2-RF (licensed " +
+    "psychologist), and BDI-II. EQ-i 2.0 is documented but not converted into an MSCEIT ability score.",
   elite:
     "Full Tier-3 battery. NEO-PI-R (240-item with facets), NASA Cognition Battery (Joggle Research), " +
     "CPET with metabolic cart, NeuroCom Equitest CDP SOT-5, MSCEIT v2.0 ability-based EI, MMPI-2-RF + " +

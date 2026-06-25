@@ -20,10 +20,14 @@ type ReleaseFreezeManifest = {
   generatedAt: string;
   sourceCommit: string;
   sourceDirty: boolean;
+  sourceStatus: string;
+  sourceTags: string[];
   packageVersion: string;
   priorCatalogPath: string;
   priorCatalogSha256: string;
   evidenceStatusPath: string;
+  evidenceStatusSha256: string;
+  artifactHashes: Record<string, string | null>;
   evidenceStatus: {
     status: string;
     nominalAcceptedRows: number;
@@ -41,6 +45,17 @@ const ROOT = process.cwd();
 const PRIOR_PATH = "src/data/imm-priors.json";
 const EVIDENCE_STATUS_PATH = "research/evidence_extracted/evidence_status.json";
 const OUT_PATH = "verification-artifacts/release-freeze-manifest.json";
+const HASH_PATHS = [
+  "src/data/demo-criteria.ts",
+  "src/imm/conditions.ts",
+  "src/data/imm-missions.ts",
+  "src/imm/profile-effects.ts",
+  "src/data/k15-regression-brackets.json",
+  "python/src/selectron/k15_regression_brackets.json",
+  "package-lock.json",
+  "python/pyproject.toml",
+  "notebooks/requirements.txt",
+];
 
 function readJson<T>(path: string): T {
   return JSON.parse(readFileSync(resolve(ROOT, path), "utf8")) as T;
@@ -50,8 +65,18 @@ function sha256File(path: string): string {
   return createHash("sha256").update(readFileSync(resolve(ROOT, path))).digest("hex");
 }
 
+function optionalSha256(path: string): string | null {
+  const full = resolve(ROOT, path);
+  return existsSync(full) ? sha256File(path) : null;
+}
+
 function git(args: string[]): string {
   return execFileSync("git", args, { cwd: ROOT, encoding: "utf8" }).trim();
+}
+
+function gitList(args: string[]): string[] {
+  const out = git(args);
+  return out ? out.split(/\r?\n/).filter(Boolean) : [];
 }
 
 function buildManifest(): ReleaseFreezeManifest {
@@ -64,18 +89,24 @@ function buildManifest(): ReleaseFreezeManifest {
 
   const packageJson = readJson<{ version: string }>("package.json");
   const evidence = readJson<EvidenceStatusSnapshot>(EVIDENCE_STATUS_PATH);
+  const sourceStatus = git(["status", "--short"]);
   const malformedAcceptedRows = Array.isArray(evidence.malformedAcceptedRows)
     ? evidence.malformedAcceptedRows.length
     : evidence.malformedAcceptedRowCount ?? 0;
+  const artifactHashes = Object.fromEntries(HASH_PATHS.map((path) => [path, optionalSha256(path)]));
 
   return {
     generatedAt: new Date().toISOString(),
     sourceCommit: git(["rev-parse", "HEAD"]),
-    sourceDirty: git(["status", "--short", "--untracked-files=no"]).length > 0,
+    sourceDirty: sourceStatus.length > 0,
+    sourceStatus,
+    sourceTags: gitList(["tag", "--points-at", "HEAD"]),
     packageVersion: packageJson.version,
     priorCatalogPath: PRIOR_PATH,
     priorCatalogSha256: sha256File(PRIOR_PATH),
     evidenceStatusPath: EVIDENCE_STATUS_PATH,
+    evidenceStatusSha256: sha256File(EVIDENCE_STATUS_PATH),
+    artifactHashes,
     evidenceStatus: {
       status: evidence.status,
       nominalAcceptedRows: evidence.acceptedCount,
@@ -98,6 +129,9 @@ function validateManifest(manifest: ReleaseFreezeManifest): void {
   if (!/^[0-9a-f]{64}$/.test(manifest.priorCatalogSha256)) {
     throw new Error(`invalid prior hash: ${manifest.priorCatalogSha256}`);
   }
+  if (!/^[0-9a-f]{64}$/.test(manifest.evidenceStatusSha256)) {
+    throw new Error(`invalid evidence-status hash: ${manifest.evidenceStatusSha256}`);
+  }
   if (manifest.evidenceStatus.activeParameterCount <= 0) {
     throw new Error("evidence status has no active parameters");
   }
@@ -108,6 +142,19 @@ function validateManifest(manifest: ReleaseFreezeManifest): void {
 
 const manifest = buildManifest();
 validateManifest(manifest);
+
+const isCheck = process.argv.includes("--check");
+const allowDirty = process.argv.includes("--allow-dirty");
+const allowUntagged = process.argv.includes("--allow-untagged");
+
+if (isCheck) {
+  if (manifest.sourceDirty && !allowDirty) {
+    throw new Error(`release freeze requires a clean worktree, including untracked files:\n${manifest.sourceStatus}`);
+  }
+  if (manifest.sourceTags.length === 0 && !allowUntagged) {
+    throw new Error("release freeze requires HEAD to have a git tag; pass --allow-untagged only for development checks");
+  }
+}
 
 if (process.argv.includes("--write")) {
   const out = resolve(ROOT, OUT_PATH);

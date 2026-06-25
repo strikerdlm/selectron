@@ -58,43 +58,34 @@ describe("evaluateGates", () => {
 
 // Tier/contract regression guards.
 //
-// Analog-audit correction (see src/ui/wizard/StepCriteria.tsx): tiers change
-// instrument fidelity, not construct inclusion. `isCriterionAvailableAtTier`
-// is intentionally a no-op (returns true for every criterion at every tier)
-// so the construct set — and therefore the Dirichlet mean weight 1/K — stays
-// stable when the access tier changes. Tiers do NOT exclude criteria or
-// gates. The tests below lock that contract: a mid-range candidate still
-// faces the elite MMPI-2-RF EID gate at every tier, and missing-score gating
-// is exercised via direct minimumTier comparison rather than the no-op helper.
-describe("tier/construct-set stability (analog audit)", () => {
-  it("isCriterionAvailableAtTier is a no-op: every criterion is available at every tier", async () => {
+// Scientific-audit correction: accessibility tiers must not force
+// non-comparable instruments onto canonical scales. The helper therefore
+// returns true only when the selected tier has a scoreable instrument/crosswalk.
+describe("tier scoreability boundaries", () => {
+  it("isCriterionAvailableAtTier follows the criterion minimumTier", async () => {
     const { PLACEHOLDER_CRITERIA } = await import("../../src/data/placeholder-criteria");
     const { isCriterionAvailableAtTier } = await import("../../src/types/scenario");
-    for (const c of PLACEHOLDER_CRITERIA) {
-      expect(isCriterionAvailableAtTier(c.minimumTier, "minimum")).toBe(true);
-      expect(isCriterionAvailableAtTier(c.minimumTier, "elite")).toBe(true);
-    }
+    const mmpi = PLACEHOLDER_CRITERIA.find((c) => c.id === "psych.mmpi2rf_eid")!;
+    const ei = PLACEHOLDER_CRITERIA.find((c) => c.id === "psych.emotional_intelligence")!;
+    const bdi = PLACEHOLDER_CRITERIA.find((c) => c.id === "psych.bdi2_baseline")!;
+
+    expect(isCriterionAvailableAtTier(mmpi.minimumTier, "minimum")).toBe(false);
+    expect(isCriterionAvailableAtTier(mmpi.minimumTier, "elite")).toBe(true);
+    expect(isCriterionAvailableAtTier(ei.minimumTier, "medium")).toBe(false);
+    expect(isCriterionAvailableAtTier(ei.minimumTier, "elite")).toBe(true);
+    expect(isCriterionAvailableAtTier(bdi.minimumTier, "minimum")).toBe(true);
   });
 
-  it("a mid-range candidate is still gated by the elite MMPI-2-RF EID gate at every tier", async () => {
+  it("minimum tier excludes elite-only MMPI and MSCEIT criteria from the MCDA set", async () => {
     const { PLACEHOLDER_CRITERIA } = await import("../../src/data/placeholder-criteria");
     const { isCriterionAvailableAtTier } = await import("../../src/types/scenario");
 
-    // No-op filter returns the full construct set at the minimum tier.
     const visibleAtMin = PLACEHOLDER_CRITERIA.filter(
       (c) => isCriterionAvailableAtTier(c.minimumTier, "minimum"),
     );
-    expect(visibleAtMin.length).toBe(PLACEHOLDER_CRITERIA.length);
-
-    const scores: Record<string, number> = {};
-    for (const c of visibleAtMin) scores[c.id] = (c.scale.min + c.scale.max) / 2;
-
-    // MMPI-2-RF EID scale is 50..100 → mid 75, above the fail-if-above:65 gate.
-    const result = evaluateGates({ id: "mid-tier", alias: "mid-tier", scores }, visibleAtMin);
-    expect(result.verdict).toBe("review-flagged");
-    expect(result.failedGates).toContain("psych.mmpi2rf_eid");
-    // nasa_cognition mid (0) is above its fail-if-below:-2.0 gate, so it passes.
-    expect(result.failedGates).not.toContain("cognitive.nasa_cognition_battery");
+    expect(visibleAtMin.map((c) => c.id)).not.toContain("psych.mmpi2rf_eid");
+    expect(visibleAtMin.map((c) => c.id)).not.toContain("psych.emotional_intelligence");
+    expect(visibleAtMin.map((c) => c.id)).toContain("psych.bdi2_baseline");
   });
 
   it("elite-tier candidate with MMPI EID > 65 is still review-flagged at elite tier", async () => {
@@ -116,7 +107,7 @@ describe("tier/construct-set stability (analog audit)", () => {
     expect(result.failedGates).toContain("psych.mmpi2rf_eid");
   });
 
-  it("gates on medium/elite criteria fire on missing scores (direct minimumTier comparison)", async () => {
+  it("gates on unavailable medium/elite criteria still fire if the full catalog is evaluated directly", async () => {
     const { PLACEHOLDER_CRITERIA } = await import("../../src/data/placeholder-criteria");
 
     // Score only the minimum-tier construct set (by direct minimumTier match,

@@ -35,7 +35,7 @@ Outputs should be read as conditional scenario quantities under the loaded assum
 - Stage A intervals are MCDA score intervals induced by uncertain criterion weights.
 - Stage B intervals are simulation intervals over modeled mission-to-mission variability under shared condition/trial incidence draws.
 - MCSE and rare-event precision diagnostics describe numerical simulation stability, not empirical calibration.
-- Expected duty hours lost is summarized from raw per-trial QTL before CHI is clipped to the 0-100 display scale.
+- Quality-time lost / impairment-equivalent hours are summarized from raw per-trial QTL before CHI is clipped to the 0-100 display scale. This is not scheduled duty time.
 - Severity sampling is mechanistic only until branch-specific outcome priors are adjudicated; current generated coverage is 0/101 distinct branch sets.
 - Treatment resources are depleted per resource, but RAF treatment interpolation remains a proposal-stage screening approximation.
 - Communications delay is a proposal-stage exploratory sensitivity effect and is off in default adjudicated mode.

@@ -21,11 +21,19 @@ function makeCrewMember(id: string, evaCount = 0): IMMCrewMember {
 
 function missionForCrew(base: IMMMission, crew: IMMCrewMember[]): IMMMission {
   const totalEVAs = crew.reduce((sum, member) => sum + member.EVA_count, 0);
+  const evaSchedule = totalEVAs === 0
+    ? []
+    : base.evaSchedule.length >= totalEVAs
+      ? base.evaSchedule.slice(0, totalEVAs)
+      : Array.from(
+          { length: totalEVAs },
+          (_, i) => Math.round(((i + 1) * base.durationDays) / (totalEVAs + 1)),
+        );
   return {
     ...base,
     crewSize: crew.length,
     totalEVAs,
-    evaSchedule: totalEVAs === 0 ? [] : base.evaSchedule,
+    evaSchedule,
   };
 }
 

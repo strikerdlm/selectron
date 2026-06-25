@@ -220,7 +220,7 @@ export function IMMScenarioDistributions({
       "mission. Each curve represents how often the model predicts a particular level of total " +
       "medical events (TME), crew health index (CHI), probability of emergency evacuation " +
       "(pEVAC), and probability of crew loss (pLOCL). Wider curves mean more uncertainty; " +
-      "the shaded band covers the central 90% simulation interval. The dashed line marks the most likely " +
+      "the shaded band covers the central 90% simulation interval. The dashed line marks the mean " +
       "value. Lower pEVAC and pLOCL, and higher CHI, indicate a healthier crew.",
   };
 

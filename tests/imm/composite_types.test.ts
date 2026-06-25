@@ -46,18 +46,21 @@ describe("IMM composite-crew types", () => {
     expect(noScores.stageAScores).toBeUndefined();
   });
 
-  it("IMMOutcome exposes health-criterion attainment, raw duty-hour loss, and a legacy alias", () => {
+  it("IMMOutcome exposes health-criterion attainment, raw QTL, and legacy aliases", () => {
     const scenarioSummary: ScenarioSummary = { mean: 72, ci90: [60, 85], ci95: [55, 90], sd: 8 };
     const healthCriterion: ScenarioSummary = { mean: 45, ci90: [30, 60], ci95: [25, 65], sd: 12 };
+    const qtl: ScenarioSummary = { mean: 18, ci90: [4, 30], ci95: [2, 35], sd: 6 };
     const outcome: IMMOutcome = {
       tme: scenarioSummary, chi: scenarioSummary, pEvac: scenarioSummary, pLocl: scenarioSummary,
-      dutyHoursLost: { mean: 18, ci90: [4, 30], ci95: [2, 35], sd: 6 },
+      qualityTimeLostHours: qtl,
+      dutyHoursLost: qtl,
       healthCriterionAttainment: healthCriterion,
       missionSuccess: healthCriterion,
       perConditionDrivers: [],
       convergence: { trialCheckpoints: [], sigmaChi: [], sigmaPevac: [] },
     };
     expect(outcome.healthCriterionAttainment?.mean).toBe(45);
+    expect(outcome.qualityTimeLostHours?.mean).toBe(18);
     expect(outcome.dutyHoursLost?.mean).toBe(18);
     expect(outcome.missionSuccess.mean).toBe(45);
   });

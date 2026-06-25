@@ -1,8 +1,9 @@
 // src/imm/posterior-predictive.ts
 //
-// posteriorPredictiveSimulateIMM — predictive Monte Carlo wrapper around
-// simulateIMM. Given fitted per-condition λ parameter draws, it runs T' trials
-// per draw and summarizes each metric as a predictive distribution.
+// posteriorPredictiveSimulateIMM — compatibility wrapper around simulateIMM for
+// incidence-parameter uncertainty sensitivity. Given stored per-condition λ
+// draws, it runs T' trials per draw and summarizes each metric across the
+// per-draw conditional means.
 //
 // ── How parameter draws are threaded into the engine ─────────────────────────
 // simulateIMM accepts two orthogonal controls:
@@ -13,17 +14,18 @@
 //
 //     incidenceRateOverrides[cid] = λ_d
 //
-// and leaves `kindMultipliers` as the explicit or auto-loaded mission-context
-// map. The base Gamma/Lognormal/Fixed prior is not sampled again for overridden
+// and leaves `kindMultipliers` as an explicit sensitivity context map when the
+// caller supplies one. The base Gamma/Lognormal/Fixed prior is not sampled again for overridden
 // conditions, so the draw cleanly represents fitted parameter uncertainty plus
 // ordinary event-count variation under that fixed draw.
 //
 // ── What the resulting interval is (and is not) ───────────────────────────────
 // Each λ_d is drawn from the condition's stored Gamma/Lognormal prior fit.
-// Because E[λ_d] = E[λ], the grand mean over draws stays unbiased versus the
-// point-prior pipeline; the spread of per-draw metric means is a conditional
-// posterior-predictive interval for the fitted incidence-rate draws. It still
+// The spread of per-draw metric means is a sensitivity interval over incidence
+// parameters only. It is not a complete posterior-predictive distribution and
 // does not validate the underlying evidence base or analog transportability.
+// Nonlinear downstream functions (CHI clipping, terminal outcomes, and resource
+// depletion) mean E[f(λ)] generally differs from f(E[λ]).
 
 import type {
   IMMCrewMember,

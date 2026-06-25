@@ -194,8 +194,11 @@ export const DEMO_CRITERIA: readonly Criterion[] = [
         instrument: "mCTSIB (foam pad standing × 4 conditions × 30 s) + Functional Mobility Test obstacle course (TTC, seconds)",
         citations: ["10.1007/s00221-010-2171-0"],
         scaleTransform: {
+          evidenceStatus: "unsupported",
           note: "FMT time-to-complete (seconds, lower=better) requires inverse mapping to SOT-5 EQ canonical 0–100 scale (higher=better). Empirical calibration TBD — flag for Diego.",
         },
+        scoreUse: "non-comparable",
+        constructEquivalence: "not-established",
         notes: "Mulavara 2010 ISS post-flight locomotor function validation; loses vestibular-isolation specificity of SOT-5.",
       },
       medium: {
@@ -206,6 +209,9 @@ export const DEMO_CRITERIA: readonly Criterion[] = [
       elite: {
         instrument: "NeuroCom Equitest CDP — SOT-5 Equilibrium Score (sway-referenced platform; eyes closed)",
         citations: ["10.3389/fphys.2018.01680", "10.3389/fncir.2021.723504"],
+        scoreUse: "canonical",
+        nativeScale: { min: 0, max: 100 },
+        constructEquivalence: "same-instrument",
         notes: "OCHMO reference context; 91% fall rate on R+0 in SOT-5M-challenged subjects.",
       },
     },
@@ -258,20 +264,28 @@ export const DEMO_CRITERIA: readonly Criterion[] = [
     scale: { min: -3, max: 3 },
     higherIsBetter: true,
     citations: ["10.1037/1528-3542.3.1.97"],
-    minimumTier: "medium",
+    minimumTier: "elite",
     tierInstruments: {
       minimum: {
         instrument: "TEIQue-SF (Trait Emotional Intelligence Questionnaire — Short Form; 30-item; free for research at psychometriclab.com)",
         citations: ["10.1007/978-0-387-88370-0_5"],
-        notes: "Petrides 2009 — verified via Scite (K. V. Petrides, Springer book chapter 'Psychometric Properties of the TEIQue', 1333 citations). α≈0.88; convergent validity with MSCEIT and EQ-i established in multiple meta-analyses.",
+        scoreUse: "non-comparable",
+        constructEquivalence: "not-established",
+        notes: "Petrides 2009 — verified via Scite. TEIQue-SF is a trait self-report measure; no accepted crosswalk to the MSCEIT ability z-score is implemented.",
       },
       medium: {
         instrument: "EQ-i 2.0 (MHS Inc.; self-report; ~USD 30–50/administration)",
         citations: ["10.1002/job.714"],
+        scoreUse: "non-comparable",
+        constructEquivalence: "not-established",
+        notes: "EQ-i 2.0 is a self-report emotional/social functioning scale; no accepted crosswalk to the MSCEIT ability z-score is implemented.",
       },
       elite: {
         instrument: "MSCEIT v2.0 (MHS; ability-based; 141-item; 4 branches)",
         citations: ["10.1002/job.714"],
+        scoreUse: "canonical",
+        nativeScale: { min: -3, max: 3 },
+        constructEquivalence: "same-instrument",
       },
     },
   },
@@ -297,6 +311,15 @@ export const DEMO_CRITERIA: readonly Criterion[] = [
       minimum: {
         instrument: "DASS-21 (Depression Anxiety Stress Scales, 21-item; free, public domain; Lovibond & Lovibond 1995) — TRIAGE FLAG ONLY",
         citations: [],
+        scoreUse: "triage-only",
+        nativeScale: { min: 0, max: 42 },
+        nativeHigherIsBetter: false,
+        reviewThreshold: {
+          operator: "fail-if-above",
+          value: 14,
+          note: "DASS-21 depression subscale triage threshold only; not a canonical MMPI-2-RF EID gate.",
+        },
+        constructEquivalence: "not-established",
         notes:
           "NOT a psychiatric disposition boundary at this tier. DASS-21 depression subscale ≥ 14 (severe) " +
           "should trigger external referral to a licensed mental-health professional before any real deployment decision. " +
@@ -305,10 +328,16 @@ export const DEMO_CRITERIA: readonly Criterion[] = [
       medium: {
         instrument: "MMPI-2-RF (Pearson; ~USD 15–30/administration; licensed psychologist required)",
         citations: ["10.1037/0033-2909.130.5.661"],
+        scoreUse: "canonical",
+        nativeScale: { min: 30, max: 120 },
+        constructEquivalence: "same-instrument",
       },
       elite: {
         instrument: "MMPI-2-RF (full 338-item) + supplemental psychiatric interview by clinical psychiatrist",
         citations: ["10.1037/0033-2909.130.5.661"],
+        scoreUse: "canonical",
+        nativeScale: { min: 30, max: 120 },
+        constructEquivalence: "same-instrument",
       },
     },
   },
@@ -324,25 +353,42 @@ export const DEMO_CRITERIA: readonly Criterion[] = [
     instrument: "BDI-II total score 0–63, 21 items (Beck et al. 1996); reversed",
     scale: { min: 0, max: 63 },
     higherIsBetter: false,
+    gateThreshold: { operator: "fail-if-above", value: 20 },
     citations: ["10.1207/s15327752jpa6703_13"],
     minimumTier: "minimum",
     tierInstruments: {
       minimum: {
         instrument: "PHQ-9 (Patient Health Questionnaire, 9-item; free, public domain; Kroenke & Spitzer 2001)",
         citations: ["10.1046/j.1525-1497.2001.016009606.x"],
+        nativeScale: { min: 0, max: 27 },
+        nativeHigherIsBetter: false,
         scaleTransform: {
           multiplier: 2.33,
+          evidenceStatus: "proposal",
           note: "PHQ-9 native 0–27 → ×2.33 → BDI-II canonical 0–63 scale.",
+        },
+        scoreUse: "linear-crosswalk",
+        constructEquivalence: "proposal-crosswalk",
+        reviewThreshold: {
+          operator: "fail-if-above",
+          value: 10,
+          note: "PHQ-9 moderate-symptom screen; canonical BDI-II demo review flag remains ≥20 after the proposal crosswalk.",
         },
         notes: "Kroenke & Spitzer 2001; DOI flagged for manual verification.",
       },
       medium: {
         instrument: "BDI-II (Pearson; ~USD 2–5/protocol; paper-and-pencil)",
         citations: ["10.1207/s15327752jpa6703_13"],
+        scoreUse: "canonical",
+        nativeScale: { min: 0, max: 63 },
+        constructEquivalence: "same-instrument",
       },
       elite: {
         instrument: "BDI-II serial administration (every 2–4 weeks pre-mission; trajectory slope is operative statistic)",
         citations: ["10.1207/s15327752jpa6703_13", "10.1371/journal.pone.0093298"],
+        scoreUse: "canonical",
+        nativeScale: { min: 0, max: 63 },
+        constructEquivalence: "same-instrument",
       },
     },
   },

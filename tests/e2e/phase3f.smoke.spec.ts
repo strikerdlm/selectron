@@ -105,7 +105,7 @@ test.describe("Crew Composition view", () => {
     // Wait for the badge text to flip to the Antarctic context.
     const badge = page.locator("[data-testid='mission-kind-context']");
     await expect(badge).toBeVisible();
-    await expect(badge).toContainText(/Antarctic winter-over priors/i);
+    await expect(badge).toContainText(/Antarctic proposal multipliers/i);
     // Snapshot the badge + its sibling <details> container. The
     // <details> starts closed by default — that's the canonical state.
     const region = page.locator("[data-testid='mission-kind-context']")

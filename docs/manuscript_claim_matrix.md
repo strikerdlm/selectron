@@ -15,7 +15,7 @@ These claims may be made when tied to a specific source commit, prior hash, evid
 | Stage B runs a chronological IMM-style event simulation | `src/imm/simulate.ts` tests for condition/trial shared incidence draws, chronological resource depletion, mutually exclusive terminal outcomes, overlap-aware QTL integration, and input validation |
 | The simulator reports Monte Carlo precision diagnostics | `monteCarloError`, Wilson intervals, sparse-tail flags, independent-seed replication summaries, and associated tests |
 | The current prior/evidence state is machine-readable | `research/evidence_extracted/evidence_status.json`, `src/data/evidence-status.json`, and `npm run evidence:check` |
-| The release/manuscript source can be frozen | `npm run release:freeze:check` for inspection and `npm run release:freeze` for an archival manifest |
+| The release/manuscript source can be frozen | `npm run release:freeze:check` as a hard clean/tagged-source gate and `npm run release:freeze` for an archival manifest |
 
 ## Assumption-Conditional
 
@@ -27,7 +27,7 @@ These claims require wording such as "under the loaded assumptions", "scenario e
 | Resource kits affect CHI, TME, pEVAC, or pLOCL | RAF treatment interpolation is proposal-stage screening only, not medical-kit optimization |
 | Stage-A trait coupling changes incidence | `vulnerabilityCouplingMode: "scenario"` must be explicitly enabled; default scientific runs keep it off |
 | Communications delay changes behavioral/psychiatric incidence | `profileEffectMode: "exploratory"` must be explicitly enabled; current coefficient is proposal-stage |
-| Expected duty hours lost are reported | Interpret as raw-QTL simulation output before CHI display clamping, not observed duty-time prediction |
+| Quality-time lost / impairment-equivalent hours are reported | Interpret as raw-QTL simulation output before CHI display clamping, not observed scheduled-duty-time prediction |
 
 ## Empirically Unvalidated
 

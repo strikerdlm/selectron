@@ -5,6 +5,10 @@ export type CriterionInstrument = {
   instrument: string;
   /** Verified DOIs for THIS instrument's validation literature. */
   citations: string[];
+  /** Native instrument scale shown to the operator when a scoreable crosswalk exists. */
+  nativeScale?: { min: number; max: number };
+  /** Native instrument direction. Defaults to the criterion's canonical direction. */
+  nativeHigherIsBetter?: boolean;
   /**
    * Linear or note-only transform from the instrument's native scale to the
    * Criterion's canonical scale. E.g. PHQ-9 (0–27) → BDI-II canonical (0–63)
@@ -14,7 +18,18 @@ export type CriterionInstrument = {
   scaleTransform?: {
     multiplier?: number;
     note?: string;
+    evidenceStatus?: "accepted" | "proposal" | "unsupported";
   };
+  /**
+   * Whether this tier instrument can produce a canonical score for the demo
+   * MCDA. Non-comparable and triage-only instruments are displayed for
+   * governance but are not forced onto the canonical scale.
+   */
+  scoreUse?: "canonical" | "linear-crosswalk" | "triage-only" | "non-comparable";
+  /** Tier-specific review rule on native units, when one exists. */
+  reviewThreshold?: { operator: "fail-if-below" | "fail-if-above"; value: number; note?: string };
+  /** Construct-equivalence status between the tier instrument and the canonical criterion. */
+  constructEquivalence?: "same-instrument" | "validated-crosswalk" | "proposal-crosswalk" | "not-established";
   /** Tier-specific caveats, such as triage-only instruments that require external clinical review. */
   notes?: string;
 };

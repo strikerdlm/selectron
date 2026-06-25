@@ -172,7 +172,7 @@ Navigation is via the top header. Five primary views:
 2. Click **New candidate**.
 3. You are taken to the Wizard (Step 1 — Identity).
 
-Alternatively, click **Generate synthetic** to seed a random demo candidate with scores across all 11 demo criteria.
+Alternatively, click **Generate synthetic** to seed a random demo candidate with scores across the demo criteria.
 
 ### 5.2 Filter and open existing candidates
 
@@ -201,7 +201,7 @@ Open the candidate card menu → **Delete**. This removes the candidate and asso
 
 ## 6. Step-by-step: Candidate Wizard (Stage A)
 
-The Wizard has **four steps**. It scores **one candidate** under the demo MCDA catalog (`src/data/demo-criteria.ts`, 11 criteria). It does **not** run IMM simulation.
+The Wizard has **four steps**. It scores **one candidate** under the demo MCDA catalog (`src/data/demo-criteria.ts`, 11 criteria total; lower tiers may expose fewer scoreable criteria when no valid crosswalk exists). It does **not** run IMM simulation.
 
 ### Step 1 — Identity
 
@@ -211,13 +211,13 @@ The Wizard has **four steps**. It scores **one candidate** under the demo MCDA c
 
 ### Step 2 — Criteria scores
 
-1. Review the **11 demo criteria** grouped by family (psychological, cognitive, physical, behavioral).
+1. Review the scoreable demo criteria for the selected access tier, grouped by family (psychological, cognitive, physical, behavioral).
 2. For each criterion, enter the **raw instrument value** on its documented scale (e.g., MMPI-2-RF T-scores, NASA Cognition composite).
 3. Expand a row to see instrument tier notes, citations, and mini-figures.
 4. Missing values **block** progression — the wizard no longer silently imputes worst-case scores.
 5. Click **Continue** when all required fields are complete.
 
-**Access tier selector** (top of wizard): Minimum / Medium / Elite changes displayed instrument metadata only; the criterion set and Dirichlet mean weights stay fixed in v0.6.
+**Access tier selector** (top of wizard): Minimum / Medium / Elite changes which instruments can produce canonical MCDA scores. Non-comparable substitutes such as DASS-21, TEIQue-SF, and FMT are documented but not forced onto MMPI-2-RF, MSCEIT, or SOT scales.
 
 **Gate criteria** (informational in Wizard; enforced in Crew Composition):
 
@@ -298,7 +298,7 @@ Failed gates are **review flags**; the sim can still run unless you choose to ex
    - Composite crew health criterion attainment
    - MCSE/Wilson/sparse-tail stopping-rule status and independent-seed replication status
    - CHI clamp count/proportion
-   - Expected duty hours lost from raw per-trial QTL before CHI display clamping
+   - Quality-time lost / impairment-equivalent hours from raw per-trial QTL before CHI display clamping
    - Evidence coverage statement (`accepted: N / M params · unadjudicated`)
    - Mission evidence grade
 
@@ -465,7 +465,7 @@ For the current prediction boundary, see the model card: [`docs/model_card.md`](
 | `npm run guard:active-imports` | Block archived `src/risk` imports in active paths |
 | `npm run validate:imm` | K15 reference-model regression (CLI) |
 | `npm run validate:imm:analog` | Analog archetype regression tests |
-| `npm run release:freeze:check` | Print exact commit, prior hash, and evidence snapshot for manuscript/release freeze |
+| `npm run release:freeze:check` | Hard clean/tagged-source gate that prints exact commit, prior hash, evidence snapshot, and freeze artifact hashes |
 | `npm run release:freeze` | Write the release-freeze manifest to `verification-artifacts/` for archival upload |
 | `npm run calibrate:imm` | TypeScript IMM prior calibration script |
 | `npm run e2e` | Playwright browser tests |
@@ -486,7 +486,7 @@ The Python package supports offline calibration and screening analyses. Its forw
 | **CHI** | Crew Health Index — functional impairment aggregate |
 | **pEVAC** | Probability of mission evacuation due to medical event |
 | **pLOCL** | Probability of loss of crew life |
-| **QTL** | Quality time lost (duty hours), exposed as expected duty hours lost from raw per-trial QTL before CHI display clamping |
+| **QTL** | Quality time lost, exposed as impairment-equivalent hours from raw per-trial QTL before CHI display clamping |
 | **Composite attainment** | P(no LOCL ∧ no EVAC ∧ CHI > χ*) |
 | **MCDA interval** | Percentile band of Stage A score under weight uncertainty |
 | **Simulation interval** | Percentile band of simulated mission-to-mission variability under current assumptions; not a confidence interval for real analog outcomes |

@@ -8,9 +8,9 @@ import { isCriterionAvailableAtTier, TIER_LABEL } from "@/types";
 export function StepCriteria() {
   const { criterionEntries, accessTier, markStepCompleted, setStep } = useWizard();
 
-  // Analog-audit correction: tiers change instrument fidelity, not construct
-  // inclusion. `isCriterionAvailableAtTier` now keeps the construct set stable
-  // so Dirichlet mean weights do not change simply because K changed by tier.
+  // Scientific-audit correction: lower tiers must not force non-comparable
+  // instruments onto canonical scales. Criteria with no scoreable tier
+  // instrument are unavailable until an accepted or proposal crosswalk exists.
   const visibleCriteria = useMemo(
     () => DEMO_CRITERIA.filter((c) => isCriterionAvailableAtTier(c.minimumTier, accessTier)),
     [accessTier],
@@ -54,7 +54,7 @@ export function StepCriteria() {
           </span>
         </div>
         <p className="mono mt-2 text-[12px] text-ink-3 leading-relaxed">
-          tier <span className="text-signal">{TIER_LABEL[accessTier]}</span> uses tier-specific instruments while preserving the same construct set.
+          tier <span className="text-signal">{TIER_LABEL[accessTier]}</span> uses only scoreable tier instruments; non-comparable substitutes are documented but not scored.
         </p>
       </div>
 

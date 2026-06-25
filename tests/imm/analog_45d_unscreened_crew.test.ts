@@ -33,8 +33,8 @@
 //     risk elevation asserted below is driven by all four psych/cognitive
 //     scores jointly, not by emotional_stability + conscientiousness alone.
 //
-// The test demonstrates, on the real calibrated engine (auto-loaded
-// analog-controlled kind_multipliers included):
+// The test demonstrates, on the real engine with proposal-stage mission-kind
+// multipliers left off by default:
 //   (1) selection gates would disqualify the unscreened crew (and pass the
 //       screened control),
 //   (2) the Stage-A composite is materially lower (the technical-competence
@@ -99,6 +99,7 @@ const UNSCREENED_OVERRIDES: Record<string, number> = {
   "psych.conscientiousness": 0, //     0 on 0–100, higherIsBetter
   "professional.technical_competence": 1, // 1 on 1–10, higherIsBetter
   "psych.mmpi2rf_eid": 90, //          T-score; gate fails ABOVE 65 (reversed scale)
+  "psych.bdi2_baseline": 35, //        BDI-II; gate fails ABOVE 20
   "cognitive.nasa_cognition_battery": -2.5, // z; gate fails BELOW −2.0
 };
 
@@ -108,6 +109,7 @@ const SCREENED_OVERRIDES: Record<string, number> = {
   "psych.conscientiousness": 90,
   "professional.technical_competence": 9,
   "psych.mmpi2rf_eid": 35,
+  "psych.bdi2_baseline": 5,
   "cognitive.nasa_cognition_battery": 1.0,
 };
 
@@ -121,10 +123,20 @@ const unscreenedCrew = makeCrew(UNSCREENED_OVERRIDES);
 const screenedCrew = makeCrew(SCREENED_OVERRIDES);
 
 function missionForCrew(base: IMMMission, crew: IMMCrewMember[]): IMMMission {
+  const totalEVAs = crew.reduce((sum, member) => sum + member.EVA_count, 0);
+  const evaSchedule = totalEVAs === 0
+    ? []
+    : base.evaSchedule.length >= totalEVAs
+      ? base.evaSchedule.slice(0, totalEVAs)
+      : Array.from(
+          { length: totalEVAs },
+          (_, i) => Math.round(((i + 1) * base.durationDays) / (totalEVAs + 1)),
+        );
   return {
     ...base,
     crewSize: crew.length,
-    totalEVAs: crew.reduce((sum, member) => sum + member.EVA_count, 0),
+    totalEVAs,
+    evaSchedule,
   };
 }
 

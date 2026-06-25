@@ -9,7 +9,7 @@
 // Commit 5: polish + a11y.
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import type { IMMCrewMember, CrewCompositeMethod, IMMOutcome, VulnerabilityCouplingMode, ProfileEffectMode } from "../../imm/types";
+import type { IMMCrewMember, CrewCompositeMethod, IMMOutcome, VulnerabilityCouplingMode, ProfileEffectMode, KindMultiplierMode } from "../../imm/types";
 import { ACTIVE_CRITERION_CATALOG } from "../../data/demo-criteria";
 import { ACTIVE_MISSIONS } from "../../data/imm-missions";
 import type { IMMMission } from "../../imm/types";
@@ -60,7 +60,7 @@ type SimState = "idle" | "running" | "done" | "error";
 type PpState = "idle" | "running" | "done" | "api-error" | "compute-error";
 
 // 2026-06-04 (I6): mission kinds that carry a `kind_multipliers` block in the
-// calibrated priors — the only kinds for which `/posterior/draws` returns
+// stored incidence-prior draws — the only kinds for which `/posterior/draws` returns
 // per-condition parameter draws. For other kinds the endpoint returns empty
 // draws and the uncertainty figure adds nothing, so we skip the fetch+sim entirely.
 const POSTERIOR_KINDS = new Set(["antarctic-station", "analog-controlled"]);
@@ -146,16 +146,15 @@ const INITIAL_CREW: IMMCrewMember[] = [
 ];
 
 /**
- * 2026-06-04 mission-kind context label. Surfaces the active prior-calibration
- * context so the user knows whether the engine is running controlled-habitat
- * priors or Antarctic winter-over priors. Each label maps
+ * 2026-06-04/25 mission-kind context label. Surfaces the available proposal
+ * context without implying it is active in default/adjudicated runs. Each label maps
  * 1-to-1 to a key in `imm-priors.json::global_calibration.kind_multipliers`.
  */
 function missionKindContextLabel(kind: import("../../imm/types").IMMMissionKind): string {
   switch (kind) {
     case "leo-iss":         return "Context: ISS developer benchmark";
-    case "analog-controlled": return "Context: Controlled-habitat priors";
-    case "antarctic-station": return "Context: Antarctic winter-over priors (Bhatia/Palinkas anchored)";
+    case "analog-controlled": return "Context: controlled-habitat proposal multipliers available";
+    case "antarctic-station": return "Context: Antarctic proposal multipliers available";
     case "analog-isolation":  return "Context: legacy analog (no kind multiplier; 1.0 fallthrough)";
     case "lunar-artemis-future": return "Context: future (not yet supported)";
     case "interplanetary-mars-future": return "Context: future (not yet supported)";
@@ -178,10 +177,10 @@ function kindShortLabel(kind: import("../../imm/types").IMMMissionKind): string 
 }
 
 /**
- * 2026-06-04: per-(mission-kind, condition) multiplier map resolved from
+ * 2026-06-04/25: per-(mission-kind, condition) proposal multiplier map resolved from
  * `imm-priors.json::global_calibration.kind_multipliers[mission.kind]`.
- * Falls through to an empty object for kinds without an entry (leo-iss,
- * analog-isolation, future kinds) so the engine default of 1.0 applies.
+ * Display-only unless the operator selects exploratory mode or a worker call
+ * passes it as an explicit custom sensitivity map.
  */
 function useKindMultipliers(kind: import("../../imm/types").IMMMissionKind): Record<string, number> {
   return useMemo(
@@ -201,6 +200,7 @@ interface CrewState {
   couplingMode: VulnerabilityCouplingMode;
   familyBetaScale: number;
   profileEffectMode: ProfileEffectMode;
+  kindMultiplierMode: KindMultiplierMode;
 }
 
 const INITIAL_STATE: CrewState = {
@@ -214,6 +214,7 @@ const INITIAL_STATE: CrewState = {
   couplingMode: "off",
   familyBetaScale: 1.0,
   profileEffectMode: "adjudicated",
+  kindMultiplierMode: "adjudicated",
 };
 
 // ─── localStorage autosave (Diego 2026-05-29) ────────────────────────────────
@@ -238,6 +239,7 @@ function persistCrewState(s: CrewState): void {
         couplingMode: s.couplingMode,
         familyBetaScale: s.familyBetaScale,
         profileEffectMode: s.profileEffectMode,
+        kindMultiplierMode: s.kindMultiplierMode,
       }),
     );
   } catch {
@@ -260,6 +262,7 @@ function loadPersistedCrewState(): CrewState | null {
       couplingMode: VulnerabilityCouplingMode;
       familyBetaScale: number;
       profileEffectMode: ProfileEffectMode;
+      kindMultiplierMode: KindMultiplierMode;
     }>;
     if (!Array.isArray(p.members) || !p.mission) return null;
     const kit =
@@ -277,6 +280,7 @@ function loadPersistedCrewState(): CrewState | null {
       couplingMode: p.couplingMode ?? INITIAL_STATE.couplingMode,
       familyBetaScale: p.familyBetaScale ?? INITIAL_STATE.familyBetaScale,
       profileEffectMode: p.profileEffectMode ?? INITIAL_STATE.profileEffectMode,
+      kindMultiplierMode: p.kindMultiplierMode ?? INITIAL_STATE.kindMultiplierMode,
     };
   } catch {
     return null;
@@ -311,6 +315,16 @@ function makeDefaultMember(id: string): IMMCrewMember {
     EVA_count: 0,
     stageAScores: defaultScores({ default: 0.65 }),
   };
+}
+
+function resizeEvaSchedule(mission: IMMMission, totalEVAs: number): number[] {
+  if (totalEVAs <= 0) return [];
+  if (mission.evaSchedule.length === totalEVAs) return mission.evaSchedule;
+  if (mission.evaSchedule.length > totalEVAs) return mission.evaSchedule.slice(0, totalEVAs);
+  return Array.from(
+    { length: totalEVAs },
+    (_, i) => Math.round(((i + 1) * mission.durationDays) / (totalEVAs + 1)),
+  );
 }
 
 export function CrewComposition() {
@@ -371,7 +385,13 @@ export function CrewComposition() {
     [state.members],
   );
   const simulationMission = useMemo(
-    () => ({ ...state.mission, crewSize: state.members.length, totalEVAs }),
+    () => ({
+      ...state.mission,
+      crewSize: state.members.length,
+      totalEVAs,
+      evaSchedule: resizeEvaSchedule(state.mission, totalEVAs),
+      evaAssignments: undefined,
+    }),
     [state.mission, state.members.length, totalEVAs],
   );
 
@@ -428,17 +448,18 @@ export function CrewComposition() {
         vulnerabilityCouplingMode: state.couplingMode,
         familyBetaScale: state.familyBetaScale,
         profileEffectMode: state.profileEffectMode,
+        kindMultiplierMode: state.kindMultiplierMode,
       });
     }, 400);
     return () => {
       clearTimeout(handle);
       if (previewWorkerRef.current) { previewWorkerRef.current.terminate(); previewWorkerRef.current = null; }
     };
-  }, [state.members, simulationMission, state.kit, state.seed, state.chiStar, state.couplingMode, state.familyBetaScale, state.profileEffectMode]);
+  }, [state.members, simulationMission, state.kit, state.seed, state.chiStar, state.couplingMode, state.familyBetaScale, state.profileEffectMode, state.kindMultiplierMode]);
 
-  // ── I6 (2026-06-04): analog prior-uncertainty predictive effect ───────────
+  // ── I6 (2026-06-04/25): analog incidence-parameter sensitivity ───────────
   // Fetch per-condition λ draws from the Python calibration API, then
-  // run a predictive Monte Carlo sweep in the worker (NEVER on the main
+  // run an incidence-parameter sensitivity sweep in the worker (NEVER on the main
   // thread — the sweep is nDraws × trialsPerDraw trials). Mirrors the preview
   // effect above: debounced (400 ms), race-guarded (ppReqRef), cleanup-safe.
   // Two extra teardowns over the preview effect: an AbortController for the fetch
@@ -511,6 +532,7 @@ export function CrewComposition() {
               trialsPerDraw: 200,
               seed: state.seed,
               kindMultipliers,
+              kindMultiplierMode: "custom",
               vulnerabilityCouplingMode: state.couplingMode,
               familyBetaScale: state.familyBetaScale,
               profileEffectMode: state.profileEffectMode,
@@ -530,7 +552,7 @@ export function CrewComposition() {
       if (ppAbortRef.current) { ppAbortRef.current.abort(); ppAbortRef.current = null; }
       if (ppWorkerRef.current) { ppWorkerRef.current.terminate(); ppWorkerRef.current = null; }
     };
-  }, [state.members, simulationMission, state.kit, state.seed, state.couplingMode, state.familyBetaScale, state.profileEffectMode, kindMultipliers]);
+  }, [state.members, simulationMission, state.kit, state.seed, state.couplingMode, state.familyBetaScale, state.profileEffectMode, state.kindMultiplierMode, kindMultipliers]);
 
   function toggleMember(id: string) {
     setExpandedIds((prev) => {
@@ -663,8 +685,9 @@ export function CrewComposition() {
       vulnerabilityCouplingMode: state.couplingMode,
       familyBetaScale: state.familyBetaScale,
       profileEffectMode: state.profileEffectMode,
+      kindMultiplierMode: state.kindMultiplierMode,
     });
-  }, [simState, state.members, simulationMission, state.kit, state.trials, state.seed, state.chiStar, state.couplingMode, state.familyBetaScale, state.profileEffectMode]);
+  }, [simState, state.members, simulationMission, state.kit, state.trials, state.seed, state.chiStar, state.couplingMode, state.familyBetaScale, state.profileEffectMode, state.kindMultiplierMode]);
 
   // ── worker cleanup on unmount ───────────────────────────────────────────
   useEffect(() => {
@@ -732,8 +755,9 @@ export function CrewComposition() {
            configure crew / mission / scenario; replaced by the authoritative
            T=100,000 run when one is present. */}
       {(() => {
-        const dutyHoursLost = readoutOutcome
-          ? readoutOutcome.dutyHoursLost?.mean
+        const qualityTimeLostHours = readoutOutcome
+          ? readoutOutcome.qualityTimeLostHours?.mean
+            ?? readoutOutcome.dutyHoursLost?.mean
             ?? ((100 - readoutOutcome.chi.mean) / 100) * state.mission.durationDays * 24 * state.members.length
           : 0;
         const healthCriterion = readoutOutcome
@@ -759,7 +783,7 @@ export function CrewComposition() {
                       </span>
                       <span className="mono text-xs text-ink-2">CHI %</span>
                       <span className="mono text-[13px] text-ink-3 ml-1">
-                        {dutyHoursLost.toFixed(0)} duty hours lost
+                        {qualityTimeLostHours.toFixed(0)} impairment-equivalent hours
                       </span>
                     </div>
                   ) : (
@@ -870,9 +894,11 @@ export function CrewComposition() {
                   {ISOLATION_CONFINEMENT_EXPOSURE_MODELED ? " · I&C pilot active" : ""}
                 </summary>
                 <p className="leading-relaxed mt-1 text-ink-2">
-                  Duration, mission kind, ISS/future space-EVA schedule, kit, and{" "}
+                  Duration, explicit space-EVA schedule for LEO/future missions, kit, and{" "}
                   <span className="text-ink-1">comms delay → behavioral/psychiatric incidence</span>{" "}
-                  (pilot) drive the simulator. Remaining profile fields are{" "}
+                  (exploratory pilot only) can drive the simulator. Mission-kind
+                  multipliers are proposal-stage and only active when selected below.
+                  Remaining profile fields are{" "}
                   <span className="text-warn">descriptive only; no modeled effect</span>{" "}
                   (registry v{PROFILE_MAPPING_VERSION}).
                 </p>
@@ -919,10 +945,11 @@ export function CrewComposition() {
                 <p className="leading-relaxed">
                   Per-(mission-kind, condition) multipliers from Bhatia 2012,
                   Palinkas 2004, Pattarini 2016, Hong 2022, Peřina 2024, and
-                  Nirwan 2022 modulate the base prior <em>after</em> the
+                  Nirwan 2022 are proposal-stage sensitivity inputs. They modulate the base prior <em>after</em> the
                   tier-A/B/C multiplier and <em>before</em> risk-factor and
-                  scenario trait-coupling multipliers when enabled. The label
-                  above names the active prior-calibration context; the table
+                  scenario trait-coupling multipliers only when Mission-kind multipliers
+                  is set to exploratory or when an explicit custom map is supplied. The label
+                  above names the available context; the table
                   below lists the per-condition multipliers with citations and
                   confidence.
                 </p>
@@ -1099,6 +1126,38 @@ export function CrewComposition() {
                     setState((s) => ({
                       ...s,
                       profileEffectMode: e.target.value as ProfileEffectMode,
+                    }));
+                    setOutcome(undefined);
+                    setSimState("idle");
+                  }}
+                >
+                  <option value="adjudicated">adjudicated</option>
+                  <option value="off">off</option>
+                  <option value="exploratory">exploratory</option>
+                </select>
+              </div>
+
+              <div className="flex items-center justify-between gap-3 border border-line/60 rounded px-3 py-2">
+                <div className="flex flex-col">
+                  <label htmlFor="kind-multiplier-mode" className="mono text-[12px] text-ink-2">
+                    Mission-kind multipliers
+                  </label>
+                  <span className="mono text-[10px] text-ink-3">
+                    {state.kindMultiplierMode === "exploratory"
+                      ? "proposal multipliers active"
+                      : state.kindMultiplierMode === "off"
+                        ? "zero-effect control"
+                        : "accepted effects only"}
+                  </span>
+                </div>
+                <select
+                  id="kind-multiplier-mode"
+                  className="mono text-[11px] border border-line/60 bg-transparent text-ink-1 px-2 py-1"
+                  value={state.kindMultiplierMode}
+                  onChange={(e) => {
+                    setState((s) => ({
+                      ...s,
+                      kindMultiplierMode: e.target.value as KindMultiplierMode,
                     }));
                     setOutcome(undefined);
                     setSimState("idle");
@@ -1310,7 +1369,7 @@ export function CrewComposition() {
       )}
 
       {/* ── Analog-mission context — NOT gated on `outcome` (2026-06-05). The
-          kind-multipliers table reads only the static calibrated priors, and
+          kind-multipliers table reads only static proposal multipliers, and
           the I6 parameter-draw layer consumes the calibration API + the worker
           predictive sweep above — both independent of the main
           T=100k run. Previously these sat inside the figures region, so every
@@ -1330,18 +1389,18 @@ export function CrewComposition() {
           <h3 className="label text-ink-1 uppercase tracking-cap mb-3">
             Kind multipliers · {missionKindContextLabel(state.mission.kind)}
           </h3>
-          <KindMultipliersTable kind={state.mission.kind} />
+          <KindMultipliersTable kind={state.mission.kind} mode={state.kindMultiplierMode} />
         </div>
 
-        {/* I6 — analog predictive incidence uncertainty, gated on the eligible kinds
+        {/* I6 — analog incidence-parameter uncertainty sensitivity, gated on the eligible kinds
             (antarctic-station / analog-controlled) that carry a kind_multipliers
-            block in the calibrated priors. The draws are fetched from the optional
-            Python calibration API and the predictive sweep runs in the
+            block in the stored incidence priors. The draws are fetched from the optional
+            Python calibration API and the sensitivity sweep runs in the
             worker; the panel degrades gracefully when the API is unreachable. */}
         {POSTERIOR_KINDS.has(state.mission.kind) && (
           <div className="panel" data-testid="imm-i6-posterior">
             <h3 className="label text-ink-1 uppercase tracking-cap mb-4">
-              I6 · Predictive Incidence Uncertainty
+              I6 · Incidence-Parameter Sensitivity
             </h3>
             {ppState === "running" && !ppDraws && (
               <p className="text-[11px] italic text-ink-3">
@@ -1350,7 +1409,7 @@ export function CrewComposition() {
             )}
             {ppState === "running" && ppDraws && (
               <p className="text-[11px] italic text-ink-3">
-                running predictive sweep ({Math.min(64, ppDraws.n_draws)} draws × 200 trials per draw)…
+                running incidence-parameter sensitivity sweep ({Math.min(64, ppDraws.n_draws)} draws × 200 trials per draw)…
               </p>
             )}
             {ppState === "api-error" && (
@@ -1362,7 +1421,7 @@ export function CrewComposition() {
             )}
             {ppState === "compute-error" && (
               <p className="text-[11px] italic text-ink-3">
-                predictive sweep failed{ppError ? `: ${ppError}` : " (unknown error)"}.
+                incidence-parameter sensitivity sweep failed{ppError ? `: ${ppError}` : " (unknown error)"}.
               </p>
             )}
             {ppState === "done" && ppDraws && ppOutcome && (
@@ -1377,7 +1436,7 @@ export function CrewComposition() {
               <p className="text-[11px] italic text-ink-3">
                 No per-condition parameter draws for kind "{state.mission.kind}" — this
                 is expected for mission kinds without a kind_multipliers block in the
-                calibrated priors.
+                stored incidence priors.
               </p>
             )}
           </div>
@@ -1434,6 +1493,7 @@ export function CrewComposition() {
                 couplingMode: state.couplingMode,
                 familyBetaScale: state.familyBetaScale,
                 profileEffectMode: state.profileEffectMode,
+                kindMultiplierMode: state.kindMultiplierMode,
                 chiStar: state.chiStar,
                 aggregator: state.aggregator,
                 criterionCatalogId: ACTIVE_CRITERION_CATALOG.id,
@@ -1495,6 +1555,7 @@ export function CrewComposition() {
               couplingMode: s.couplingMode ?? cur.couplingMode,
               familyBetaScale: s.familyBetaScale ?? cur.familyBetaScale,
               profileEffectMode: s.profileEffectMode ?? cur.profileEffectMode,
+              kindMultiplierMode: s.kindMultiplierMode ?? cur.kindMultiplierMode,
               chiStar: s.chiStar ?? cur.chiStar,
               aggregator: s.aggregator ?? cur.aggregator,
             }));
@@ -1552,6 +1613,7 @@ export function CrewComposition() {
               couplingMode: state.couplingMode,
               familyBetaScale: state.familyBetaScale,
               profileEffectMode: state.profileEffectMode,
+              kindMultiplierMode: state.kindMultiplierMode,
               chiStar: state.chiStar,
               aggregator: state.aggregator,
               // F3: catalog + prior/multiplier provenance

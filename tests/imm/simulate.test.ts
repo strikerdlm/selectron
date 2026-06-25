@@ -832,15 +832,51 @@ describe("simulateIMM healthCriterionAttainment (IC-4)", () => {
     expect(a.healthCriterionAttainment!.sd).toBe(b.healthCriterionAttainment!.sd);
   });
 
-  it("reports dutyHoursLost from raw QTL before CHI display clamping", () => {
+  it("reports qualityTimeLostHours from raw QTL before CHI display clamping", () => {
     const out = simulateIMM({ crew: oneCrew, mission: oneDayMission, kit: IMM_KITS.issHMS, trials: 1000, seed: 0xd00d });
-    expect(out.dutyHoursLost?.mean).toBeGreaterThanOrEqual(0);
-    expect(Number.isFinite(out.dutyHoursLost?.mean)).toBe(true);
+    expect(out.qualityTimeLostHours?.mean).toBeGreaterThanOrEqual(0);
+    expect(Number.isFinite(out.qualityTimeLostHours?.mean)).toBe(true);
+    expect(out.dutyHoursLost?.mean).toBe(out.qualityTimeLostHours?.mean);
     if ((out.chiClamp?.count ?? 0) === 0) {
       const denomHours = oneDayMission.durationDays * 24 * oneCrew.length;
-      const dutyHoursFromChi = ((100 - out.chi.mean) / 100) * denomHours;
-      expect(out.dutyHoursLost!.mean).toBeCloseTo(dutyHoursFromChi, 8);
+      const qtlHoursFromChi = ((100 - out.chi.mean) / 100) * denomHours;
+      expect(out.qualityTimeLostHours!.mean).toBeCloseTo(qtlHoursFromChi, 8);
     }
+  });
+
+  it("preserves explicit EVA assignment day for EVA-coupled event timing", () => {
+    const crew: IMMCrewMember[] = [{ ...oneCrew[0], EVA_eligible: true, EVA_count: 1 }];
+    const baseMission: IMMMission = {
+      id: "eva-timing",
+      label: "EVA timing",
+      kind: "leo-iss",
+      durationDays: 10,
+      crewSize: 1,
+      totalEVAs: 1,
+      evaSchedule: [1],
+    };
+    const conditionId = "fingernail-delamination";
+    const common = {
+      crew,
+      kit: IMM_KITS.none,
+      trials: 1,
+      seed: 0xabc123,
+      conditionFilter: (c: import("../../src/imm/types").IMMCondition) => c.id === conditionId,
+      kindMultipliers: { [conditionId]: 1_000_000 },
+    };
+
+    const early = simulateIMM({
+      ...common,
+      mission: { ...baseMission, evaAssignments: [{ day: 1, memberIds: ["c1"], type: "iss-reference" }] },
+    });
+    const late = simulateIMM({
+      ...common,
+      mission: { ...baseMission, evaAssignments: [{ day: 9, memberIds: ["c1"], type: "iss-reference" }] },
+    });
+
+    expect(early.tme.mean).toBe(1);
+    expect(late.tme.mean).toBe(1);
+    expect(late.qualityTimeLostHours!.mean).toBeLessThan(early.qualityTimeLostHours!.mean);
   });
 });
 
@@ -969,12 +1005,10 @@ describe("σ<5% convergence (M18/A22 rule)", () => {
 // ── 2026-06-04 Antarctic vs controlled-habitat kind_multipliers ────────────────
 //
 // Mirrors the priors-rev3-b tier multiplier block above. The engine exposes
-// `IMMTrialOpts.kindMultipliers?: Record<conditionId, number>` and the public
-// `simulateIMM({ kindMultipliers? })` wrapper auto-loads the per-kind map from
-// `imm-priors.json::global_calibration.kind_multipliers[mission.kind]`. Default
-// is 1.0 for any condition not listed, so K15 ISS runs (kind=leo-iss) are
-// unaffected — the kind_multipliers block has no `leo-iss` entry and the
-// engine falls through.
+// `IMMTrialOpts.kindMultipliers?: Record<conditionId, number>` for explicit
+// operator-selected maps. Proposal-stage mission-kind maps are no longer
+// applied by default; exploratory mode opts into
+// `imm-priors.json::global_calibration.kind_multipliers[mission.kind]`.
 describe("kind_multipliers: per-(kind, condition) incidence modulation", () => {
   const issMission = IMM_MISSIONS.find(m => m.id === "iss-6mo")!;
   const k15Crew: IMMCrewMember[] = [
@@ -989,11 +1023,9 @@ describe("kind_multipliers: per-(kind, condition) incidence modulation", () => {
   const TR = 3_000;
 
   it("kindMultipliers=1.0 reproduces baseline TME exactly (K15 invariance canary)", () => {
-    // Run the same K15 setup twice — once with explicit 1.0 kindMultipliers and
-    // once with kindMultipliers omitted — they must agree bit-exactly because
-    // the public wrapper's default (1.0 fallthrough) matches the explicit
-    // override. This is the canary that the new code path did not drift the
-    // calibrated K15 reference.
+    // Run the same K15 setup twice: explicit 1.0 kindMultipliers and omitted
+    // kindMultipliers. They must agree bit-exactly because default/adjudicated
+    // mode leaves proposal-stage kind multipliers off.
     const explicit = simulateIMM({
       crew: k15Crew, mission: issMission, kit: IMM_KITS.issHMS, trials: TR, seed: 0xc0ffee, ...ONES,
       kindMultipliers: {},  // explicit empty → all 1.0 fallthrough
@@ -1006,16 +1038,13 @@ describe("kind_multipliers: per-(kind, condition) incidence modulation", () => {
   });
 
   it("K15 ISS run: kindMultipliers has no effect when mission.kind=leo-iss (no entry in JSON)", () => {
-    // Even with an aggressive kindMultipliers map passed via opts, an ISS run
-    // should be bit-identical to a no-map run UNLESS the caller threads the
-    // map explicitly. The public wrapper only auto-applies the map when
-    // mission.kind has an entry in JSON, so a leo-iss run with no explicit
-    // kindMultipliers gets the 1.0 fallthrough and reproduces the baseline.
+    // An ISS run with no explicit kindMultipliers should use the adjudicated
+    // zero-effect baseline. K15 must remain independent of proposal-stage
+    // mission-kind maps unless a caller explicitly supplies one.
     const baseline = simulateIMM({
       crew: k15Crew, mission: issMission, kit: IMM_KITS.issHMS, trials: TR, seed: 0xc0ffee, ...ONES,
     });
-    // Auto-loaded wrapper finds no "leo-iss" entry in JSON, so the engine
-    // multiplies by 1.0 for every condition and the run is unchanged.
+    // Default/adjudicated mode has no proposal kind effect.
     expect(Math.abs(baseline.tme.mean - baseline.tme.mean)).toBeLessThan(1e-9); // tautology, intent
     // The real check: the run produced a sane K15 TME in the calibrated range.
     // Per STATUS.md, post-rev3-e/f K15 issHMS TME is 98.06 ± headroom. We
@@ -1072,23 +1101,20 @@ describe("kind_multipliers: per-(kind, condition) incidence modulation", () => {
   });
 
   it("analog-controlled kindMultipliers reduces TME relative to no-mission (no extreme-cold, no altitude-sickness, etc.)", () => {
-    // Build a longer controlled-mission run (90d) with full kind_multipliers
-    // applied. The 14d window is too short for the chronic-illness conditions
-    // (depression, anxiety, frostbite, etc.) to fire often enough to register
-    // a TME delta. 90d is enough for the cumulative effect to be visible.
-    //
-    // Key: the baseline must DISABLE the auto-load by passing an explicit
-    // `kindMultipliers: {}` (1.0 fallthrough). Otherwise both runs apply the
-    // same controlled multipliers from JSON and the TME is bit-identical.
-    const controlled90d = { ...IMM_MISSIONS.find(m => m.id === "analog-90d")!, totalEVAs: 12 };
+    // Build a longer controlled-mission run (90d) with explicit proposal
+    // kind_multipliers applied. The 14d window is too short for the
+    // chronic-illness conditions (depression, anxiety, frostbite, etc.) to
+    // fire often enough to register a TME delta.
+    const baseMission = IMM_MISSIONS.find(m => m.id === "analog-90d")!;
+    const controlled90d = { ...baseMission, totalEVAs: 12, evaSchedule: baseMission.evaSchedule.slice(0, 12) };
     const baseline = simulateIMM({
       crew: k15Crew, mission: controlled90d, kit: IMM_KITS.none, trials: TR, seed: 0xc0ffee, ...ONES,
-      kindMultipliers: {},  // DISABLE auto-load — every condition gets 1.0
+      kindMultipliers: {},  // explicit zero-effect baseline
     });
     const controlled = simulateIMM({
       crew: k15Crew, mission: controlled90d, kit: IMM_KITS.none, trials: TR, seed: 0xc0ffee, ...ONES,
-      // Apply the controlled multiplier map directly. This bypasses the
-      // mission-kind auto-load and exercises the mechanism.
+      // Apply the controlled multiplier map directly and exercise the
+      // operator-selected mechanism.
       kindMultipliers: {
         "respiratory-infection": 0.5,
         "depression": 0.5,
@@ -1108,28 +1134,32 @@ describe("kind_multipliers: per-(kind, condition) incidence modulation", () => {
     expect(controlled.tme.mean).toBeLessThan(baseline.tme.mean);
   });
 
-  it("auto-load: simulateIMM picks up kind_multipliers[mission.kind] from imm-priors.json", () => {
-    // The public wrapper must auto-apply the per-kind map from the JSON
-    // global_calibration block. We exercise by:
-    //   (a) calling with explicit empty kindMultipliers (no map applied) and
-    //   (b) calling with no override (auto-load).
-    // The auto-load must differ from the explicit-empty 1.0 fallthrough iff
-    // the JSON block has multipliers for this kind. Use the 90d mission so
-    // the multiplier effect is visible.
-    const controlled90d = { ...IMM_MISSIONS.find(m => m.id === "analog-90d")!, totalEVAs: 12 };
-    const auto = simulateIMM({
+  it("default/adjudicated kindMultiplierMode does not auto-apply proposal kind multipliers", () => {
+    const baseMission = IMM_MISSIONS.find(m => m.id === "analog-90d")!;
+    const controlled90d = { ...baseMission, totalEVAs: 12, evaSchedule: baseMission.evaSchedule.slice(0, 12) };
+    const adjudicated = simulateIMM({
       crew: k15Crew, mission: controlled90d, kit: IMM_KITS.none, trials: TR, seed: 0xc0ffee, ...ONES,
-      // No kindMultipliers opt → wrapper auto-loads from JSON for "analog-controlled".
+      kindMultiplierMode: "adjudicated",
     });
     const forcedOnes = simulateIMM({
       crew: k15Crew, mission: controlled90d, kit: IMM_KITS.none, trials: TR, seed: 0xc0ffee, ...ONES,
-      kindMultipliers: {},  // explicit 1.0 fallthrough — disables auto-load
+      kindMultipliers: {},  // explicit 1.0 fallthrough
     });
-    // If the wrapper auto-loads the JSON map, `auto` has controlled
-    // multipliers applied (lower TME); `forcedOnes` does not. The assertion
-    // is that the two differ — this is the canary that the auto-load code
-    // path is wired up.
-    expect(Math.abs(auto.tme.mean - forcedOnes.tme.mean)).toBeGreaterThan(1e-6);
+    expect(Math.abs(adjudicated.tme.mean - forcedOnes.tme.mean)).toBeLessThan(1e-9);
+  });
+
+  it("exploratory kindMultiplierMode opts into kind_multipliers[mission.kind] from imm-priors.json", () => {
+    const baseMission = IMM_MISSIONS.find(m => m.id === "analog-90d")!;
+    const controlled90d = { ...baseMission, totalEVAs: 12, evaSchedule: baseMission.evaSchedule.slice(0, 12) };
+    const exploratory = simulateIMM({
+      crew: k15Crew, mission: controlled90d, kit: IMM_KITS.none, trials: TR, seed: 0xc0ffee, ...ONES,
+      kindMultiplierMode: "exploratory",
+    });
+    const forcedOnes = simulateIMM({
+      crew: k15Crew, mission: controlled90d, kit: IMM_KITS.none, trials: TR, seed: 0xc0ffee, ...ONES,
+      kindMultipliers: {},
+    });
+    expect(Math.abs(exploratory.tme.mean - forcedOnes.tme.mean)).toBeGreaterThan(1e-6);
   });
 
   it("legacy kind='analog-isolation' falls through to multiplier 1.0 (Dexie backward compat)", () => {
@@ -1139,7 +1169,8 @@ describe("kind_multipliers: per-(kind, condition) incidence modulation", () => {
     // with an empty kindMultipliers override.
     const legacyMission: IMMMission = {
       id: "legacy-14d", label: "Legacy 14d", kind: "analog-isolation",
-      durationDays: 14, crewSize: 6, totalEVAs: 12, evaSchedule: [3, 5, 7, 9, 11, 13],
+      durationDays: 14, crewSize: 6, totalEVAs: 12,
+      evaSchedule: [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13],
     };
     const legacy = simulateIMM({
       crew: k15Crew, mission: legacyMission, kit: IMM_KITS.none, trials: TR, seed: 0xc0ffee, ...ONES,

@@ -14,8 +14,9 @@ const SEED_SAMPLER = 0xc0ffee;
 export function StepReview() {
   const { candidate, criterionEntries, setStep, markStepCompleted, accessTier } = useWizard();
 
-  // The construct set is stable across tiers; tiers change the assessment
-  // instrument fidelity shown upstream, not the criteria included here.
+  // Criteria are included only when the selected tier has a scoreable instrument
+  // or crosswalk. Non-comparable substitutes are documented upstream but do not
+  // enter the MCDA score distribution.
   const visibleCriteria = useMemo(
     () => ACTIVE_CRITERION_CATALOG.criteria.filter((c) => isCriterionAvailableAtTier(c.minimumTier, accessTier)),
     [accessTier],

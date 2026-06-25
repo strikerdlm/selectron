@@ -329,13 +329,13 @@ describe("CrewComposition · I6 analog predictive uncertainty", () => {
     await screen.findByTestId("imm-i6-posterior", undefined, { timeout: 3000 });
     // The panel should display the compute-error note containing the worker error string.
     expect(
-      await screen.findByText(/predictive sweep failed.*boom/i, undefined, { timeout: 3000 }),
+      await screen.findByText(/incidence-parameter sensitivity sweep failed.*boom/i, undefined, { timeout: 3000 }),
     ).toBeDefined();
   });
 });
 
 // ── 2026-06-05: analog surfaces render BEFORE any sim run ───────────────────
-// The kind-multipliers table reads only the static calibrated priors, and the
+// The kind-multipliers table reads only the stored proposal multipliers, and the
 // I6 posterior layer consumes the calibration API + the pp worker sweep — both
 // independent of the main T=100k `outcome`. Gating them on `outcome` forced a
 // fresh full run after every mission switch just to *read* the analog context

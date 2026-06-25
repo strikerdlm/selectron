@@ -91,13 +91,26 @@ const GOOD: Record<string, number> = {
   "psych.conscientiousness": 90,
   "professional.technical_competence": 9,
   "psych.mmpi2rf_eid": 35,
+  "psych.bdi2_baseline": 5,
   "cognitive.nasa_cognition_battery": 1.0,
 };
 // Population-mean EID anchor (see header). Mid-fraction base elsewhere.
-const AVG: Record<string, number> = { "psych.mmpi2rf_eid": 50 };
-const EMO: Record<string, number> = { "psych.emotional_stability": 0, "psych.mmpi2rf_eid": 90 };
-const CONSC: Record<string, number> = { "psych.conscientiousness": 0, "psych.mmpi2rf_eid": 50 };
-const COG: Record<string, number> = { "cognitive.nasa_cognition_battery": -2.5, "psych.mmpi2rf_eid": 50 };
+const AVG: Record<string, number> = { "psych.mmpi2rf_eid": 50, "psych.bdi2_baseline": 8 };
+const EMO: Record<string, number> = {
+  "psych.emotional_stability": 0,
+  "psych.mmpi2rf_eid": 90,
+  "psych.bdi2_baseline": 8,
+};
+const CONSC: Record<string, number> = {
+  "psych.conscientiousness": 0,
+  "psych.mmpi2rf_eid": 50,
+  "psych.bdi2_baseline": 8,
+};
+const COG: Record<string, number> = {
+  "cognitive.nasa_cognition_battery": -2.5,
+  "psych.mmpi2rf_eid": 50,
+  "psych.bdi2_baseline": 8,
+};
 
 const uniform = (ov: Record<string, number>) =>
   Array.from({ length: mission.crewSize }, (_, i) => makeMember(`m${i + 1}`, 0.5, ov));
@@ -120,10 +133,20 @@ const CREWS: Record<string, IMMCrewMember[]> = {
 };
 
 function missionForCrew(base: IMMMission, crew: IMMCrewMember[]): IMMMission {
+  const totalEVAs = crew.reduce((sum, member) => sum + member.EVA_count, 0);
+  const evaSchedule = totalEVAs === 0
+    ? []
+    : base.evaSchedule.length >= totalEVAs
+      ? base.evaSchedule.slice(0, totalEVAs)
+      : Array.from(
+          { length: totalEVAs },
+          (_, i) => Math.round(((i + 1) * base.durationDays) / (totalEVAs + 1)),
+        );
   return {
     ...base,
     crewSize: crew.length,
-    totalEVAs: crew.reduce((sum, member) => sum + member.EVA_count, 0),
+    totalEVAs,
+    evaSchedule,
   };
 }
 

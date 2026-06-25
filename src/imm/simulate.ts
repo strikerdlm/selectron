@@ -76,7 +76,7 @@ export function isTerrestrialAnalog(kind: IMMMissionKind): boolean {
   return TERRESTRIAL_MISSION_KINDS.has(kind);
 }
 
-import type { IMMCrewMember, IMMMission, IMMKitScenario, IMMPrior, IMMConditionFamily, IMMCondition, IMMMissionKind, IMMProcessType, VulnerabilityCouplingMode, ProfileEffectMode } from "./types";
+import type { IMMCrewMember, IMMMission, IMMKitScenario, IMMPrior, IMMConditionFamily, IMMCondition, IMMMissionKind, IMMProcessType, VulnerabilityCouplingMode, ProfileEffectMode, KindMultiplierMode } from "./types";
 import { IMM_CONDITIONS } from "./conditions";
 import { loadIMMPriors } from "./priors";
 import { applyProportionalHazardMultiplier, sampleBeta, samplePoisson, sampleLognormal, samplePoissonProcess } from "./incidence";
@@ -220,6 +220,34 @@ export type IMMTrialOpts = {
   vulnerabilityCouplingMode?: VulnerabilityCouplingMode;
   profileEffectMode?: ProfileEffectMode;
 };
+
+function evaExposureDaysByCrew(crew: readonly IMMCrewMember[], mission: IMMMission): Map<number, number[]> {
+  const out = new Map<number, number[]>();
+  for (let i = 0; i < crew.length; i++) out.set(i, []);
+
+  if (mission.evaAssignments?.length) {
+    const idxById = new Map(crew.map((member, idx) => [member.id, idx] as const));
+    for (const assignment of mission.evaAssignments) {
+      for (const memberId of assignment.memberIds) {
+        const idx = idxById.get(memberId);
+        if (idx !== undefined) out.get(idx)!.push(assignment.day);
+      }
+    }
+  } else {
+    let cursor = 0;
+    for (let cIdx = 0; cIdx < crew.length; cIdx++) {
+      const member = crew[cIdx];
+      for (let e = 0; e < member.EVA_count; e++) {
+        const fallbackIdx = mission.evaSchedule.length > 0 ? cursor % mission.evaSchedule.length : 0;
+        out.get(cIdx)!.push(mission.evaSchedule[cursor] ?? mission.evaSchedule[fallbackIdx] ?? 0);
+        cursor++;
+      }
+    }
+  }
+
+  for (const days of out.values()) days.sort((a, b) => a - b);
+  return out;
+}
 
 /**
  * IC-5: Compute Stage A scale-relative vulnerability multiplier for a condition.
@@ -523,6 +551,7 @@ export function runIMMTrial(
 
   // T24: Per-crew-member once-cap for space-adaptation conditions (Set of condition ids).
   const processedSAOnce: Set<string>[] = crew.map(() => new Set<string>());
+  const evaDaysByCrew = evaExposureDaysByCrew(crew, mission);
 
   for (let cIdx = 0; cIdx < crew.length; cIdx++) {
     const member = crew[cIdx];
@@ -597,9 +626,15 @@ export function runIMMTrial(
         // Per-EVA occurrence path. Multiplier is applied to the sampled event
         // probability through proportional-hazard scaling so values >1 elevate
         // risk instead of being silently capped by a second Bernoulli gate.
-        for (let e = 0; e < member.EVA_count; e++) {
-          if (sampleSingleOccurrenceWithMultiplier(rng, prior, effectiveMult, 1, trialRate, trialBetaProbability)) count++;
+        // Push occurrences directly here so the sampled event retains the exact
+        // assigned EVA day. Counting first and later mapping event #0, #1, ...
+        // onto the first schedule entries can move an event from EVA 10 to EVA 1.
+        for (const evaDay of evaDaysByCrew.get(cIdx) ?? []) {
+          if (sampleSingleOccurrenceWithMultiplier(rng, prior, effectiveMult, 1, trialRate, trialBetaProbability)) {
+            pendingOccurrences.push({ condition: cond, prior, crewIndex: cIdx, timeDays: evaDay });
+          }
         }
+        count = 0;
       } else if (cond.processType === "SPE-coupled") {
         // T23: Per-SPE-event Bernoulli via ARS prior (Beta-Bernoulli per event).
         // speEventTimes pre-sampled once per trial so all crew share the same solar timeline.
@@ -1155,13 +1190,12 @@ export type SimulateIMMOptions = {
    */
   conditionFilter?: (c: import("./types").IMMCondition) => boolean;
   /**
-   * 2026-06-04: Optional explicit per-(kind, condition) multiplier map.
-   * When provided, takes precedence over the auto-loaded
-   * `global_calibration.kind_multipliers[mission.kind]` block. When omitted,
-   * the wrapper auto-loads the per-kind map from imm-priors.json; for any
-   * kind without an entry (e.g. leo-iss), the engine falls through to 1.0.
+   * 2026-06-04/25: Optional explicit per-(kind, condition) multiplier map.
+   * Explicit maps are custom operator inputs. Otherwise proposal-stage
+   * mission-kind multipliers are applied only in kindMultiplierMode="exploratory".
    */
   kindMultipliers?: Record<string, number>;
+  kindMultiplierMode?: KindMultiplierMode;
   /**
    * Direct per-condition incidence-rate overrides (λ per person-day) for
    * non-Beta incidence paths. Used by posterior-predictive simulations to
@@ -1310,9 +1344,76 @@ export function simulateIMM(opts: SimulateIMMOptions): IMMOutcome {
       crewEvaExposureCount,
     });
   }
-  if (mission.totalEVAs > 0 && mission.evaSchedule.length === 0) {
-    throw _bad("mission.evaSchedule must include at least one in-range EVA day when totalEVAs > 0", {
+  if (mission.evaAssignments !== undefined) {
+    if (!Array.isArray(mission.evaAssignments)) {
+      throw _bad("mission.evaAssignments must be an array when supplied", {
+        evaAssignments: mission.evaAssignments,
+      });
+    }
+    let assignmentExposureCount = 0;
+    let previousAssignmentDay = -Infinity;
+    const assignmentCountsByMember = new Map<string, number>();
+    for (const [idx, assignment] of mission.evaAssignments.entries()) {
+      if (!assignment || typeof assignment !== "object") {
+        throw _bad(`mission.evaAssignments[${idx}] must be an object`, { index: idx });
+      }
+      if (!Number.isFinite(assignment.day) || assignment.day < 0 || assignment.day > mission.durationDays) {
+        throw _bad(`mission.evaAssignments[${idx}].day must be within [0, ${mission.durationDays}], got ${assignment.day}`, {
+          index: idx,
+          value: assignment.day,
+        });
+      }
+      if (assignment.day < previousAssignmentDay) {
+        throw _bad(`mission.evaAssignments must be ordered ascending; index ${idx} is ${assignment.day} after ${previousAssignmentDay}`, {
+          index: idx,
+          value: assignment.day,
+          previous: previousAssignmentDay,
+        });
+      }
+      previousAssignmentDay = assignment.day;
+      if (!Array.isArray(assignment.memberIds) || assignment.memberIds.length === 0) {
+        throw _bad(`mission.evaAssignments[${idx}].memberIds must be a non-empty array`, { index: idx });
+      }
+      const idsInAssignment = new Set<string>();
+      for (const memberId of assignment.memberIds) {
+        if (typeof memberId !== "string" || memberId.trim() === "") {
+          throw _bad(`mission.evaAssignments[${idx}].memberIds contains an invalid member id`, { index: idx, memberId });
+        }
+        if (idsInAssignment.has(memberId)) {
+          throw _bad(`mission.evaAssignments[${idx}] repeats member id ${memberId}`, { index: idx, memberId });
+        }
+        idsInAssignment.add(memberId);
+        const member = crew.find((c) => c.id === memberId);
+        if (!member) {
+          throw _bad(`mission.evaAssignments[${idx}] references unknown crew member ${memberId}`, { index: idx, memberId });
+        }
+        if (!member.EVA_eligible) {
+          throw _bad(`mission.evaAssignments[${idx}] references non-EVA-eligible crew member ${memberId}`, { index: idx, memberId });
+        }
+        assignmentCountsByMember.set(memberId, (assignmentCountsByMember.get(memberId) ?? 0) + 1);
+        assignmentExposureCount++;
+      }
+    }
+    if (assignmentExposureCount !== mission.totalEVAs) {
+      throw _bad(`mission.evaAssignments exposure count (${assignmentExposureCount}) must equal mission.totalEVAs (${mission.totalEVAs})`, {
+        assignmentExposureCount,
+        totalEVAs: mission.totalEVAs,
+      });
+    }
+    for (const member of crew) {
+      const assigned = assignmentCountsByMember.get(member.id) ?? 0;
+      if (assigned !== member.EVA_count) {
+        throw _bad(`mission.evaAssignments count for ${member.id} (${assigned}) must equal crew EVA_count (${member.EVA_count})`, {
+          memberId: member.id,
+          assigned,
+          EVA_count: member.EVA_count,
+        });
+      }
+    }
+  } else if (mission.evaSchedule.length !== mission.totalEVAs) {
+    throw _bad(`mission.evaSchedule length (${mission.evaSchedule.length}) must equal mission.totalEVAs (${mission.totalEVAs}) when explicit evaAssignments are absent`, {
       totalEVAs: mission.totalEVAs,
+      scheduleLength: mission.evaSchedule.length,
     });
   }
   if (!Number.isFinite(chiStar) || chiStar < 0 || chiStar > 1) {
@@ -1361,6 +1462,12 @@ export function simulateIMM(opts: SimulateIMMOptions): IMMOutcome {
       throw _bad(`kindMultipliers[${k}] must be finite and non-negative, got ${m}`, { key: k, value: m });
     }
   }
+  const kindMultiplierMode = opts.kindMultiplierMode ?? (opts.kindMultipliers !== undefined ? "custom" : "adjudicated");
+  if (!["off", "adjudicated", "exploratory", "custom"].includes(kindMultiplierMode)) {
+    throw _bad(`kindMultiplierMode must be off, adjudicated, exploratory, or custom; got ${String(kindMultiplierMode)}`, {
+      kindMultiplierMode,
+    });
+  }
   const priors = loadIMMPriors();
   const conditionById = new Map(IMM_CONDITIONS.map(c => [c.id, c]));
   for (const [k, lambdaPerDay] of Object.entries(opts.incidenceRateOverrides ?? {})) {
@@ -1390,19 +1497,23 @@ export function simulateIMM(opts: SimulateIMMOptions): IMMOutcome {
   }
   // priors-rev3-b: read global_calibration defaults for tier multipliers.
   const globalCal = priors.global_calibration;
-  // 2026-06-04: kind_multipliers auto-load. Caller's explicit override wins;
-  // otherwise look up the per-kind map from JSON. Any (kind, condition) pair
-  // not in the map falls through to 1.0 in the engine, so absence of a kind
-  // entry is safe (leo-iss / analog-isolation etc. all get the 1.0 baseline).
+  // 2026-06-25: mission-kind multipliers remain proposal-stage. Default and
+  // adjudicated runs apply no kind map; exploratory mode opts into the JSON
+  // proposal block; explicit opts.kindMultipliers is a custom operator input
+  // unless the caller explicitly forces "off".
   const kindMultAuto = globalCal.kind_multipliers?.[mission.kind] ?? {};
-  const effectiveKindMults = opts.kindMultipliers ?? kindMultAuto;
+  const effectiveKindMults =
+    kindMultiplierMode === "off" ? {}
+      : opts.kindMultipliers !== undefined ? opts.kindMultipliers
+      : kindMultiplierMode === "exploratory" ? kindMultAuto
+      : {};
   // IC-5: criteria index was built once during public-boundary validation.
   const chiStarPct = chiStar * 100;
   const rng = makeRng(seed);
   const L_hours = mission.durationDays * 24;
   const denom = L_hours * crew.length;
 
-  const tmes: number[] = [], chis: number[] = [], evacs: number[] = [], locls: number[] = [], dutyHoursLost: number[] = [];
+  const tmes: number[] = [], chis: number[] = [], evacs: number[] = [], locls: number[] = [], qualityTimeLostHours: number[] = [];
   const healthCriterionFlags: number[] = [];
   const sigmaCheckpoints: number[] = [];
   const sigmaChi: number[] = [];
@@ -1431,7 +1542,7 @@ export function simulateIMM(opts: SimulateIMMOptions): IMMOutcome {
       conditionFilter: opts.conditionFilter,
     });
     tmes.push(r.tme);
-    dutyHoursLost.push(r.qtl);
+    qualityTimeLostHours.push(r.qtl);
     // CHI clamped at [0, 100] — QTL can exceed denom under pathological priors (v1 analogue of risk/simulate.ts §3.5 guard).
     const rawChiForTrial = 100 * (1 - r.qtl / denom);
     const chiForTrial = Math.max(0, Math.min(100, rawChiForTrial));
@@ -1479,12 +1590,14 @@ export function simulateIMM(opts: SimulateIMMOptions): IMMOutcome {
 
   const healthCriterionAttainment = scenarioSummary(healthCriterionFlags.map(x => x * 100));
   const monteCarloError = monteCarloErrorSummary({ tmes, chis, evacs, locls, healthCriterionFlags });
+  const qualityTimeLostSummary = scenarioSummary(qualityTimeLostHours);
   const outcome: IMMOutcome = {
     tme:   scenarioSummary(tmes),
     chi:   scenarioSummary(chis),
     pEvac: scenarioSummary(evacs.map(x => x * 100)),
     pLocl: scenarioSummary(locls.map(x => x * 100)),
-    dutyHoursLost: scenarioSummary(dutyHoursLost),
+    qualityTimeLostHours: qualityTimeLostSummary,
+    dutyHoursLost: qualityTimeLostSummary,
     healthCriterionAttainment,
     // Legacy alias for persisted sessions and existing scripts/tests.
     missionSuccess: healthCriterionAttainment,

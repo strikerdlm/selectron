@@ -122,6 +122,15 @@ export type IMMCrewMember = {
   stageAScores?: Record<string, number>;
 };
 
+export type IMMEvaAssignment = {
+  /** Mission day on which the exposure occurs. */
+  day: number;
+  /** Crew IDs assigned to this exposure. Each ID contributes one EVA exposure. */
+  memberIds: string[];
+  /** Descriptive category only; not yet a risk-model branch. */
+  type?: string;
+};
+
 /**
  * Mission taxonomy. Selectron v1 supports analog-isolation / analog-controlled /
  * antarctic-station / leo-iss. LEO/ISS runs have K15 reference-model anchors;
@@ -160,6 +169,12 @@ export type IMMMission = {
   crewSize: number;
   totalEVAs: number;
   evaSchedule: number[];
+  /**
+   * Optional explicit EVA exposure assignments. When absent, the simulator
+   * derives assignments from evaSchedule in crew order and requires
+   * evaSchedule.length === totalEVAs at the public boundary.
+   */
+  evaAssignments?: IMMEvaAssignment[];
   /**
    * Structured analog context. Required for analog-facing scientific runs so
    * results are conditional on documented habitat, operations, autonomy, and
@@ -356,9 +371,14 @@ export type IMMOutcome = {
   pEvac: ScenarioSummary;
   pLocl: ScenarioSummary;
   /**
-   * Expected duty hours lost, summarized from per-trial raw QTL before CHI is
-   * clipped to the 0-100 display scale. Populated by current simulateIMM runs;
-   * optional for historical saved outcomes.
+   * Quality-time lost, summarized from per-trial raw QTL before CHI is clipped
+   * to the 0-100 display scale. This is impairment-equivalent time over the
+   * whole mission timeline, not scheduled duty time.
+   */
+  qualityTimeLostHours?: ScenarioSummary;
+  /**
+   * Legacy alias retained for historical saved outcomes and tests. New UI and
+   * manuscripts should use qualityTimeLostHours.
    */
   dutyHoursLost?: ScenarioSummary;
   /**
@@ -512,6 +532,7 @@ export type IMMSession = {
    */
   familyBetaScale?: number;
   profileEffectMode?: ProfileEffectMode;
+  kindMultiplierMode?: KindMultiplierMode;
   chiStar?: number;
   aggregator?: CrewCompositeMethod;
   criterionCatalogId?: string;
@@ -549,3 +570,4 @@ export type IMMSession = {
 
 export type VulnerabilityCouplingMode = "off" | "scenario";
 export type ProfileEffectMode = import("./profile-effects").ProfileEffectMode;
+export type KindMultiplierMode = "off" | "adjudicated" | "exploratory" | "custom";

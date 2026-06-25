@@ -68,7 +68,7 @@ Residual limitation: several tier-B conditions remain sourced or historically fi
 
 ### 3.3 Reproducibility depends on the exact priors file
 
-`simulateIMM` auto-loads `global_calibration.tierA/B/C_multiplier` defaults and `kind_multipliers` from `imm-priors.json`. The current tier multipliers are all 1.0, but the broader reproducibility rule remains: the same `(seed, priors-json-state)` pair gives the same output, while the same seed with a mutated priors file does not.
+`simulateIMM` auto-loads `global_calibration.tierA/B/C_multiplier` defaults from `imm-priors.json`. Proposal-stage `kind_multipliers` are applied only when the operator selects exploratory/custom mode. The current tier multipliers are all 1.0, but the broader reproducibility rule remains: the same `(seed, priors-json-state, explicit effect-mode state)` pair gives the same output, while the same seed with a mutated priors file or different effect-mode state does not.
 
 Snapshot tests and manuscript locks must therefore include the SHA-256 hash of `src/data/imm-priors.json`, not only the git commit and random seed.
 
