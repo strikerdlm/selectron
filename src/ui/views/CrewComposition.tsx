@@ -733,7 +733,8 @@ export function CrewComposition() {
            T=100,000 run when one is present. */}
       {(() => {
         const dutyHoursLost = readoutOutcome
-          ? ((100 - readoutOutcome.chi.mean) / 100) * state.mission.durationDays * 24 * state.members.length
+          ? readoutOutcome.dutyHoursLost?.mean
+            ?? ((100 - readoutOutcome.chi.mean) / 100) * state.mission.durationDays * 24 * state.members.length
           : 0;
         const healthCriterion = readoutOutcome
           ? readoutOutcome.healthCriterionAttainment ?? readoutOutcome.missionSuccess

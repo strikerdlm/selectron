@@ -28,7 +28,7 @@
 //                 worst +4.05…+4.29 | consc −0.03…+0.07 (NULL — see below)
 //   avg vs screened: +0.93…+1.07 when scenario coupling is enabled
 //   CHI worst vs screened: −0.73…−0.92
-//   pEVAC / pLOCL / MSP do NOT discriminate archetypes even at 90 days
+//   pEVAC / pLOCL / health-criterion attainment do NOT discriminate archetypes even at 90 days
 //   (evac tails are kit/treatment-dominated) — deliberately unasserted.
 //
 // Coupling counts behind the scenario levers (verified in src/imm/conditions.ts):

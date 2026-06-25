@@ -192,8 +192,8 @@ class TestSimulateIMM:
 
 
 @pytest.mark.slow
-class TestCrossValidationTS:
-    """Statistical cross-validation: Python MC vs TS engine."""
+class TestPythonForwardMCScope:
+    """Python forward MC smoke checks; not TypeScript-engine parity tests."""
 
     @pytest.fixture(scope="class")
     def python_results(self) -> dict[str, dict[str, Any]]:

@@ -298,7 +298,7 @@ Failed gates are **review flags**; the sim can still run unless you choose to ex
    - Composite crew health criterion attainment
    - MCSE/Wilson/sparse-tail stopping-rule status and independent-seed replication status
    - CHI clamp count/proportion
-   - Expected duty hours lost
+   - Expected duty hours lost from raw per-trial QTL before CHI display clamping
    - Evidence coverage statement (`accepted: N / M params · unadjudicated`)
    - Mission evidence grade
 
@@ -465,10 +465,14 @@ For the current prediction boundary, see the model card: [`docs/model_card.md`](
 | `npm run guard:active-imports` | Block archived `src/risk` imports in active paths |
 | `npm run validate:imm` | K15 reference-model regression (CLI) |
 | `npm run validate:imm:analog` | Analog archetype regression tests |
+| `npm run release:freeze:check` | Print exact commit, prior hash, and evidence snapshot for manuscript/release freeze |
+| `npm run release:freeze` | Write the release-freeze manifest to `verification-artifacts/` for archival upload |
 | `npm run calibrate:imm` | TypeScript IMM prior calibration script |
 | `npm run e2e` | Playwright browser tests |
 | `cd python && pytest -m "not slow"` | Python unit tests |
 | `python -m selectron --dry-run` | Analytic Gamma-Poisson batch fit dry-run |
+
+The Python package supports offline calibration and screening analyses. Its forward Monte Carlo, validator, and sensitivity reports are simplified Python approximations and should not be mixed with canonical TypeScript IMM scenario outputs unless a future cross-language golden-test parity suite is added.
 
 **Determinism:** Seed `0xc0ffee` is canonical across tests, demo cohorts, and K15 invariance checks.
 
@@ -482,7 +486,7 @@ For the current prediction boundary, see the model card: [`docs/model_card.md`](
 | **CHI** | Crew Health Index — functional impairment aggregate |
 | **pEVAC** | Probability of mission evacuation due to medical event |
 | **pLOCL** | Probability of loss of crew life |
-| **QTL** | Quality time lost (duty hours) |
+| **QTL** | Quality time lost (duty hours), exposed as expected duty hours lost from raw per-trial QTL before CHI display clamping |
 | **Composite attainment** | P(no LOCL ∧ no EVAC ∧ CHI > χ*) |
 | **MCDA interval** | Percentile band of Stage A score under weight uncertainty |
 | **Simulation interval** | Percentile band of simulated mission-to-mission variability under current assumptions; not a confidence interval for real analog outcomes |

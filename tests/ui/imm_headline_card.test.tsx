@@ -28,7 +28,7 @@ function makeOutcome(opts?: {
   chi?: number;
   pEvac?: number;
   pLocl?: number;
-  msp?: number;
+  healthCriterion?: number;
   sd?: number;
   checkpoints?: number[];
   sigmaChi?: number[];
@@ -40,7 +40,8 @@ function makeOutcome(opts?: {
     chi:   makeSummary(opts?.chi   ?? 94.93,  sd),
     pEvac: makeSummary(opts?.pEvac ?? 5.57,   sd),
     pLocl: makeSummary(opts?.pLocl ?? 0.44,   sd),
-    missionSuccess: makeSummary(opts?.msp ?? 80.0, sd),
+    healthCriterionAttainment: makeSummary(opts?.healthCriterion ?? 80.0, sd),
+    missionSuccess: makeSummary(opts?.healthCriterion ?? 80.0, sd),
     perConditionDrivers: [],
     convergence: {
       trialCheckpoints: opts?.checkpoints ?? [1000, 2000, 3000, 4000, 5000],
@@ -115,7 +116,7 @@ describe("IMMHeadlineCard (I1)", () => {
       chi:   91.5,
       pEvac: 6.7,
       pLocl: 1.2,
-      msp:   77.8,
+      healthCriterion: 77.8,
     });
     const { container } = render(
       <IMMHeadlineCard

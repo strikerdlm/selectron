@@ -202,8 +202,8 @@ describe("analog-45d · unscreened high-risk crew (no Stage-A selection)", () =>
     // Margin choice (3-seed × {3k, 8k}-trial sweep, 2026-06-05): ΔTME spans
     // +2.53 to +2.61 and ΔCHI spans −0.33 to −0.61 across every seed/T pair —
     // these are the durable signals, asserted with headroom below. ΔpEVAC,
-    // ΔpLOCL, and ΔMSP all sign-invert across seeds at these trial counts
-    // (45-day rare-event tails: e.g. ΔpEVAC = −0.30 at seed 99/T=3k, ΔMSP =
+    // ΔpLOCL, and health-criterion-attainment deltas all sign-invert across seeds at these trial counts
+    // (45-day rare-event tails: e.g. ΔpEVAC = −0.30 at seed 99/T=3k, ΔhealthCriterion =
     // +0.037 at 0xc0ffee/T=8k), so they are deliberately NOT asserted —
     // a passing inequality on them would be seed luck, not evidence.
     expect(unscreened.tme.mean).toBeGreaterThan(screened.tme.mean + 1.5);
@@ -227,7 +227,7 @@ describe("analog-45d · unscreened high-risk crew (no Stage-A selection)", () =>
 //
 // Margin choice (3-seed × {3k, 8k}-trial sweep, 2026-06-05): at 22 days
 // ΔTME spans +1.19 to +1.29 and ΔCHI spans −0.36 to −0.44 across every
-// seed/T pair — asserted with headroom. ΔpEVAC and ΔMSP sign-invert across
+// seed/T pair — asserted with headroom. ΔpEVAC and health-criterion-attainment deltas sign-invert across
 // seeds at these trial counts (22-day rare-event tails are even thinner
 // than at 45 days), so they remain deliberately unasserted.
 describe("analog-22d · same unscreened crew (22-day campaign)", () => {

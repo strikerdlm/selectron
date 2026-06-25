@@ -35,9 +35,14 @@ Outputs should be read as conditional scenario quantities under the loaded assum
 - Stage A intervals are MCDA score intervals induced by uncertain criterion weights.
 - Stage B intervals are simulation intervals over modeled mission-to-mission variability under shared condition/trial incidence draws.
 - MCSE and rare-event precision diagnostics describe numerical simulation stability, not empirical calibration.
+- Expected duty hours lost is summarized from raw per-trial QTL before CHI is clipped to the 0-100 display scale.
 - Severity sampling is mechanistic only until branch-specific outcome priors are adjudicated; current generated coverage is 0/101 distinct branch sets.
 - Treatment resources are depleted per resource, but RAF treatment interpolation remains a proposal-stage screening approximation.
 - Communications delay is a proposal-stage exploratory sensitivity effect and is off in default adjudicated mode.
+
+## Canonical Engine Boundary
+
+Browser and manuscript-grade scenario outputs should come from the TypeScript IMM engine in `src/imm/`. The Python package is an offline calibration and screening-analysis path. Its forward Monte Carlo, K15 validator, and sensitivity reports are simplified Python approximations and must not be combined with TypeScript application results as the same scientific model unless cross-language golden tests establish parity over event counts, timing, severity branches, terminal outcomes, QTL, resource depletion, and summaries.
 
 ## Unacceptable Extrapolations
 

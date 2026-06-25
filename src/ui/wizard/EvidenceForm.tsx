@@ -55,7 +55,8 @@ export function EvidenceForm({
   // slider (e.g. tier switch causes a criterion to reappear, or another tab
   // edits). Convert canonical → native via /multiplier; clamp to the native
   // range so any legacy bad data persisted before this fix is rendered as
-  // an in-range slider position (the engine boundary also clamps below).
+  // an in-range slider position. Public simulation boundaries reject invalid
+  // imported stageAScores rather than extrapolating outside criterion scales.
   const draggingRef = useRef(false);
   useEffect(() => {
     if (!draggingRef.current && entry?.rawValue !== undefined) {

@@ -793,47 +793,54 @@ describe("applyStageAVulnerabilityMultiplier (IC-5)", () => {
   });
 });
 
-// ── IC-4: missionSuccess MSP tracking ────────────────────────────────────────
-describe("simulateIMM missionSuccess (IC-4)", () => {
-  it("missionSuccess is a valid ScenarioSummary in [0, 100] percent scale", () => {
+// ── IC-4: composite health-criterion tracking ────────────────────────────────
+describe("simulateIMM healthCriterionAttainment (IC-4)", () => {
+  it("healthCriterionAttainment is a valid ScenarioSummary in [0, 100] percent scale", () => {
     const out = simulateIMM({ crew: oneCrew, mission: oneDayMission, kit: IMM_KITS.issHMS, trials: 2000, seed: 0xface });
-    expect(out.missionSuccess.mean).toBeGreaterThanOrEqual(0);
-    expect(out.missionSuccess.mean).toBeLessThanOrEqual(100);
-    expect(out.missionSuccess.ci90[0]).toBeGreaterThanOrEqual(0);
-    expect(out.missionSuccess.ci90[1]).toBeLessThanOrEqual(100);
+    const hca = out.healthCriterionAttainment!;
+    expect(hca.mean).toBeGreaterThanOrEqual(0);
+    expect(hca.mean).toBeLessThanOrEqual(100);
+    expect(hca.ci90[0]).toBeGreaterThanOrEqual(0);
+    expect(hca.ci90[1]).toBeLessThanOrEqual(100);
+    expect(out.missionSuccess).toBe(hca);
   });
 
-  it("missionSuccess.mean <= (100 - pEvac.mean) since any EVAC trial is not a success", () => {
-    // MSP <= 100% - pEVAC by construction: EVAC=1 excludes a trial from success.
-    // With uncalibrated priors pEVAC is high, so MSP will be low — just verify the inequality.
+  it("healthCriterionAttainment.mean <= (100 - pEvac.mean) since any EVAC trial fails the criterion", () => {
+    // Composite attainment <= 100% - pEVAC by construction: EVAC=1 excludes a trial.
     const out = simulateIMM({ crew: oneCrew, mission: oneDayMission, kit: IMM_KITS.none, trials: 5000, seed: 0xbeef });
-    // Allow ≤ 1% tolerance for floating point: success fraction ≤ non-evac fraction
-    expect(out.missionSuccess.mean).toBeLessThanOrEqual(100 - out.pEvac.mean + 1.0);
+    expect(out.healthCriterionAttainment!.mean).toBeLessThanOrEqual(100 - out.pEvac.mean + 1.0);
   });
 
-  it("chiStar=0.0 makes MSP depend only on EVAC/LOCL (CHI threshold always passes)", () => {
-    // chiStar=0 → CHI >= 0 is always true → success = no EVAC AND no LOCL
+  it("chiStar=0.0 makes attainment depend only on EVAC/LOCL (CHI threshold always passes)", () => {
+    // chiStar=0 → CHI >= 0 is always true → attainment = no EVAC AND no LOCL.
     const out = simulateIMM({ crew: oneCrew, mission: oneDayMission, kit: IMM_KITS.issHMS, trials: 3000, seed: 0xcafe, chiStar: 0.0 });
-    // MSP should be > 0 since not all trials end in EVAC/LOCL
-    // (with chiStar=0 the CHI term never excludes a trial)
-    // At minimum, MSP must be non-negative and ≤ 100
-    expect(out.missionSuccess.mean).toBeGreaterThanOrEqual(0);
-    expect(out.missionSuccess.mean).toBeLessThanOrEqual(100);
+    expect(out.healthCriterionAttainment!.mean).toBeGreaterThanOrEqual(0);
+    expect(out.healthCriterionAttainment!.mean).toBeLessThanOrEqual(100);
   });
 
-  it("chiStar=1.0 makes MSP ≤ chiStar=0.0 MSP (tighter CHI requirement reduces success rate)", () => {
+  it("chiStar=1.0 makes attainment <= chiStar=0.0 attainment", () => {
     const opts = { crew: oneCrew, mission: oneDayMission, kit: IMM_KITS.issHMS, trials: 3000, seed: 0x1234 };
     const loose = simulateIMM({ ...opts, chiStar: 0.0 });
     const tight = simulateIMM({ ...opts, chiStar: 1.0 });
-    // Tighter chiStar must produce ≤ or equal success rate
-    expect(tight.missionSuccess.mean).toBeLessThanOrEqual(loose.missionSuccess.mean + 1.0); // +1% tolerance
+    expect(tight.healthCriterionAttainment!.mean).toBeLessThanOrEqual(loose.healthCriterionAttainment!.mean + 1.0);
   });
 
-  it("deterministic: same seed produces same missionSuccess", () => {
+  it("deterministic: same seed produces same health-criterion attainment", () => {
     const a = simulateIMM({ crew: oneCrew, mission: oneDayMission, kit: IMM_KITS.issHMS, trials: 1000, seed: 0xabc });
     const b = simulateIMM({ crew: oneCrew, mission: oneDayMission, kit: IMM_KITS.issHMS, trials: 1000, seed: 0xabc });
-    expect(a.missionSuccess.mean).toBe(b.missionSuccess.mean);
-    expect(a.missionSuccess.sd).toBe(b.missionSuccess.sd);
+    expect(a.healthCriterionAttainment!.mean).toBe(b.healthCriterionAttainment!.mean);
+    expect(a.healthCriterionAttainment!.sd).toBe(b.healthCriterionAttainment!.sd);
+  });
+
+  it("reports dutyHoursLost from raw QTL before CHI display clamping", () => {
+    const out = simulateIMM({ crew: oneCrew, mission: oneDayMission, kit: IMM_KITS.issHMS, trials: 1000, seed: 0xd00d });
+    expect(out.dutyHoursLost?.mean).toBeGreaterThanOrEqual(0);
+    expect(Number.isFinite(out.dutyHoursLost?.mean)).toBe(true);
+    if ((out.chiClamp?.count ?? 0) === 0) {
+      const denomHours = oneDayMission.durationDays * 24 * oneCrew.length;
+      const dutyHoursFromChi = ((100 - out.chi.mean) / 100) * denomHours;
+      expect(out.dutyHoursLost!.mean).toBeCloseTo(dutyHoursFromChi, 8);
+    }
   });
 });
 

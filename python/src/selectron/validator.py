@@ -1,7 +1,9 @@
-"""K15 Table 1 reference-model regression.
+"""K15 Table 1 reference-model regression for the simplified Python path.
 
-This module compares Selectron's IMM output against the NASA K15 Table 1
-reference values. It reports two independent statuses per metric:
+This module compares the offline Python forward model against the NASA K15
+Table 1 reference values. It is a secondary Python-package check, not the
+canonical TypeScript IMM regression lane. It reports two independent statuses
+per metric:
 
   * K15 agreement — observed value is inside the K15 published CI₉₅.
   * Internal regression — observed value is inside a frozen regression
@@ -10,7 +12,8 @@ reference values. It reports two independent statuses per metric:
 The regression envelope is NOT a validation or acceptance criterion. A metric
 that is outside the K15 CI₉₅ but inside its regression envelope is "regression
 stable · K15 divergent" — it must never be reported as an unqualified PASS.
-Only `within_ci95` (true K15 agreement) is a scientific agreement signal.
+Only `within_ci95` (K15 interval overlap for this Python approximation) is a
+scientific agreement signal inside this secondary lane.
 """
 
 from __future__ import annotations
@@ -118,7 +121,7 @@ class MetricResult:
 
 @dataclass
 class K15ValidationReport:
-    """Full K15 reference-model regression report."""
+    """Full K15 reference-model regression report for the Python approximation."""
 
     timestamp: str = ""
     trials: int = 0
@@ -180,7 +183,7 @@ def validate_k15(
     priors_path: Path | None = None,
     output_dir: Path | None = None,
 ) -> K15ValidationReport:
-    """Run K15 reference-model regression on current priors."""
+    """Run Python-path K15 reference-model regression on current priors."""
     if scenarios is None:
         scenarios = ["none", "issHMS", "unlimited"]
 

@@ -1402,7 +1402,7 @@ export function simulateIMM(opts: SimulateIMMOptions): IMMOutcome {
   const L_hours = mission.durationDays * 24;
   const denom = L_hours * crew.length;
 
-  const tmes: number[] = [], chis: number[] = [], evacs: number[] = [], locls: number[] = [];
+  const tmes: number[] = [], chis: number[] = [], evacs: number[] = [], locls: number[] = [], dutyHoursLost: number[] = [];
   const healthCriterionFlags: number[] = [];
   const sigmaCheckpoints: number[] = [];
   const sigmaChi: number[] = [];
@@ -1431,6 +1431,7 @@ export function simulateIMM(opts: SimulateIMMOptions): IMMOutcome {
       conditionFilter: opts.conditionFilter,
     });
     tmes.push(r.tme);
+    dutyHoursLost.push(r.qtl);
     // CHI clamped at [0, 100] — QTL can exceed denom under pathological priors (v1 analogue of risk/simulate.ts §3.5 guard).
     const rawChiForTrial = 100 * (1 - r.qtl / denom);
     const chiForTrial = Math.max(0, Math.min(100, rawChiForTrial));
@@ -1483,6 +1484,7 @@ export function simulateIMM(opts: SimulateIMMOptions): IMMOutcome {
     chi:   scenarioSummary(chis),
     pEvac: scenarioSummary(evacs.map(x => x * 100)),
     pLocl: scenarioSummary(locls.map(x => x * 100)),
+    dutyHoursLost: scenarioSummary(dutyHoursLost),
     healthCriterionAttainment,
     // Legacy alias for persisted sessions and existing scripts/tests.
     missionSuccess: healthCriterionAttainment,

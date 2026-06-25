@@ -88,9 +88,9 @@ describe("criterion citation coverage", () => {
     expect(CITATIONS["method:composite:geometric-mean"]).toBeDefined();
   });
 
-  it("both MSP formulation citations present (A22 and K15)", () => {
-    expect(CITATIONS["msp:formulation:A22"]).toBeDefined();
-    expect(CITATIONS["msp:formulation:K15"]).toBeDefined();
+  it("both composite health-criterion formulation citations present (A22 and K15)", () => {
+    expect(CITATIONS["health-criterion:formulation:A22"]).toBeDefined();
+    expect(CITATIONS["health-criterion:formulation:K15"]).toBeDefined();
   });
 });
 

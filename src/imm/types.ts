@@ -356,6 +356,12 @@ export type IMMOutcome = {
   pEvac: ScenarioSummary;
   pLocl: ScenarioSummary;
   /**
+   * Expected duty hours lost, summarized from per-trial raw QTL before CHI is
+   * clipped to the 0-100 display scale. Populated by current simulateIMM runs;
+   * optional for historical saved outcomes.
+   */
+  dutyHoursLost?: ScenarioSummary;
+  /**
    * Probability of meeting the specified composite health criterion (×100,
    * percent scale, same as pEvac/pLocl). A trial meets the criterion when:
    * EVAC=0 AND LOCL=0 AND CHI >= chiStar×100.

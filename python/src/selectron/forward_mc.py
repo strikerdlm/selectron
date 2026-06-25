@@ -1,7 +1,9 @@
-"""Numpy forward Monte Carlo engine — simplified IMM trial loop.
+"""Numpy forward Monte Carlo engine — simplified offline IMM trial loop.
 
 Scope: general-Poisson conditions only. Does NOT reimplement SPE-coupled,
 EVA-coupled, space-adaptation-once, or Stage A vulnerability paths.
+Scientific scenario outputs for the app are produced by the canonical
+TypeScript engine unless explicit cross-language golden parity is added.
 """
 
 from __future__ import annotations

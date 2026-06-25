@@ -1,4 +1,8 @@
-"""Sobol/Morris global sensitivity analysis via SALib."""
+"""Sobol/Morris sensitivity analysis for the simplified Python forward model.
+
+These analyses are offline screening studies over the Python approximation,
+not canonical TypeScript IMM scenario results.
+"""
 
 from __future__ import annotations
 
@@ -88,7 +92,7 @@ def _objective(
     trials: int,
     seed: int,
 ) -> float:
-    """Evaluate the forward MC for one parameter set. Returns CHI mean."""
+    """Evaluate the simplified Python forward MC for one parameter set. Returns CHI mean."""
     priors_data = load_priors()
     all_priors = dict(priors_data["conditions"])
 

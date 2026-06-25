@@ -23,6 +23,8 @@
     "evidence:check": "tsx scripts/evidence_status.ts --check",
     "evidence:require-adjudicated": "tsx scripts/evidence_status.ts --require-adjudicated",
     "severity:coverage": "tsx scripts/severity_branch_coverage.ts --write",
+    "release:freeze": "tsx scripts/release_freeze_check.ts --write",
+    "release:freeze:check": "tsx scripts/release_freeze_check.ts --check",
     "sync:public": "node scripts/sync-to-public.mjs",
     "bootstrap:public-sync-auth": "node scripts/bootstrap-public-sync-auth.mjs",
     "verify:release": "npm run typecheck && npm run guard:active-imports && npm run evidence:check && npx vitest run tests/imm/conditions.test.ts && npm run build"

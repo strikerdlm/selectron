@@ -56,6 +56,7 @@ Other key docs:
 |----------|---------|
 | [`docs/Manual.md`](docs/Manual.md) | Full user manual (primary operator guide) |
 | [`docs/model_card.md`](docs/model_card.md) | Validation status, intended use, and unacceptable extrapolations |
+| [`docs/manuscript_claim_matrix.md`](docs/manuscript_claim_matrix.md) | Claim-audit matrix for methods manuscripts and releases |
 | [`STATUS.md`](STATUS.md) | Software project tracker |
 | [`docs/v0.6_rebaseline.md`](docs/v0.6_rebaseline.md) | Release gates and disposition matrix |
 | [`docs/iter3_vv_dossier.md`](docs/iter3_vv_dossier.md) | Validation & verification dossier |
@@ -112,6 +113,8 @@ uvicorn api.main:app --reload --port 8000
 
 The Calibration tab uses `http://localhost:8000` by default (`VITE_CALIBRATION_API_URL` override in `.env.local`).
 
+The Python package is an offline calibration and screening-analysis path. Its forward Monte Carlo, validator, and sensitivity reports are simplified Python approximations and are not canonical TypeScript IMM scenario results unless a future golden-test parity suite is added.
+
 ## Methodology (summary)
 
 **Stage A:** uncertain-weight MCDA — `S_i = sum_k w_k * z(x_i,k)` with `w ~ Dirichlet(alpha)`.
@@ -140,6 +143,7 @@ selectron/
 
 - `npm run verify:fast` — typecheck, import guard, evidence drift check, fast Vitest suite
 - `npm run severity:coverage` — regenerate the IMM severity-branch coverage table
+- `npm run release:freeze:check` — print source commit, prior hash, and evidence-coverage freeze metadata
 - `tests/imm/priors.test.ts` — locks 101-condition prior catalog and provenance counts
 - `tests/imm/validation_k15.test.ts` — K15 reference-model regression checks
 

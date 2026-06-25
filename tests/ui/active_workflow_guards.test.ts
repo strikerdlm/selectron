@@ -168,10 +168,29 @@ describe("active analog workflow guards", () => {
 
     expect(source).toContain("No population, mission type, mission duration range, or analog facility family is currently validated");
     expect(source).toContain("valid accepted active-parameter coverage: 0/4,849");
+    expect(source).toContain("Canonical Engine Boundary");
+    expect(source).toContain("Python package is an offline calibration and screening-analysis path");
     expect(source).toContain("Unacceptable Extrapolations");
     expect(source).toContain("not an empirically calibrated analog-risk predictor");
     expect(readRepoFile("README.md")).toContain("docs/model_card.md");
     expect(readRepoFile("docs/Manual.md")).toContain("docs/model_card.md");
+  });
+
+  it("publishes manuscript claim and release-freeze controls", () => {
+    const claimMatrix = readRepoFile("docs/manuscript_claim_matrix.md");
+    const releaseScript = readRepoFile("scripts/release_freeze_check.ts");
+    const packageJson = readRepoFile("package.json");
+
+    expect(claimMatrix).toContain("Mechanically Verified");
+    expect(claimMatrix).toContain("Assumption-Conditional");
+    expect(claimMatrix).toContain("Empirically Unvalidated");
+    expect(claimMatrix).toContain("Prohibited Operational Interpretations");
+    expect(claimMatrix).toContain("0/4,849");
+    expect(claimMatrix).toContain("mission-success probability");
+    expect(releaseScript).toContain("priorCatalogSha256");
+    expect(releaseScript).toContain("validAcceptedCoverage");
+    expect(releaseScript).toContain("releasePriorsAdjudicated");
+    expect(packageJson).toContain("release:freeze:check");
   });
 
   it("keeps top-level docs and citation metadata scoped to scenario analysis", () => {

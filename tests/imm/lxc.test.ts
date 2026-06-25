@@ -15,32 +15,34 @@ function summary(mean: number, sd = 1): ScenarioSummary {
   };
 }
 
-function fakeOutcome(opts: { chiPct: number; missionSuccessPct: number }): IMMOutcome {
+function fakeOutcome(opts: { chiPct: number; healthCriterionPct: number }): IMMOutcome {
+  const healthCriterion = summary(opts.healthCriterionPct);
   return {
     tme:            summary(100),
     chi:            summary(opts.chiPct),
     pEvac:          summary(5),
     pLocl:          summary(0.4),
-    missionSuccess: summary(opts.missionSuccessPct),
+    healthCriterionAttainment: healthCriterion,
+    missionSuccess: healthCriterion,
     perConditionDrivers: [],
     convergence:    { trialCheckpoints: [], sigmaChi: [], sigmaPevac: [] },
   };
 }
 
 describe("assessIMMLxC — happy paths", () => {
-  it("excellent CHI + near-certain success → green (L1×C1=1)", () => {
-    // chi=99.9% → fractionLost=0.001 → C1 (≤0.01); missionSuccess=99.999% → pFailure=0.00001 → L1 (≤0.0001).
-    const r = assessIMMLxC(fakeOutcome({ chiPct: 99.9, missionSuccessPct: 99.999 }));
+  it("excellent CHI + near-certain health-criterion attainment → green (L1×C1=1)", () => {
+    // chi=99.9% -> fractionLost=0.001 -> C1; healthCriterion=99.999% -> pFailure=0.00001 -> L1.
+    const r = assessIMMLxC(fakeOutcome({ chiPct: 99.9, healthCriterionPct: 99.999 }));
     expect(r.consequence).toBe(1);
     expect(r.likelihood).toBe(1);
     expect(r.score).toBe(1);
     expect(r.color).toBe("green");
   });
 
-  it("typical issHMS-tier sim (95% CHI, 95% mission success) → yellow per JSC bands", () => {
-    // chi=95% → fractionLost=0.05 → C2 (≤0.05); missionSuccess=95% → pFailure=0.05 → L4 (≤0.10).
+  it("typical issHMS-tier sim (95% CHI, 95% criterion attainment) → yellow per JSC bands", () => {
+    // chi=95% -> fractionLost=0.05 -> C2; healthCriterion=95% -> pFailure=0.05 -> L4.
     // L4×C2 = 13 per the JSC-66705 priority matrix = yellow.
-    const r = assessIMMLxC(fakeOutcome({ chiPct: 95, missionSuccessPct: 95 }));
+    const r = assessIMMLxC(fakeOutcome({ chiPct: 95, healthCriterionPct: 95 }));
     expect(r.fractionLost).toBeCloseTo(0.05, 5);
     expect(r.pMissionFailure).toBeCloseTo(0.05, 5);
     expect(r.consequence).toBe(2);
@@ -50,8 +52,8 @@ describe("assessIMMLxC — happy paths", () => {
   });
 
   it("low CHI + high pFailure → max LxC score, red", () => {
-    // CHI=10% → fractionLost=0.90 → C5; missionSuccess=5% → pFailure=0.95 → L5.
-    const r = assessIMMLxC(fakeOutcome({ chiPct: 10, missionSuccessPct: 5 }));
+    // CHI=10% -> fractionLost=0.90 -> C5; healthCriterion=5% -> pFailure=0.95 -> L5.
+    const r = assessIMMLxC(fakeOutcome({ chiPct: 10, healthCriterionPct: 5 }));
     expect(r.fractionLost).toBeCloseTo(0.90, 5);
     expect(r.pMissionFailure).toBeCloseTo(0.95, 5);
     expect(r.likelihood).toBe(5);
@@ -61,8 +63,8 @@ describe("assessIMMLxC — happy paths", () => {
   });
 
   it("clamps degenerate inputs into [0,1]", () => {
-    // missionSuccess = 105% (impossible but tolerate) → pFailure clamped to 0.
-    const r = assessIMMLxC(fakeOutcome({ chiPct: 100, missionSuccessPct: 105 }));
+    // healthCriterion = 105% (impossible but tolerated for historical inputs) -> pFailure clamped to 0.
+    const r = assessIMMLxC(fakeOutcome({ chiPct: 100, healthCriterionPct: 105 }));
     expect(r.pMissionFailure).toBe(0);
     expect(r.fractionLost).toBe(0);
     // Expect lowest cells.
@@ -73,7 +75,7 @@ describe("assessIMMLxC — happy paths", () => {
 
 describe("assessIMMLxC — crew gate review flags", () => {
   it("crewVerdict=review-flagged reports review flags without overriding the IMM result", () => {
-    const greatOutcome = fakeOutcome({ chiPct: 99, missionSuccessPct: 99 });
+    const greatOutcome = fakeOutcome({ chiPct: 99, healthCriterionPct: 99 });
     const failedCrew: CrewGateResult = {
       crewVerdict: "review-flagged",
       perMemberResults: {},
@@ -90,7 +92,7 @@ describe("assessIMMLxC — crew gate review flags", () => {
 
   it("crewVerdict=clear does NOT short-circuit — Monte Carlo result drives verdict", () => {
     // Very-low-failure path: pure-IMM result must come through (no review flag).
-    const greatOutcome = fakeOutcome({ chiPct: 99.9, missionSuccessPct: 99.999 });
+    const greatOutcome = fakeOutcome({ chiPct: 99.9, healthCriterionPct: 99.999 });
     const clearCrew: CrewGateResult = {
       crewVerdict: "clear",
       perMemberResults: {},
@@ -103,7 +105,7 @@ describe("assessIMMLxC — crew gate review flags", () => {
   });
 
   it("no gate supplied → uses Monte Carlo result", () => {
-    const r = assessIMMLxC(fakeOutcome({ chiPct: 50, missionSuccessPct: 50 }));
+    const r = assessIMMLxC(fakeOutcome({ chiPct: 50, healthCriterionPct: 50 }));
     // 50% loss + 50% failure should land mid-matrix; specific cell depends on JSC bands.
     expect(r.reviewFlagged).toBeUndefined();
     expect(r.fractionLost).toBe(0.5);
@@ -114,17 +116,17 @@ describe("assessIMMLxC — crew gate review flags", () => {
 describe("assessIMMLxC — IMM unit conversion (percent ↔ fraction)", () => {
   it("converts IMM chi (0-100 percent) → consequence input (0-1 fractionLost)", () => {
     // chi = 70% → fractionLost = 0.30 exactly (within float epsilon).
-    const r = assessIMMLxC(fakeOutcome({ chiPct: 70, missionSuccessPct: 80 }));
+    const r = assessIMMLxC(fakeOutcome({ chiPct: 70, healthCriterionPct: 80 }));
     expect(r.fractionLost).toBeCloseTo(0.30, 9);
   });
 
-  it("converts IMM missionSuccess (0-100 percent) → likelihood input (0-1 pFailure)", () => {
-    const r = assessIMMLxC(fakeOutcome({ chiPct: 80, missionSuccessPct: 80 }));
+  it("converts IMM healthCriterionAttainment (0-100 percent) → likelihood input (0-1 pFailure)", () => {
+    const r = assessIMMLxC(fakeOutcome({ chiPct: 80, healthCriterionPct: 80 }));
     expect(r.pMissionFailure).toBeCloseTo(0.20, 9);
   });
 
   it("returns labels + definitions from the JSC-66705 verbatim band tables", () => {
-    const r = assessIMMLxC(fakeOutcome({ chiPct: 95, missionSuccessPct: 95 }));
+    const r = assessIMMLxC(fakeOutcome({ chiPct: 95, healthCriterionPct: 95 }));
     expect(r.likelihoodLabel).toBeTruthy();
     expect(r.likelihoodDefinition).toBeTruthy();
     expect(r.consequenceLabel).toBeTruthy();

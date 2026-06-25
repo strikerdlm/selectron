@@ -1,6 +1,6 @@
 // src/data/citations.ts
 // Scite/Crossref-verified citation database for Selectron criteria, gates, composite methods,
-// and mission-success-probability formulation.
+// and composite health-criterion formulation.
 //
 // Verification protocol:
 //   - Crossref: curl -fsS -A "Selectron/1.0 (mailto:dlmalpica@yahoo.com)" https://api.crossref.org/works/<DOI>
@@ -32,7 +32,7 @@ export type Citation = {
   relevance_quote?: string;
 };
 
-export type CitationKey = string; // namespaced: "criterion:<id>:primary|validation", "gate:<id>:threshold", "method:<id>", "msp:<id>"
+export type CitationKey = string; // namespaced: "criterion:<id>:primary|validation", "gate:<id>:threshold", "method:<id>", "health-criterion:<id>"
 
 // ─────────────────────────────────────────────────────────────────────────────
 // CRITERION CITATIONS (12 criteria × ~2 each)
@@ -518,12 +518,12 @@ const METHOD_CITATIONS: Record<CitationKey, Citation> = {
 };
 
 // ─────────────────────────────────────────────────────────────────────────────
-// MISSION SUCCESS PROBABILITY FORMULATION
+// COMPOSITE HEALTH-CRITERION FORMULATION
 // ─────────────────────────────────────────────────────────────────────────────
 
-const MSP_CITATIONS: Record<CitationKey, Citation> = {
+const HEALTH_CRITERION_CITATIONS: Record<CitationKey, Citation> = {
 
-  "msp:formulation:A22": {
+  "health-criterion:formulation:A22": {
     doi: "10.1038/s41526-022-00193-9",
     apa: "Antonsen, E., Myers, J. G., Boley, L., et al. (2022). Estimating medical risk in human spaceflight. npj Microgravity, 8(1). https://doi.org/10.1038/s41526-022-00193-9",
     authors: "Antonsen et al.",
@@ -538,7 +538,7 @@ const MSP_CITATIONS: Record<CitationKey, Citation> = {
     relevance_quote: "IMM 4-step trial: (1) Bernoulli incidence draw, (2) severity assignment, (3) treatment success, (4) outcome resolution — 100k Monte Carlo trials, converged on CHI/EVAC/LOCL probability estimates across 6 DRM scenarios.",
   },
 
-  "msp:formulation:K15": {
+  "health-criterion:formulation:K15": {
     doi: "no-doi-K15",
     apa: "Keenan, A., et al. (2015). Probabilistic Simulation for Medical Risk Estimation in Spaceflight. In Proceedings of ICES 2015. NASA.",
     authors: "Keenan et al.",
@@ -559,7 +559,7 @@ export const CITATIONS: Record<CitationKey, Citation> = {
   ...CRITERION_CITATIONS,
   ...GATE_CITATIONS,
   ...METHOD_CITATIONS,
-  ...MSP_CITATIONS,
+  ...HEALTH_CRITERION_CITATIONS,
 };
 
 export function citationsFor(key: CitationKey): Citation | undefined {

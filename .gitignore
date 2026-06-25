@@ -36,6 +36,7 @@ __pycache__/
 
 # Repo-root outputs (fitted priors, batch reports)
 outputs/
+verification-artifacts/
 
 # Graphify skill generated artifacts
 research/graphify-out/

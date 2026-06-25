@@ -7,11 +7,11 @@
 //
 // Mapping IMMOutcome → LxC inputs:
 //
-//   Likelihood: 1 − missionSuccess.mean/100
-//     missionSuccess is the per-trial fraction where the mission
-//     succeeded (no EVAC ∧ no LOCL ∧ CHI ≥ χ*). 1 − success rate is the
-//     probability of an unsuccessful mission, which is the operationally
-//     meaningful "early termination" measure for HSRB likelihood banding.
+//   Likelihood: 1 − healthCriterionAttainment.mean/100
+//     healthCriterionAttainment is the per-trial fraction where the composite
+//     health criterion was met (no EVAC ∧ no LOCL ∧ CHI ≥ χ*). 1 − attainment
+//     is an internal scenario criterion for historical HSRB band experiments,
+//     not a mission-success prediction.
 //     Conservative because it captures all failure modes (EVAC, LOCL, low
 //     CHI) — not just CHI < χ* like the Stage-B Risk assessor's pEarlyTerm.
 //
@@ -47,7 +47,7 @@ export type IMMLxCAssessment = {
   score: number;       // 1..25 (JSC-66705 priority matrix)
   color: RiskColor;    // green | yellow | red
   // Inputs that drove the assessment — surfaced for the UI explanation.
-  pMissionFailure: number;   // 1 − missionSuccess.mean/100 (likelihood input)
+  pMissionFailure: number;   // 1 − healthCriterionAttainment.mean/100 (likelihood input)
   fractionLost: number;      // 1 − chi.mean/100 (consequence input)
   /** Set to true when the crew triggered at least one demo-threshold review flag. */
   reviewFlagged?: boolean;

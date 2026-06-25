@@ -160,7 +160,7 @@ function HealthCriterionRow({
       <div className="flex items-baseline gap-3">
         <span
           className="display mono text-2xl text-ink-0 leading-none tabular-nums"
-          data-testid="imm-headline-msp-mean"
+          data-testid="imm-headline-health-criterion-mean"
         >
           {fmtPct(summary.mean)}
         </span>
