@@ -1,4 +1,4 @@
-import { readFileSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { describe, expect, it } from "vitest";
 
@@ -6,6 +6,10 @@ const ROOT = resolve(__dirname, "../..");
 
 function readRepoFile(path: string): string {
   return readFileSync(resolve(ROOT, path), "utf8");
+}
+
+function repoFileExists(path: string): boolean {
+  return existsSync(resolve(ROOT, path));
 }
 
 describe("active analog workflow guards", () => {
@@ -256,6 +260,17 @@ describe("active analog workflow guards", () => {
       "paper/supplementary/S-Methods-2-nasa-mc-audit.md",
     ];
 
+    if (!repoFileExists("paper/RETIREMENT_NOTICE.md")) {
+      for (const path of retiredPaperFiles) {
+        expect(repoFileExists(path), `${path} must not be published without retirement metadata`).toBe(false);
+      }
+      expect(repoFileExists("paper/Makefile"), "public mirror must not publish retired paper build targets").toBe(false);
+      expect(readRepoFile(".gitignore")).toContain("!paper/REPRODUCIBILITY_LOCK.json");
+      expect(readRepoFile("src/ui/testing/TestFigureHost.tsx")).toContain("RETIRED_PAPER_FIGURE_IDS");
+      expect(readRepoFile("src/ui/testing/TestFigureHost.tsx")).toContain("Retired paper figure");
+      return;
+    }
+
     expect(readRepoFile("paper/RETIREMENT_NOTICE.md")).toContain("Do not submit, cite, rebuild, or upload");
     expect(readRepoFile("paper/Makefile")).toContain("The paper/ submission package is retired");
     expect(readRepoFile("src/ui/testing/TestFigureHost.tsx")).toContain("RETIRED_PAPER_FIGURE_IDS");
@@ -289,6 +304,10 @@ describe("active analog workflow guards", () => {
     ];
 
     for (const path of reportPaths) {
+      if (!repoFileExists(path)) {
+        expect(path).toBe("docs/reports/2026-06-09_peer-review_selectron-publication-readiness.md");
+        continue;
+      }
       const source = readRepoFile(path);
       expect(source, `${path} must carry the archive boundary`).toContain("Historical report boundary");
       for (const forbidden of [

@@ -20,7 +20,7 @@ Manuscript sources, journal submission packages, and peer-review working files a
 - **v0.6 rebaseline** is the active software baseline (see `docs/v0.6_rebaseline.md`).
 - **Gate 0–2 audit containment** is implemented: research-prototype warnings, explicit Stage-A demo catalog, parameter-level evidence status, default-off trait coupling, K15 framed as reference-model regression (not operational validation).
 - **Review audit batch (F1–F12)** largely complete in application code: session provenance exports, evidence drift CI check, fail-closed scenario validation, profile-effects pilot (`profile.communication.delaySec`), PVT double-count resolved in demo criteria.
-- **Evidence ledger:** 4 accepted pilot rows; `releasePriorsAdjudicated = false`; ~4,849 active parameter paths.
+- **Evidence ledger:** four nominal `accepted` rows, all malformed; valid accepted active-parameter coverage is `0/4,849`; `releasePriorsAdjudicated = false`.
 - **User manual:** [`docs/Manual.md`](docs/Manual.md).
 
 ### Verification (last recorded)

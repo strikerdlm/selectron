@@ -2,7 +2,7 @@
 
 # Selectron
 
-**A transparent uncertain-weight MCDA and analog mission simulation prototype for space-analog crew-selection research.**
+**A transparent uncertain-weight MCDA and analog mission simulation prototype for space-analog crew-composition scenario analysis.**
 
 *Candidate scores are uncertainty-propagated MCDA estimates, not validated suitability posteriors. Analog mission outputs are scenario estimates, not NASA HSRB verdicts.*
 
@@ -35,10 +35,10 @@ The application runs locally in the browser. Candidate and simulation data are s
 
 Selectron combines four pieces that are kept in one source tree:
 
-- **Stage A: uncertain-weight MCDA selection scoring** in `src/engine/`. Candidate totals are score distributions induced by Dirichlet-distributed criterion weights and normalized criterion scores. They are not learned Bayesian posteriors unless a separate elicitation/inference model is added.
+- **Stage A: uncertain-weight MCDA candidate scoring** in `src/engine/`. Candidate totals are score distributions induced by Dirichlet-distributed criterion weights and normalized criterion scores. They are not learned Bayesian posteriors, eligibility determinations, or suitability rankings unless a separate elicitation, inference, and validation model is added.
 - **Stage B: analog mission medical-event simulation** in `src/imm/`. The current IMM-style calculator uses a 101-condition prior set, structured analog mission profiles, resource-kit configuration, and chronological event processing.
 - **A browser application** in Vite + React + Tailwind + ECharts. The main surfaces are Dashboard, Wizard, Crew Composition, Calibration, and Analysis.
-- **Evidence and reproducibility tooling** in `research/`, `python/`, and `docs/`. Release fitting reads adjudicated count extracts from `research/evidence_extracted/evidence_ledger.csv`; proposal CSVs require an explicit exploratory flag. Pilot adjudication is in progress (4 accepted ledger rows; release remains unadjudicated until all active parameter paths are covered).
+- **Evidence and reproducibility tooling** in `research/`, `python/`, and `docs/`. Release fitting reads adjudicated count extracts from `research/evidence_extracted/evidence_ledger.csv`; proposal CSVs require an explicit exploratory flag. Pilot adjudication is in progress (4 nominal accepted ledger rows, all currently malformed; 0 valid accepted active-parameter paths; release remains unadjudicated until all active parameter paths are covered).
 
 This is the **public application repository** (`https://github.com/strikerdlm/selectron`). The software archive is on Zenodo at `https://doi.org/10.5281/zenodo.20693257`. The active development version is **v0.6.0-rebaseline.0** across `package.json`, `CITATION.cff`, `src/version.ts`, and app chrome.
 
@@ -55,6 +55,7 @@ Other key docs:
 | Document | Purpose |
 |----------|---------|
 | [`docs/Manual.md`](docs/Manual.md) | Full user manual (primary operator guide) |
+| [`docs/model_card.md`](docs/model_card.md) | Validation status, intended use, and unacceptable extrapolations |
 | [`STATUS.md`](STATUS.md) | Software project tracker |
 | [`docs/v0.6_rebaseline.md`](docs/v0.6_rebaseline.md) | Release gates and disposition matrix |
 | [`docs/iter3_vv_dossier.md`](docs/iter3_vv_dossier.md) | Validation & verification dossier |
@@ -145,7 +146,7 @@ See `docs/iter5_scientific_limitations.md`, `docs/future_features.md`, and `STAT
 
 ## Citation
 
-> Malpica Hincapie, D. L. (2026). *Selectron: uncertain-weight MCDA and analog mission simulation prototype for space-analog crew-selection research*. Zenodo. https://doi.org/10.5281/zenodo.20693257
+> Malpica Hincapie, D. L. (2026). *Selectron: uncertain-weight MCDA and analog mission simulation prototype for space-analog crew-composition scenario analysis*. Zenodo. https://doi.org/10.5281/zenodo.20693257
 
 See `CITATION.cff` for machine-readable metadata.
 
