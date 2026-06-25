@@ -50,7 +50,7 @@ jobs:
           npx playwright test
           tests/e2e/calibration.smoke.spec.ts
           tests/e2e/crew_composition.smoke.spec.ts
-          --grep "Batch Fit tab renders config form|V&V tab shows validation and sensitivity panels|scenario trait coupling exposes beta scale control"
+          --grep "Batch Fit tab renders config form|V&V tab shows reference-model regression and sensitivity panels|scenario trait coupling exposes beta scale control"
 
   python-fast:
     name: python fast tests

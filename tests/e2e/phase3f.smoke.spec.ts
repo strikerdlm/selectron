@@ -133,7 +133,7 @@ test.describe("Crew Composition view", () => {
   //   • Use raw element.screenshot() (not toHaveScreenshot) so no comparison
   //     baseline is created — the PNG would otherwise diff-fail across API
   //     states (offline-first contract).
-  test("i6 analog predictive figure renders for antarctic mission", async ({ page }) => {
+  test("i6 analog predictive figure renders for antarctic mission", async ({ page }, testInfo) => {
     // The full 100k-trial worker sim + the predictive sweep can take
     // well over the 60s default; allow generous headroom for this one test.
     test.setTimeout(150_000);
@@ -164,7 +164,7 @@ test.describe("Crew Composition view", () => {
     await page.waitForTimeout(800); // allow ECharts histogram to settle
 
     await region.screenshot({
-      path: "tests/e2e/__snapshots__/phase3f.smoke.spec.ts/i6-analog-posterior.png",
+      path: testInfo.outputPath("i6-analog-posterior.png"),
     });
   });
 });
