@@ -52,7 +52,7 @@ import { aggregateCrewComposite } from "../../src/imm/composite";
 import { IMM_KITS } from "../../src/imm/kits";
 import { IMM_MISSIONS } from "../../src/data/imm-missions";
 import { PLACEHOLDER_CRITERIA } from "../../src/data/placeholder-criteria";
-import type { IMMCrewMember } from "../../src/imm/types";
+import type { IMMCrewMember, IMMMission } from "../../src/imm/types";
 
 const SEED = 0xc0ffee;
 const TRIALS = 3_000; // matches the kind_multipliers suite's TR convention
@@ -120,6 +120,17 @@ function makeCrew(overrides: Record<string, number>): IMMCrewMember[] {
 const unscreenedCrew = makeCrew(UNSCREENED_OVERRIDES);
 const screenedCrew = makeCrew(SCREENED_OVERRIDES);
 
+function missionForCrew(base: IMMMission, crew: IMMCrewMember[]): IMMMission {
+  return {
+    ...base,
+    crewSize: crew.length,
+    totalEVAs: crew.reduce((sum, member) => sum + member.EVA_count, 0),
+  };
+}
+
+const mission45ForCrew = missionForCrew(mission, unscreenedCrew);
+const mission22ForCrew = missionForCrew(mission22, unscreenedCrew);
+
 describe("analog-45d · unscreened high-risk crew (no Stage-A selection)", () => {
   it("fixture: analog-45d is the 45-day analog-controlled campaign", () => {
     expect(mission.kind).toBe("analog-controlled");
@@ -146,7 +157,7 @@ describe("analog-45d · unscreened high-risk crew (no Stage-A selection)", () =>
   it("default scientific mode ignores Stage-A incidence coupling even when criteria are supplied", () => {
     const screened = simulateIMM({
       crew: screenedCrew,
-      mission,
+      mission: mission45ForCrew,
       kit,
       trials: 500,
       seed: SEED,
@@ -154,7 +165,7 @@ describe("analog-45d · unscreened high-risk crew (no Stage-A selection)", () =>
     });
     const unscreened = simulateIMM({
       crew: unscreenedCrew,
-      mission,
+      mission: mission45ForCrew,
       kit,
       trials: 500,
       seed: SEED,
@@ -168,7 +179,7 @@ describe("analog-45d · unscreened high-risk crew (no Stage-A selection)", () =>
   it("scenario mode elevates 45-day mission risk via the vulnerability path (TME↑, CHI↓)", () => {
     const screened = simulateIMM({
       crew: screenedCrew,
-      mission,
+      mission: mission45ForCrew,
       kit,
       trials: TRIALS,
       seed: SEED,
@@ -177,7 +188,7 @@ describe("analog-45d · unscreened high-risk crew (no Stage-A selection)", () =>
     });
     const unscreened = simulateIMM({
       crew: unscreenedCrew,
-      mission,
+      mission: mission45ForCrew,
       kit,
       trials: TRIALS,
       seed: SEED,
@@ -201,8 +212,8 @@ describe("analog-45d · unscreened high-risk crew (no Stage-A selection)", () =>
   });
 
   it("negative control: without a criteria catalog scenario mode cannot see stageAScores — both crews bit-identical", () => {
-    const a = simulateIMM({ crew: screenedCrew, mission, kit, trials: 500, seed: SEED, vulnerabilityCouplingMode: "scenario" });
-    const b = simulateIMM({ crew: unscreenedCrew, mission, kit, trials: 500, seed: SEED, vulnerabilityCouplingMode: "scenario" });
+    const a = simulateIMM({ crew: screenedCrew, mission: mission45ForCrew, kit, trials: 500, seed: SEED, vulnerabilityCouplingMode: "scenario" });
+    const b = simulateIMM({ crew: unscreenedCrew, mission: mission45ForCrew, kit, trials: 500, seed: SEED, vulnerabilityCouplingMode: "scenario" });
     expect(Math.abs(a.tme.mean - b.tme.mean)).toBeLessThan(1e-12);
     expect(Math.abs(a.chi.mean - b.chi.mean)).toBeLessThan(1e-12);
     expect(Math.abs(a.pEvac.mean - b.pEvac.mean)).toBeLessThan(1e-12);
@@ -229,7 +240,7 @@ describe("analog-22d · same unscreened crew (22-day campaign)", () => {
   it("scenario mode elevates 22-day mission risk via the vulnerability path (TME↑, CHI↓)", () => {
     const screened = simulateIMM({
       crew: screenedCrew,
-      mission: mission22,
+      mission: mission22ForCrew,
       kit,
       trials: TRIALS,
       seed: SEED,
@@ -238,7 +249,7 @@ describe("analog-22d · same unscreened crew (22-day campaign)", () => {
     });
     const unscreened = simulateIMM({
       crew: unscreenedCrew,
-      mission: mission22,
+      mission: mission22ForCrew,
       kit,
       trials: TRIALS,
       seed: SEED,
@@ -253,7 +264,7 @@ describe("analog-22d · same unscreened crew (22-day campaign)", () => {
   it("duration monotonicity: the same unscreened crew accrues fewer expected medical events in 22 days than in 45", () => {
     const u22 = simulateIMM({
       crew: unscreenedCrew,
-      mission: mission22,
+      mission: mission22ForCrew,
       kit,
       trials: TRIALS,
       seed: SEED,
@@ -262,7 +273,7 @@ describe("analog-22d · same unscreened crew (22-day campaign)", () => {
     });
     const u45 = simulateIMM({
       crew: unscreenedCrew,
-      mission,
+      mission: mission45ForCrew,
       kit,
       trials: TRIALS,
       seed: SEED,

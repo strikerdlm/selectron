@@ -82,11 +82,14 @@ function PrecisionPanel({ outcome }: { outcome: IMMOutcome }) {
         : `needs T >= ${fmtTrials(precision.requiredTrials)}`
     : null;
   const minTailCount = precision?.targets.minBinaryEventCount ?? 30;
+  const replicationSpreadLabel = replication
+    ? `percent spread ${fmtPp(replication.maxMeanSpreadPp ?? 0)}; TME spread ${(replication.maxTmeMeanSpread ?? 0).toFixed(2)} events`
+    : "";
   const replicationLabel = replication
     ? replication.passed === true
       ? `pass (${replication.observedSeeds}/${replication.requiredSeeds} seeds)`
       : replication.passed === false
-        ? `needs review (${replication.observedSeeds}/${replication.requiredSeeds} seeds, spread ${fmtPp(replication.maxMeanSpreadPp ?? 0)})`
+        ? `needs review (${replication.observedSeeds}/${replication.requiredSeeds} seeds, ${replicationSpreadLabel})`
         : `not assessed (${replication.observedSeeds}/${replication.requiredSeeds} seeds)`
     : "not assessed";
   return (

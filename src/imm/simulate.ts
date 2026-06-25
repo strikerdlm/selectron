@@ -60,6 +60,7 @@ export const DEFAULT_MONTE_CARLO_PRECISION_TARGETS: MonteCarloPrecisionTargets =
   minBinaryEventCount: 30,
   minIndependentSeeds: 3,
   maxSeedMeanSpreadPp: 0.5,
+  tmeSeedMeanSpreadMax: 0.5,
 };
 
 // General-Poisson conditions that are specific to ISS/ECLSS infrastructure
@@ -78,11 +79,11 @@ export function isTerrestrialAnalog(kind: IMMMissionKind): boolean {
 import type { IMMCrewMember, IMMMission, IMMKitScenario, IMMPrior, IMMConditionFamily, IMMCondition, IMMMissionKind, IMMProcessType, VulnerabilityCouplingMode, ProfileEffectMode } from "./types";
 import { IMM_CONDITIONS } from "./conditions";
 import { loadIMMPriors } from "./priors";
-import { applyProportionalHazardMultiplier, samplePoisson, sampleLognormal, sampleScaledBetaBernoulli, samplePoissonProcess } from "./incidence";
+import { applyProportionalHazardMultiplier, sampleBeta, samplePoisson, sampleLognormal, samplePoissonProcess } from "./incidence";
 import { applyVulnerabilityMultiplier } from "../engine/vulnerability";
 import { scaleRelativeScore } from "../engine/normalize-cohort";
 import { sampleGamma } from "../engine/gamma";
-import { sampleSeverity } from "./severity";
+import { sampleSeverityFromProbability, sampleSeverityProbability } from "./severity";
 import { sampleBetaPert } from "./outcomes";
 import { RAF_TREATMENT_MODEL_DISCLOSURE, interpolateBetaPertByRAF, selectSeverityOutcomes } from "./treatment";
 import { computeRAF } from "./kits";
@@ -381,32 +382,20 @@ function sampleGeneralPoissonCount(
   rng: Rng,
   prior: IMMPrior,
   member: IMMCrewMember,
+  lambdaPerDay: number,
   durationDays: number,
   family: IMMConditionFamily,
   vulnerabilityCriteria: string[],
   criteriaIndex: ReadonlyMap<string, Criterion>,
   tierMult: number = 1.0,
   familyBetaScale = 1.0,
-  incidenceRateOverride?: number,
 ): number {
-  const inc = prior.incidence;
-  if (inc.distribution === "Lognormal-Poisson") {
-    const lambdaPerDay = incidenceRateOverride ?? sampleLognormal(rng, inc.mu_log_lambda!, inc.sigma_log_lambda!);
-    const rfmLambda = applyRiskFactorMultiplier(lambdaPerDay, member, prior);
-    const modLambda = applyStageAVulnerabilityMultiplier(rfmLambda, member, family, vulnerabilityCriteria, criteriaIndex, familyBetaScale);
-    // rev3-b-followup: tierMult applied at the λ-sampling site → Poisson(λ · tierMult)
-    // preserves both mean *and* variance (Var = λ · tierMult, not mult² · λ which
-    // is what post-count stochastic rounding produced).
-    return samplePoisson(rng, modLambda * durationDays * tierMult);
-  }
-  if (inc.distribution === "Gamma-Poisson") {
-    const lambdaPerDay = incidenceRateOverride ?? (sampleGamma(inc.alpha!, rng) / inc.beta!);
-    const rfmLambda = applyRiskFactorMultiplier(lambdaPerDay, member, prior);
-    const modLambda = applyStageAVulnerabilityMultiplier(rfmLambda, member, family, vulnerabilityCriteria, criteriaIndex, familyBetaScale);
-    return samplePoisson(rng, modLambda * durationDays * tierMult);
-  }
-  // Fixed: already handled inline in the caller (lambda_fixed is a rate-per-day too)
-  throw new Error(`E_BAD_PRIOR: sampleGeneralPoissonCount called with unsupported distribution ${inc.distribution}`);
+  const rfmLambda = applyRiskFactorMultiplier(lambdaPerDay, member, prior);
+  const modLambda = applyStageAVulnerabilityMultiplier(rfmLambda, member, family, vulnerabilityCriteria, criteriaIndex, familyBetaScale);
+  // rev3-b-followup: tierMult applied at the λ-sampling site → Poisson(λ · tierMult)
+  // preserves both mean *and* variance (Var = λ · tierMult, not mult² · λ which
+  // is what post-count stochastic rounding produced).
+  return samplePoisson(rng, modLambda * durationDays * tierMult);
 }
 
 function sampleRateFromPrior(rng: Rng, prior: IMMPrior): number {
@@ -422,16 +411,19 @@ function sampleSingleOccurrenceWithMultiplier(
   prior: IMMPrior,
   multiplier: number,
   exposureUnits: number,
-  incidenceRateOverride?: number,
+  trialRate?: number,
+  trialBetaProbability?: number,
 ): 0 | 1 {
   if (!Number.isFinite(multiplier) || multiplier <= 0 || exposureUnits <= 0) return 0;
 
   const inc = prior.incidence;
   if (inc.distribution === "Beta-Bernoulli") {
-    return sampleScaledBetaBernoulli(rng, inc.alpha!, inc.beta!, multiplier);
+    const baseP = trialBetaProbability ?? sampleBeta(rng, inc.alpha!, inc.beta!);
+    const scaledP = applyProportionalHazardMultiplier(baseP, multiplier);
+    return rng() < scaledP ? 1 : 0;
   }
 
-  const rate = Math.max(0, incidenceRateOverride ?? sampleRateFromPrior(rng, prior));
+  const rate = Math.max(0, trialRate ?? sampleRateFromPrior(rng, prior));
   const baseP = 1 - Math.exp(-rate * exposureUnits);
   const scaledP = applyProportionalHazardMultiplier(baseP, multiplier);
   return rng() < scaledP ? 1 : 0;
@@ -486,6 +478,36 @@ export function runIMMTrial(
     return opts.conditionFilter ? opts.conditionFilter(cond) : true;
   });
 
+  // Scientific hierarchy: Gamma/lognormal incidence distributions represent
+  // epistemic uncertainty about a condition-level rate. Draw that base rate
+  // once per condition per trial, then apply person-level risk factors/frailty
+  // separately. Beta-Bernoulli incidence and severity probabilities follow the
+  // same outer-draw convention so their concentration parameters affect
+  // between-trial uncertainty rather than collapsing to only the mean.
+  const trialRatesByCondition = new Map<string, number>();
+  const trialBetaProbabilitiesByCondition = new Map<string, number>();
+  const trialSeverityProbabilitiesByCondition = new Map<string, number>();
+  for (const cond of activeConditions) {
+    const prior = priors.conditions[cond.id];
+    if (!prior) continue;
+    const rawRateOverride = opts.incidenceRateOverrides?.[cond.id];
+    if (rawRateOverride !== undefined && (!Number.isFinite(rawRateOverride) || rawRateOverride < 0)) {
+      throw new SelectronError("E_BAD_SCENARIO_CONTROL", `incidenceRateOverrides[${cond.id}] must be finite and non-negative, got ${rawRateOverride}`, {
+        key: cond.id,
+        value: rawRateOverride,
+      });
+    }
+    if (prior.incidence.distribution === "Beta-Bernoulli") {
+      trialBetaProbabilitiesByCondition.set(cond.id, sampleBeta(rng, prior.incidence.alpha!, prior.incidence.beta!));
+    } else {
+      trialRatesByCondition.set(cond.id, Math.max(0, rawRateOverride ?? sampleRateFromPrior(rng, prior)));
+    }
+    trialSeverityProbabilitiesByCondition.set(
+      cond.id,
+      sampleSeverityProbability(rng, prior.severity.worst_case_prob_alpha, prior.severity.worst_case_prob_beta),
+    );
+  }
+
   // Health-Support gating: scale each resource by the tier's per-delivery-class
   // deliverability before RAF. Identity for issHMS/unlimited (K15 invariant);
   // only bites for none/medium. See src/imm/health-support.ts.
@@ -532,13 +554,8 @@ export function runIMMTrial(
         opts.profileEffectMode ?? "adjudicated",
       );
       const effectiveMult = tierMult * kindMult * profileMult;
-      const rawRateOverride = opts.incidenceRateOverrides?.[cond.id];
-      if (rawRateOverride !== undefined && (!Number.isFinite(rawRateOverride) || rawRateOverride < 0)) {
-        throw new SelectronError("E_BAD_SCENARIO_CONTROL", `incidenceRateOverrides[${cond.id}] must be finite and non-negative, got ${rawRateOverride}`, {
-          key: cond.id,
-          value: rawRateOverride,
-        });
-      }
+      const trialRate = trialRatesByCondition.get(cond.id);
+      const trialBetaProbability = trialBetaProbabilitiesByCondition.get(cond.id);
 
       let count = 0;
       if (cond.processType === "general-Poisson") {
@@ -547,31 +564,32 @@ export function runIMMTrial(
           // Scenario mode: apply Stage A vulnerability multiplier on top of RFM.
           // rev3-b-followup: tierMult applied to λ directly (variance-preserving).
           // 2026-06-04: kindMult threaded into effectiveMult.
-          const baseLambdaPerDay = rawRateOverride ?? prior.incidence.lambda_fixed!;
+          const baseLambdaPerDay = trialRate ?? prior.incidence.lambda_fixed!;
           const rfmLambdaPerDay = applyRiskFactorMultiplier(baseLambdaPerDay, member, prior);
           const modLambdaPerDay = applyStageAVulnerabilityMultiplier(rfmLambdaPerDay, member, cond.family, cond.vulnerabilityCriteria, criteriaIndex, familyBetaScale);
           count = samplePoisson(rng, modLambdaPerDay * mission.durationDays * effectiveMult);
         } else {
-          // Gamma-Poisson / Lognormal-Poisson: draw λ/day from the stored rate prior, apply RFM,
-          // optional scenario Stage A multiplier, then scale by mission duration before Poisson sampling.
+          // Gamma-Poisson / Lognormal-Poisson: reuse the condition/trial λ/day
+          // draw, apply RFM and optional scenario Stage A multiplier, then scale
+          // by mission duration before Poisson sampling.
           count = sampleGeneralPoissonCount(
             rng,
             prior,
             member,
+            trialRate ?? sampleRateFromPrior(rng, prior),
             mission.durationDays,
             cond.family,
             cond.vulnerabilityCriteria,
             criteriaIndex,
             effectiveMult,
             familyBetaScale,
-            rawRateOverride,
           );
         }
       } else if (cond.processType === "space-adaptation-once") {
         // T24: once-per-mission cap — skip if this crew member already had this condition.
         if (processedSAOnce[cIdx].has(cond.id)) {
           count = 0;
-        } else if (sampleSingleOccurrenceWithMultiplier(rng, prior, effectiveMult, mission.durationDays, rawRateOverride)) {
+        } else if (sampleSingleOccurrenceWithMultiplier(rng, prior, effectiveMult, mission.durationDays, trialRate, trialBetaProbability)) {
           processedSAOnce[cIdx].add(cond.id);
           count = 1;
         }
@@ -580,7 +598,7 @@ export function runIMMTrial(
         // probability through proportional-hazard scaling so values >1 elevate
         // risk instead of being silently capped by a second Bernoulli gate.
         for (let e = 0; e < member.EVA_count; e++) {
-          if (sampleSingleOccurrenceWithMultiplier(rng, prior, effectiveMult, 1, rawRateOverride)) count++;
+          if (sampleSingleOccurrenceWithMultiplier(rng, prior, effectiveMult, 1, trialRate, trialBetaProbability)) count++;
         }
       } else if (cond.processType === "SPE-coupled") {
         // T23: Per-SPE-event Bernoulli via ARS prior (Beta-Bernoulli per event).
@@ -594,8 +612,10 @@ export function runIMMTrial(
         // set today).
         const arsAlpha = prior.incidence.alpha ?? 2;
         const arsBeta  = prior.incidence.beta  ?? 18;
+        const arsProbability = trialBetaProbability ?? sampleBeta(rng, arsAlpha, arsBeta);
         for (const speTime of speEventTimes) {
-          if (sampleScaledBetaBernoulli(rng, arsAlpha, arsBeta, effectiveMult) === 1) {
+          const scaledP = applyProportionalHazardMultiplier(arsProbability, effectiveMult);
+          if (rng() < scaledP) {
             pendingOccurrences.push({ condition: cond, prior, crewIndex: cIdx, timeDays: speTime });
           }
         }
@@ -603,7 +623,7 @@ export function runIMMTrial(
       } else if (cond.processType === "SA-VIIP-late") {
         // Single late-mission occurrence path under the same probability
         // scaling as other Bernoulli-style processes.
-        if (sampleSingleOccurrenceWithMultiplier(rng, prior, effectiveMult, mission.durationDays, rawRateOverride)) count = 1;
+        if (sampleSingleOccurrenceWithMultiplier(rng, prior, effectiveMult, mission.durationDays, trialRate, trialBetaProbability)) count = 1;
       }
 
       // rev3-b-followup (2026-05-22): the post-count stochastic-rounding block that
@@ -636,7 +656,10 @@ export function runIMMTrial(
   for (const pending of pendingOccurrences) {
     if (earlyTerminated.has(pending.crewIndex)) continue;
     const { condition: cond, prior } = pending;
-    const severity = sampleSeverity(rng, prior.severity.worst_case_prob_alpha, prior.severity.worst_case_prob_beta);
+    const severityProbability =
+      trialSeverityProbabilitiesByCondition.get(cond.id) ??
+      sampleSeverityProbability(rng, prior.severity.worst_case_prob_alpha, prior.severity.worst_case_prob_beta);
+    const severity = sampleSeverityFromProbability(rng, severityProbability);
     const severityOutcomes = selectSeverityOutcomes(prior, severity);
     const raf = computeRAF(prior.required_resources, availableResources);
     if (opts.traceRAF) rafHistory.push({ conditionId: cond.id, raf });
@@ -654,7 +677,7 @@ export function runIMMTrial(
       outcomes: { fi_cp1, dt_cp1_hours: dt_cp1, fi_cp2, dt_cp2_hours: dt_cp2, fi_cp3, p_evac, p_locl },
     });
     for (const [k, q] of Object.entries(prior.required_resources)) {
-      const used = q * raf;
+      const used = Math.min(q, availableResources[k] ?? 0);
       availableResources[k] = Math.max(0, (availableResources[k] ?? 0) - used);
     }
     if (terminal.evac || terminal.locl) earlyTerminated.add(pending.crewIndex);
@@ -1012,6 +1035,9 @@ export function assessMonteCarloPrecision(
     observedSeeds: 1,
     targetMaxMeanSpreadPp: targets.maxSeedMeanSpreadPp,
     maxMeanSpreadPp: null,
+    targetMaxTmeMeanSpread: targets.tmeSeedMeanSpreadMax,
+    maxTmeMeanSpread: null,
+    allSeedStoppingRulesPassed: null,
     passed: null,
   };
   return {
@@ -1065,12 +1091,20 @@ export function summarizeIndependentSeedOutcomes(
     metrics.pLoclMeanRangePp,
     metrics.healthCriterionMeanRangePp,
   );
+  const allSeedStoppingRulesPassed = outcomes.every((outcome) => outcome.precisionAssessment?.stoppingRulePassed === true);
   const assessment: MonteCarloSeedReplicationAssessment = {
     requiredSeeds: targets.minIndependentSeeds,
     observedSeeds: outcomes.length,
     targetMaxMeanSpreadPp: targets.maxSeedMeanSpreadPp,
     maxMeanSpreadPp,
-    passed: outcomes.length >= targets.minIndependentSeeds && maxMeanSpreadPp <= targets.maxSeedMeanSpreadPp,
+    targetMaxTmeMeanSpread: targets.tmeSeedMeanSpreadMax,
+    maxTmeMeanSpread: metrics.tmeMeanRange,
+    allSeedStoppingRulesPassed,
+    passed:
+      outcomes.length >= targets.minIndependentSeeds &&
+      metrics.tmeMeanRange <= targets.tmeSeedMeanSpreadMax &&
+      maxMeanSpreadPp <= targets.maxSeedMeanSpreadPp &&
+      allSeedStoppingRulesPassed,
   };
   return {
     seeds: [...seeds],
@@ -1189,8 +1223,97 @@ export function simulateIMM(opts: SimulateIMMOptions): IMMOutcome {
   if (!Array.isArray(crew) || crew.length === 0) {
     throw _bad("crew must be a non-empty array", { crewLength: crew?.length });
   }
+  if (!mission || typeof mission !== "object") {
+    throw _bad("mission must be an object");
+  }
+  if (!kit || typeof kit !== "object") {
+    throw _bad("kit must be an object");
+  }
   if (!Number.isFinite(mission.durationDays) || mission.durationDays <= 0) {
     throw _bad(`mission.durationDays must be positive and finite, got ${mission.durationDays}`, { durationDays: mission.durationDays });
+  }
+  if (!Number.isInteger(mission.crewSize) || mission.crewSize <= 0) {
+    throw _bad(`mission.crewSize must be a positive integer, got ${mission.crewSize}`, { crewSize: mission.crewSize });
+  }
+  if (mission.crewSize !== crew.length) {
+    throw _bad(`mission.crewSize (${mission.crewSize}) must equal supplied crew length (${crew.length})`, {
+      crewSize: mission.crewSize,
+      crewLength: crew.length,
+    });
+  }
+  if (!Number.isInteger(mission.totalEVAs) || mission.totalEVAs < 0) {
+    throw _bad(`mission.totalEVAs must be a non-negative integer, got ${mission.totalEVAs}`, { totalEVAs: mission.totalEVAs });
+  }
+  if (!Array.isArray(mission.evaSchedule)) {
+    throw _bad("mission.evaSchedule must be an array", { evaSchedule: mission.evaSchedule });
+  }
+  let previousEvaDay = -Infinity;
+  for (const [idx, day] of mission.evaSchedule.entries()) {
+    if (!Number.isFinite(day) || day < 0 || day > mission.durationDays) {
+      throw _bad(`mission.evaSchedule[${idx}] must be within [0, ${mission.durationDays}], got ${day}`, {
+        index: idx,
+        value: day,
+        durationDays: mission.durationDays,
+      });
+    }
+    if (day < previousEvaDay) {
+      throw _bad(`mission.evaSchedule must be ordered ascending; index ${idx} is ${day} after ${previousEvaDay}`, {
+        index: idx,
+        value: day,
+        previous: previousEvaDay,
+      });
+    }
+    previousEvaDay = day;
+  }
+  const seenCrewIds = new Set<string>();
+  let crewEvaExposureCount = 0;
+  for (const [idx, member] of crew.entries()) {
+    if (!member || typeof member !== "object") {
+      throw _bad(`crew[${idx}] must be an object`, { index: idx });
+    }
+    if (typeof member.id !== "string" || member.id.trim() === "") {
+      throw _bad(`crew[${idx}].id must be a non-empty string`, { index: idx, id: member.id });
+    }
+    if (seenCrewIds.has(member.id)) {
+      throw _bad(`crew member id must be unique, duplicate id ${member.id}`, { id: member.id });
+    }
+    seenCrewIds.add(member.id);
+    if (member.sex !== "male" && member.sex !== "female") {
+      throw _bad(`crew[${idx}].sex must be "male" or "female", got ${String(member.sex)}`, {
+        index: idx,
+        sex: member.sex,
+      });
+    }
+    for (const flag of ["contacts", "crowns", "CAC_positive", "abdominal_surgery_history", "EVA_eligible"] as const) {
+      if (typeof member[flag] !== "boolean") {
+        throw _bad(`crew[${idx}].${flag} must be boolean`, { index: idx, key: flag, value: member[flag] });
+      }
+    }
+    if (!Number.isInteger(member.EVA_count) || member.EVA_count < 0) {
+      throw _bad(`crew[${idx}].EVA_count must be a non-negative integer, got ${member.EVA_count}`, {
+        index: idx,
+        EVA_count: member.EVA_count,
+      });
+    }
+    if (!member.EVA_eligible && member.EVA_count !== 0) {
+      throw _bad(`crew[${idx}].EVA_count must be 0 when EVA_eligible is false`, {
+        index: idx,
+        EVA_eligible: member.EVA_eligible,
+        EVA_count: member.EVA_count,
+      });
+    }
+    crewEvaExposureCount += member.EVA_eligible ? member.EVA_count : 0;
+  }
+  if (crewEvaExposureCount !== mission.totalEVAs) {
+    throw _bad(`mission.totalEVAs (${mission.totalEVAs}) must equal supplied crew EVA exposure count (${crewEvaExposureCount})`, {
+      totalEVAs: mission.totalEVAs,
+      crewEvaExposureCount,
+    });
+  }
+  if (mission.totalEVAs > 0 && mission.evaSchedule.length === 0) {
+    throw _bad("mission.evaSchedule must include at least one in-range EVA day when totalEVAs > 0", {
+      totalEVAs: mission.totalEVAs,
+    });
   }
   if (!Number.isFinite(chiStar) || chiStar < 0 || chiStar > 1) {
     throw _bad(`chiStar must be within [0, 1], got ${chiStar}`, { chiStar });

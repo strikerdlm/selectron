@@ -71,7 +71,7 @@ Evidence status is machine-readable at `research/evidence_extracted/evidence_sta
 npm run evidence:status -- --write
 ```
 
-Current status: `acceptedCount = 4` (pilot batch-1 adjudication), `proposalRefCount = 7`, `activeParameterCount = 4849`, `releasePriorsAdjudicated = false`.
+Current status: `acceptedCount = 4` (pilot batch-1 adjudication), `malformedAcceptedRows = 4`, `acceptedCoveredParameterCount = 0`, `proposalRefCount = 7`, `activeParameterCount = 4849`, `releasePriorsAdjudicated = false`.
 
 | Prior provenance | Count |
 |---|---:|
@@ -116,7 +116,9 @@ The Calibration tab uses `http://localhost:8000` by default (`VITE_CALIBRATION_A
 
 **Stage A:** uncertain-weight MCDA — `S_i = sum_k w_k * z(x_i,k)` with `w ~ Dirichlet(alpha)`.
 
-**Stage B:** IMM-style Monte Carlo over 101 conditions — occurrence → severity → treatment → CHI/QTL aggregation at T = 100,000 trials.
+**Stage B:** IMM-style Monte Carlo over 101 conditions — occurrence → severity → treatment → CHI/QTL aggregation at T = 100,000 trials. Incidence parameters are drawn once per condition per trial and shared across crew members before individual event sampling. Resource depletion is per-resource conservative, while RAF treatment interpolation remains a proposal-stage screening approximation.
+
+Severity sampling is implemented, but the active prior catalog currently has 0 distinct best/worst branch sets and 0 independently adjudicated severity branches; regenerate the audit table with `npm run severity:coverage`.
 
 Trait-to-incidence coupling and profile effects are **off by default** or explicitly labeled as scenario analysis. See the manual for full workflow detail.
 
@@ -137,6 +139,7 @@ selectron/
 ## Verification
 
 - `npm run verify:fast` — typecheck, import guard, evidence drift check, fast Vitest suite
+- `npm run severity:coverage` — regenerate the IMM severity-branch coverage table
 - `tests/imm/priors.test.ts` — locks 101-condition prior catalog and provenance counts
 - `tests/imm/validation_k15.test.ts` — K15 reference-model regression checks
 

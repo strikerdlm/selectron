@@ -296,6 +296,55 @@ describe("T28: resource consumption + RAF re-computation", () => {
     // 6th event: kit is empty → RAF=0.
     expect(sinusRafs[5]).toBe(0);
   });
+
+  it("consumes partial resources per item instead of q * RAF", () => {
+    const kit = {
+      scenarioId: "custom" as const,
+      label: "A-only test kit",
+      resources: { resourceA: 1, resourceB: 0 },
+    };
+    const realPriors = priorsModule.loadIMMPriors();
+    const pert0 = { min: 0, mode: 0, max: 0 };
+    const partialPrior: import("../../src/imm/types").IMMPrior = {
+      conditionId: "acute-sinusitis",
+      provenance: "tierA-nasa" as const,
+      source_ref: "test-partial-resource-consumption",
+      incidence: { distribution: "Fixed", lambda_fixed: 3.0 },
+      severity: { worst_case_prob_alpha: 1, worst_case_prob_beta: 1 },
+      treated: {
+        fi_cp1: pert0, dt_cp1_hours: pert0,
+        fi_cp2: pert0, dt_cp2_hours: pert0,
+        fi_cp3: pert0, p_evac: pert0, p_locl: pert0,
+      },
+      untreated: {
+        fi_cp1: pert0, dt_cp1_hours: pert0,
+        fi_cp2: pert0, dt_cp2_hours: pert0,
+        fi_cp3: pert0, p_evac: pert0, p_locl: pert0,
+      },
+      required_resources: { resourceA: 1, resourceB: 1 },
+      risk_factor_multipliers: {},
+    };
+    vi.spyOn(priorsModule, "loadIMMPriors").mockReturnValue({
+      ...realPriors,
+      conditions: { ...realPriors.conditions, "acute-sinusitis": partialPrior },
+    });
+
+    let sinusRafs: number[] = [];
+    for (let seed = 0; seed < 100; seed++) {
+      const result = runIMMTrial(makeRng(seed), oneCrew, oneDayMission, kit, {
+        traceRAF: true,
+        conditionFilter: (c) => c.id === "acute-sinusitis",
+      });
+      sinusRafs = result.rafHistory!
+        .filter(h => h.conditionId === "acute-sinusitis")
+        .map(h => h.raf);
+      if (sinusRafs.length >= 2) break;
+    }
+
+    expect(sinusRafs.length).toBeGreaterThanOrEqual(2);
+    expect(sinusRafs[0]).toBe(0.5);
+    expect(sinusRafs[1]).toBe(0);
+  });
 });
 
 describe("T25: per-event Bernoulli end-state", () => {
@@ -385,22 +434,34 @@ describe("simulateIMM", () => {
     expect(out.precisionAssessment?.independentSeedReplication.passed).toBeNull();
   });
 
-  it("summarizes independent-seed replication without treating one seed as replicated", () => {
+  it("summarizes independent-seed replication and requires each seed to pass precision gates", () => {
     const summary = simulateIMMIndependentSeeds({
       crew: oneCrew,
       mission: oneDayMission,
       kit: IMM_KITS.none,
       trialsPerSeed: 100,
       seeds: [0x101, 0x202, 0x303],
-      precisionTargets: { maxSeedMeanSpreadPp: 100 },
+      precisionTargets: {
+        tmeRelativeMcseMax: 1,
+        chiMcseMaxPp: 100,
+        pEvacMcseMaxPp: 100,
+        pLoclMcseMaxPp: 100,
+        healthCriterionMcseMaxPp: 100,
+        binaryWilsonWidthMaxPp: 100,
+        minBinaryEventCount: 1,
+        maxSeedMeanSpreadPp: 100,
+        tmeSeedMeanSpreadMax: 100,
+      },
     });
 
     expect(summary.seeds).toEqual([0x101, 0x202, 0x303]);
     expect(summary.trialsPerSeed).toBe(100);
     expect(summary.assessment.observedSeeds).toBe(3);
     expect(summary.assessment.requiredSeeds).toBe(3);
-    expect(summary.assessment.passed).toBe(true);
+    expect(summary.assessment.passed).toBe(false);
+    expect(summary.assessment.allSeedStoppingRulesPassed).toBe(false);
     expect(summary.assessment.maxMeanSpreadPp).toBeGreaterThanOrEqual(0);
+    expect(summary.assessment.maxTmeMeanSpread).toBeGreaterThanOrEqual(0);
   });
 
   it("does not report an analog field-EVA gap for a LEO/ISS reference run", () => {
@@ -496,6 +557,58 @@ describe("General-Poisson duration scaling", () => {
     // Allow ±25% tolerance (Monte Carlo noise at N=10k).
     expect(empiricalMean).toBeGreaterThan(1.8 * 0.75); // > 1.35
     expect(empiricalMean).toBeLessThan(1.8 * 1.25);    // < 2.25
+  });
+
+  it("draws Gamma-Poisson condition rates once per trial, shared across crew members", () => {
+    const realPriors = priorsModule.loadIMMPriors();
+    const pert0 = { min: 0, mode: 0, max: 0 };
+    const sharedRatePrior: import("../../src/imm/types").IMMPrior = {
+      conditionId: "acute-sinusitis",
+      provenance: "tierA-nasa" as const,
+      source_ref: "test-shared-rate-hierarchy",
+      incidence: { distribution: "Gamma-Poisson", alpha: 0.2, beta: 0.2 },
+      severity: { worst_case_prob_alpha: 1, worst_case_prob_beta: 1 },
+      treated: {
+        fi_cp1: pert0, dt_cp1_hours: pert0, fi_cp2: pert0, dt_cp2_hours: pert0,
+        fi_cp3: pert0, p_evac: pert0, p_locl: pert0,
+      },
+      untreated: {
+        fi_cp1: pert0, dt_cp1_hours: pert0, fi_cp2: pert0, dt_cp2_hours: pert0,
+        fi_cp3: pert0, p_evac: pert0, p_locl: pert0,
+      },
+      required_resources: {},
+      risk_factor_multipliers: {},
+    };
+    vi.spyOn(priorsModule, "loadIMMPriors").mockReturnValue({
+      ...realPriors,
+      conditions: { ...realPriors.conditions, "acute-sinusitis": sharedRatePrior },
+    });
+    const crew2: IMMCrewMember[] = [
+      { ...oneCrew[0], id: "c1" },
+      { ...oneCrew[0], id: "c2" },
+    ];
+    const mission2: IMMMission = {
+      ...oneDayMission,
+      crewSize: 2,
+      totalEVAs: 0,
+      evaSchedule: [],
+    };
+    const samples: number[] = [];
+    const n = 8_000;
+    for (let seed = 0; seed < n; seed++) {
+      const out = runIMMTrial(makeRng(seed), crew2, mission2, IMM_KITS.none, {
+        conditionFilter: (c) => c.id === "acute-sinusitis",
+      });
+      samples.push(out.perConditionCounts["acute-sinusitis"] ?? 0);
+    }
+    const mean = samples.reduce((sum, x) => sum + x, 0) / samples.length;
+    const variance = samples.reduce((sum, x) => sum + (x - mean) ** 2, 0) / samples.length;
+    // Independent person-level Gamma draws with this fixture would have
+    // variance around 12. A shared condition-level epistemic rate has
+    // variance around 22, giving a heavier aggregate crew tail.
+    expect(mean).toBeGreaterThan(1.6);
+    expect(mean).toBeLessThan(2.4);
+    expect(variance).toBeGreaterThan(16);
   });
 
   it("incidenceRateOverrides inject a direct rate at the sampling site", () => {
@@ -960,7 +1073,7 @@ describe("kind_multipliers: per-(kind, condition) incidence modulation", () => {
     // Key: the baseline must DISABLE the auto-load by passing an explicit
     // `kindMultipliers: {}` (1.0 fallthrough). Otherwise both runs apply the
     // same controlled multipliers from JSON and the TME is bit-identical.
-    const controlled90d = IMM_MISSIONS.find(m => m.id === "analog-90d")!;
+    const controlled90d = { ...IMM_MISSIONS.find(m => m.id === "analog-90d")!, totalEVAs: 12 };
     const baseline = simulateIMM({
       crew: k15Crew, mission: controlled90d, kit: IMM_KITS.none, trials: TR, seed: 0xc0ffee, ...ONES,
       kindMultipliers: {},  // DISABLE auto-load — every condition gets 1.0
@@ -996,7 +1109,7 @@ describe("kind_multipliers: per-(kind, condition) incidence modulation", () => {
     // The auto-load must differ from the explicit-empty 1.0 fallthrough iff
     // the JSON block has multipliers for this kind. Use the 90d mission so
     // the multiplier effect is visible.
-    const controlled90d = IMM_MISSIONS.find(m => m.id === "analog-90d")!;
+    const controlled90d = { ...IMM_MISSIONS.find(m => m.id === "analog-90d")!, totalEVAs: 12 };
     const auto = simulateIMM({
       crew: k15Crew, mission: controlled90d, kit: IMM_KITS.none, trials: TR, seed: 0xc0ffee, ...ONES,
       // No kindMultipliers opt → wrapper auto-loads from JSON for "analog-controlled".
@@ -1019,7 +1132,7 @@ describe("kind_multipliers: per-(kind, condition) incidence modulation", () => {
     // with an empty kindMultipliers override.
     const legacyMission: IMMMission = {
       id: "legacy-14d", label: "Legacy 14d", kind: "analog-isolation",
-      durationDays: 14, crewSize: 6, totalEVAs: 6, evaSchedule: [3, 5, 7, 9, 11, 13],
+      durationDays: 14, crewSize: 6, totalEVAs: 12, evaSchedule: [3, 5, 7, 9, 11, 13],
     };
     const legacy = simulateIMM({
       crew: k15Crew, mission: legacyMission, kit: IMM_KITS.none, trials: TR, seed: 0xc0ffee, ...ONES,
@@ -1054,11 +1167,50 @@ describe("F9: simulateIMM fail-closed input validation", () => {
     expect(() => simulateIMM({ ...base, crew: [] })).toThrowError(SelectronError);
   });
 
+  it("rejects duplicate crew IDs and invalid runtime sex values", () => {
+    expect(() =>
+      simulateIMM({ ...base, crew: [{ ...oneCrew[0], id: "dup" }, { ...oneCrew[0], id: "dup" }], mission: { ...oneDayMission, crewSize: 2 } }),
+    ).toThrowError(SelectronError);
+    expect(() =>
+      simulateIMM({ ...base, crew: [{ ...oneCrew[0], sex: "other" as never }] }),
+    ).toThrowError(SelectronError);
+  });
+
   it("rejects non-positive / non-finite duration", () => {
     const badMission = { ...oneDayMission, durationDays: 0 };
     expect(() => simulateIMM({ ...base, mission: badMission })).toThrowError(SelectronError);
     const infMission = { ...oneDayMission, durationDays: Infinity };
     expect(() => simulateIMM({ ...base, mission: infMission })).toThrowError(SelectronError);
+  });
+
+  it("rejects inconsistent crew size, EVA counts, and EVA schedules", () => {
+    expect(() =>
+      simulateIMM({ ...base, mission: { ...oneDayMission, crewSize: 2 } }),
+    ).toThrowError(SelectronError);
+    expect(() =>
+      simulateIMM({ ...base, crew: [{ ...oneCrew[0], EVA_count: 1 }] }),
+    ).toThrowError(SelectronError);
+    expect(() =>
+      simulateIMM({
+        ...base,
+        crew: [{ ...oneCrew[0], EVA_eligible: true, EVA_count: 1 }],
+        mission: { ...oneDayMission, totalEVAs: 0 },
+      }),
+    ).toThrowError(SelectronError);
+    expect(() =>
+      simulateIMM({
+        ...base,
+        crew: [{ ...oneCrew[0], EVA_eligible: true, EVA_count: 1 }],
+        mission: { ...oneDayMission, totalEVAs: 1, evaSchedule: [] },
+      }),
+    ).toThrowError(SelectronError);
+    expect(() =>
+      simulateIMM({
+        ...base,
+        crew: [{ ...oneCrew[0], EVA_eligible: true, EVA_count: 1 }],
+        mission: { ...oneDayMission, totalEVAs: 1, evaSchedule: [0.9, 0.2] },
+      }),
+    ).toThrowError(SelectronError);
   });
 
   it("rejects chiStar outside [0, 1]", () => {

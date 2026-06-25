@@ -143,6 +143,7 @@ const createObjectURLMock = vi.fn((_blob: Blob): string => "blob:fake-url");
 const revokeObjectURLMock = vi.fn((_url: string): void => {});
 let originalCreateObjectURL: typeof URL.createObjectURL | undefined;
 let originalRevokeObjectURL: typeof URL.revokeObjectURL | undefined;
+let originalAnchorClick: typeof HTMLAnchorElement.prototype.click | undefined;
 
 beforeEach(async () => {
   await db.delete();
@@ -156,8 +157,10 @@ beforeEach(async () => {
 
   originalCreateObjectURL = URL.createObjectURL;
   originalRevokeObjectURL = URL.revokeObjectURL;
+  originalAnchorClick = HTMLAnchorElement.prototype.click;
   URL.createObjectURL = createObjectURLMock as unknown as typeof URL.createObjectURL;
   URL.revokeObjectURL = revokeObjectURLMock as unknown as typeof URL.revokeObjectURL;
+  HTMLAnchorElement.prototype.click = vi.fn();
 
   vi.stubGlobal("Worker", FakeWorker as unknown as typeof Worker);
 });
@@ -167,6 +170,7 @@ afterEach(async () => {
   vi.unstubAllGlobals();
   if (originalCreateObjectURL) URL.createObjectURL = originalCreateObjectURL;
   if (originalRevokeObjectURL) URL.revokeObjectURL = originalRevokeObjectURL;
+  if (originalAnchorClick) HTMLAnchorElement.prototype.click = originalAnchorClick;
   await db.delete();
 });
 

@@ -266,7 +266,7 @@ Each mission carries structured **I&C profile** metadata (communication delay, w
 
 #### Select resource kit
 
-Choose **None**, **ISS HMS analog**, or **Unlimited** kit. Kit choice affects treatment resource availability and RAF interpolation paths; the RAF result is a screening approximation, not a treatment-state model.
+Choose **None**, **ISS HMS analog**, or **Unlimited** kit. Kit choice affects treatment resource availability and RAF interpolation paths. Resource depletion is conservative per required resource, but the RAF result is still a scalar screening approximation, not a treatment-state model.
 
 #### Simulation controls
 
@@ -303,6 +303,8 @@ Failed gates are **review flags**; the sim can still run unless you choose to ex
    - Mission evidence grade
 
 **Read the disclaimer:** Scenario output under unadjudicated priors — intervals describe simulated variability, not empirical calibration.
+
+The IMM engine draws incidence parameters once per condition per trial and shares them across crew members before individual event sampling. Severity probability is also drawn at condition/trial level, but the active prior catalog currently duplicates legacy outcomes into best/worst branches; see `docs/severity_branch_coverage.md` for the generated coverage table.
 
 ### 7.4 Interpret condition drivers
 

@@ -364,11 +364,15 @@ export function CrewComposition() {
     [state.members, state.aggregator],
   );
 
-  // Total EVAs is derived from per-member EVA_count (the engine's only EVA lever);
-  // mission.totalEVAs is display metadata the engine never reads.
+  // Total EVAs is derived from per-member EVA_count; the simulation payload
+  // uses this derived mission so runtime validation matches the editable crew.
   const totalEVAs = useMemo(
     () => state.members.reduce((sum, m) => sum + (m.EVA_count || 0), 0),
     [state.members],
+  );
+  const simulationMission = useMemo(
+    () => ({ ...state.mission, crewSize: state.members.length, totalEVAs }),
+    [state.mission, state.members.length, totalEVAs],
   );
 
   // ── live gate evaluation ────────────────────────────────────────────────
@@ -419,7 +423,7 @@ export function CrewComposition() {
         if (previewWorkerRef.current === w) previewWorkerRef.current = null;
       };
       w.postMessage({
-        crew: state.members, mission: state.mission, kit: state.kit,
+        crew: state.members, mission: simulationMission, kit: state.kit,
         trials: 5000, seed: state.seed, chiStar: state.chiStar, criteria: ACTIVE_CRITERIA,
         vulnerabilityCouplingMode: state.couplingMode,
         familyBetaScale: state.familyBetaScale,
@@ -430,7 +434,7 @@ export function CrewComposition() {
       clearTimeout(handle);
       if (previewWorkerRef.current) { previewWorkerRef.current.terminate(); previewWorkerRef.current = null; }
     };
-  }, [state.members, state.mission, state.kit, state.seed, state.chiStar, state.couplingMode, state.familyBetaScale, state.profileEffectMode]);
+  }, [state.members, simulationMission, state.kit, state.seed, state.chiStar, state.couplingMode, state.familyBetaScale, state.profileEffectMode]);
 
   // ── I6 (2026-06-04): analog prior-uncertainty predictive effect ───────────
   // Fetch per-condition λ draws from the Python calibration API, then
@@ -500,7 +504,7 @@ export function CrewComposition() {
             mode: "posterior-predictive",
             opts: {
               crew: state.members,
-              mission: state.mission,
+              mission: simulationMission,
               kit: state.kit,
               posterior,
               nDraws: Math.min(64, resp.n_draws),
@@ -526,7 +530,7 @@ export function CrewComposition() {
       if (ppAbortRef.current) { ppAbortRef.current.abort(); ppAbortRef.current = null; }
       if (ppWorkerRef.current) { ppWorkerRef.current.terminate(); ppWorkerRef.current = null; }
     };
-  }, [state.members, state.mission, state.kit, state.seed, state.couplingMode, state.familyBetaScale, state.profileEffectMode, kindMultipliers]);
+  }, [state.members, simulationMission, state.kit, state.seed, state.couplingMode, state.familyBetaScale, state.profileEffectMode, kindMultipliers]);
 
   function toggleMember(id: string) {
     setExpandedIds((prev) => {
@@ -650,7 +654,7 @@ export function CrewComposition() {
     // Post the simulation payload (simulateIMM options)
     worker.postMessage({
       crew: state.members,
-      mission: state.mission,
+      mission: simulationMission,
       kit: state.kit,
       trials: state.trials,
       seed: state.seed,
@@ -660,7 +664,7 @@ export function CrewComposition() {
       familyBetaScale: state.familyBetaScale,
       profileEffectMode: state.profileEffectMode,
     });
-  }, [simState, state.members, state.mission, state.kit, state.trials, state.seed, state.chiStar, state.couplingMode, state.familyBetaScale, state.profileEffectMode]);
+  }, [simState, state.members, simulationMission, state.kit, state.trials, state.seed, state.chiStar, state.couplingMode, state.familyBetaScale, state.profileEffectMode]);
 
   // ── worker cleanup on unmount ───────────────────────────────────────────
   useEffect(() => {
@@ -1080,7 +1084,7 @@ export function CrewComposition() {
                   </label>
                   <span className="mono text-[10px] text-ink-3">
                     {state.profileEffectMode === "exploratory"
-                      ? "proposal sensitivity enabled"
+                      ? "proposal comms-delay sensitivity"
                       : state.profileEffectMode === "off"
                         ? "zero-effect control"
                         : "accepted effects only"}
@@ -1417,8 +1421,7 @@ export function CrewComposition() {
               ]);
               const id = await createIMMSession({
                 candidateId: null,
-                // Sync display metadata to the actual crew before persisting.
-                mission: { ...state.mission, crewSize: state.members.length, totalEVAs },
+                mission: simulationMission,
                 crew: state.members.map((m) => ({ ...m })),
                 kit: state.kit,
                 trials: state.trials,
@@ -1539,7 +1542,7 @@ export function CrewComposition() {
               softwareVersion: SELECTRON_VERSION,
               sourceCommit: SELECTRON_SOURCE_COMMIT,
               exportedAt: new Date().toISOString(),
-              mission: { ...state.mission, crewSize: state.members.length, totalEVAs },
+              mission: simulationMission,
               kit: state.kit.scenarioId,
               trials: state.trials,
               seed: state.seed,

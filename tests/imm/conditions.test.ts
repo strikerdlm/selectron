@@ -4,7 +4,7 @@ import { IMM_CONDITIONS } from "../../src/imm/conditions";
 import { simulateIMM } from "../../src/imm/simulate";
 import { IMM_KITS } from "../../src/imm/kits";
 import { IMM_MISSIONS } from "../../src/data/imm-missions";
-import type { IMMCrewMember } from "../../src/imm/types";
+import type { IMMCrewMember, IMMMission } from "../../src/imm/types";
 
 function makeCrewMember(id: string, evaCount = 0): IMMCrewMember {
   return {
@@ -16,6 +16,16 @@ function makeCrewMember(id: string, evaCount = 0): IMMCrewMember {
     abdominal_surgery_history: false,
     EVA_eligible: true,
     EVA_count: evaCount,
+  };
+}
+
+function missionForCrew(base: IMMMission, crew: IMMCrewMember[]): IMMMission {
+  const totalEVAs = crew.reduce((sum, member) => sum + member.EVA_count, 0);
+  return {
+    ...base,
+    crewSize: crew.length,
+    totalEVAs,
+    evaSchedule: totalEVAs === 0 ? [] : base.evaSchedule,
   };
 }
 
@@ -82,7 +92,7 @@ describe("terrestrial analog guard", () => {
     const mission = IMM_MISSIONS.find(m => m.id === "analog-45d")!;
     const crew = Array.from({ length: 6 }, (_, i) => makeCrewMember(`m${i}`));
     const out = simulateIMM({
-      crew, mission, kit: IMM_KITS.none,
+      crew, mission: missionForCrew(mission, crew), kit: IMM_KITS.none,
       trials: 500, seed: 0xc0ffee,
     });
     const driverIds = new Set(out.perConditionDrivers.map(d => d.conditionId));
@@ -95,7 +105,7 @@ describe("terrestrial analog guard", () => {
     const mission = IMM_MISSIONS.find(m => m.id === "antarctic-winter")!;
     const crew = Array.from({ length: 12 }, (_, i) => makeCrewMember(`m${i}`));
     const out = simulateIMM({
-      crew, mission, kit: IMM_KITS.none,
+      crew, mission: missionForCrew(mission, crew), kit: IMM_KITS.none,
       trials: 500, seed: 0xc0ffee,
     });
     const driverIds = new Set(out.perConditionDrivers.map(d => d.conditionId));

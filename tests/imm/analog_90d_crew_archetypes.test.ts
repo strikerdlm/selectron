@@ -40,7 +40,7 @@
 
 import { describe, it, expect, beforeAll } from "vitest";
 import { simulateIMM } from "../../src/imm/simulate";
-import type { IMMOutcome } from "../../src/imm/types";
+import type { IMMOutcome, IMMMission } from "../../src/imm/types";
 import { evaluateCrewGates } from "../../src/imm/crew-gates";
 import { IMM_KITS } from "../../src/imm/kits";
 import { IMM_MISSIONS } from "../../src/data/imm-missions";
@@ -119,6 +119,14 @@ const CREWS: Record<string, IMMCrewMember[]> = {
   worst: uniform(BAD),
 };
 
+function missionForCrew(base: IMMMission, crew: IMMCrewMember[]): IMMMission {
+  return {
+    ...base,
+    crewSize: crew.length,
+    totalEVAs: crew.reduce((sum, member) => sum + member.EVA_count, 0),
+  };
+}
+
 describe("analog-90d · crew archetype comparison (mostly-unselected crews)", () => {
   const R: Record<string, IMMOutcome> = {};
 
@@ -126,7 +134,7 @@ describe("analog-90d · crew archetype comparison (mostly-unselected crews)", ()
     for (const [key, crew] of Object.entries(CREWS)) {
       R[key] = simulateIMM({
         crew,
-        mission,
+        mission: missionForCrew(mission, crew),
         kit,
         trials: TRIALS,
         seed: SEED,

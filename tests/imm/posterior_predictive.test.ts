@@ -16,7 +16,7 @@ import { IMM_MISSIONS } from "../../src/data/imm-missions";
 import { loadIMMPriors } from "../../src/imm/priors";
 import type { IMMMission, IMMCrewMember } from "../../src/imm/types";
 
-const ISS_6MO = IMM_MISSIONS.find(m => m.id === "iss-6mo") as IMMMission;
+const ISS_6MO_BASE = IMM_MISSIONS.find(m => m.id === "iss-6mo") as IMMMission;
 
 // House crew fixture: 2 members (shape per IMMCrewMember, cf. simulate.test.ts).
 const CREW: IMMCrewMember[] = [
@@ -31,6 +31,12 @@ const CREW: IMMCrewMember[] = [
     EVA_eligible: true, EVA_count: 6,
   },
 ];
+
+const ISS_6MO: IMMMission = {
+  ...ISS_6MO_BASE,
+  crewSize: CREW.length,
+  totalEVAs: CREW.reduce((sum, member) => sum + member.EVA_count, 0),
+};
 
 /** Prior mean λ for a condition, mirroring the wrapper's resolution rules. */
 function priorMeanLambda(cid: string): number {

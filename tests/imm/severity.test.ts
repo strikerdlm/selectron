@@ -1,6 +1,7 @@
 import { describe, it, expect } from "vitest";
-import { sampleSeverity } from "../../src/imm/severity";
+import { sampleSeverity, sampleSeverityProbability } from "../../src/imm/severity";
 import { selectSeverityOutcomes } from "../../src/imm/treatment";
+import { buildSeverityBranchCoverage } from "../../src/imm/severity-coverage";
 import { makeRng } from "../../src/engine/prng";
 import type { IMMConditionOutcomes, IMMPrior } from "../../src/imm/types";
 
@@ -23,6 +24,23 @@ describe("sampleSeverity", () => {
     for (let i = 0; i < 1_000; i++) {
       expect(sampleSeverity(rng, 0, 5)).toBe("best");
     }
+  });
+
+  it("Beta concentration affects outer severity-probability uncertainty", () => {
+    const lowConcentrationRng = makeRng(0x5151);
+    const highConcentrationRng = makeRng(0x5151);
+    const n = 20_000;
+    const low: number[] = [];
+    const high: number[] = [];
+    for (let i = 0; i < n; i++) {
+      low.push(sampleSeverityProbability(lowConcentrationRng, 1, 1));
+      high.push(sampleSeverityProbability(highConcentrationRng, 100, 100));
+    }
+    const variance = (xs: number[]) => {
+      const mean = xs.reduce((sum, x) => sum + x, 0) / xs.length;
+      return xs.reduce((sum, x) => sum + (x - mean) ** 2, 0) / xs.length;
+    };
+    expect(variance(low)).toBeGreaterThan(variance(high) * 20);
   });
 });
 
@@ -74,5 +92,18 @@ describe("selectSeverityOutcomes", () => {
     const selected = selectSeverityOutcomes(prior, "worst");
     expect(selected.source).toBe("legacy-v1-duplicated");
     expect(selected.treated.fi_cp1.mode).toBe(0.1);
+  });
+});
+
+describe("buildSeverityBranchCoverage", () => {
+  it("publishes machine-readable severity branch coverage counts", () => {
+    const coverage = buildSeverityBranchCoverage("2026-06-25T00:00:00.000Z");
+    expect(coverage.totalConditions).toBeGreaterThan(0);
+    expect(coverage.rows).toHaveLength(coverage.totalConditions);
+    expect(
+      coverage.conditionsWithDistinctBestWorstOutcomeBranches +
+      coverage.conditionsWithDuplicatedLegacyBranches,
+    ).toBeLessThanOrEqual(coverage.totalConditions);
+    expect(coverage.conditionsWithIndependentlyAdjudicatedSeverityEvidence).toBeGreaterThanOrEqual(0);
   });
 });

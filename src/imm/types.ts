@@ -300,6 +300,8 @@ export type MonteCarloPrecisionTargets = {
   minIndependentSeeds: number;
   /** Maximum across-seed spread for percent-scale means, percentage-point scale. */
   maxSeedMeanSpreadPp: number;
+  /** Maximum across-seed spread for the TME mean, event-count scale. */
+  tmeSeedMeanSpreadMax: number;
 };
 
 export type MonteCarloPrecisionCheck = {
@@ -317,6 +319,10 @@ export type MonteCarloSeedReplicationAssessment = {
   observedSeeds: number;
   targetMaxMeanSpreadPp: number;
   maxMeanSpreadPp: number | null;
+  targetMaxTmeMeanSpread: number;
+  maxTmeMeanSpread: number | null;
+  /** True only when every seed run satisfies its own MCSE/Wilson stopping rule. */
+  allSeedStoppingRulesPassed: boolean | null;
   passed: boolean | null;
 };
 

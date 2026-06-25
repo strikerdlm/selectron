@@ -1,7 +1,7 @@
 # Selectron Model Card
 
 **Version:** v0.6.0-rebaseline.0  
-**Last updated:** 2026-06-24  
+**Last updated:** 2026-06-25
 **Status:** research prototype; not validated for operational prediction
 
 ## Intended Use
@@ -33,8 +33,10 @@ K15 comparison is an inter-model reference benchmark against published IMM outpu
 Outputs should be read as conditional scenario quantities under the loaded assumptions:
 
 - Stage A intervals are MCDA score intervals induced by uncertain criterion weights.
-- Stage B intervals are simulation intervals over modeled mission-to-mission variability.
+- Stage B intervals are simulation intervals over modeled mission-to-mission variability under shared condition/trial incidence draws.
 - MCSE and rare-event precision diagnostics describe numerical simulation stability, not empirical calibration.
+- Severity sampling is mechanistic only until branch-specific outcome priors are adjudicated; current generated coverage is 0/101 distinct branch sets.
+- Treatment resources are depleted per resource, but RAF treatment interpolation remains a proposal-stage screening approximation.
 - Communications delay is a proposal-stage exploratory sensitivity effect and is off in default adjudicated mode.
 
 ## Unacceptable Extrapolations

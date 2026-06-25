@@ -1,7 +1,7 @@
 # Selectron — Scientific Limitations of the Current IMM Calibration
 
 **Created:** 2026-05-22 (post priors-rev3-b)
-**Last updated:** 2026-06-24 — v0.6 audit containment; HSRB verdict and validation claims retired; accepted-evidence coverage clarified as 0/4,849
+**Last updated:** 2026-06-25 — calculation hierarchy hardening; severity-branch coverage generated; accepted-evidence coverage remains 0/4,849
 **Status:** Living document — update on every priors revision or engine extension
 **Companion docs:** [`iter5_priors_rev3_strategy.md`](iter5_priors_rev3_strategy.md), [`iter3_vv_dossier.md`](iter3_vv_dossier.md) §5, [`future_features.md`](future_features.md)
 
@@ -17,7 +17,11 @@ The following are mechanically verified or unit-tested. They do not establish em
 
 - **Stage A uncertain-weight MCDA** (`src/engine/`) — Dirichlet weights, Marsaglia–Tsang Gamma sampler, Mulberry32 PRNG, score normalization, finite-alpha validation, finite raw-score/range validation, positive integer iteration validation, and IID draw-count reporting. Closed-form mean / variance match Monte Carlo within 2 % / 5 % at 50k samples. These are induced score distributions, not suitability posteriors.
 - **IMM engine math** (`src/imm/`) — Lognormal-Poisson, Gamma-Poisson, Beta-Bernoulli incidence samplers; Beta-Pert outcomes (mean = (a+4m+b)/6); concurrent FI formula `1 − Π(1 − f_i)` per K15 §II.A.9 verbatim; sequential-phase QTL accumulator (cp1 + cp2 + cp3) per K15 §II.A.9; per-event Bernoulli end-state sampling per spec; T=100 000 canonical trial count per M18 / A22.
-- **Monte Carlo precision diagnostics** — MCSE, relative MCSE, Wilson 95 % intervals for rare binary probabilities, CHI clamp count/proportion, and independent-seed replication status are reported for current IMM scenario outputs. Legacy σ checkpoint arrays remain compatibility diagnostics and are not presented as empirical convergence proof.
+- **Condition-level incidence hierarchy** — Gamma-Poisson, lognormal-Poisson, and Beta-Bernoulli condition rates/probabilities are now drawn once per condition per trial and shared across crew members before individual event sampling. This treats the stored distributions as trial-level parameter uncertainty rather than independent person-level rate noise; a separate fitted frailty layer is still future work.
+- **Severity uncertainty layer** — severity Beta distributions now draw one condition/trial severity probability before event-level severity Bernoulli sampling, so Beta concentration affects between-trial uncertainty. Current priors still duplicate legacy outcome branches unless branch-specific outcomeScenarios are adjudicated.
+- **Treatment resource accounting** — resource depletion now consumes each required resource as `min(required, available)` in chronological event order. The RAF scalar still controls treated/untreated interpolation and remains a screening approximation, not a treatment-state model.
+- **Monte Carlo precision diagnostics** — MCSE, relative MCSE, Wilson 95 % intervals for rare binary probabilities, CHI clamp count/proportion, and independent-seed replication status are reported for current IMM scenario outputs. Independent-seed acceptance now includes TME spread and requires every replicated seed run to satisfy its own precision gate. Legacy σ checkpoint arrays remain compatibility diagnostics and are not presented as empirical convergence proof.
+- **Runtime request validation** — the public simulation boundary rejects malformed mission/crew requests, including duplicate crew IDs, invalid sex values, crew-size mismatch, unordered or out-of-range EVA schedules, inconsistent total/per-member EVA counts, and nonzero EVA exposure for ineligible crew members.
 - **HSRB-inspired developer adapter** — LxC translation remains available only for historical/developer comparison. The active analog workflow does not present NASA-equivalent HSRB verdicts, select/reject decisions, or L5/C5 override semantics.
 - **Tier multipliers** — applied at each distribution-specific sampling site (λ-site for Poisson; per-Bernoulli for SA-once and EVA-coupled). Variance-correct by construction (Poisson closed under rate scaling; Bernoulli(p)×Bernoulli(mult) = Bernoulli(p·mult)). Commit `ce97dda`.
 
@@ -94,6 +98,22 @@ The 'none' (no medical kit) scenario produces values that diverge from K15:
 **Sensitivity confirmation (2026-05-26).** The closed-form rescale predicted in `iter5_priors_rev3_strategy.md` §3.3 was implemented (`scripts/rescale_outcome_parameters.ts`) and checked as a sensitivity run. Results: untreated `p_evac` scaled by 8.42× and treated `p_evac` by 3.16× brings 'none' pEVAC to 63.90 % (target 66.90 %) and unlimited pEVAC to 4.86 % (target 4.93 %) — strong fit to that model-output target. However, the same rescale drives issHMS pEVAC to 53.39 % (target 5.57 %) via RAF-interpolated fall-through coupling, confirming prediction #4 exactly. The priors were reverted; the script is preserved for sensitivity analysis but is not merged into production priors.
 
 Selectron's 'none' scenario should be interpreted as a sensitivity-analysis lower bound, not a calibrated prediction.
+
+### 3.6 Severity-branch coverage is currently mechanistic only
+
+Severity sampling is operational in the engine, but the active prior catalog does not yet contain independently adjudicated best/worst outcome branches. The generated coverage table is [`severity_branch_coverage.md`](severity_branch_coverage.md):
+
+| Item | Current count |
+|---|---:|
+| Conditions with distinct best/worst outcome branches | 0 |
+| Conditions with duplicated legacy branches | 101 |
+| Conditions with independently adjudicated severity evidence | 0 |
+
+Therefore severity draws currently modulate branch labels and future-proof the engine architecture; they should not be described as validated condition-specific severity outcome evidence.
+
+### 3.7 Treatment model remains proposal-stage screening
+
+The 2026-06-25 patch fixed non-conservative partial resource consumption, but the treatment model still reduces multi-resource availability to one RAF scalar and linearly interpolates between treated and untreated outcome distributions. It omits threshold treatment states, contraindications, provider skill, treatment delay, failed treatment, adverse effects, and resource interactions. Use it for conditional resource-scenario screening only, not clinical treatment-policy optimization or medical-kit sizing.
 
 ---
 
