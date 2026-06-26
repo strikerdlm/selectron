@@ -175,6 +175,74 @@ describe("posteriorPredictiveSimulateIMM", () => {
     expect(s!.mean).toBe(0);
   });
 
+  it("does not auto-apply proposal mission-kind multipliers by default/adjudicated mode", () => {
+    const CID = "interpersonal-conflict";
+    const nDraws = 4;
+    const trialsPerDraw = 250;
+    const baseMission = IMM_MISSIONS.find(m => m.id === "analog-90d")!;
+    const mission: IMMMission = {
+      ...baseMission,
+      crewSize: CREW.length,
+      totalEVAs: CREW.reduce((sum, member) => sum + member.EVA_count, 0),
+      evaSchedule: baseMission.evaSchedule.slice(0, CREW.reduce((sum, member) => sum + member.EVA_count, 0)),
+    };
+    const posterior = { [CID]: constDraws(priorMeanLambda(CID) * 100, nDraws) };
+    const common = {
+      crew: CREW, mission, kit: IMM_KITS.none,
+      posterior, nDraws, trialsPerDraw, seed: 0xC0FFEE,
+    };
+
+    const omitted = posteriorPredictiveSimulateIMM(common);
+    const adjudicated = posteriorPredictiveSimulateIMM({
+      ...common,
+      kindMultiplierMode: "adjudicated",
+    });
+    const explicitIdentity = posteriorPredictiveSimulateIMM({
+      ...common,
+      kindMultipliers: {},
+    });
+
+    expect(omitted.perConditionTmeContribPost[CID].mean).toBe(
+      explicitIdentity.perConditionTmeContribPost[CID].mean,
+    );
+    expect(adjudicated.perConditionTmeContribPost[CID].mean).toBe(
+      explicitIdentity.perConditionTmeContribPost[CID].mean,
+    );
+    expect(omitted.chiPost.mean).toBe(explicitIdentity.chiPost.mean);
+    expect(adjudicated.chiPost.mean).toBe(explicitIdentity.chiPost.mean);
+  });
+
+  it("opts into proposal mission-kind multipliers only in exploratory mode", () => {
+    const CID = "interpersonal-conflict";
+    const nDraws = 4;
+    const trialsPerDraw = 250;
+    const baseMission = IMM_MISSIONS.find(m => m.id === "analog-90d")!;
+    const mission: IMMMission = {
+      ...baseMission,
+      crewSize: CREW.length,
+      totalEVAs: CREW.reduce((sum, member) => sum + member.EVA_count, 0),
+      evaSchedule: baseMission.evaSchedule.slice(0, CREW.reduce((sum, member) => sum + member.EVA_count, 0)),
+    };
+    const posterior = { [CID]: constDraws(priorMeanLambda(CID) * 100, nDraws) };
+    const common = {
+      crew: CREW, mission, kit: IMM_KITS.none,
+      posterior, nDraws, trialsPerDraw, seed: 0xC0FFEE,
+    };
+
+    const adjudicated = posteriorPredictiveSimulateIMM({
+      ...common,
+      kindMultiplierMode: "adjudicated",
+    });
+    const exploratory = posteriorPredictiveSimulateIMM({
+      ...common,
+      kindMultiplierMode: "exploratory",
+    });
+
+    expect(exploratory.perConditionTmeContribPost[CID].mean).toBeGreaterThan(
+      adjudicated.perConditionTmeContribPost[CID].mean,
+    );
+  });
+
   // (e) Contract errors --------------------------------------------------------
   it("throws when a posterior array is shorter than nDraws", () => {
     const m = priorMeanLambda("acute-sinusitis");

@@ -1,5 +1,5 @@
 import type { Candidate, Criterion } from "@/types";
-import { zScoreAgainstScale } from "@/engine/normalize-cohort";
+import { permissiveScaleRelativeScore } from "@/engine/normalize-cohort";
 import { sampleFrailty, sampleStandardNormal } from "./incidence";
 
 type Rng = () => number;
@@ -27,16 +27,16 @@ function logistic(x: number): number {
   return 1 / (1 + Math.exp(-x));
 }
 
-/** Mean z of the fit-proxy criterion across the crew (0 if unavailable). */
-function meanFitZ(crew: readonly Candidate[], idx: ReadonlyMap<string, Criterion>, fitId: string): number {
+/** Mean scale-relative coordinate of the fit-proxy criterion across the crew (0 if unavailable). */
+function meanFitCoordinate(crew: readonly Candidate[], idx: ReadonlyMap<string, Criterion>, fitId: string): number {
   const c = idx.get(fitId);
   if (!c) return 0;
   let sum = 0, k = 0;
   for (const m of crew) {
     const raw = m.scores[fitId];
     if (raw === undefined || !Number.isFinite(raw)) continue;
-    const z = zScoreAgainstScale(raw, c.scale);
-    sum += c.higherIsBetter ? z : -z;
+    const coordinate = permissiveScaleRelativeScore(raw, c.scale);
+    sum += c.higherIsBetter ? coordinate : -coordinate;
     k++;
   }
   return k === 0 ? 0 : sum / k;
@@ -49,9 +49,9 @@ export function drawTrialLatentState(
   hyper: TeamHyper,
   rng: Rng,
 ): TrialLatentState {
-  const fitZ = meanFitZ(crew, idx, hyper.fitCriterionId);
+  const fitCoordinate = meanFitCoordinate(crew, idx, hyper.fitCriterionId);
   const alpha0 = Math.log(hyper.piUnstableBase / (1 - hyper.piUnstableBase));
-  const piUnstable = logistic(alpha0 + hyper.alphaFit * fitZ);
+  const piUnstable = logistic(alpha0 + hyper.alphaFit * fitCoordinate);
   const latentClass: 0 | 1 = rng() < piUnstable ? 1 : 0;
   const memberFrailty = crew.map(() => sampleFrailty(rng, hyper.memberFrailtyPhi));
   const crewFrailty = sampleFrailty(rng, hyper.crewFrailtyPhi);

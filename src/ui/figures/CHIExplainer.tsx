@@ -50,46 +50,46 @@ function severityBucket(chiMean: number, chiStar: number): {
   tone: string;
   blurb: string;
 } {
-  // Distance below the configured χ* threshold drives the qualitative label.
-  // χ ≥ χ* + 0.05 → strong; ≥ χ* → adequate; within 0.05 below → marginal; below → degraded.
+  // Distance from the configured χ* threshold drives a display-only band. These
+  // bins are not externally validated operational thresholds.
   const delta = chiMean - chiStar;
   if (delta >= 0.05) {
     return {
-      label: "STRONG",
-      tone: "text-emerald-300 border-emerald-400/40",
+      label: "ABOVE CONFIG",
+      tone: "text-ink-2 border-line",
       blurb:
-        "Simulated crew health holds comfortably above the configured threshold under the modeled assumptions.",
+        "Simulated crew health is above the configured demonstration threshold under the modeled assumptions.",
     };
   }
   if (delta >= 0) {
     return {
-      label: "ADEQUATE",
-      tone: "text-signal border-signal/40",
+      label: "AT CONFIG",
+      tone: "text-ink-2 border-line",
       blurb:
-        "Simulated crew health sits at or just above the configured threshold. The margin is thin, so small adverse assumption changes could move the result into degraded territory.",
+        "Simulated crew health sits at or just above the configured demonstration threshold. The margin is thin, so small adverse assumption changes could move the run below that configured line.",
     };
   }
   if (delta >= -0.05) {
     return {
-      label: "MARGINAL",
-      tone: "text-amber-300 border-amber-400/40",
+      label: "NEAR BELOW CONFIG",
+      tone: "text-ink-2 border-line",
       blurb:
-        "Simulated crew health is slightly below the configured χ* threshold. Review mitigations and assumptions before treating this scenario as acceptable.",
+        "Simulated crew health is slightly below the configured demonstration threshold. Review assumptions and mitigations before using this scenario comparison.",
     };
   }
   return {
-    label: "DEGRADED",
-    tone: "text-warn border-warn/40",
+    label: "BELOW CONFIG",
+    tone: "text-ink-2 border-line",
     blurb:
-      "Simulated crew health is clearly below the configured threshold. This run flags a mission-profile mismatch or insufficient evidence under the modeled priors.",
+      "Simulated crew health is below the configured demonstration threshold. This is a scenario-review signal, not a validated operational disposition.",
   };
 }
 
 function pctBucket(p: number): { label: string; tone: string } {
-  if (p < 0.05) return { label: "LOW", tone: "text-emerald-300" };
-  if (p < 0.15) return { label: "MODERATE", tone: "text-signal" };
-  if (p < 0.30) return { label: "ELEVATED", tone: "text-amber-300" };
-  return { label: "HIGH", tone: "text-warn" };
+  if (p < 0.05) return { label: "DISPLAY BIN 1", tone: "text-ink-2" };
+  if (p < 0.15) return { label: "DISPLAY BIN 2", tone: "text-ink-2" };
+  if (p < 0.30) return { label: "DISPLAY BIN 3", tone: "text-ink-2" };
+  return { label: "DISPLAY BIN 4", tone: "text-ink-2" };
 }
 
 export function CHIExplainer({ scenarioResult, chiStar, missionId, gate }: Props) {
@@ -228,7 +228,7 @@ export function CHIExplainer({ scenarioResult, chiStar, missionId, gate }: Props
           Crew Health Index
         </h3>
         <span className={`mono text-[10px] uppercase tracking-cap ${severity.tone}`}>
-          scenario status · {severity.label}
+          display-only band · {severity.label}
         </span>
       </header>
 
@@ -258,7 +258,8 @@ export function CHIExplainer({ scenarioResult, chiStar, missionId, gate }: Props
             Higher thresholds (0.8+) make the scenario criterion stricter; lower
             thresholds (0.6) make it less strict. The simulated
             probability that <span className="mono">χ &lt; χ*</span> is reported as{" "}
-            <em>threshold-failure risk</em> below.
+            <em>threshold-failure frequency</em> below. These bands are display-only
+            configuration bins, not evidence-supported operational thresholds.
           </p>
         </div>
       </div>
@@ -285,7 +286,7 @@ export function CHIExplainer({ scenarioResult, chiStar, missionId, gate }: Props
               {etBucket.label}
             </span>{" "}
             — fraction of Monte-Carlo trials in which the crew fell below the configured
-            health threshold at some point in the mission. Interpret as a literal "what fraction of
+            demonstration health threshold at some point in the mission. Interpret as a literal "what fraction of
             possible futures fall below the configured health threshold" —
             not as a validated operational acceptance rule.
           </li>
@@ -304,10 +305,10 @@ export function CHIExplainer({ scenarioResult, chiStar, missionId, gate }: Props
       <div className="border-t border-line pt-4">
         <p className="text-sm text-ink-1 leading-relaxed">
           This is a research scenario tool, not an autonomous selector. The CHI
-          and threshold-failure probability are inputs to human review. A STRONG
-          status means the configured model does not flag the scenario; a
-          MARGINAL or DEGRADED status does not categorically reject a crew,
-          but it does require documented review of assumptions and mitigations.
+          and threshold-failure frequency are inputs to human review. Above-config
+          bands mean only that the run stayed above the configured demonstration
+          line; below-config bands do not categorically reject a crew, but they
+          require documented review of assumptions and mitigations.
         </p>
       </div>
     </section>

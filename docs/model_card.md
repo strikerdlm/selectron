@@ -21,8 +21,9 @@ No population, mission type, mission duration range, or analog facility family i
 
 Current evidence status is:
 
-- nominal accepted ledger rows: 4;
-- malformed accepted ledger rows: 4;
+- accepted ledger rows: 0;
+- queued proposal ledger rows: 5;
+- malformed accepted ledger rows: 0;
 - valid accepted active-parameter coverage: 0/4,849;
 - release priors adjudicated: false.
 

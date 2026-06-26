@@ -16,7 +16,7 @@ export function f1Caption(
     oneLine: `Uncertain-weight MCDA score distribution for ${alias} (n = ${scoreDistribution.samples.length.toLocaleString()} draws; tier · ${TIER_LABEL[accessTier]}).`,
     methods:
       `56-bin histogram of the MCDA score induced by uncertain Dirichlet criterion weights (Iter-1 engine: ` +
-      `S_i = Σ w_k · z(x_{i,k}) where w ~ Dirichlet(1,…,1) and z is per-criterion affine ` +
+      `S_i = Σ w_k · u(x_{i,k}) where w ~ Dirichlet(1,…,1) and u is per-criterion affine ` +
       `normalisation to [0,1]). Central 90% score interval shaded; distribution mean overlaid as dashed line. ` +
       `Software: ${SOFTWARE_VERSION}.`,
     source:

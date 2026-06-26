@@ -5,9 +5,9 @@ export function f6Caption(args: { totalScore: number }): CaptionBlock {
     figureId: "F6",
     oneLine: `Per-criterion contribution to total MCDA score (total μ = ${(100 * args.totalScore).toFixed(1)}%).`,
     methods:
-      "Radar plot of weighted per-criterion contribution w̄_k · z(x_k), where w̄_k is the " +
+      "Radar plot of weighted per-criterion contribution w̄_k · u(x_k), where w̄_k is the " +
       "mean Dirichlet weight (closed-form α_k/Σα_l with α=(1,…,1) → 1/K) and " +
-      "z(x_k) is the normalised criterion score in [0,1].",
+      "u(x_k) is the normalised criterion score in [0,1].",
     source: "Computed in-browser from the current criterionEntries.",
     reproducibility: "Deterministic for given criterion scores; no Monte-Carlo.",
   };

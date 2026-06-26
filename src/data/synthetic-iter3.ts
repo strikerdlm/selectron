@@ -137,8 +137,8 @@ function buildSyntheticPriors(): PriorsJson {
           ? Object.fromEntries(
               c.vulnerabilityCriteria.map((cid) => [
                 cid,
-                // Family-specific β against z-scored higher-is-better criteria.
-                // Negative β: HIGH-quality candidate (z>0) → β·z<0 → exp<1 → λ↓.
+                // Family-specific β against scale-relative higher-is-better criteria.
+                // Negative β: HIGH-quality candidate (r>0) → β·r<0 → exp<1 → λ↓.
                 // Magnitudes are operator-selected defaults so worst-vs-best
                 // (4 SD spread, ±2 z units) produces a meaningful 2-4×
                 // incidence multiplier spread.

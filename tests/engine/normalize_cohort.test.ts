@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { scaleRelativeScore, zScoreAgainstScale } from "../../src/engine/normalize-cohort";
+import { permissiveScaleRelativeScore, scaleRelativeScore } from "../../src/engine/normalize-cohort";
 import { SelectronError } from "../../src/engine/errors";
 
 // F10: this is a bounded scale-relative coordinate, NOT a population z-score.
@@ -26,11 +26,11 @@ describe("scaleRelativeScore", () => {
 });
 
 // Backward-compat helper used by archived src/risk paths.
-describe("zScoreAgainstScale (archived permissive compatibility helper)", () => {
+describe("permissiveScaleRelativeScore (archived compatibility helper)", () => {
   it("matches scaleRelativeScore inside range but preserves archived extrapolation", () => {
-    expect(zScoreAgainstScale(0, { min: 0, max: 100 })).toBe(scaleRelativeScore(0, { min: 0, max: 100 }));
-    expect(zScoreAgainstScale(100, { min: 0, max: 100 })).toBe(2);
-    expect(zScoreAgainstScale(0.5, { min: 20, max: 70 })).toBeLessThan(-2);
-    expect(zScoreAgainstScale(5, { min: 5, max: 5 })).toBe(0);
+    expect(permissiveScaleRelativeScore(0, { min: 0, max: 100 })).toBe(scaleRelativeScore(0, { min: 0, max: 100 }));
+    expect(permissiveScaleRelativeScore(100, { min: 0, max: 100 })).toBe(2);
+    expect(permissiveScaleRelativeScore(0.5, { min: 20, max: 70 })).toBeLessThan(-2);
+    expect(permissiveScaleRelativeScore(5, { min: 5, max: 5 })).toBe(0);
   });
 });

@@ -35,6 +35,7 @@ import type {
   PosteriorPredictiveOutcome,
   VulnerabilityCouplingMode,
   ProfileEffectMode,
+  KindMultiplierMode,
 } from "./types";
 import { simulateIMM } from "./simulate";
 import { loadIMMPriors } from "./priors";
@@ -53,8 +54,16 @@ export type PosteriorPredictiveOpts = {
   nDraws: number;
   trialsPerDraw: number;
   seed: number;
-  /** Explicit per-condition kind multipliers; defaults to the mission kind's map from imm-priors.json. */
+  /**
+   * Explicit per-condition kind multipliers. This is a custom operator scenario
+   * override; omitted maps use identity unless kindMultiplierMode="exploratory".
+   */
   kindMultipliers?: Record<string, number>;
+  /**
+   * Mission-kind multiplier mode. Default/adjudicated/off runs use identity;
+   * exploratory mode opts into the proposal-stage mission-kind map.
+   */
+  kindMultiplierMode?: KindMultiplierMode;
   tierAMultiplier?: number;
   tierBMultiplier?: number;
   tierCMultiplier?: number;
@@ -135,12 +144,21 @@ export function posteriorPredictiveSimulateIMM(
     }
   }
 
-  // Resolve the base kind-multiplier map once (explicit override wins, else the
-  // mission kind's map from imm-priors.json, else empty → 1.0 everywhere).
+  // Resolve the base kind-multiplier map once. Proposal-stage mission-kind maps
+  // are not auto-loaded in default/adjudicated posterior-predictive runs; the
+  // semantics match simulateIMM.
+  const kindMultiplierMode =
+    opts.kindMultiplierMode ?? (opts.kindMultipliers !== undefined ? "custom" : "adjudicated");
+  if (!["off", "adjudicated", "exploratory", "custom"].includes(kindMultiplierMode)) {
+    throw new Error(
+      `posteriorPredictiveSimulateIMM: kindMultiplierMode must be off, adjudicated, exploratory, or custom; got ${String(kindMultiplierMode)}`,
+    );
+  }
   const base: Record<string, number> =
-    opts.kindMultipliers ??
-    priors.global_calibration.kind_multipliers?.[mission.kind] ??
-    {};
+    kindMultiplierMode === "off" ? {}
+      : opts.kindMultipliers !== undefined ? opts.kindMultipliers
+      : kindMultiplierMode === "exploratory" ? priors.global_calibration.kind_multipliers?.[mission.kind] ?? {}
+      : {};
 
   // Build cleanBase once: strip documentation sentinel keys (e.g. `_doc_`) and
   // any non-numeric values — hoisted out of the draw loop to avoid O(nDraws) redundancy.
@@ -174,6 +192,9 @@ export function posteriorPredictiveSimulateIMM(
       seed: drawSeed,
       kindMultipliers: cleanBase,
       incidenceRateOverrides,
+      kindMultiplierMode: opts.kindMultipliers !== undefined && kindMultiplierMode !== "off"
+        ? "custom"
+        : kindMultiplierMode,
       tierAMultiplier: opts.tierAMultiplier,
       tierBMultiplier: opts.tierBMultiplier,
       tierCMultiplier: opts.tierCMultiplier,

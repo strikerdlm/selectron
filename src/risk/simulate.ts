@@ -1,6 +1,6 @@
 import { SelectronError } from "@/engine/errors";
 import { makeRng } from "@/engine/prng";
-import { zScoreAgainstScale } from "@/engine/normalize-cohort";
+import { permissiveScaleRelativeScore } from "@/engine/normalize-cohort";
 import { DEMO_CRITERIA } from "@/data/demo-criteria";
 import type {
   AnalogMission,
@@ -87,38 +87,38 @@ function sampleFromPosterior(rng: Rng, samples: readonly number[]): number {
   return samples[idx];
 }
 
-// Build a scale-relative vector for a crew member by looking up the criteria
+// Build a scale-relative coordinate vector for a crew member by looking up the criteria
 // the condition flags as vulnerability drivers. This is not a population
-// z-score: scale min maps to -2, midpoint to 0, and max to +2.
+// score: scale min maps to -2, midpoint to 0, and max to +2.
 //
 // Sign convention: HIGH-quality candidate → SMALL λ multiplier.
-// β is negative in SYNTHETIC_PRIORS (G6). So we need β·z < 0 for high-quality,
-// meaning z > 0 for high-quality candidates.
+// β is negative in SYNTHETIC_PRIORS (G6). So we need β·r < 0 for high-quality,
+// meaning r > 0 for high-quality candidates.
 //
-// For higherIsBetter=true:  HIGH raw = high quality → zVal > 0 → use zVal directly.
-// For higherIsBetter=false: HIGH raw = BAD (e.g., high MMPI-EID) → must FLIP so z < 0
-//                           for high-quality (low raw) candidates: use -zVal.
+// For higherIsBetter=true:  HIGH raw = high quality → rVal > 0 → use rVal directly.
+// For higherIsBetter=false: HIGH raw = BAD (e.g., high MMPI-EID) → must FLIP so r < 0
+//                           for high-quality (low raw) candidates: use -rVal.
 //
 // Verification:
-//   VO₂max=70 (max, good; higherIsBetter=true):  z=+2, β=-0.2 → exp(-0.4)≈0.67 (λ↓) ✓
-//   VO₂max=20 (min, bad):                        z=-2, β=-0.2 → exp(+0.4)≈1.49 (λ↑) ✓
-//   MMPI-EID=120 (max, bad; higherIsBetter=false): zVal=+2, z=-2, β=-0.2 → exp(+0.4)≈1.49 (λ↑) ✓
+//   VO₂max=70 (max, good; higherIsBetter=true):  r=+2, β=-0.2 → exp(-0.4)≈0.67 (λ↓) ✓
+//   VO₂max=20 (min, bad):                        r=-2, β=-0.2 → exp(+0.4)≈1.49 (λ↑) ✓
+//   MMPI-EID=120 (max, bad; higherIsBetter=false): rVal=+2, r=-2, β=-0.2 → exp(+0.4)≈1.49 (λ↑) ✓
 export function vulnerabilityVector(
   member: Candidate,
   criterionIds: readonly string[],
   criteriaIndex: ReadonlyMap<string, Criterion>,
 ): Record<string, number> {
-  const z: Record<string, number> = {};
+  const coordinates: Record<string, number> = {};
   for (const cid of criterionIds) {
     const raw = member.scores[cid];
     const c = criteriaIndex.get(cid);
     if (raw === undefined || !Number.isFinite(raw) || !c) continue;
-    const zVal = zScoreAgainstScale(raw, c.scale);
-    // higherIsBetter=true:  high raw = high quality → z positive → β·z < 0 → λ↓
-    // higherIsBetter=false: high raw = bad → flip so bad candidates get z > 0
-    z[cid] = c.higherIsBetter ? zVal : -zVal;
+    const rVal = permissiveScaleRelativeScore(raw, c.scale);
+    // higherIsBetter=true:  high raw = high quality → r positive → β·r < 0 → λ↓
+    // higherIsBetter=false: high raw = bad → flip so bad candidates get r > 0
+    coordinates[cid] = c.higherIsBetter ? rVal : -rVal;
   }
-  return z;
+  return coordinates;
 }
 
 // τ = mean countermeasure availability across the mission's countermeasure
@@ -294,7 +294,7 @@ export function runMissionTrial(
       } else {
         // Spec §3.2: for event-triggered conditions, the log_lambda posterior
         // encodes log(p_event); after the vulnerability multiplier it can
-        // overshoot 1 under extreme β·z combinations — clamp to a valid
+        // overshoot 1 under extreme β·r combinations — clamp to a valid
         // binomial probability rather than throw, since this is a soft
         // model-misspec guard (not a programmer error).
         n = sampleBinomial(rng, mission.evaCount, clampProb(lambdaI));

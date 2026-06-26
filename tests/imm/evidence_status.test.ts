@@ -97,18 +97,18 @@ function writeSingleParameterFixture(root: string, rowOverrides: Record<string, 
 }
 
 describe("evidence status gate", () => {
-  it("reports pilot adjudication in progress when partial accepted ledger rows exist", () => {
+  it("reports unadjudicated status when queued proposal rows exist but no accepted coverage exists", () => {
     const status = buildEvidenceStatus();
 
-    expect(status.acceptedCount).toBe(4);
-    expect(status.proposalCount).toBe(1);
+    expect(status.acceptedCount).toBe(0);
+    expect(status.proposalCount).toBe(5);
     expect(status.releasePriorsAdjudicated).toBe(false);
     expect(status.status).toBe("unadjudicated");
     expect(status.proposalRefCount).toBeGreaterThan(0);
     expect(status.activeParameterCount).toBeGreaterThan(0);
     expect(status.acceptedCoveredParameterCount).toBe(0);
     expect(status.uncoveredParameterCount).toBe(status.activeParameterCount);
-    expect(status.malformedAcceptedRows).toHaveLength(4);
+    expect(status.malformedAcceptedRows).toHaveLength(0);
     expect(status.message).toContain("No complete adjudicated analog evidence release");
   });
 

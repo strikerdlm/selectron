@@ -1,8 +1,8 @@
 // F6 ScoreBreakdownRadar — per-criterion weighted contribution to total MCDA score.
 //
 // Each spoke represents one criterion. The value plotted is the weighted contribution
-// w̄_k · z(x_k) where w̄_k = 1/K (closed-form Dirichlet(1,…,1) mean) and z(x_k) is
-// the normalized criterion score in [0, 1]. For K=5 criteria, contribution ∈ [0, 0.2].
+// w̄_k · u(x_k) where w̄_k = 1/K (closed-form Dirichlet(1,…,1) mean) and u(x_k)
+// is the normalized criterion score in [0, 1]. For K=5 criteria, contribution ∈ [0, 0.2].
 //
 // Design:
 //   - Radar (polar) chart; one spoke per criterion.

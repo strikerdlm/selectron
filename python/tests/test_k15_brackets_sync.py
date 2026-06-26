@@ -8,6 +8,7 @@ has no source tree, so the test skips rather than failing.
 from __future__ import annotations
 
 import json
+from importlib import resources
 from pathlib import Path
 
 import pytest
@@ -28,6 +29,13 @@ def test_bundled_brackets_match_repo_canonical() -> None:
     with _REPO_CANONICAL.open() as f:
         canonical = json.load(f)
     assert _K15_REGRESSION_BRACKETS == canonical
+
+
+def test_brackets_are_readable_as_package_resource() -> None:
+    raw = resources.files("selectron").joinpath("k15_regression_brackets.json").read_text(
+        encoding="utf-8"
+    )
+    assert json.loads(raw) == _K15_REGRESSION_BRACKETS
 
 
 def test_bundled_brackets_have_expected_shape() -> None:

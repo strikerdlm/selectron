@@ -116,8 +116,8 @@ export type IMMCrewMember = {
   /**
    * Per-criterion Stage A scores (raw, instrument scale).
    * Keys are criterion IDs from DEMO_CRITERIA or a future ratified catalog.
-   * When present, used in `simulateIMM` to compute z-scored vulnerability multipliers
-   * that modulate per-condition λ (gate-then-modulate, Commit 5).
+   * When present, used in `simulateIMM` to compute scale-relative vulnerability
+   * multipliers that modulate per-condition λ in explicit scenario mode.
    */
   stageAScores?: Record<string, number>;
 };

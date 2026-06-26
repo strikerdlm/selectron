@@ -21,6 +21,6 @@ export function normalizeScore(
       scale,
     });
   }
-  const z = (raw - scale.min) / (scale.max - scale.min);
-  return higherIsBetter ? z : 1 - z;
+  const fraction = (raw - scale.min) / (scale.max - scale.min);
+  return higherIsBetter ? fraction : 1 - fraction;
 }

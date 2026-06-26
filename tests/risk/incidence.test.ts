@@ -146,7 +146,7 @@ describe("sampleBinomial", () => {
 });
 
 describe("applyVulnerabilityMultiplier", () => {
-  it("matches closed-form exp(β·z)", () => {
+  it("matches closed-form exp(β·r)", () => {
     const baseLambda = 0.01;
     const beta = { neuroticism: 0.4, agreeableness: -0.2 };
     const z = { neuroticism: 1.5, agreeableness: -1.0 };

@@ -82,6 +82,28 @@ describe("check_active_imports architecture guard", () => {
     expect(result.computedDynamicImports).toEqual([]);
   });
 
+  it("flags transitive active dependencies that reach archived risk code", () => {
+    const root = fixture({
+      "src/risk/some-module.ts": "export const archived = 1;",
+      "src/active/helper.ts": 'import { archived } from "@/risk/some-module";\nexport const x = archived;',
+      "src/active/app.ts": 'import { x } from "@/active/helper";\nexport const y = x;',
+    });
+
+    const result = analyzeActiveImports({ root });
+
+    expect(result.violations).toEqual([
+      {
+        file: "src/active/app.ts",
+        risk: ["src/risk/some-module.ts"],
+      },
+      {
+        file: "src/active/helper.ts",
+        risk: ["src/risk/some-module.ts"],
+      },
+    ]);
+    expect(result.computedDynamicImports).toEqual([]);
+  });
+
   it("fails closed on computed dynamic imports in active source", () => {
     const root = fixture({
       "src/risk/some-module.ts": "export const archived = 1;",

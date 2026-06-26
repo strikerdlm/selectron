@@ -48,7 +48,7 @@ function syntheticPriors(): PriorsJson {
     conditions[c.id] = {
       missions,
       // Tiny positive β on emotional stability — high-stability candidates get
-      // a small downward shift in λ via the multiplier exp(β·z) for z<0 inputs.
+      // a small downward shift in λ via the multiplier exp(β·r) for r<0 inputs.
       // We use raw candidate scores (caller's responsibility to standardize);
       // for the unit tests β values are kept small to avoid runaway multipliers.
       vulnerability_beta:

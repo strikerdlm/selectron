@@ -186,7 +186,7 @@ function mcdaSteps(args: {
         <span>
           S{sup("(s)")} = Σ{sub("k=1")}
           {sup("K")} w{sub("k")}
-          {sup("(s)")} · z{sub("k")}
+          {sup("(s)")} · u{sub("k")}
         </span>
       ),
       concrete: (
@@ -196,7 +196,7 @@ function mcdaSteps(args: {
         </span>
       ),
       lay:
-        "For each draw of the weight vector, we multiply each criterion's z-score by its weight and add them up. The result is one possible total score for the candidate. Different weight draws give different totals; that spread is an assumed-priority sensitivity distribution, not a learned posterior.",
+        "For each draw of the weight vector, we multiply each criterion's normalized [0, 1] score by its weight and add them up. The result is one possible total score for the candidate. Different weight draws give different totals; that spread is an assumed-priority sensitivity distribution, not a learned posterior.",
       citation: {
         id: "Iter-1 spec §3.3",
         label: "Selectron MCDA scoring engine",
@@ -400,17 +400,17 @@ function immSteps(args: {
         <span>
           λ{sub("k,i")} = λ{sub("k")}
           {sup("base")} · exp(β{sub("k")}
-          {sup("⊤")} · z{sub("i")})
+          {sup("⊤")} · r{sub("i")})
         </span>
       ),
       concrete: (
         <span>
           crew size {mission.crewSize} · scenario β vector from operator defaults ·
-          z = normalized Stage A scores when coupling is explicitly enabled
+          r = scale-relative Stage A coordinates when coupling is explicitly enabled
         </span>
       ),
       lay:
-        "Trait-to-incidence coupling is an explicit scenario-analysis lever, not the default scientific mode. When enabled, the app multiplies the base rate by exp(β·z), where β is an operator-supplied stress-test coefficient and z is the crew member's normalized Stage A score. The accepted evidence ledger does not currently calibrate these β values against analog outcome data.",
+        "Trait-to-incidence coupling is an explicit scenario-analysis lever, not the default scientific mode. When enabled, the app multiplies the base rate by exp(β·r), where β is an operator-supplied stress-test coefficient and r is the crew member's scale-relative Stage A coordinate. The accepted evidence ledger does not currently calibrate these β values against analog outcome data.",
       citation: {
         id: "Cox 1972 / [M18 §2.1.1 extension]",
         label: "Log-linear vulnerability multiplier",
@@ -487,7 +487,7 @@ function immSteps(args: {
     },
     {
       n: 6,
-      title: "Repeat thousands of trials → CHI simulation distribution + threshold-failure probability",
+      title: "Repeat thousands of trials → CHI simulation distribution + threshold-crossing frequency",
       equation: (
         <span>
           run T = {trials.toLocaleString()} independent trials · χ* threshold ={" "}

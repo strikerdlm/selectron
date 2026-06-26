@@ -65,7 +65,7 @@ const HETERO_SCORES: Record<string, number> = {
   "psych.bdi2_baseline":                3,
 };
 
-/** Closed-form per-criterion contributions (w̄_k · z_k) for the ScoreBreakdownRadar. */
+/** Closed-form per-criterion contributions (w̄_k · u_k) for the ScoreBreakdownRadar. */
 function paperRadarData(): import("@/ui/figures/ScoreBreakdownRadar").RadarDatum[] {
   const K = DEMO_CRITERIA.length;
   const wBar = 1 / K; // Dirichlet(1,…,1) mean weight per criterion

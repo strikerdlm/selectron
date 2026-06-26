@@ -141,10 +141,10 @@ describe("provenance — SHA-256 helpers (F3)", () => {
 
 describe("provenance — evidence coverage statement (F4)", () => {
   it("EVIDENCE_STATUS_SNAPSHOT reports zero valid accepted coverage (0 / 4,849)", () => {
-    expect(EVIDENCE_STATUS_SNAPSHOT.acceptedCount).toBe(4);
+    expect(EVIDENCE_STATUS_SNAPSHOT.acceptedCount).toBe(0);
     expect(EVIDENCE_STATUS_SNAPSHOT.acceptedCoveredParameterCount).toBe(0);
     expect(EVIDENCE_STATUS_SNAPSHOT.activeParameterCount).toBe(4849);
-    expect(EVIDENCE_STATUS_SNAPSHOT.malformedAcceptedRowCount).toBe(4);
+    expect(EVIDENCE_STATUS_SNAPSHOT.malformedAcceptedRowCount).toBe(0);
     expect(EVIDENCE_STATUS_SNAPSHOT.releasePriorsAdjudicated).toBe(false);
     expect(EVIDENCE_STATUS_SNAPSHOT.status).toBe("unadjudicated");
   });

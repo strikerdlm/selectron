@@ -94,7 +94,7 @@ import type { Criterion } from "../types";
 
 /**
  * Family-specific β coefficients for Stage A scale-relative vulnerability multiplier.
- * Negative β: HIGH-quality candidate (z>0 on higherIsBetter criteria) → exp(β·z) < 1 → λ↓.
+ * Negative β: HIGH-quality candidate (r>0 on higherIsBetter criteria) → exp(β·r) < 1 → λ↓.
  * Magnitudes are operator-selected sensitivity defaults chosen so a -2..+2
  * coordinate spread produces a 2–4× incidence multiplier spread.
  * Same values as SYNTHETIC_PRIORS in src/data/synthetic-iter3.ts — these are the
@@ -256,11 +256,11 @@ function evaExposureDaysByCrew(crew: readonly IMMCrewMember[], mission: IMMMissi
  *   1. Look up the criterion in criteriaIndex to get scale + higherIsBetter.
  *   2. Scale-relative score: scaleRelativeScore(raw, scale). This is NOT a
  *      population z-score. The declared scale endpoints map to -2 and +2.
- *   3. Apply sign convention: higherIsBetter ? z : -z
- *      (HIGH raw on higherIsBetter=true → z>0; with β<0 → exp<1 → λ↓).
+ *   3. Apply sign convention: higherIsBetter ? r : -r
+ *      (HIGH raw on higherIsBetter=true → r>0; with β<0 → exp<1 → λ↓).
  *   4. Look up the operator-supplied scenario β from FAMILY_BETA (default -0.2).
  *
- * Returns modifiedLambda = applyVulnerabilityMultiplier(baseLambda, beta, z).
+ * Returns modifiedLambda = applyVulnerabilityMultiplier(baseLambda, beta, r).
  * Falls through to baseLambda when no criteria are present or no stageAScores.
  *
  * This function is only called with a non-empty criteria index in explicit

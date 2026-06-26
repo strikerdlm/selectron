@@ -91,3 +91,31 @@ in `imm-priors.json`.
 - `study_slug` should be the filename stem (no `.md`) of the source markdown — e.g. `palinkas-2004-antarctic-psychiatric-disorders`, `imm_sources/zotero_imm/antonsen-2023-hsrb`.
 - `person_days = crew × days` for the study. If the study reports only the mission duration, the controller-staged subagent must derive crew from a co-cited mission profile and prefix the notes column with `EST: derived crew=N from <ref>`.
 - `events` counts incidents, not severity-weighted contributions. A single hospitalised episode + 3 outpatient visits = 4 events.
+
+## `evidence_adjudication_queue.csv` — release-block work queue
+
+This file is a work queue only. Rows here do not count toward accepted coverage
+and must not feed release priors. A queued row becomes accepted only when a
+schema-complete row is written to `evidence_ledger.csv` with `status=accepted`
+and passes `npm run evidence:check`.
+
+Required columns:
+
+| Column | Description |
+|---|---|
+| parameter_path | Exact active prior or profile-effect parameter path to adjudicate. |
+| condition | Condition id or `mission-kind` for global multiplier rows. |
+| model_component | Incidence, mission-kind multiplier, pEVAC/pLOCL, severity branch, treatment/resource, or profile effect component. |
+| current_value | Current unadjudicated value in the active model. |
+| source | Candidate source file, DOI, or prior source reference to verify. |
+| denominator_person_time | Source denominator/person-time to extract before acceptance. |
+| extraction_quote | Verbatim source quote or table locator to verify before acceptance. |
+| extractor | Primary extractor. |
+| verifier | Independent verifier. |
+| bias_note | Risk-of-bias note to complete before acceptance. |
+| transportability_note | Analog/mission transportability note to complete before acceptance. |
+| prior_value_hash | Hash of the transformed accepted value when available. |
+| priority | Queue priority. |
+| queue_block | Rebaseline priority block. |
+| status | Queue status, e.g. `queued`, `in-review`, `ready-for-ledger`, `blocked`. |
+| notes | Free text caveats. |

@@ -88,7 +88,7 @@ For terrestrial analog missions, orbital/pressurized-suit `EVA-coupled` priors a
 
 - The **Wizard** scores individual candidates (Stage A only).
 - **Crew Composition** simulates team-level medical outcomes (Stage B).
-- Optional **trait coupling** (default **off**) can modulate incidence by Stage A z-scores — enabled only as explicit scenario analysis.
+- Optional **trait coupling** (default **off**) can modulate incidence by scale-relative Stage A coordinates — enabled only as explicit scenario analysis.
 - **Profile effects** are default-off unless an effect is explicitly adjudicated; the current communications-delay coefficient is proposal-stage and applies only in exploratory mode.
 
 ---
@@ -324,6 +324,11 @@ The **Mission profile → modeled effects** panel lists:
 - **Proposal** effects documented for explicit exploratory mode, including the communications-delay pilot coefficient
 - **Unsupported** I&C fields stored descriptively only
 
+The external analog validation protocol is defined in
+[`docs/analog_validation_protocol.md`](analog_validation_protocol.md). Current
+v0.6 status remains: protocol defined, no observed analog-outcome validation
+performed.
+
 ### 7.6 Save, load, export session
 
 Toolbar appears once an outcome exists (config-only save available earlier):
@@ -439,7 +444,7 @@ npm run evidence:require-adjudicated # release gate (fails until full coverage)
 
 4. Python release fitting (`python -m selectron` / `scripts/apply_fit.py`) reads **accepted count extracts** for the analytic Gamma-Poisson fitter; parameter-path acceptance rows are tracked by the TS gate separately.
 
-**Current pilot state (v0.6):** 4 nominal accepted ledger rows exist, but all 4 are malformed and quarantined from accepted coverage; valid accepted coverage is 0/4,849 active parameter paths. Release remains **unadjudicated** until every active parameter path has accepted, independently verified coverage.
+**Current pilot state (v0.6):** no accepted ledger rows currently satisfy the release schema; five rows are queued as proposals for readjudication. Valid accepted coverage is 0/4,849 active parameter paths. Release remains **unadjudicated** until every active parameter path has accepted, independently verified coverage.
 
 ### Do not claim
 
@@ -462,7 +467,7 @@ For the current prediction boundary, see the model card: [`docs/model_card.md`](
 | `npm run test:fast` | All tests except slow stochastic (K15, calibration) |
 | `npm run test:slow` | K15 + calibration + rhat convergence |
 | `npm run verify:fast` | typecheck + import guard + evidence:check + test:fast |
-| `npm run guard:active-imports` | Block archived `src/risk` imports in active paths |
+| `npm run guard:active-imports` | Block direct or transitive archived `src/risk` dependencies in active paths |
 | `npm run validate:imm` | K15 reference-model regression (CLI) |
 | `npm run validate:imm:analog` | Analog archetype regression tests |
 | `npm run release:freeze:check` | Hard clean/tagged-source gate that prints exact commit, prior hash, evidence snapshot, and freeze artifact hashes |
@@ -495,7 +500,7 @@ The Python package supports offline calibration and screening analyses. Its forw
 | **CHI clamp** | Count/proportion of trials where raw CHI was clipped to the 0–100 display scale |
 | **Kind multiplier** | Per-(mission-kind, condition) incidence scaler from prior catalog |
 | **Profile multiplier** | Registry-controlled I&C profile effect; communications delay is proposal-stage and applies only in exploratory mode |
-| **Vulnerability multiplier** | exp(β·z) on λ from Stage A z-scores (scenario mode only) |
+| **Vulnerability multiplier** | exp(β·r) on λ from scale-relative Stage A coordinates (scenario mode only) |
 
 ---
 

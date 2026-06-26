@@ -163,6 +163,17 @@ describe("active analog workflow guards", () => {
     }
   });
 
+  it("keeps CHI threshold bands framed as display-only configuration bins", () => {
+    const source = readRepoFile("src/ui/figures/CHIExplainer.tsx");
+
+    expect(source).toContain("display-only band");
+    expect(source).toContain("DISPLAY BIN 1");
+    expect(source).toContain("not evidence-supported operational thresholds");
+    for (const token of ["scenario status", "STRONG", "ADEQUATE", "MARGINAL", "DEGRADED"]) {
+      expect(source).not.toContain(token);
+    }
+  });
+
   it("publishes a model card with explicit non-validation boundaries", () => {
     const source = readRepoFile("docs/model_card.md");
 
@@ -209,7 +220,8 @@ describe("active analog workflow guards", () => {
     expect(manual).toContain("candidate-score sensitivity analysis and crew-composition mission scenarios");
     expect(future).toContain("inter-model verification benchmarks");
     expect(future).toContain("Future benchmark/external-validation requirement");
-    expect(status).toContain("four nominal `accepted` rows, all malformed");
+    expect(status).toContain("acceptedCount=0");
+    expect(status).toContain("proposalCount=5");
     expect(status).toContain("0/4,849");
     expect(iter3VvDossier).toContain("archived historical dossier");
     expect(iter3VvDossier).toContain("Superseded by v0.6");
@@ -224,7 +236,6 @@ describe("active analog workflow guards", () => {
       "Validation gate to add",
       "K15 calibration partially within CI₉₅",
       "0 / 4,846",
-      "zero accepted rows",
       "**Status:** living document",
     ]) {
       for (const [path, source] of [

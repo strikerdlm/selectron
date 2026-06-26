@@ -22,6 +22,7 @@ import json
 import logging
 from dataclasses import dataclass, asdict, field
 from datetime import datetime, timezone
+from importlib import resources
 from pathlib import Path
 from typing import Any
 
@@ -70,24 +71,21 @@ _SCENARIO_RESOURCES: dict[str, dict[str, Any]] = {
     "unlimited": _UNLIMITED_RESOURCES,
 }
 
-_K15_REGRESSION_BRACKETS_PATH = (
-    Path(__file__).resolve().parents[3] / "src" / "data" / "k15-regression-brackets.json"
-)
-
-
 def _load_k15_regression_brackets() -> dict[str, dict[str, dict[str, Any]]]:
-    # F8: prefer the copy bundled inside the installed package (via
-    # importlib.resources) so the validator works when the Python package is
-    # installed standalone, without the TypeScript source tree. Fall back to
-    # the repo-relative src/data path only when running from a checkout where
-    # the package data has not been installed.
+    """Load the frozen K15 regression brackets bundled with the Python package.
+
+    F8: this intentionally does not navigate into the TypeScript source tree.
+    The Python path is a secondary offline approximation; its regression
+    envelope must travel as package data when installed standalone.
+    """
     try:
-        from importlib.resources import files  # Python 3.9+
-        with (files("selectron") / "k15_regression_brackets.json").open("r") as f:
-            return json.load(f)
-    except (FileNotFoundError, ModuleNotFoundError):
-        with open(_K15_REGRESSION_BRACKETS_PATH) as f:
-            return json.load(f)
+        resource = resources.files("selectron").joinpath("k15_regression_brackets.json")
+        return json.loads(resource.read_text(encoding="utf-8"))
+    except (FileNotFoundError, ModuleNotFoundError) as exc:
+        raise RuntimeError(
+            "selectron.k15_regression_brackets.json is missing from package data; "
+            "reinstall selectron-offline or check pyproject.toml package-data."
+        ) from exc
 
 
 _K15_REGRESSION_BRACKETS = _load_k15_regression_brackets()

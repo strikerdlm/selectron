@@ -42,9 +42,9 @@ export function scaleRelativeScore(raw: number, scale: { min: number; max: numbe
 
 // Backward-compatibility helper for archived `src/risk` paths. Those historical
 // paths pass pre-normalized 0..1 demo scores through raw instrument scales, so
-// this alias preserves the old permissive extrapolation behavior. New active
+// this helper preserves the old permissive extrapolation behavior. New active
 // code must call `scaleRelativeScore` and receives fail-closed validation.
-export function zScoreAgainstScale(raw: number, scale: { min: number; max: number }): number {
+export function permissiveScaleRelativeScore(raw: number, scale: { min: number; max: number }): number {
   const mid = (scale.min + scale.max) / 2;
   const range = scale.max - scale.min;
   if (!Number.isFinite(raw) || !Number.isFinite(mid) || !Number.isFinite(range) || range <= 0) return 0;

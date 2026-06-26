@@ -159,6 +159,14 @@ export const PROFILE_EFFECTS: readonly ProfileEffect[] = [
   },
 ];
 
+export const ACCEPTED_PROFILE_EFFECTS: readonly ProfileEffect[] = PROFILE_EFFECTS.filter(
+  (e) => e.evidenceStatus === "accepted",
+);
+
+export const PROPOSAL_PROFILE_EFFECTS: readonly ProfileEffect[] = PROFILE_EFFECTS.filter(
+  (e) => e.evidenceStatus === "proposal",
+);
+
 export const DESCRIPTIVE_ONLY_FIELDS: readonly ProfileEffect[] = PROFILE_EFFECTS.filter(
   (e) => e.evidenceStatus === "unsupported",
 );

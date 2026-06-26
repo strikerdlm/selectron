@@ -1,8 +1,8 @@
 {
   "status": "unadjudicated",
   "releasePriorsAdjudicated": false,
-  "acceptedCount": 4,
-  "proposalCount": 1,
+  "acceptedCount": 0,
+  "proposalCount": 5,
   "proposalRefCount": 7,
   "proposalRefConditionIds": [
     "ankle-sprain-strain",
@@ -16,7 +16,7 @@
   "activeParameterCount": 4849,
   "acceptedCoveredParameterCount": 0,
   "uncoveredParameterCount": 4849,
-  "malformedAcceptedRowCount": 4,
+  "malformedAcceptedRowCount": 0,
   "message": "No complete adjudicated analog evidence release is available; active prior parameters remain uncovered or proposal-stage references remain exploratory.",
-  "generatedAt": "2026-06-24T13:02:57.682Z"
+  "generatedAt": "2026-06-26T09:59:42.106Z"
 }

@@ -9,7 +9,7 @@ import type { Condition } from "@/types";
 //   rates per condition; see synthetic-iter3.ts CONDITION_MEAN_LOG for values.
 //
 // vulnerabilityCriteria are the Stage-A criterion ids (Iter-1 placeholders
-// here) that the candidate-vulnerability multiplier exp(β_k^T z_i) consumes.
+// here) that the candidate-vulnerability multiplier exp(β_k^T r_i) consumes.
 // Spec §5 names finer-grained constructs (sleep quality, chronotype,
 // comms-delay tolerance, immune marker, cognitive flexibility, training
 // history) that Iter-1's 5-criterion placeholder set does NOT cover. Where

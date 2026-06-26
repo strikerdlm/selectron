@@ -18,8 +18,8 @@
 //
 // What each trait actually moves in the engine (verified 2026-06-05):
 //   - psych.emotional_stability and psych.conscientiousness appear in IMM
-//     conditions' `vulnerabilityCriteria` → z-scored against the criterion
-//     scale (zScoreAgainstScale, scale-relative) → exp(β·z) multiplier on λ
+//     conditions' `vulnerabilityCriteria` → scale-relative criterion
+//     coordinate → exp(β·r) multiplier on λ
 //     (FAMILY_BETA, psychiatric β = −0.4). Low scores → z < 0 → λ↑ → risk↑.
 //   - professional.technical_competence is NOT referenced by any condition's
 //     vulnerabilityCriteria (0 hits in src/imm/conditions.ts) — it degrades
@@ -209,7 +209,7 @@ describe("analog-45d · unscreened high-risk crew (no Stage-A selection)", () =>
     });
 
     // Low emotional stability + low conscientiousness → z < 0 on the coupled
-    // conditions → exp(β·z) > 1 → λ↑ → more medical events in 45 days.
+    // conditions → exp(β·r) > 1 → λ↑ → more medical events in 45 days.
     //
     // Margin choice (3-seed × {3k, 8k}-trial sweep, 2026-06-05): ΔTME spans
     // +2.53 to +2.61 and ΔCHI spans −0.33 to −0.61 across every seed/T pair —

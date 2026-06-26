@@ -1,8 +1,8 @@
 {
   "ledgerPath": "research/evidence_extracted/evidence_ledger.csv",
   "priorsPath": "src/data/imm-priors.json",
-  "acceptedCount": 4,
-  "proposalCount": 1,
+  "acceptedCount": 0,
+  "proposalCount": 5,
   "proposalRefCount": 7,
   "proposalRefConditionIds": [
     "ankle-sprain-strain",
@@ -4867,12 +4867,7 @@
     "profile_effects.mission.evaSchedule.incidence.estimate",
     "profile_effects.profile.communication.delaySec.incidence.estimate"
   ],
-  "malformedAcceptedRows": [
-    "row 2: missing numerator|events|repeated_measure_structure|extraction_quote|holdout_design|calibration_metrics; numerator is not a finite non-negative integer; events is not a finite non-negative integer; missing finite positive denominator/person_days/exposure_time; extractor and verifier are not independent; study_doi 10.3357/ASEM.3612.2013 does not match S20_walton_kerstman_2020_iss_quantification (10.3357/amhp.5432.2020; title: Quantification of Medical Risk on the International Space Station Using the Integrated Medical Model)",
-    "row 3: missing numerator|events|repeated_measure_structure|extraction_quote|holdout_design|calibration_metrics; numerator is not a finite non-negative integer; events is not a finite non-negative integer; missing finite positive denominator/person_days/exposure_time; extractor and verifier are not independent; study_doi 10.3357/ASEM.3612.2013 does not match S20_walton_kerstman_2020_iss_quantification (10.3357/amhp.5432.2020; title: Quantification of Medical Risk on the International Space Station Using the Integrated Medical Model)",
-    "row 4: missing numerator|events|repeated_measure_structure|extraction_quote|holdout_design|calibration_metrics; numerator is not a finite non-negative integer; events is not a finite non-negative integer; missing finite positive denominator/person_days/exposure_time; extractor and verifier are not independent; study_slug M18_myers_2018_imm_validation has no DOI in research/imm_sources/methods/M18_myers_2018_imm_validation.md; found 10.3357/amhp.4343.2015",
-    "row 5: missing numerator|events|repeated_measure_structure|extraction_quote|holdout_design|calibration_metrics; numerator is not a finite non-negative integer; events is not a finite non-negative integer; missing finite positive denominator/person_days/exposure_time; extractor and verifier are not independent; study_slug M18_myers_2018_imm_validation has no DOI in research/imm_sources/methods/M18_myers_2018_imm_validation.md; found 10.3357/amhp.4343.2015"
-  ],
+  "malformedAcceptedRows": [],
   "releasePriorsAdjudicated": false,
   "status": "unadjudicated",
   "message": "No complete adjudicated analog evidence release is available; active prior parameters remain uncovered or proposal-stage references remain exploratory."

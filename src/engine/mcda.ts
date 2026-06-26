@@ -14,7 +14,7 @@ export type ScoreInput = {
 
 function normalizedScoreVector(candidate: Candidate, criteria: readonly Criterion[]): Float64Array {
   if (criteria.length === 0) throw new SelectronError("E_NO_CRITERIA", "criteria array is empty");
-  const z = new Float64Array(criteria.length);
+  const normalizedScores = new Float64Array(criteria.length);
   for (let k = 0; k < criteria.length; k++) {
     const c = criteria[k];
     const raw = candidate.scores[c.id];
@@ -24,9 +24,9 @@ function normalizedScoreVector(candidate: Candidate, criteria: readonly Criterio
         candidate: candidate.id,
       });
     }
-    z[k] = normalizeScore(raw, c.scale, c.higherIsBetter);
+    normalizedScores[k] = normalizeScore(raw, c.scale, c.higherIsBetter);
   }
-  return z;
+  return normalizedScores;
 }
 
 function quantile(sortedAsc: Float64Array, q: number): number {
@@ -66,13 +66,13 @@ export function scoreCandidate(input: ScoreInput): ScoreDistribution {
   }
   validateAlphaForCriteria(alpha, criteria);
 
-  const z = normalizedScoreVector(candidate, criteria);
+  const normalizedScores = normalizedScoreVector(candidate, criteria);
   const rng = makeRng(seed);
   const samples = new Float64Array(iterations);
   for (let t = 0; t < iterations; t++) {
     const w = sampleDirichlet(alpha, rng);
     let s = 0;
-    for (let k = 0; k < z.length; k++) s += w[k] * z[k];
+    for (let k = 0; k < normalizedScores.length; k++) s += w[k] * normalizedScores[k];
     samples[t] = s;
   }
 
@@ -99,24 +99,24 @@ export type ClosedFormInput = {
 export function closedFormMoments(input: ClosedFormInput): { mean: number; variance: number } {
   const { candidate, criteria, alpha } = input;
   validateAlphaForCriteria(alpha, criteria);
-  const z = normalizedScoreVector(candidate, criteria);
+  const normalizedScores = normalizedScoreVector(candidate, criteria);
   const muW = dirichletMean(alpha);
   const varW = dirichletVariance(alpha);
 
-  // E[S] = sum_k mu_k * z_k
+  // E[S] = sum_k mu_k * normalizedScore_k
   let mean = 0;
-  for (let k = 0; k < z.length; k++) mean += muW[k] * z[k];
+  for (let k = 0; k < normalizedScores.length; k++) mean += muW[k] * normalizedScores[k];
 
   // Cov(w_k, w_l) = -alpha_k * alpha_l / (alpha0^2 * (alpha0 + 1)), k != l
-  // Var(S) = sum_k z_k^2 * Var(w_k) + sum_{k!=l} z_k * z_l * Cov(w_k, w_l)
+  // Var(S) = sum_k score_k^2 * Var(w_k) + sum_{k!=l} score_k * score_l * Cov(w_k, w_l)
   const alpha0 = alpha.reduce((a, b) => a + b, 0);
   let variance = 0;
-  for (let k = 0; k < z.length; k++) {
-    variance += z[k] * z[k] * varW[k];
-    for (let l = 0; l < z.length; l++) {
+  for (let k = 0; k < normalizedScores.length; k++) {
+    variance += normalizedScores[k] * normalizedScores[k] * varW[k];
+    for (let l = 0; l < normalizedScores.length; l++) {
       if (k === l) continue;
       const cov = (-alpha[k] * alpha[l]) / (alpha0 * alpha0 * (alpha0 + 1));
-      variance += z[k] * z[l] * cov;
+      variance += normalizedScores[k] * normalizedScores[l] * cov;
     }
   }
   return { mean, variance };

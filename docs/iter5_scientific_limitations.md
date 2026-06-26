@@ -1,13 +1,13 @@
 # Selectron — Scientific Limitations of the Current IMM Calibration
 
 **Created:** 2026-05-22 (post priors-rev3-b)
-**Last updated:** 2026-06-25 — calculation hierarchy hardening; severity-branch coverage generated; accepted-evidence coverage remains 0/4,849
+**Last updated:** 2026-06-26 — evidence-ledger demotion and adjudication queue; accepted-evidence coverage remains 0/4,849
 **Status:** Living document — update on every priors revision or engine extension
 **Companion docs:** [`iter5_priors_rev3_strategy.md`](iter5_priors_rev3_strategy.md), [`iter3_vv_dossier.md`](iter3_vv_dossier.md) §5, [`future_features.md`](future_features.md)
 
 > **NOT-FOR-FLIGHT — analog scope only.** Selectron v1 is a research tool + methodology demonstrator scoped to **Earth-based analog isolation missions** (MDRS, HI-SEAS, Mars-500, Antarctic winter-over) and **LEO / ISS-baseline scenarios** (ISS 6 mo K15 reference, S20 DRMs). It is **NOT** a Mars-mission tool, **NOT** an Artemis-mission tool, **NOT** a flight-medical-kit sizing tool, **NOT** a medical-clearance or crew-selection instrument, and **NOT** a NASA HSRB verdict engine. Mars and Artemis are catalogued in [`future_features.md`](future_features.md) with their structural prerequisites; do not enable them in `ACTIVE_MISSIONS` until those prerequisites land. The limitations below apply to the *in-scope* analog + LEO use case and are real and material.
 
-> **v0.6 evidence boundary.** Source-attribution provenance in `imm-priors.json` is not the same as accepted evidence adjudication. The evidence ledger currently contains four nominal `accepted` rows, all malformed, yielding **0/4,849 valid accepted active-parameter coverage** and `releasePriorsAdjudicated = false`. K15 agreement is inter-model verification against a public NASA model output, not external validation against observed analog clinical outcomes.
+> **v0.6 evidence boundary.** Source-attribution provenance in `imm-priors.json` is not the same as accepted evidence adjudication. The evidence ledger currently contains **0 accepted rows** and five proposal rows queued for readjudication, yielding **0/4,849 valid accepted active-parameter coverage** and `releasePriorsAdjudicated = false`. K15 agreement is inter-model verification against a public NASA model output, not external validation against observed analog clinical outcomes.
 
 ---
 
@@ -44,7 +44,7 @@ The K15 Appendix lists the 100 conditions with their incidence-source category a
 
 **Consequence:** for tier-A and (especially) tier-B conditions, the specific numerical λ / Beta-Pert parameters are Selectron priors, not NASA's internal database values. They are reviewable but not independently verified against in-flight observation per condition.
 
-**Evidence-ledger status:** the machine-readable accepted-evidence ledger is not release-ready. All four nominal accepted rows are malformed and excluded from accepted coverage. The valid accepted active-parameter coverage is **0/4,849**, and the current coverage denominator includes profile-effect parameters as well as `imm-priors.json` numeric parameters.
+**Evidence-ledger status:** the machine-readable accepted-evidence ledger is not release-ready. The previous four malformed pilot rows have been demoted to proposal status and placed in the adjudication queue. The valid accepted active-parameter coverage is **0/4,849**, and the current coverage denominator includes profile-effect parameters as well as `imm-priors.json` numeric parameters.
 
 ---
 
