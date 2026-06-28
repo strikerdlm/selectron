@@ -7,8 +7,11 @@ import { describe, it, expect, afterEach } from "vitest";
 import { render, fireEvent, cleanup } from "@testing-library/react";
 import { aggregateCrewComposite } from "@/imm/composite";
 import { evaluateCrewGates } from "@/imm/crew-gates";
+import { simulateIMM } from "@/imm/simulate";
 import { PLACEHOLDER_CRITERIA } from "@/data/placeholder-criteria";
-import { defaultScores } from "@/ui/views/CrewComposition";
+import { ACTIVE_MISSIONS } from "@/data/imm-missions";
+import { IMM_KITS } from "@/imm/kits";
+import { defaultScores, sanitizeCrewMembersForActiveCatalog } from "@/ui/views/CrewComposition";
 import { PerScoreCard } from "@/ui/components/PerScoreCard";
 import type { IMMCrewMember } from "@/imm/types";
 
@@ -101,6 +104,40 @@ describe("evaluateCrewGates — demo-threshold flags", () => {
     const crew = [makeMember("Solo", 0.65)];
     const result = evaluateCrewGates(crew, PLACEHOLDER_CRITERIA);
     expect(result.crewVerdict).toBe("clear");
+  });
+
+  it("drops retired Stage A criterion keys before IMM simulation", () => {
+    const dirtyMember = {
+      ...makeMember("Alpha", 0.7),
+      EVA_count: 0,
+      stageAScores: {
+        ...defaultScores({ default: 0.7 }),
+        "cognitive.pvt_b_rt_ms": 350,
+      },
+    };
+
+    const [cleanMember] = sanitizeCrewMembersForActiveCatalog([dirtyMember]);
+    expect(cleanMember.stageAScores).not.toHaveProperty("cognitive.pvt_b_rt_ms");
+
+    const mission = {
+      ...ACTIVE_MISSIONS[0],
+      crewSize: 1,
+      totalEVAs: 0,
+      evaSchedule: [],
+      evaAssignments: undefined,
+    };
+
+    expect(() =>
+      simulateIMM({
+        crew: [cleanMember],
+        mission,
+        kit: IMM_KITS.medium,
+        trials: 5,
+        seed: 123,
+        criteria: PLACEHOLDER_CRITERIA,
+        vulnerabilityCouplingMode: "scenario",
+      }),
+    ).not.toThrow();
   });
 });
 

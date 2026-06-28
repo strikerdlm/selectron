@@ -5,6 +5,13 @@ from fastapi.middleware.cors import CORSMiddleware
 from .models import HealthResponse
 from .routers import fit, validate, sensitivity, conditions, posterior
 
+ALLOWED_ORIGINS = [
+    "http://localhost:5173",
+    "http://127.0.0.1:5173",
+    "http://localhost:4173",
+    "http://127.0.0.1:4173",
+]
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     yield
@@ -13,7 +20,7 @@ app = FastAPI(title="Selectron Calibration API", version="0.1.0", lifespan=lifes
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173", "http://localhost:4173"],
+    allow_origins=ALLOWED_ORIGINS,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

@@ -65,6 +65,34 @@ type PpState = "idle" | "running" | "done" | "api-error" | "compute-error";
 // draws and the uncertainty figure adds nothing, so we skip the fetch+sim entirely.
 const POSTERIOR_KINDS = new Set(["antarctic-station", "analog-controlled"]);
 const ACTIVE_CRITERIA = ACTIVE_CRITERION_CATALOG.criteria;
+const ACTIVE_CRITERION_IDS = new Set(ACTIVE_CRITERIA.map((c) => c.id));
+
+export function filterStageAScoresToActiveCatalog(
+  scores: Record<string, number> | undefined,
+): Record<string, number> | undefined {
+  if (!scores) return scores;
+
+  let changed = false;
+  const filtered: Record<string, number> = {};
+  for (const [criterionId, value] of Object.entries(scores)) {
+    if (ACTIVE_CRITERION_IDS.has(criterionId)) {
+      filtered[criterionId] = value;
+    } else {
+      changed = true;
+    }
+  }
+
+  return changed ? filtered : scores;
+}
+
+export function sanitizeCrewMembersForActiveCatalog(
+  members: readonly IMMCrewMember[],
+): IMMCrewMember[] {
+  return members.map((member) => {
+    const stageAScores = filterStageAScoresToActiveCatalog(member.stageAScores);
+    return stageAScores === member.stageAScores ? member : { ...member, stageAScores };
+  });
+}
 
 // ─── safe default score generation ───────────────────────────────────────────
 // For every criterion, `fraction` ∈ [0, 1] is the archetype's intended
@@ -229,7 +257,7 @@ function persistCrewState(s: CrewState): void {
     localStorage.setItem(
       PERSIST_KEY,
       JSON.stringify({
-        members: s.members,
+        members: sanitizeCrewMembersForActiveCatalog(s.members),
         mission: s.mission,
         kitScenarioId: s.kit.scenarioId,
         trials: s.trials,
@@ -270,7 +298,7 @@ function loadPersistedCrewState(): CrewState | null {
     const mission =
       ACTIVE_MISSIONS.find((m) => m.id === p.mission?.id) ?? INITIAL_STATE.mission;
     return {
-      members: p.members,
+      members: sanitizeCrewMembersForActiveCatalog(p.members),
       mission,
       kit,
       trials: p.trials ?? INITIAL_STATE.trials,
@@ -358,6 +386,11 @@ export function CrewComposition() {
   const ppAbortRef = useRef<AbortController | null>(null);
   const ppWorkerRef = useRef<Worker | null>(null);
 
+  const activeMembers = useMemo(
+    () => sanitizeCrewMembersForActiveCatalog(state.members),
+    [state.members],
+  );
+
   // ── IMM-50: recent saved sessions for the load dropdown ─────────────────
   const [recentSessions, setRecentSessions] = useState<IMMSession[]>([]);
   const reloadRecentSessions = useCallback(async () => {
@@ -374,31 +407,31 @@ export function CrewComposition() {
 
   // ── live crew composite ─────────────────────────────────────────────────
   const composite = useMemo(
-    () => aggregateCrewComposite(state.members, ACTIVE_CRITERIA, state.aggregator),
-    [state.members, state.aggregator],
+    () => aggregateCrewComposite(activeMembers, ACTIVE_CRITERIA, state.aggregator),
+    [activeMembers, state.aggregator],
   );
 
   // Total EVAs is derived from per-member EVA_count; the simulation payload
   // uses this derived mission so runtime validation matches the editable crew.
   const totalEVAs = useMemo(
-    () => state.members.reduce((sum, m) => sum + (m.EVA_count || 0), 0),
-    [state.members],
+    () => activeMembers.reduce((sum, m) => sum + (m.EVA_count || 0), 0),
+    [activeMembers],
   );
   const simulationMission = useMemo(
     () => ({
       ...state.mission,
-      crewSize: state.members.length,
+      crewSize: activeMembers.length,
       totalEVAs,
       evaSchedule: resizeEvaSchedule(state.mission, totalEVAs),
       evaAssignments: undefined,
     }),
-    [state.mission, state.members.length, totalEVAs],
+    [state.mission, activeMembers.length, totalEVAs],
   );
 
   // ── live gate evaluation ────────────────────────────────────────────────
   const gateResult = useMemo(
-    () => evaluateCrewGates(state.members, ACTIVE_CRITERIA),
-    [state.members],
+    () => evaluateCrewGates(activeMembers, ACTIVE_CRITERIA),
+    [activeMembers],
   );
 
   // 2026-06-04: per-(mission-kind, condition) multiplier map for the active
@@ -416,7 +449,7 @@ export function CrewComposition() {
   // (400 ms), race-guarded (previewReqRef), and cleanup-safe; the Worker construction is
   // try/caught so non-browser (test) environments simply no-op.
   useEffect(() => {
-    if (state.members.length === 0) { setPreviewOutcome(undefined); return; }
+    if (activeMembers.length === 0) { setPreviewOutcome(undefined); return; }
     const reqId = ++previewReqRef.current;
     setPreviewState("running");
     const handle = setTimeout(() => {
@@ -443,7 +476,7 @@ export function CrewComposition() {
         if (previewWorkerRef.current === w) previewWorkerRef.current = null;
       };
       w.postMessage({
-        crew: state.members, mission: simulationMission, kit: state.kit,
+        crew: activeMembers, mission: simulationMission, kit: state.kit,
         trials: 5000, seed: state.seed, chiStar: state.chiStar, criteria: ACTIVE_CRITERIA,
         vulnerabilityCouplingMode: state.couplingMode,
         familyBetaScale: state.familyBetaScale,
@@ -455,7 +488,7 @@ export function CrewComposition() {
       clearTimeout(handle);
       if (previewWorkerRef.current) { previewWorkerRef.current.terminate(); previewWorkerRef.current = null; }
     };
-  }, [state.members, simulationMission, state.kit, state.seed, state.chiStar, state.couplingMode, state.familyBetaScale, state.profileEffectMode, state.kindMultiplierMode]);
+  }, [activeMembers, simulationMission, state.kit, state.seed, state.chiStar, state.couplingMode, state.familyBetaScale, state.profileEffectMode, state.kindMultiplierMode]);
 
   // ── I6 (2026-06-04/25): analog incidence-parameter sensitivity ───────────
   // Fetch per-condition λ draws from the Python calibration API, then
@@ -463,12 +496,12 @@ export function CrewComposition() {
   // thread — the sweep is nDraws × trialsPerDraw trials). Mirrors the preview
   // effect above: debounced (400 ms), race-guarded (ppReqRef), cleanup-safe.
   // Two extra teardowns over the preview effect: an AbortController for the fetch
-  // and the pp worker. `state.members` IS in the deps (stale-crew guard); the
+  // and the pp worker. `activeMembers` IS in the deps (stale-crew guard); the
   // memoized `kindMultipliers` is stable per kind so it is safe as a dep.
   useEffect(() => {
     // Gate: only eligible kinds with a non-empty crew. Anything else resets to
     // idle so a stale figure from a prior eligible mission does not linger.
-    if (!POSTERIOR_KINDS.has(state.mission.kind) || state.members.length === 0) {
+    if (!POSTERIOR_KINDS.has(state.mission.kind) || activeMembers.length === 0) {
       setPpState("idle");
       setPpDraws(null);
       setPpOutcome(undefined);
@@ -524,7 +557,7 @@ export function CrewComposition() {
           w.postMessage({
             mode: "posterior-predictive",
             opts: {
-              crew: state.members,
+              crew: activeMembers,
               mission: simulationMission,
               kit: state.kit,
               posterior,
@@ -552,7 +585,7 @@ export function CrewComposition() {
       if (ppAbortRef.current) { ppAbortRef.current.abort(); ppAbortRef.current = null; }
       if (ppWorkerRef.current) { ppWorkerRef.current.terminate(); ppWorkerRef.current = null; }
     };
-  }, [state.members, simulationMission, state.kit, state.seed, state.couplingMode, state.familyBetaScale, state.profileEffectMode, state.kindMultiplierMode, kindMultipliers]);
+  }, [activeMembers, state.mission.kind, simulationMission, state.kit, state.seed, state.couplingMode, state.familyBetaScale, state.profileEffectMode, state.kindMultiplierMode, kindMultipliers]);
 
   function toggleMember(id: string) {
     setExpandedIds((prev) => {
@@ -637,7 +670,7 @@ export function CrewComposition() {
 
   const runSimulation = useCallback(() => {
     if (simState === "running") return;
-    if (state.members.length === 0) return;
+    if (activeMembers.length === 0) return;
 
     // Terminate any previous worker
     if (workerRef.current) {
@@ -675,7 +708,7 @@ export function CrewComposition() {
 
     // Post the simulation payload (simulateIMM options)
     worker.postMessage({
-      crew: state.members,
+      crew: activeMembers,
       mission: simulationMission,
       kit: state.kit,
       trials: state.trials,
@@ -687,7 +720,7 @@ export function CrewComposition() {
       profileEffectMode: state.profileEffectMode,
       kindMultiplierMode: state.kindMultiplierMode,
     });
-  }, [simState, state.members, simulationMission, state.kit, state.trials, state.seed, state.chiStar, state.couplingMode, state.familyBetaScale, state.profileEffectMode, state.kindMultiplierMode]);
+  }, [simState, activeMembers, simulationMission, state.kit, state.trials, state.seed, state.chiStar, state.couplingMode, state.familyBetaScale, state.profileEffectMode, state.kindMultiplierMode]);
 
   // ── worker cleanup on unmount ───────────────────────────────────────────
   useEffect(() => {
@@ -721,7 +754,7 @@ export function CrewComposition() {
         </h2>
         <span className="label text-signal">IMM · Stage A</span>
         <span className="mono text-[13px] text-ink-3 hidden sm:inline">
-          {state.mission.label} · {state.members.length} members
+          {state.mission.label} · {activeMembers.length} members
         </span>
       </div>
       {/* Screen-reader live region for composite updates */}
@@ -758,7 +791,7 @@ export function CrewComposition() {
         const qualityTimeLostHours = readoutOutcome
           ? readoutOutcome.qualityTimeLostHours?.mean
             ?? readoutOutcome.dutyHoursLost?.mean
-            ?? ((100 - readoutOutcome.chi.mean) / 100) * state.mission.durationDays * 24 * state.members.length
+            ?? ((100 - readoutOutcome.chi.mean) / 100) * state.mission.durationDays * 24 * activeMembers.length
           : 0;
         const healthCriterion = readoutOutcome
           ? readoutOutcome.healthCriterionAttainment ?? readoutOutcome.missionSuccess
@@ -788,7 +821,7 @@ export function CrewComposition() {
                     </div>
                   ) : (
                     <span className="mono text-sm text-ink-3">
-                      {state.members.length === 0
+                      {activeMembers.length === 0
                         ? "add crew members to estimate outcomes"
                         : previewState === "running"
                           ? "estimating outcomes (T=5,000)…"
@@ -1191,7 +1224,7 @@ export function CrewComposition() {
           <div className="flex items-center justify-between">
             <h3 className="label text-ink-1 uppercase tracking-cap">
               Crew Members
-              <span className="ml-2 text-ink-3 normal-case tracking-normal">({state.members.length})</span>
+              <span className="ml-2 text-ink-3 normal-case tracking-normal">({activeMembers.length})</span>
             </h3>
             <div className="flex items-center gap-2">
               {/* Add member (manual cap MAX_CREW) */}
@@ -1213,24 +1246,24 @@ export function CrewComposition() {
                 className="mono text-[12px] uppercase tracking-cap text-ink-3 hover:text-ink-1
                            border border-line rounded px-2 py-0.5 transition-colors"
                 onClick={() => {
-                  const allIds = state.members.map((m) => m.id);
+                  const allIds = activeMembers.map((m) => m.id);
                   const allExpanded = allIds.every((id) => expandedIds.has(id));
                   setExpandedIds(allExpanded ? new Set() : new Set(allIds));
                 }}
               >
-                {state.members.every((m) => expandedIds.has(m.id)) ? "collapse all" : "expand all"}
+                {activeMembers.every((m) => expandedIds.has(m.id)) ? "collapse all" : "expand all"}
               </button>
             </div>
           </div>
 
-          {state.members.length === 0 ? (
+          {activeMembers.length === 0 ? (
             <div className="panel flex items-center justify-center h-32">
               <span className="mono text-[14px] text-ink-3 italic">
                 no crew members — add at least one to run the simulation
               </span>
             </div>
           ) : (
-            state.members.map((member, idx) => {
+            activeMembers.map((member, idx) => {
               const memberGate = gateResult.perMemberResults[member.id];
               const memberScore = composite.perMemberScores[idx] ?? 0;
               // Build figures map only when expanded (lazy rendering)
@@ -1482,7 +1515,7 @@ export function CrewComposition() {
               const id = await createIMMSession({
                 candidateId: null,
                 mission: simulationMission,
-                crew: state.members.map((m) => ({ ...m })),
+                crew: activeMembers.map((m) => ({ ...m })),
                 kit: state.kit,
                 trials: state.trials,
                 seed: state.seed,
@@ -1548,7 +1581,7 @@ export function CrewComposition() {
               kit: s.kit as typeof IMM_KITS["issHMS"],
               trials: s.trials,
               seed: s.seed,
-              members: s.crew,
+              members: sanitizeCrewMembersForActiveCatalog(s.crew),
               // F3: restore the operative scenario controls recorded at save
               // time, so a loaded session re-runs under the assumptions that
               // generated its outcome (not the current working-state controls).
@@ -1608,7 +1641,7 @@ export function CrewComposition() {
               kit: state.kit.scenarioId,
               trials: state.trials,
               seed: state.seed,
-              members: state.members,
+              members: activeMembers,
               // F3: operative scenario controls
               couplingMode: state.couplingMode,
               familyBetaScale: state.familyBetaScale,

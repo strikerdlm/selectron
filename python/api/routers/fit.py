@@ -1,4 +1,4 @@
-import asyncio
+import inspect
 import logging
 from fastapi import APIRouter, BackgroundTasks, HTTPException
 
@@ -8,6 +8,22 @@ from selectron.fitter import fit_all_tier_b
 
 logger = logging.getLogger(__name__)
 router = APIRouter()
+
+
+def _fit_all_tier_b_compatible(**kwargs):
+    signature = inspect.signature(fit_all_tier_b)
+    accepts_arbitrary_kwargs = any(
+        p.kind is inspect.Parameter.VAR_KEYWORD
+        for p in signature.parameters.values()
+    )
+    if "run_sampler_diagnostic" not in signature.parameters and not accepts_arbitrary_kwargs:
+        requested = bool(kwargs.pop("run_sampler_diagnostic", False))
+        if requested:
+            logger.warning(
+                "Running selectron.fitter.fit_all_tier_b does not accept "
+                "run_sampler_diagnostic; continuing with analytic fit only",
+            )
+    return fit_all_tier_b(**kwargs)
 
 
 async def _run_fit(
@@ -20,7 +36,7 @@ async def _run_fit(
 ) -> None:
     try:
         store.update(job_id, status="running")
-        report = fit_all_tier_b(
+        report = _fit_all_tier_b_compatible(
             draws=draws,
             tune=draws // 2,
             chains=chains,
