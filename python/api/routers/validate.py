@@ -1,10 +1,13 @@
 import asyncio
 import logging
+from collections.abc import Mapping
 from concurrent.futures import ThreadPoolExecutor
+from typing import Any
+
 from fastapi import APIRouter, BackgroundTasks, HTTPException
 
 from ..job_store import store
-from ..models import ValidateRequest, ValidateJobResponse, JobStatusResponse, ValidateResponse, MetricResult
+from ..models import ValidateRequest, ValidateJobResponse, JobStatusResponse
 from ..dependencies import IMM_PRIORS_PATH
 from selectron.validator import validate_k15
 
@@ -12,6 +15,100 @@ logger = logging.getLogger(__name__)
 router = APIRouter()
 
 _executor = ThreadPoolExecutor(max_workers=2)
+
+
+_MISSING = object()
+
+
+def _metric_value(metric: object, name: str, default: Any = _MISSING) -> Any:
+    if isinstance(metric, Mapping) and name in metric:
+        return metric[name]
+    if hasattr(metric, name):
+        return getattr(metric, name)
+    if default is not _MISSING:
+        return default
+    raise AttributeError(
+        f"{type(metric).__name__!s} object has no attribute or key {name!r}"
+    )
+
+
+def _metric_bounds(
+    metric: object,
+    tuple_name: str,
+    low_name: str,
+    high_name: str,
+) -> tuple[float, float] | None:
+    bounds = _metric_value(metric, tuple_name, None)
+    if bounds is not None:
+        return float(bounds[0]), float(bounds[1])
+
+    low = _metric_value(metric, low_name, None)
+    high = _metric_value(metric, high_name, None)
+    if low is None or high is None:
+        return None
+    return float(low), float(high)
+
+
+def _metric_response(metric: object) -> dict[str, Any]:
+    observed = float(_metric_value(metric, "observed"))
+    reference = float(_metric_value(metric, "reference"))
+    ci95 = _metric_bounds(metric, "ci95", "ci95_low", "ci95_high")
+    if ci95 is None:
+        raise AttributeError(
+            f"{type(metric).__name__!s} object has no CI95 bounds"
+        )
+
+    within_ci95 = bool(
+        _metric_value(metric, "within_ci95", ci95[0] <= observed <= ci95[1])
+    )
+
+    regression = _metric_bounds(
+        metric,
+        "regression",
+        "regression_low",
+        "regression_high",
+    )
+    used_legacy_regression_fallback = regression is None
+    if regression is None:
+        regression = ci95
+
+    within_regression = bool(
+        _metric_value(
+            metric,
+            "within_regression_envelope",
+            regression[0] <= observed <= regression[1],
+        )
+    )
+
+    k15_status = str(
+        _metric_value(
+            metric,
+            "k15_status",
+            "within-k15-ci95" if within_ci95 else "legacy-ci95-only",
+        )
+    )
+    tracking = str(_metric_value(metric, "tracking", ""))
+    if used_legacy_regression_fallback and not tracking:
+        tracking = (
+            "Validator result did not include regression-envelope fields; "
+            "using K15 CI95 as the compatibility envelope."
+        )
+
+    return {
+        "metric": str(_metric_value(metric, "metric")),
+        "scenario": str(_metric_value(metric, "scenario")),
+        "observed": round(observed, 4),
+        "reference": round(reference, 4),
+        "ci95_low": round(ci95[0], 4),
+        "ci95_high": round(ci95[1], 4),
+        "regression_low": round(regression[0], 4),
+        "regression_high": round(regression[1], 4),
+        "delta": round(float(_metric_value(metric, "delta", observed - reference)), 4),
+        "within_ci95": within_ci95,
+        "k15_status": k15_status,
+        "within_regression_envelope": within_regression,
+        "tracking": tracking,
+    }
 
 
 async def _run_validation(job_id: str, trials: int, seed: int) -> None:
@@ -26,23 +123,7 @@ async def _run_validation(job_id: str, trials: int, seed: int) -> None:
                 priors_path=IMM_PRIORS_PATH,
             )
         )
-        metrics = []
-        for m in report.metrics:
-            metrics.append({
-                "metric": m.metric,
-                "scenario": m.scenario,
-                "observed": round(m.observed, 4),
-                "reference": round(m.reference, 4),
-                "ci95_low": round(m.ci95[0], 4),
-                "ci95_high": round(m.ci95[1], 4),
-                "regression_low": round(m.regression[0], 4),
-                "regression_high": round(m.regression[1], 4),
-                "delta": round(m.delta, 4),
-                "within_ci95": m.within_ci95,
-                "k15_status": m.k15_status,
-                "within_regression_envelope": m.within_regression_envelope,
-                "tracking": m.tracking,
-            })
+        metrics = [_metric_response(m) for m in report.metrics]
         store.update(
             job_id,
             status="done",
